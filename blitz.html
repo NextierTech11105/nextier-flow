@@ -58,7 +58,7 @@ svg{display:block;width:100%;min-width:620px;height:auto}
 <div class="wrap">
   <header>
     <h1>The Follow-Up Blitz, on one homeowner's calendar</h1>
-    <p class="lede">Example: the first text goes out <b>Wednesday Oct 14 at 5 PM</b>. If they never reply, this is every text they get. <b>10 total in 30 days. No more, ever.</b> Any reply stops it the same day.</p>
+    <p class="lede">Example: the first text goes out <b>Wednesday Oct 14 at 5 PM</b>. If they never reply, this is every text they get in the cycle. <b>No more than 10 texts in any 30 days.</b> If they reply, the next follow-up text doesn't go out.</p>
   </header>
 
   <section class="panel">
@@ -82,8 +82,8 @@ svg{display:block;width:100%;min-width:620px;height:auto}
 
   <section class="facts">
     <div class="fact"><b>Every 3 days</b><p>Reminder, Reminder 2, Nudge, Qualify. Then the same four again.</p></div>
-    <div class="fact"><b>10 max</b><p>Per person, per 30 days, counting the first text.</p></div>
-    <div class="fact g"><b>Any reply = stop</b><p>A text back, a call, or a voicemail ends it. A person takes over.</p></div>
+    <div class="fact"><b>10 max</b><p>Per person in any 30 days, counting the first text.</p></div>
+    <div class="fact g"><b>Any reply = stop</b><p>A text back, a call, or a voicemail stops the follow-ups. A person takes over.</p></div>
     <div class="fact"><b>500 a day</b><p>Spread across everyone in line, Monday to Saturday.</p></div>
   </section>
 </div>
@@ -141,7 +141,7 @@ const y=v=>B-v*(B-T);
 const el=(tag,attrs,text)=>{const e=document.createElementNS(NS,tag);for(const k in attrs)e.setAttribute(k,attrs[k]);if(text!=null)e.textContent=text;svg.appendChild(e);return e;};
 // axis + week ticks
 el("line",{x1:L,y1:B,x2:R,y2:B,stroke:"#1f2836","stroke-width":1.5});
-[0,7,14,21,28].forEach(d=>{el("line",{x1:x(d),y1:B,x2:x(d),y2:B+6,stroke:"#b9c3d3"});el("text",{x:x(d),y:B+24,fill:"#b9c3d3","font-size":14,"text-anchor":"middle","font-family":"IBM Plex Sans, sans-serif"},"Day "+d);});
+[0,7,14,21].forEach(d=>{el("line",{x1:x(d),y1:B,x2:x(d),y2:B+6,stroke:"#b9c3d3"});el("text",{x:x(d),y:B+24,fill:"#b9c3d3","font-size":14,"text-anchor":"middle","font-family":"IBM Plex Sans, sans-serif"},"Day "+d);});
 el("text",{x:R,y:B+24,fill:"#b9c3d3","font-size":14,"text-anchor":"end","font-family":"IBM Plex Sans, sans-serif"},"Day 30");
 el("text",{x:L,y:T-10,fill:"#b9c3d3","font-size":13,"font-family":"IBM Plex Sans, sans-serif"},"MORE DIRECT ↑");
 // area + line
