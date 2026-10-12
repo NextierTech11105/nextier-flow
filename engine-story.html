@@ -1,0 +1,444 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Data Engine Story Mode</title>
+<meta name="description" content="Story Mode for the Nextier Data Engine: buy box, daily monitors, event signals, skip trace, autotags, the Property Book list, any tool by webhook, and ready blocks that wait at Initial SMS until you press Send.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=DM+Sans:wght@400;500;700&display=swap">
+<style>
+/* Layout: a stage (the app's own screens, animated) beside a narration column, a chapter rail underneath; one chapter at a time. Single committed dark look, continuous with Story Mode and the Nextier app. */
+:root{
+  --bg:#070B18; --panel:#0F1630; --panel-2:#141D3D; --line:#26335F;
+  --fg:#FFFFFF; --soft:#D5DDF0; --orange:#FF8A3D; --orange-soft:#FFB27A;
+  --blue:#4C8DFF; --blue-soft:#9CC0FF; --green:#2FD39A; --ink:#0A1022;
+  --app:#0B0F14; --app-2:#12181F; --app-line:#232B35; --gold:#E2B54A;
+  --display:'Space Grotesk','Trebuchet MS',Arial,sans-serif;
+  --body:'DM Sans','Segoe UI',Arial,sans-serif;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+html,body{height:100%}
+body{margin:0;background:radial-gradient(circle at 70% 20%,#16234D 0%,var(--bg) 60%) fixed,var(--bg);color:var(--fg);font-family:var(--body);font-size:17px;line-height:1.5}
+.wrap{max-width:1240px;margin:0 auto;padding-inline:20px;padding-block:28px 40px;display:flex;flex-direction:column;gap:24px}
+header{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px}
+.brand{font-family:var(--display);font-weight:700;font-size:22px;letter-spacing:.08em}
+.brand span{color:var(--orange)}
+.tag{font-size:13px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--soft);border:1px solid var(--line);border-radius:999px;padding:6px 12px}
+h1{font-family:var(--display);font-weight:700;font-size:clamp(30px,4.4vw,52px);line-height:1.05;margin:0;text-wrap:balance}
+h1 em{font-style:normal;color:var(--orange)}
+.main{display:grid;grid-template-columns:minmax(0,1.5fr) minmax(0,1fr);gap:24px;align-items:stretch}
+@media (max-width:920px){.main{grid-template-columns:minmax(0,1fr)}}
+.stage{position:relative;background:var(--panel);border:1px solid var(--line);border-radius:24px;min-height:500px;overflow:hidden}
+.narr{display:flex;flex-direction:column;gap:16px;padding:8px 4px;min-width:0}
+.step{font-size:13px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--orange)}
+.narr h2{font-family:var(--display);font-size:clamp(26px,3vw,36px);line-height:1.1;margin:0;text-wrap:balance}
+.narr p{margin:0;font-size:19px;max-width:36ch}
+.controls{display:flex;flex-wrap:wrap;gap:10px;margin-top:auto}
+button{font:inherit;font-weight:700;font-size:15px;color:var(--fg);background:var(--panel-2);border:1px solid var(--line);border-radius:12px;padding:10px 16px;cursor:pointer}
+button:hover{border-color:var(--blue)}
+button:focus-visible{outline:3px solid var(--orange);outline-offset:2px}
+#play{background:var(--orange);border-color:var(--orange);color:var(--ink);min-width:120px}
+.rail{display:grid;grid-template-columns:repeat(10,minmax(0,1fr));gap:6px}
+@media (max-width:1000px){.rail{grid-template-columns:repeat(5,minmax(0,1fr))}}
+@media (max-width:520px){.rail{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.rail button{display:flex;flex-direction:column;align-items:flex-start;gap:8px;padding:10px;border-radius:12px;text-align:left;font-size:13px;color:var(--soft);min-width:0}
+.rail .bar{display:block;width:100%;height:4px;border-radius:2px;background:var(--line);overflow:hidden}
+.rail .bar i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--blue),var(--orange))}
+.rail button[aria-current="step"]{color:var(--fg);border-color:var(--orange)}
+.rail .n{font-variant-numeric:tabular-nums;color:var(--orange)}
+.foot{font-size:14px;color:var(--soft)}
+.foot a{color:var(--fg)}
+
+/* ── the app, recreated ─────────────────────────────────────────────── */
+.scene{position:absolute;inset:0;padding:22px;display:flex;align-items:center;justify-content:center}
+.scene[hidden]{display:none!important}
+.app{width:100%;max-width:640px;background:var(--app);border:1px solid var(--app-line);border-radius:16px;overflow:hidden;box-shadow:0 0 60px #4C8DFF22;font-size:14px}
+.abar{display:flex;align-items:center;gap:10px;padding:10px 14px;border-bottom:1px solid var(--app-line);background:#090C10;flex-wrap:wrap}
+.abar b{font-weight:700}
+.ws{border:1px solid #3A4450;border-radius:8px;padding:4px 10px;font-weight:700}
+.pill{font-size:11px;font-weight:700;letter-spacing:.1em;padding:3px 8px;border-radius:999px;background:#0F2A1E;color:#5BE3A8;border:1px solid #1E5A40}
+.abody{padding:14px;display:flex;flex-direction:column;gap:12px}
+.ah{font-family:var(--display);font-weight:700;font-size:18px}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.ac{padding:6px 10px;border-radius:8px;background:var(--app-2);border:1px solid var(--app-line);font-weight:700;font-size:13px;color:#C9D2DC;white-space:nowrap}
+.ac.on{border-color:var(--blue);background:#13254A;color:#fff}
+.ac small{color:#8FA0B3;font-weight:700;margin-left:4px;font-variant-numeric:tabular-nums}
+.ac.hit{border-color:var(--gold);color:#fff}
+
+/* lead builder map */
+.amap{position:relative;height:220px;border-radius:12px;overflow:hidden;border:1px solid var(--app-line);
+  background:
+   repeating-linear-gradient(28deg,transparent 0 38px,#1A222C 38px 40px),
+   repeating-linear-gradient(118deg,transparent 0 52px,#1A222C 52px 54px),
+   radial-gradient(ellipse 60% 50% at 62% 55%,#162016 0%,#10161C 70%)}
+.amap .water{position:absolute;right:-10%;bottom:-30%;width:70%;height:60%;border-radius:50%;background:#0B1624}
+.amap .road{position:absolute;height:3px;background:#3B4552;transform-origin:left center}
+.amap .ctl{position:absolute;left:10px;top:10px;display:flex;flex-direction:column;gap:6px}
+.amap .ctl span{background:#0C1116;border:1px solid var(--app-line);border-radius:8px;padding:4px 10px;font-size:12px;font-weight:700}
+.amap .cnt{position:absolute;right:10px;top:10px;background:#0C1116;border:1px solid var(--app-line);border-radius:999px;padding:6px 12px;font-weight:700;font-variant-numeric:tabular-nums}
+.pin{position:absolute;width:14px;height:14px;margin:-7px 0 0 -7px;border-radius:50%;background:var(--blue);border:2px solid #fff;box-shadow:0 0 12px #4C8DFF}
+.go .pin{animation:drop .5s cubic-bezier(.2,1.4,.4,1) both var(--d)}
+.rows{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.rows .box{border:1px solid #3A4450;border-radius:8px;padding:6px 14px;font-weight:700;font-size:18px;font-variant-numeric:tabular-nums}
+
+/* monitors */
+.mon{display:flex;justify-content:space-between;align-items:center;gap:12px;border:1px solid var(--app-line);border-radius:12px;padding:12px 14px;background:var(--app-2)}
+.mon b{display:block;font-size:15px}
+.mon span{color:#C9D2DC;font-size:13px}
+.on-btn{background:#16A34A;color:#fff;font-weight:700;border-radius:8px;padding:8px 14px;flex:none}
+.presets{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.preset{border:1px solid var(--app-line);border-radius:10px;padding:10px 12px;background:var(--app-2)}
+.preset b{display:block;font-size:14px}.preset span{font-size:12px;color:#AEB9C6}
+.preset.on{border-color:var(--blue);background:#101D38}
+.tick{display:flex;justify-content:space-between;align-items:center;border:1px dashed #3A4450;border-radius:10px;padding:10px 12px;font-weight:700}
+.tick b{font-family:var(--display);font-size:22px;color:var(--green);font-variant-numeric:tabular-nums}
+
+/* signals */
+.sig{display:flex;flex-direction:column;gap:10px;width:min(460px,100%)}
+.sc{display:flex;gap:12px;align-items:center;padding:12px 14px;border-radius:14px;background:var(--panel-2);border:1px solid var(--line)}
+.sc .ic{flex:none;width:40px;height:40px;border-radius:10px;display:grid;place-items:center;font-weight:700;font-family:var(--display)}
+.sc b{display:block}.sc small{color:var(--soft);font-size:14px}
+.sc .new{margin-left:auto;flex:none;font-size:11px;font-weight:700;letter-spacing:.12em;padding:4px 8px;border-radius:999px;background:var(--orange);color:var(--ink)}
+
+/* owner split */
+.split{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:14px;width:min(520px,100%)}
+.lanebox{border-radius:16px;padding:14px;border:1px solid var(--line);background:var(--panel-2);display:flex;flex-direction:column;gap:8px}
+.lanebox h3{margin:0;font-family:var(--display);font-size:17px}
+.lanebox .o{padding:8px 10px;border-radius:10px;background:#0B1126;border:1px solid var(--line);font-size:14px}
+.lanebox.go-l{border-color:var(--green)}.lanebox.go-l h3{color:var(--green)}
+.lanebox.rs-l h3{color:var(--blue-soft)}
+
+/* trace */
+.trace{width:min(440px,100%);display:flex;flex-direction:column;gap:10px}
+.tr{display:flex;align-items:center;gap:10px;padding:12px 14px;border-radius:12px;background:var(--panel-2);border:1px solid var(--line)}
+.tr .ok{margin-left:auto;font-size:12px;font-weight:700;letter-spacing:.1em;padding:4px 10px;border-radius:999px;background:#0F2A1E;color:#5BE3A8;border:1px solid #1E5A40}
+.tr .num{font-family:var(--display);font-size:22px;color:var(--green);font-variant-numeric:tabular-nums}
+
+/* property book list */
+.tbl{border:1px solid var(--app-line);border-radius:10px;overflow:auto;max-height:250px}
+table{border-collapse:collapse;width:100%;min-width:460px;font-size:13px;table-layout:fixed}
+td small{display:block;color:#8FA0B3;font-size:12px}
+td.w{white-space:normal}
+th:nth-child(1){width:34%}th:nth-child(2){width:18%}th:nth-child(3){width:18%}
+th{position:sticky;top:0;background:#0E1319;text-align:left;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:#AEB9C6;padding:8px 10px;border-bottom:1px solid var(--app-line)}
+td{padding:8px 10px;border-bottom:1px solid #1A2129;vertical-align:top;white-space:nowrap}
+tr.sel td{background:#122033}
+.tgs{display:flex;flex-wrap:wrap;gap:4px;white-space:normal}
+.tg{font-size:11px;font-weight:700;padding:2px 7px;border-radius:999px;border:1px solid #3A4450;color:#E5EBF2;background:#161D25}
+.tg.ev{border-color:var(--orange);color:var(--orange-soft)}
+.tg.ok{border-color:#1E5A40;color:#5BE3A8}
+.go .tg{animation:stamp .35s cubic-bezier(.2,1.4,.4,1) both var(--d)}
+.search{border:1px solid var(--app-line);border-radius:8px;padding:8px 10px;color:#8FA0B3;font-size:13px;background:#0E1319}
+.toprow{display:flex;justify-content:space-between;gap:10px;align-items:center;flex-wrap:wrap}
+.enzo{border:1px solid #1E5A40;color:#5BE3A8;border-radius:8px;padding:6px 10px;font-weight:700;font-size:12px}
+
+/* record panel */
+.rec{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.1fr);gap:12px}
+@media (max-width:560px){.rec{grid-template-columns:minmax(0,1fr)}.rec .mini{display:none}}
+.mini{display:flex;flex-direction:column;gap:6px}
+.mini span{padding:7px 9px;border-radius:8px;background:#0E1319;border:1px solid #1A2129;font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.mini span.sel{background:#122033;border-color:#24406A}
+.panel{border:1px solid var(--app-line);border-radius:12px;padding:12px;background:var(--app-2);display:flex;flex-direction:column;gap:10px;min-width:0}
+.panel .addr{font-weight:700;font-size:16px}
+.panel .cty{color:#AEB9C6;font-size:13px}
+.traced{align-self:flex-start;font-size:11px;font-weight:700;letter-spacing:.1em;border:1px solid #3A4450;border-radius:6px;padding:2px 8px}
+.acts{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.acts .ph{font-family:var(--display);font-size:18px;color:#5BE3A8;font-variant-numeric:tabular-nums;margin-right:4px}
+.acts .call{background:#16A34A;color:#fff;border-radius:8px;padding:6px 12px;font-weight:700}
+.acts .bt{border:1px solid #3A4450;border-radius:8px;padding:6px 10px;font-weight:700}
+.clock{border:1px solid #4A3A12;background:#1A160B;border-radius:10px;padding:10px}
+.clock b{font-size:11px;letter-spacing:.14em;color:var(--gold)}
+.clock .g{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px 10px;margin-top:6px;font-size:12px}
+.clock .g small{display:block;color:#AEB9C6;letter-spacing:.08em;text-transform:uppercase;font-size:10px}
+.clock .g span{font-weight:700}
+
+/* webhook */
+.hook{display:grid;grid-template-columns:minmax(0,1.1fr) 70px minmax(0,1fr);gap:8px;align-items:center;width:100%;max-width:640px}
+@media (max-width:560px){.hook{grid-template-columns:minmax(0,1fr)}.hook .wire{display:none}}
+pre{margin:0;padding:12px;border-radius:12px;background:#0B1126;border:1px solid var(--line);font-size:12px;line-height:1.45;color:#CFE0FF;overflow:auto;white-space:pre}
+pre .k{color:var(--blue-soft)}pre .s{color:var(--orange-soft)}
+.wire{position:relative;height:120px}
+.wire i{position:absolute;left:0;width:10px;height:10px;border-radius:50%;background:var(--orange-soft);box-shadow:0 0 10px var(--orange);animation:tf 1.8s linear infinite;animation-delay:var(--d)}
+.wire i:nth-child(1){top:10px}.wire i:nth-child(2){top:40px}.wire i:nth-child(3){top:70px}.wire i:nth-child(4){top:100px}
+.dest{display:flex;flex-direction:column;gap:6px}
+.dest span{padding:8px 12px;border-radius:10px;background:var(--panel-2);border:1px solid var(--line);font-weight:700;font-size:14px}
+.go .dest span{animation:lit .5s ease-out both var(--d)}
+
+/* launch */
+.launch{display:flex;flex-direction:column;gap:10px}
+.blk{display:flex;justify-content:space-between;align-items:center;gap:10px;border:1px solid var(--app-line);border-radius:12px;padding:12px 14px;background:var(--app-2);flex-wrap:wrap}
+.blk b{display:block;font-size:15px}
+.blk span{font-size:13px;color:#C9D2DC}
+.ready{font-size:11px;font-weight:700;letter-spacing:.12em;padding:4px 10px;border-radius:999px;background:#0F2A1E;color:#5BE3A8;border:1px solid #1E5A40}
+.send{align-self:center;background:var(--orange);color:var(--ink);font-weight:700;font-size:18px;border-radius:14px;padding:14px 30px;box-shadow:0 0 0 0 #FF8A3D88}
+.go .send{animation:wait 1.8s ease-in-out infinite 1.5s}
+.halt{text-align:center;font-weight:700;color:var(--soft);font-size:14px}
+
+/* entrances: elements rest visible; .go replays them */
+.go .in1{animation:up .5s ease-out both .1s}.go .in2{animation:up .5s ease-out both .8s}
+.go .in3{animation:up .5s ease-out both 1.5s}.go .in4{animation:up .5s ease-out both 2.2s}
+.go .pop{animation:pop .45s cubic-bezier(.2,1.4,.4,1) both 2s}
+@keyframes up{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+@keyframes pop{from{opacity:0;transform:scale(.6)}to{opacity:1;transform:none}}
+@keyframes drop{from{opacity:0;transform:translateY(-22px) scale(.6)}to{opacity:1;transform:none}}
+@keyframes stamp{from{opacity:0;transform:scale(1.8)}to{opacity:1;transform:none}}
+@keyframes tf{0%{left:0;opacity:0}20%{opacity:1}100%{left:60px;opacity:0}}
+@keyframes lit{0%{background:var(--panel-2)}100%{background:#2A1A10;border-color:var(--orange);box-shadow:0 0 14px #FF8A3D55}}
+@keyframes wait{0%,100%{box-shadow:0 0 0 0 #FF8A3D66}50%{box-shadow:0 0 0 14px #FF8A3D00}}
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}}
+</style>
+</head><body>
+<div class="wrap">
+  <header>
+    <div class="brand">NEXT<span>IER</span> · DATA ENGINE</div>
+    <div class="tag">Story mode · Illustrative example</div>
+  </header>
+  <h1>From a buy box to <em>ready-to-launch leads.</em></h1>
+
+  <div class="main">
+    <div class="stage" id="stage" aria-live="polite">
+
+      <!-- 1 · BUY BOX → LEAD BUILDER -->
+      <div class="scene">
+        <div class="app">
+          <div class="abar"><b>Workspace</b><span class="ws">Your Market · Real Estate</span><span class="pill">REAL ESTATE</span><span style="margin-left:auto;color:#AEB9C6">Lead Builder</span></div>
+          <div class="abody">
+            <div class="chips in1" id="segs">
+              <span class="ac">Pre-Foreclosure</span><span class="ac">Vacant Land</span><span class="ac">High Equity</span><span class="ac">Inherited</span><span class="ac">Expired MLS</span><span class="ac">Absentee</span><span class="ac">Long-Term Owner</span><span class="ac">Tax Delinquent</span><span class="ac">Cash Buyer</span>
+            </div>
+            <div class="amap in2" id="map1">
+              <div class="water"></div>
+              <div class="ctl"><span>Dark</span><span>Lot size</span></div>
+              <div class="cnt"><span id="pcount">0</span> properties</div>
+            </div>
+            <div class="rows in3"><b>Rows to build</b><span class="box">2,000</span><span style="color:#C9D2DC">one block, built from your buy box</span></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 2 · PROPERTY MONITORS -->
+      <div class="scene" hidden>
+        <div class="app">
+          <div class="abar"><b>Workspace</b><span class="ws">Your Market · Real Estate</span><span class="pill">REAL ESTATE</span><span style="margin-left:auto;color:#AEB9C6">Property Monitors</span></div>
+          <div class="abody">
+            <div class="mon in1"><div><b>Daily sweep into Initial SMS</b><span>New monitor leads go into the book and into one block every morning. Nothing sends until you press Send.</span></div><span class="on-btn">ON</span></div>
+            <div class="presets in2">
+              <div class="preset on"><b>Pre-Foreclosure</b><span>Newly filed properties</span></div>
+              <div class="preset"><b>Vacant Absentee</b><span>Vacant, non-owner occupied</span></div>
+              <div class="preset"><b>High-Equity Absentee</b><span>Equity plus absentee owner</span></div>
+              <div class="preset"><b>Inherited Properties</b><span>Probate and inherited records</span></div>
+            </div>
+            <div class="chips in3"><span class="ac">NY Boroughs</span><span class="ac on">Nassau + Suffolk</span><span class="ac">Westchester</span><span class="ac">South Florida</span><span class="ac on">Daily</span><span class="ac">Weekly</span></div>
+            <div class="tick in4"><span>Only new matches, this morning</span><b id="newtoday">+0</b></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 3 · EVENT SIGNALS -->
+      <div class="scene" hidden>
+        <div class="sig">
+          <div class="sc in1"><span class="ic" style="background:#2A1A10;color:var(--orange)">LP</span><div><b>Lis pendens filed</b><small>18 Birch Ln, Commack · filed this week</small></div><span class="new">NEW</span></div>
+          <div class="sc in2"><span class="ic" style="background:#1A2A55;color:var(--blue-soft)">IN</span><div><b>Inherited · estate transfer</b><small>402 Hawthorne Ave, Hempstead</small></div><span class="new">NEW</span></div>
+          <div class="sc in3"><span class="ic" style="background:#13261D;color:var(--green)">EX</span><div><b>Listing expired</b><small>9 Maple Ct, Yonkers · off market 3 days</small></div><span class="new">NEW</span></div>
+          <div class="sc in4"><span class="ic" style="background:#26201A;color:var(--gold)">TX</span><div><b>Tax delinquent</b><small>1260 NW 7th St, Miami · second year</small></div><span class="new">NEW</span></div>
+        </div>
+      </div>
+
+      <!-- 4 · OWNER TYPE -->
+      <div class="scene" hidden>
+        <div class="split">
+          <div class="lanebox go-l in1"><h3>People → go</h3><span class="o">M. Alvarez · owner-occupant</span><span class="o">Estate of R. Klein · heirs</span><span class="o">J. Patel · owns 3</span><span class="o">D. Okafor · absentee</span></div>
+          <div class="lanebox rs-l in2"><h3>Entities → research</h3><span class="o">Shore Holdings LLC</span><span class="o">Birchwood Family Trust</span><span class="o" style="color:var(--soft)">Find the person behind it first</span></div>
+        </div>
+      </div>
+
+      <!-- 5 · SKIP TRACE -->
+      <div class="scene" hidden>
+        <div class="trace">
+          <div class="tr in1"><b>M. Alvarez · 18 Birch Ln</b></div>
+          <div class="tr in2">Mobile found<span class="num" style="margin-left:auto">(631) 555-0142</span></div>
+          <div class="tr in3">Line type: mobile<span class="ok">CHECKED</span></div>
+          <div class="tr in3">Do-not-call and opt-outs<span class="ok">CLEAR</span></div>
+          <div class="tr in4">Traced only when the record had no number<span class="ok">NO WASTE</span></div>
+        </div>
+      </div>
+
+      <!-- 6 · AUTOTAGS → PROPERTY BOOK LIST -->
+      <div class="scene" hidden>
+        <div class="app">
+          <div class="abar"><b>Workspace</b><span class="ws">Your Market · Real Estate</span><span class="pill">REAL ESTATE</span><span style="margin-left:auto;color:#AEB9C6">Property Book</span></div>
+          <div class="abody">
+            <div class="toprow in1"><span class="ah">Property Book <span style="font-weight:500;color:#C9D2DC;font-size:15px">2,000 ready</span></span><span class="enzo">Export to your dialer · CSV</span></div>
+            <div class="chips in1">
+              <span class="ac hit">Pre-foreclosure<small>412</small></span><span class="ac hit">Death / inherited<small>188</small></span><span class="ac">Tax delinquent<small>96</small></span><span class="ac">Vacant<small>143</small></span><span class="ac">50×100 lot or bigger<small>301</small></span><span class="ac">Absentee<small>764</small></span><span class="ac">Owns &gt;1<small>229</small></span><span class="ac">High equity<small>655</small></span>
+            </div>
+            <div class="tbl in2">
+              <table>
+                <thead><tr><th>Property</th><th>Owner</th><th>Mobile</th><th>Autotags</th></tr></thead>
+                <tbody id="book"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 7 · ONE RECORD -->
+      <div class="scene" hidden>
+        <div class="app">
+          <div class="abar"><b>Workspace</b><span class="ws">Your Market · Real Estate</span><span class="pill">REAL ESTATE</span><span style="margin-left:auto;color:#AEB9C6">Property Book</span></div>
+          <div class="abody">
+            <div class="rec">
+              <div class="mini in1"><span class="sel">18 Birch Ln, Commack, NY</span><span>402 Hawthorne Ave, Hempstead, NY</span><span>77 Sunrise Hwy, Islip, NY</span><span>9 Maple Ct, Yonkers, NY</span><span>1260 NW 7th St, Miami, FL</span><span>55 Smithtown Blvd, Nesconset, NY</span></div>
+              <div class="panel in2">
+                <div><div class="addr">18 Birch Ln, Commack, NY</div><div class="cty">Suffolk, NY · M. Alvarez</div></div>
+                <span class="traced">TRACED</span>
+                <div class="acts"><span class="ph">(631) 555-0142</span><span class="call">CALL</span><span class="bt">Text</span><span class="bt">Mark worked</span></div>
+                <div class="tgs"><span class="tg ev">Pre-foreclosure</span><span class="tg">Owner-occupied</span><span class="tg">High equity</span><span class="tg ok">Mobile verified</span><span class="tg">Score 87</span></div>
+                <div class="clock in3"><b>THE CLOCK</b>
+                  <div class="g"><div><small>Notice origin</small><span>Lis pendens</span></div><div><small>Most recent notice</small><span>Filed this week</span></div><div><small>In it for</small><span>4 days</span></div><div><small>Auction</small><span>Not set</span></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 8 · WEBHOOK → TOOL OF CHOICE -->
+      <div class="scene" hidden>
+        <div class="hook">
+          <pre class="in1"><span class="k">POST</span> your-webhook-url
+{
+  <span class="k">"event"</span>: <span class="s">"lead.ready"</span>,
+  <span class="k">"block"</span>: <span class="s">"Suffolk · Pre-foreclosure"</span>,
+  <span class="k">"owner"</span>: <span class="s">"M. Alvarez"</span>,
+  <span class="k">"mobile"</span>: <span class="s">"+16315550142"</span>,
+  <span class="k">"tags"</span>: [<span class="s">"pre_foreclosure"</span>,
+           <span class="s">"owner_occupied"</span>,
+           <span class="s">"high_equity"</span>],
+  <span class="k">"signal"</span>: <span class="s">"lis_pendens"</span>,
+  <span class="k">"score"</span>: 87
+}</pre>
+          <div class="wire" aria-hidden="true"><i style="--d:0s"></i><i style="--d:.45s"></i><i style="--d:.9s"></i><i style="--d:1.35s"></i></div>
+          <div class="dest">
+            <span style="--d:.6s">Your CRM</span><span style="--d:1s">Your dialer</span><span style="--d:1.4s">Contact Center</span><span style="--d:1.8s">Initial SMS</span><span style="--d:2.2s">Any webhook · Zapier · Make</span><span style="--d:2.6s">CSV · API · MCP</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- 9 · READY BLOCKS, STOPPED -->
+      <div class="scene" hidden>
+        <div class="app">
+          <div class="abar"><b>Workspace</b><span class="ws">Your Market · Real Estate</span><span class="pill">REAL ESTATE</span><span style="margin-left:auto;color:#AEB9C6">Initial SMS</span></div>
+          <div class="abody launch">
+            <div class="blk in1"><div><b>Suffolk · Pre-foreclosure · this morning</b><span>2,000 leads · skip traced · auto-tagged · checked</span></div><span class="ready">READY</span></div>
+            <div class="blk in2"><div><b>Nassau · Inherited</b><span>1,240 leads · skip traced · auto-tagged · checked</span></div><span class="ready">READY</span></div>
+            <div class="blk in3"><div><b>Westchester · Expired listings</b><span>860 leads · skip traced · auto-tagged · checked</span></div><span class="ready">READY</span></div>
+            <span class="send in4">Send</span>
+            <div class="halt in4">0 sent. Nothing goes out until a person presses Send.</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 10 · YOURS -->
+      <div class="scene" hidden>
+        <div class="sig">
+          <div class="sc in1"><span class="ic" style="background:#1A2A55;color:var(--blue-soft)">DB</span><div><b>Your own database</b><small>Every lead, tag and signal, owned by you</small></div></div>
+          <div class="sc in2"><span class="ic" style="background:#13261D;color:var(--green)">AM</span><div><b>Every morning, again</b><small>Only new matches. Tags re-stamp when data changes.</small></div></div>
+          <div class="sc in3"><span class="ic" style="background:#2A1A10;color:var(--orange)">GO</span><div><b>Your move</b><small>Text it, call it, dial it, or send it to your CRM</small></div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="narr">
+      <div class="step" id="step">Chapter 1 of 10</div>
+      <h2 id="ttl"></h2>
+      <p id="txt"></p>
+      <div class="controls">
+        <button id="prev" type="button">Back</button>
+        <button id="play" type="button">Play story</button>
+        <button id="next" type="button">Next</button>
+      </div>
+    </div>
+  </div>
+
+  <nav class="rail" id="rail" aria-label="Chapters"></nav>
+  <div class="foot">Illustrative story. Names, addresses, phone numbers (555) and counts are examples, shown on the Nextier app's own screens. Use the arrow keys or the chapter buttons to move through it. · <a href="dataengine.html">The Data Engine</a> · <a href="story.html">Story Mode: the full system</a></div>
+</div>
+
+<script>
+const CH=[
+ {k:'Buy box',t:'Start with your buy box',x:'Pick the segments that make a deal for you: pre-foreclosure, inherited, expired, absentee, high equity, vacant land. The Lead Builder maps every match in your market and builds them into one block.'},
+ {k:'Monitors',t:'It watches every morning',x:'Property Monitors re-scan your market daily. Only new matches come in, and the daily sweep drops them into the book and into one block, ready for the morning.'},
+ {k:'Signals',t:'The reason to move',x:'A filing, an inheritance, an expired listing, a tax bill. Each new event lands as a signal that says why this owner might act now.'},
+ {k:'Owner',t:'Right owner, right play',x:'People go first. LLCs and trusts go to research, so the next step is finding the person behind them, not texting a company.'},
+ {k:'Trace',t:'No number, no conversation',x:'The owner’s mobile is traced only when the record doesn’t already have one. Every number is checked for line type, do-not-call and opt-outs.'},
+ {k:'Autotags',t:'Tagged the moment it lands',x:'Every lead is stamped with its signal, segment, area, property facts and a pursuit score. The Property Book shows the whole list, filterable by every tag.'},
+ {k:'Record',t:'Everything on one record',x:'Open any row: the verified mobile, one-click Call and Text, Mark worked, every tag, and The Clock, which tracks how long the notice has been running.'},
+ {k:'Any tool',t:'Into your tool of choice',x:'Each ready lead can fire a webhook into the tool you already use: your CRM, your dialer, Zapier or Make, or our Contact Center and Initial SMS. Or pull it by CSV, API or MCP.'},
+ {k:'Prepped',t:'Then it stops',x:'Ready blocks wait at Initial SMS: skip traced, auto-tagged and checked. Zero texts go out until a person presses Send.'},
+ {k:'Yours',t:'Yours, every morning',x:'Your own database, refreshed daily. The engine finds and prepares; you decide what happens next.'}
+];
+const DUR=7000;
+
+/* scene 1: pins + count + segment highlight */
+const map1=document.getElementById('map1');
+const ROADS=[[5,62,90,-8],[12,20,70,14],[40,95,60,-62],[60,8,55,48]];
+ROADS.forEach(([l,t,w,a])=>{const r=document.createElement('i');r.className='road';r.style.left=l+'%';r.style.top=t+'%';r.style.width=w+'%';r.style.transform='rotate('+a+'deg)';map1.appendChild(r)});
+const PINS=[[34,38],[42,46],[47,40],[55,52],[61,44],[38,58],[66,60],[52,30],[72,48],[45,62],[58,66],[30,50]];
+PINS.forEach(([x,y],i)=>{const p=document.createElement('i');p.className='pin';p.style.left=x+'%';p.style.top=y+'%';p.style.setProperty('--d',(1+i*.18)+'s');map1.appendChild(p)});
+const segs=[...document.querySelectorAll('#segs .ac')];
+
+/* scene 6: the list */
+const ROWS=[
+ ['18 Birch Ln, Commack, NY','Suffolk','M. Alvarez','(631) 555-0142',[['Pre-foreclosure','ev'],['Owner-occupied',''],['High equity','']]],
+ ['402 Hawthorne Ave, Hempstead, NY','Nassau','Estate of R. Klein','(516) 555-0187',[['Inherited','ev'],['Absentee',''],['Owns >1','']]],
+ ['77 Sunrise Hwy, Islip, NY','Suffolk','J. Patel','(631) 555-0110',[['High equity',''],['Owns >1',''],['Long-term owner','']]],
+ ['9 Maple Ct, Yonkers, NY','Westchester','D. Okafor','(914) 555-0163',[['Expired listing','ev'],['Vacant',''],['50×100 lot','']]],
+ ['1260 NW 7th St, Miami, FL','Miami-Dade','L. Ortiz','(305) 555-0129',[['Tax delinquent','ev'],['Absentee','']]],
+ ['55 Smithtown Blvd, Nesconset, NY','Suffolk','K. Brennan','(631) 555-0175',[['Pre-foreclosure','ev'],['2nd lien','']]],
+ ['33 Harbor Rd, Babylon, NY','Suffolk','Shore Holdings LLC','—',[['Entity · research','']]]
+];
+const book=document.getElementById('book');
+ROWS.forEach((r,i)=>{const tr=document.createElement('tr');if(i===0)tr.className='sel';
+ tr.innerHTML='<td class="w">'+r[0]+'<small>'+r[1]+'</small></td><td class="w">'+r[2]+'</td><td>'+r[3]+'</td><td><div class="tgs"></div></td>';
+ const box=tr.querySelector('.tgs');r[4].forEach(([t,c],j)=>{const s=document.createElement('span');s.className='tg'+(c?' '+c:'');s.textContent=t;s.style.setProperty('--d',(1.2+i*.25+j*.12)+'s');box.appendChild(s)});
+ if(r[3]!=='—'){const s=document.createElement('span');s.className='tg ok';s.textContent='Mobile verified';s.style.setProperty('--d',(1.5+i*.25)+'s');box.appendChild(s)}
+ book.appendChild(tr)});
+
+/* counters */
+let timers=[];
+function countUp(el,to,prefix,ms){const t0=performance.now();const f=now=>{const p=Math.min(1,(now-t0)/ms);el.textContent=prefix+Math.round(to*p).toLocaleString('en-US');if(p<1)timers.push(requestAnimationFrame(f))};timers.push(requestAnimationFrame(f))}
+
+/* player */
+const scenes=[...document.querySelectorAll('.scene')];
+const rail=document.getElementById('rail');
+const stepEl=document.getElementById('step'),ttl=document.getElementById('ttl'),txt=document.getElementById('txt'),playBtn=document.getElementById('play');
+CH.forEach((c,i)=>{const b=document.createElement('button');b.type='button';b.innerHTML='<span class="bar"><i></i></span><span><span class="n">'+String(i+1).padStart(2,'0')+'</span> '+c.k+'</span>';b.addEventListener('click',()=>go(i));rail.appendChild(b)});
+const railBtns=[...rail.children];
+let cur=0,playing=false,t0=0,raf=0,segT=0;
+function go(i){
+  cur=(i+CH.length)%CH.length;
+  scenes.forEach((s,j)=>{s.hidden=j!==cur;s.classList.remove('go')});
+  const s=scenes[cur];void s.offsetWidth;s.classList.add('go');
+  stepEl.textContent='Chapter '+(cur+1)+' of '+CH.length;ttl.textContent=CH[cur].t;txt.textContent=CH[cur].x;
+  railBtns.forEach((b,j)=>{b.querySelector('.bar i').style.width=j<cur?'100%':'0';if(j===cur)b.setAttribute('aria-current','step');else b.removeAttribute('aria-current')});
+  timers.forEach(cancelAnimationFrame);timers=[];clearInterval(segT);
+  if(cur===0){segs.forEach(e=>e.classList.remove('on'));let k=0;const pick=[0,3,4,5,2];segT=setInterval(()=>{if(k<pick.length){segs[pick[k]].classList.add('on');k++}},450);countUp(document.getElementById('pcount'),2000,'',3200)}
+  if(cur===1){countUp(document.getElementById('newtoday'),37,'+',2600)}
+  t0=performance.now();
+}
+function tick(now){
+  if(!playing)return;
+  const p=Math.min(1,(now-t0)/DUR);
+  railBtns[cur].querySelector('.bar i').style.width=(p*100)+'%';
+  if(p>=1){if(cur===CH.length-1){setPlay(false);return}go(cur+1)}
+  raf=requestAnimationFrame(tick);
+}
+function setPlay(on){playing=on;playBtn.textContent=on?'Pause':(cur===CH.length-1?'Replay':'Play story');cancelAnimationFrame(raf);if(on){if(cur===CH.length-1)go(0);t0=performance.now();raf=requestAnimationFrame(tick)}}
+playBtn.addEventListener('click',()=>setPlay(!playing));
+document.getElementById('next').addEventListener('click',()=>{go(cur+1);if(playing)t0=performance.now()});
+document.getElementById('prev').addEventListener('click',()=>{go(cur-1);if(playing)t0=performance.now()});
+document.addEventListener('keydown',e=>{if(e.key==='ArrowRight')go(cur+1);else if(e.key==='ArrowLeft')go(cur-1);else if(e.key===' '&&e.target===document.body){e.preventDefault();setPlay(!playing)}});
+// Deep link: engine-story.html#ch6 opens on chapter 6.
+const m=/^#ch(\d+)$/.exec(location.hash||'');
+go(m?Math.min(Math.max(+m[1],1),CH.length)-1:0);
+</script>
+</body></html>
