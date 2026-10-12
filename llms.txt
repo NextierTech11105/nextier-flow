@@ -10,6 +10,7 @@
 
 ## The system
 - 01 Data Engine (foundation): finds the property, the owner and the reason; skip traced, auto-tagged, staged ready to launch. Story Mode at dataengine.html#story.
+- Signal calendar (dataengine.html#calendar): new event signals land every morning, get skip traced, prepped for Initial SMS and stacked into one block; send evenings launch the freshest first; an owner moving up the distress ladder counts as new again; when the month turns, last month's signals roll to the dialer pool.
 - 02 Deal Origination Engine (layer in): initial SMS, reply classification, prioritization, adaptive routed execution.
 - 03 NXTPOST (amplify): floods social, search and AI answers.
 - Clients own it: their foundational database on DigitalOcean, managed by Nextier; logic, reasoning and contextual intelligence evolve together.
