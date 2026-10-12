@@ -33,7 +33,8 @@ svg{display:block;width:100%;min-width:620px;height:auto}
 .day .n{font-size:14px;color:var(--muted);font-variant-numeric:tabular-nums}
 .day.out{opacity:.35}
 .day.sun{background:#07090d}
-.day.sun .n::after{content:" · off";font-size:12px}
+.day.sun .n::after{content:" · no follow-ups";font-size:12px}
+@media (max-width:560px){.day.sun .n::after{content:" · off"}}
 .chip{border-radius:6px;padding:4px 6px;font-size:13px;font-weight:600;line-height:1.25;overflow-wrap:anywhere}
 .chip small{display:block;font-weight:400;color:var(--muted);font-size:12px}
 .t-init{background:var(--blue);color:#fff}
@@ -50,7 +51,22 @@ svg{display:block;width:100%;min-width:620px;height:auto}
 .fact.g{border-top-color:var(--green)}
 .fact b{display:block;font-family:var(--display);font-size:30px;line-height:1.05;font-weight:700}
 .fact p{margin:4px 0 0;color:var(--muted);font-size:15px}
-@media (max-width:560px){.day{min-height:78px;padding:4px}.chip{font-size:12px;padding:3px 4px}.chip small{display:none}}
+.week{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:8px;align-items:end}
+.wd{display:flex;flex-direction:column;align-items:center;gap:6px;min-width:0}
+.bars{height:170px;display:flex;align-items:flex-end;gap:4px}
+.bar{width:22px;border-radius:4px 4px 0 0;position:relative}
+.bar.drip{background:var(--blue-soft);border:1px solid var(--blue);border-bottom:none}
+.bar.init{background:var(--blue)}
+.bar span{position:absolute;bottom:100%;left:50%;transform:translateX(-50%);font-size:12px;color:var(--fg);padding-bottom:2px;white-space:nowrap;font-variant-numeric:tabular-nums}
+.wd .lbl{font-size:13px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.wk-total{display:flex;flex-wrap:wrap;gap:8px 22px;margin-top:14px;font-size:15px;color:var(--muted)}
+.wk-total b{color:var(--fg);font-variant-numeric:tabular-nums}
+.line-stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px;margin-bottom:12px}
+.stat b{display:block;font-family:var(--display);font-size:40px;line-height:1;font-weight:700;font-variant-numeric:tabular-nums}
+.stat p{margin:4px 0 0;color:var(--muted);font-size:15px}
+.note{color:var(--muted);font-size:15px;margin:0;max-width:70ch}
+.note b{color:var(--fg)}
+@media (max-width:560px){.day{min-height:78px;padding:4px}.chip{font-size:12px;padding:3px 4px}.chip small{display:none}.bar{width:14px}.bar span{font-size:10px}}
 </style>
 </head>
 <body>
@@ -58,8 +74,29 @@ svg{display:block;width:100%;min-width:620px;height:auto}
 <div class="wrap">
   <header>
     <h1>The Follow-Up Blitz, on one homeowner's calendar</h1>
-    <p class="lede">Example: the first text goes out <b>Wednesday Oct 14 at 5 PM</b>. If they never reply, this is every text they get in the cycle. <b>No more than 10 texts in any 30 days.</b> If they reply, the next follow-up text doesn't go out.</p>
+    <p class="lede">Example: the first text goes out <b>Wednesday Oct 14 at 5 PM</b>. If they never reply, this is the fastest their follow-ups can go. <b>No more than 10 texts in any 30 days.</b> If they reply, the next follow-up text doesn't go out.</p>
   </header>
+
+  <section class="panel">
+    <h2>The week</h2>
+    <p class="sub">First texts go out on four evenings. Follow-ups run in the background on weekdays, and stop at 5 PM on first-text evenings so the evening send gets the phone lines.</p>
+    <div class="week" id="week"></div>
+    <div class="wk-total">
+      <span>First texts: up to <b>8,000</b> a week (2,000 × Wed Thu Fri Sat)</span>
+      <span>Follow-ups: <b>2,500</b> a week (500 × Mon to Fri)</span>
+    </div>
+  </section>
+
+  <section class="panel">
+    <h2>The whole line</h2>
+    <div class="line-stats">
+      <div class="stat"><b>36,107</b><p>people waiting for a follow-up today (EHOA)</p></div>
+      <div class="stat"><b>2,500</b><p>follow-ups a week, shared by everyone in line</p></div>
+      <div class="stat"><b>~14 weeks</b><p>for everyone in line to get one follow-up</p></div>
+    </div>
+    <p class="note">Each day, <b>250</b> follow-ups go to the newest people (first text in the last 21 days) and <b>250</b> go to everyone older, the least-texted first. The calendar below is the fastest one person can go. Most people in a line this long get a follow-up every few months. New people join after every send night.</p>
+    <p class="note" style="margin-top:8px">Who's in the line: everyone whose first text was delivered and who hasn't answered, plus people who answered once and then went quiet. Added Oct 12: <b>3,335</b> who had been missed and <b>280</b> who went quiet.</p>
+  </section>
 
   <section class="panel">
     <h2>How direct the ask gets</h2>
@@ -68,8 +105,8 @@ svg{display:block;width:100%;min-width:620px;height:auto}
   </section>
 
   <section class="panel">
-    <h2>The calendar</h2>
-    <p class="sub">Texts go out during the day. A text that would land on Sunday waits for Monday, and the rest move back with it.</p>
+    <h2>One homeowner, fastest pace</h2>
+    <p class="sub">Follow-ups go out Monday to Friday, during the day. One that would land on a weekend waits for Monday, and the rest move back with it.</p>
     <div class="cal" id="cal"></div>
   </section>
 
@@ -84,12 +121,30 @@ svg{display:block;width:100%;min-width:620px;height:auto}
     <div class="fact"><b>Every 3 days</b><p>Reminder, Reminder 2, Nudge, Qualify. Then the same four again.</p></div>
     <div class="fact"><b>10 max</b><p>Per person in any 30 days, counting the first text.</p></div>
     <div class="fact g"><b>Any reply = stop</b><p>A text back, a call, or a voicemail stops the follow-ups. A person takes over.</p></div>
-    <div class="fact"><b>500 a day</b><p>Spread across everyone in line, Monday to Saturday.</p></div>
+    <div class="fact" style="border-top-color:#ff5a5f"><b>The only "never"</b><p>STOP, wrong number, or the property already sold. Those people are never texted again.</p></div>
+    <div class="fact"><b>500 a day</b><p>Spread across everyone in line, Monday to Friday.</p></div>
   </section>
 </div>
 
 <script>
-// The texts, with the day each one actually lands on in this example (Sunday slides to Monday).
+// The week: follow-ups (500, Mon-Fri) and first texts (up to 2,000, Wed-Sat evenings).
+const WEEK = [["Mon",500,0],["Tue",500,0],["Wed",500,2000],["Thu",500,2000],["Fri",500,2000],["Sat",0,2000],["Sun",0,0]];
+const wk = document.getElementById("week");
+WEEK.forEach(([d,drip,init])=>{
+  const col=document.createElement("div"); col.className="wd";
+  const bars=document.createElement("div"); bars.className="bars";
+  [["drip",drip,"follow-ups"],["init",init,"first texts"]].forEach(([k,v,name])=>{
+    const b=document.createElement("div"); b.className="bar "+k;
+    b.style.height = (v/2000*150)+"px";
+    b.setAttribute("aria-label", `${d}: ${v} ${name}`);
+    if(v){const s=document.createElement("span"); s.textContent=v.toLocaleString("en-US"); b.appendChild(s);}
+    bars.appendChild(b);
+  });
+  const l=document.createElement("div"); l.className="lbl"; l.textContent=d;
+  col.appendChild(bars); col.appendChild(l); wk.appendChild(col);
+});
+
+// The texts, with the day each one actually lands on in this example (weekends slide to Monday).
 const START = new Date(2026, 9, 14); // Wed Oct 14 2026
 const TEXTS = [
   {d:0,  kind:"init",  name:"First text",  says:"5 PM evening send"},
@@ -103,23 +158,24 @@ const TEXTS = [
   {d:24, kind:"q",     name:"Qualify",     says:"Keep, sell, not sure?"},
   {d:27, kind:"close", name:"Close",       says:"Close my file?"},
 ];
-// Walk the plan: each text is 3 days after the last one actually sent; Sunday waits a day.
+// Walk the plan: each text is 3 days after the last one actually sent; a weekend waits for Monday.
 let cur = new Date(START), placed = [];
 TEXTS.forEach((t,i)=>{
   if(i>0){ cur = new Date(cur); cur.setDate(cur.getDate()+3); }
   let slid=false;
-  if(i>0 && cur.getDay()===0){ cur.setDate(cur.getDate()+1); slid=true; }
+  if(i>0 && cur.getDay()===6){ cur.setDate(cur.getDate()+2); slid="Saturday"; }
+  else if(i>0 && cur.getDay()===0){ cur.setDate(cur.getDate()+1); slid="Sunday"; }
   placed.push({...t, date:new Date(cur), slid, offset:Math.round((cur-START)/864e5)});
 });
 
-// Calendar: Mon Oct 12 → Sun Nov 15
+// Calendar: Mon Oct 12 → Sun Nov 22 (six weeks)
 const cal = document.getElementById("cal");
 ["Mon","Tue","Wed","Thu","Fri","Sat","Sun"].forEach(d=>{const e=document.createElement("div");e.className="dow";e.textContent=d;cal.appendChild(e);});
 const first = new Date(2026,9,12);
-for(let i=0;i<35;i++){
+for(let i=0;i<42;i++){
   const day = new Date(first); day.setDate(first.getDate()+i);
   const cell = document.createElement("div");
-  cell.className = "day" + (day.getDay()===0?" sun":"") + ((day<START||day>placed[placed.length-1].date)?" out":"");
+  cell.className = "day" + ((day.getDay()===0||day.getDay()===6)?" sun":"") + ((day<START||day>placed[placed.length-1].date)?" out":"");
   const n = document.createElement("div"); n.className="n";
   n.textContent = day.toLocaleDateString("en-US",{month:"short",day:"numeric"});
   cell.appendChild(n);
@@ -128,7 +184,7 @@ for(let i=0;i<35;i++){
     c.className="chip t-"+p.kind;
     c.innerHTML = `${p.name}<small>"${p.says}"</small>`;
     cell.appendChild(c);
-    if(p.slid){const s=document.createElement("div");s.className="slid";s.textContent="moved from Sunday";cell.appendChild(s);}
+    if(p.slid){const s=document.createElement("div");s.className="slid";s.textContent="moved from "+p.slid;cell.appendChild(s);}
   });
   cal.appendChild(cell);
 }
