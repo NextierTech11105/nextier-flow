@@ -1,6 +1,6 @@
 # Nextier
 
-> Nextier is a revenue execution engine. Its data engine finds who to talk to and stops at an initial SMS ready for a person to launch. Nextier handles the texts, CloudGreet handles the calls, and your team takes the meeting.
+> Convert your target audience into deal flow by having more conversations that drive revenue. Nextier starts the conversation, CloudGreet picks up the phone, your team takes the meeting.
 
 ## Pages
 - [Digital Front Office demo](https://nextiertech11105.github.io/nextier-flow/demo.html): Real Estate Agent OS for brokerages, Digital Receptionist for B2B teams, Customer Service for retail. Proof, CRM integrations and booking.
@@ -10,5 +10,5 @@
 ## Facts
 - Brokerage rollout: installed in the brokerage's own accounts, managed every week, a seat for every agent with the full toolbox and a digital assistant.
 - Works with Zoho CRM, Salesforce, HubSpot, HighLevel and Follow Up Boss.
-- Built on RealEstateAPI, SignalHouse, Tracerfy, USBizData, Apify, CloudGreet, Anthropic and OpenAI.
+- Core engine: Observe, Detect, Classify, Prioritize, Execute, Learn. Monthly review of dispositions, notes and messaging against texts out vs positive replies in. CloudGreet answers all inbound call traffic, mapped to segment channels.
 - Book a demo: https://www.nxtier.ai/book/nextier

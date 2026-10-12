@@ -210,16 +210,16 @@ button:focus-visible{outline:3px solid var(--orange);outline-offset:2px}
       <div class="scene" data-s="0" hidden>
         <div class="cards">
           <div class="flow in1"><span>Source</span><i>→</i><span>Enrich</span><i>→</i><span class="nx">Initiate conversation</span></div>
-          <div class="dcard in1"><div class="dot" style="background:var(--green)"></div><div><b style="color:var(--green)">Apify · Source</b><span>Two-family home, 24 Maple Ave</span></div></div>
-          <div class="dcard in2"><div class="dot" style="background:var(--blue)"></div><div><b style="color:var(--blue-soft)">RealEstateAPI · Enrich</b><span>Owner Linda R. · owned 14 years</span></div></div>
-          <div class="dcard in3"><div class="dot" style="background:#C77DFF"></div><div><b style="color:#D2A8FF">Tracerfy · Enrich</b><span>Mobile number verified</span></div></div>
+          <div class="dcard in1"><div class="dot" style="background:var(--green)"></div><div><b style="color:var(--green)">Source</b><span>Two-family home, 24 Maple Ave</span></div></div>
+          <div class="dcard in2"><div class="dot" style="background:var(--blue)"></div><div><b style="color:var(--blue-soft)">Enrich</b><span>Owner Linda R. · owned 14 years</span></div></div>
+          <div class="dcard in3"><div class="dot" style="background:#C77DFF"></div><div><b style="color:#D2A8FF">Verify</b><span>Mobile number verified</span></div></div>
         </div>
       </div>
 
       <div class="scene" data-s="1" hidden>
         <div class="phone">
           <div class="typing in1" style="align-self:flex-end"><i></i><i></i><i></i></div>
-          <div class="bub out in2"><small>NEXTIER · VIA SIGNALHOUSE.IO</small>Hi Linda, would a simple plan for your property be helpful?<span class="lnk">yoursite.com/24-maple</span></div>
+          <div class="bub out in2"><small>NEXTIER · VIA SIGNALHOUSE.IO</small>Hi Linda, would a simple plan for your property be helpful?</div>
         </div>
       </div>
 
@@ -350,9 +350,9 @@ button:focus-visible{outline:3px solid var(--orange);outline-offset:2px}
 <script>
 const CH=[
  {k:'Target',t:'Start with the ideal target',x:'Pick the audience: real estate, B2B or B2C. The target layer maps where the best-fit decision-makers are, puts individual owners first and sends entities to research. New signals land every morning.'},
- {k:'Source',t:'Source and enrich',x:'Apify sources the target. RealEstateAPI and Tracerfy enrich it with the owner and a verified mobile number. Next comes the conversation.'},
- {k:'Initiate',t:'Initiate the conversation',x:'One respectful question, sent through SignalHouse.io on the channel Linda reads first. No pitch.'},
- {k:'Page',t:'Traffic to your landing page',x:'The first text intentionally brings people to your landing page. Your VSL tells the story, your automated blog keeps publishing, and every social handle and link sits one tap away, so the page keeps drawing organic traffic.'},
+ {k:'Source',t:'Source and enrich',x:'The data engine finds the owner, builds the property story and verifies a mobile number. Next comes the conversation.'},
+ {k:'Initiate',t:'Initiate the conversation',x:'One respectful question, sent through SignalHouse.io on the channel Linda reads first. No pitch. No link.'},
+ {k:'Page',t:'Traffic to your landing page',x:'No link until they say yes. Then your landing page does the selling: your VSL tells the story, your automated blog keeps publishing, and every social handle sits one tap away.'},
  {k:'Reply',t:'A positive reply',x:'Linda says yes to the conversation. That reply is what the system is built to produce.'},
  {k:'Triage',t:'Every reply, sorted',x:'Across text, voice, email and chat, the first text and the first call are handled for you. Each inbound reply is qualified, classified and prioritized, and the best ones are pushed to the operator.'},
  {k:'Call',t:'Linda calls back',x:'CloudGreet answers the call, picks up the context and routes her to the right person.'},
