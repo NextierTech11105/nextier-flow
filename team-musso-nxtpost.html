@@ -8,7 +8,7 @@
 /* Layout: a stage (the app's own screens, animated) beside a narration column, a chapter rail underneath; one chapter at a time. Single committed dark look, continuous with Story Mode and the Nextier app. */
 :root{
   --bg:#000000; --panel:#0D0D0D; --panel-2:#161616; --line:#2A2A2A;
-  --fg:#FFFFFF; --soft:#D5DDF0; --orange:#FF8A3D; --orange-soft:#FFB27A;
+  --fg:#FFFFFF; --soft:#FFFFFF; --orange:#FF8A3D; --orange-soft:#FFB27A;
   --blue:#4C8DFF; --blue-soft:#9CC0FF; --green:#2FD39A; --ink:#0A1022;
   --app:#0B0F14; --app-2:#12181F; --app-line:#232B35; --gold:#E2B54A;
   --display:'Space Grotesk','Trebuchet MS',Arial,sans-serif;
@@ -45,7 +45,7 @@ button:focus-visible{outline:3px solid var(--orange);outline-offset:2px}
 .rail .bar i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--blue),var(--orange))}
 .rail button[aria-current="step"]{color:var(--fg);border-color:var(--orange)}
 .rail .n{font-variant-numeric:tabular-nums;color:var(--orange)}
-.foot{font-size:14px;color:var(--soft)}
+.foot{font-size:15px;color:#FFFFFF}
 .foot a{color:var(--fg)}
 
 /* ── the app, recreated ─────────────────────────────────────────────── */
@@ -59,9 +59,9 @@ button:focus-visible{outline:3px solid var(--orange);outline-offset:2px}
 .abody{padding:14px;display:flex;flex-direction:column;gap:12px}
 .ah{font-family:var(--display);font-weight:700;font-size:18px}
 .chips{display:flex;flex-wrap:wrap;gap:6px}
-.ac{padding:6px 10px;border-radius:8px;background:var(--app-2);border:1px solid var(--app-line);font-weight:700;font-size:13px;color:#C9D2DC;white-space:nowrap}
+.ac{padding:6px 10px;border-radius:8px;background:var(--app-2);border:1px solid var(--app-line);font-weight:700;font-size:13px;color:#FFFFFF;white-space:nowrap}
 .ac.on{border-color:var(--blue);background:#13254A;color:#fff}
-.ac small{color:#8FA0B3;font-weight:700;margin-left:4px;font-variant-numeric:tabular-nums}
+.ac small{color:#E8ECF2;font-weight:700;margin-left:4px;font-variant-numeric:tabular-nums}
 .ac.hit{border-color:var(--gold);color:#fff}
 
 /* lead builder map */
@@ -83,11 +83,11 @@ button:focus-visible{outline:3px solid var(--orange);outline-offset:2px}
 /* monitors */
 .mon{display:flex;justify-content:space-between;align-items:center;gap:12px;border:1px solid var(--app-line);border-radius:12px;padding:12px 14px;background:var(--app-2)}
 .mon b{display:block;font-size:15px}
-.mon span{color:#C9D2DC;font-size:13px}
+.mon span{color:#FFFFFF;font-size:13px}
 .on-btn{background:#16A34A;color:#fff;font-weight:700;border-radius:8px;padding:8px 14px;flex:none}
 .presets{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
 .preset{border:1px solid var(--app-line);border-radius:10px;padding:10px 12px;background:var(--app-2)}
-.preset b{display:block;font-size:14px}.preset span{font-size:12px;color:#AEB9C6}
+.preset b{display:block;font-size:14px}.preset span{font-size:12px;color:#FFFFFF}
 .preset.on{border-color:var(--blue);background:#141414}
 .tick{display:flex;justify-content:space-between;align-items:center;border:1px dashed #3A4450;border-radius:10px;padding:10px 12px;font-weight:700}
 .tick b{font-family:var(--display);font-size:22px;color:var(--green);font-variant-numeric:tabular-nums}
@@ -116,10 +116,10 @@ button:focus-visible{outline:3px solid var(--orange);outline-offset:2px}
 /* property book list */
 .tbl{border:1px solid var(--app-line);border-radius:10px;overflow:auto;max-height:250px}
 table{border-collapse:collapse;width:100%;min-width:460px;font-size:13px;table-layout:fixed}
-td small{display:block;color:#8FA0B3;font-size:12px}
+td small{display:block;color:#E8ECF2;font-size:12px}
 td.w{white-space:normal}
 th:nth-child(1){width:34%}th:nth-child(2){width:18%}th:nth-child(3){width:18%}
-th{position:sticky;top:0;background:#0E1319;text-align:left;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:#AEB9C6;padding:8px 10px;border-bottom:1px solid var(--app-line)}
+th{position:sticky;top:0;background:#0E1319;text-align:left;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:#FFFFFF;padding:8px 10px;border-bottom:1px solid var(--app-line)}
 td{padding:8px 10px;border-bottom:1px solid #1A2129;vertical-align:top;white-space:nowrap}
 tr.sel td{background:#161B22}
 .tgs{display:flex;flex-wrap:wrap;gap:4px;white-space:normal}
@@ -127,7 +127,7 @@ tr.sel td{background:#161B22}
 .tg.ev{border-color:var(--orange);color:var(--orange-soft)}
 .tg.ok{border-color:#1E5A40;color:#5BE3A8}
 .go .tg{animation:stamp .35s cubic-bezier(.2,1.4,.4,1) both var(--d)}
-.search{border:1px solid var(--app-line);border-radius:8px;padding:8px 10px;color:#8FA0B3;font-size:13px;background:#0E1319}
+.search{border:1px solid var(--app-line);border-radius:8px;padding:8px 10px;color:#E8ECF2;font-size:13px;background:#0E1319}
 .toprow{display:flex;justify-content:space-between;gap:10px;align-items:center;flex-wrap:wrap}
 .enzo{border:1px solid #1E5A40;color:#5BE3A8;border-radius:8px;padding:6px 10px;font-weight:700;font-size:12px}
 
@@ -139,7 +139,7 @@ tr.sel td{background:#161B22}
 .mini span.sel{background:#161B22;border-color:#2E3A48}
 .panel{border:1px solid var(--app-line);border-radius:12px;padding:12px;background:var(--app-2);display:flex;flex-direction:column;gap:10px;min-width:0}
 .panel .addr{font-weight:700;font-size:16px}
-.panel .cty{color:#AEB9C6;font-size:13px}
+.panel .cty{color:#FFFFFF;font-size:13px}
 .traced{align-self:flex-start;font-size:11px;font-weight:700;letter-spacing:.1em;border:1px solid #3A4450;border-radius:6px;padding:2px 8px}
 .acts{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
 .acts .ph{font-family:var(--display);font-size:18px;color:#5BE3A8;font-variant-numeric:tabular-nums;margin-right:4px}
@@ -148,7 +148,7 @@ tr.sel td{background:#161B22}
 .clock{border:1px solid #4A3A12;background:#1A160B;border-radius:10px;padding:10px}
 .clock b{font-size:11px;letter-spacing:.14em;color:var(--gold)}
 .clock .g{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px 10px;margin-top:6px;font-size:12px}
-.clock .g small{display:block;color:#AEB9C6;letter-spacing:.08em;text-transform:uppercase;font-size:10px}
+.clock .g small{display:block;color:#FFFFFF;letter-spacing:.08em;text-transform:uppercase;font-size:10px}
 .clock .g span{font-weight:700}
 
 /* webhook */
@@ -167,7 +167,7 @@ pre .k{color:var(--blue-soft)}pre .s{color:var(--orange-soft)}
 .launch{display:flex;flex-direction:column;gap:10px}
 .blk{display:flex;justify-content:space-between;align-items:center;gap:10px;border:1px solid var(--app-line);border-radius:12px;padding:12px 14px;background:var(--app-2);flex-wrap:wrap}
 .blk b{display:block;font-size:15px}
-.blk span{font-size:13px;color:#C9D2DC}
+.blk span{font-size:13px;color:#FFFFFF}
 .ready{font-size:11px;font-weight:700;letter-spacing:.12em;padding:4px 10px;border-radius:999px;background:#0F2A1E;color:#5BE3A8;border:1px solid #1E5A40}
 .send{align-self:center;background:var(--orange);color:var(--ink);font-weight:700;font-size:18px;border-radius:14px;padding:14px 30px;box-shadow:0 0 0 0 #FF8A3D88}
 .go .send{animation:wait 1.8s ease-in-out infinite 1.5s}
@@ -259,16 +259,16 @@ pre .k{color:var(--blue-soft)}pre .s{color:var(--orange-soft)}
 /* NXTPOST scenes: the topic form, the voice, the month, per-platform versions, approval, nine platforms, search + AI answers, numbers, accounts, replies */
 .form{display:flex;flex-direction:column;gap:8px}
 .fl{border:1px solid var(--app-line);border-radius:8px;padding:9px 11px;background:#0E1319;color:#E5EBF2;font-size:14px;min-height:38px}
-.fl.ph{color:#7D8A99}
+.fl.ph{color:#E8ECF2}
 .frow{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr) 70px;gap:8px}
 @media (max-width:560px){.frow{grid-template-columns:minmax(0,1fr)}}
 .caret{display:inline-block;width:2px;height:16px;background:var(--orange);vertical-align:-3px;margin-left:1px;animation:blink 1s steps(1) infinite}
 @keyframes blink{50%{opacity:0}}
 .plats{display:flex;flex-wrap:wrap;gap:6px}
-.plat{padding:5px 10px;border-radius:999px;border:1px solid var(--app-line);font-size:12px;font-weight:700;color:#8FA0B3}
+.plat{padding:5px 10px;border-radius:999px;border:1px solid var(--app-line);font-size:12px;font-weight:700;color:#E8ECF2}
 .plat.on{border-color:var(--blue);color:#fff;background:#13254A}
 .go .plat.on{animation:lit2 .4s ease-out both var(--d)}
-@keyframes lit2{from{background:transparent;color:#8FA0B3;border-color:var(--app-line)}to{background:#13254A;color:#fff;border-color:var(--blue)}}
+@keyframes lit2{from{background:transparent;color:#E8ECF2;border-color:var(--app-line)}to{background:#13254A;color:#fff;border-color:var(--blue)}}
 .build{align-self:flex-start;background:var(--orange);color:var(--ink);font-weight:700;border-radius:10px;padding:9px 16px}
 .voice{width:min(520px,100%);display:flex;flex-direction:column;gap:10px}
 .vq{padding:12px 14px;border-radius:14px;background:var(--panel-2);border:1px solid var(--line)}
@@ -292,8 +292,8 @@ pre .k{color:var(--blue-soft)}pre .s{color:var(--orange-soft)}
 .vc p{margin:0;font-size:13px;line-height:1.35}
 .queue{display:flex;flex-direction:column;gap:8px}
 .qi{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:10px;background:var(--app-2);border:1px solid var(--app-line)}
-.qi b{font-size:14px}.qi span{font-size:12px;color:#AEB9C6}
-.qi .st{margin-left:auto;flex:none;font-size:11px;font-weight:700;letter-spacing:.1em;padding:4px 9px;border-radius:999px;border:1px solid #3A4450;color:#C9D2DC}
+.qi b{font-size:14px}.qi span{font-size:12px;color:#FFFFFF}
+.qi .st{margin-left:auto;flex:none;font-size:11px;font-weight:700;letter-spacing:.1em;padding:4px 9px;border-radius:999px;border:1px solid #3A4450;color:#FFFFFF}
 .go .qi .st.ok{animation:okk .3s ease-out both var(--d)}
 @keyframes okk{to{background:#0F2A1E;color:#5BE3A8;border-color:#1E5A40}}
 .appr{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
@@ -346,9 +346,9 @@ pre .k{color:var(--blue-soft)}pre .s{color:var(--orange-soft)}
       <!-- 1 · ONE LINE IN -->
       <div class="scene">
         <div class="app">
-          <div class="abar"><b>Workspace</b><span class="ws">Team Musso · Development</span><span class="pill">REAL ESTATE</span><span style="margin-left:auto;color:#AEB9C6">NXTPOST</span></div>
+          <div class="abar"><b>Workspace</b><span class="ws">Team Musso · Development</span><span class="pill">REAL ESTATE</span><span style="margin-left:auto;color:#FFFFFF">NXTPOST</span></div>
           <div class="abody form">
-            <div class="ah">1 · Topic <span style="font-weight:500;color:#C9D2DC;font-size:14px">Tell it what your market is doing. One line is enough.</span></div>
+            <div class="ah">1 · Topic <span style="font-weight:500;color:#FFFFFF;font-size:14px">Tell it what your market is doing. One line is enough.</span></div>
             <div class="fl" id="topic"><span id="typed"></span><span class="caret"></span></div>
             <div class="frow in2"><div class="fl">Team Musso</div><div class="fl">Riverhead · Route 110 · Long Island</div><div class="fl">18</div></div>
             <div class="plats in3">
@@ -388,7 +388,7 @@ pre .k{color:var(--blue-soft)}pre .s{color:var(--orange-soft)}
       <!-- 5 · YOU APPROVE -->
       <div class="scene" hidden>
         <div class="app">
-          <div class="abar"><b>Workspace</b><span class="ws">Team Musso · Development</span><span class="pill">REAL ESTATE</span><span style="margin-left:auto;color:#AEB9C6">NXTPOST · Approve</span></div>
+          <div class="abar"><b>Workspace</b><span class="ws">Team Musso · Development</span><span class="pill">REAL ESTATE</span><span style="margin-left:auto;color:#FFFFFF">NXTPOST · Approve</span></div>
           <div class="abody">
             <div class="queue">
               <div class="qi in1"><div><b>Nov 3 · Instagram</b><br><span>An acre and a half in Riverhead can become three homes…</span></div><span class="st ok" style="--d:1.6s">APPROVED</span></div>
@@ -396,7 +396,7 @@ pre .k{color:var(--blue-soft)}pre .s{color:var(--orange-soft)}
               <div class="qi in2"><div><b>Nov 5 · TikTok</b><br><span>What a builder sees in your back acre…</span></div><span class="st ok" style="--d:2.2s">APPROVED</span></div>
               <div class="qi in2"><div><b>Nov 7 · X</b><br><span>Mastic–Moriches: land sales this month…</span></div><span class="st">EDITING</span></div>
             </div>
-            <div class="appr in3"><span class="a">Approve all</span><span class="e">Edit one</span><span style="color:#C9D2DC;font-size:14px">Nothing publishes until you approve it.</span></div>
+            <div class="appr in3"><span class="a">Approve all</span><span class="e">Edit one</span><span style="color:#FFFFFF;font-size:14px">Nothing publishes until you approve it.</span></div>
           </div>
         </div>
       </div>
