@@ -1517,11 +1517,11 @@ function initCall(sec, v) {
   root.innerHTML = `<div class="call-main">
       <div class="call-top"><div class="ava" data-mascot="ava"></div><div class="call-id"><b>${esc(c.title)}</b><span>${esc(c.org)} · sample call</span></div><span class="status" data-status>Ready</span></div>
       <div class="wave" data-wave aria-hidden="true"></div>
-      <div class="transcript" data-transcript aria-live="polite"><p class="ph">Press <b>Start the call</b>. The assistant speaks first. You answer by tapping a reply.</p></div>
+      <div class="transcript" data-transcript aria-live="polite"><p class="ph">Press <b>Start the call</b> and allow your mic. The assistant speaks first. Just talk.</p></div>
       <div class="opts" data-opts></div>
       <div class="call-ctl"><button class="btn btn-primary" type="button" data-start>${icon("i-phone")}Start the call</button>${synth ? '<button class="voice" type="button" data-voice aria-pressed="true">Voice on</button>' : ""}</div>
-      <p class="call-note">A scripted walkthrough in your browser's voice. The real assistant answers your business line.</p>
-      <div class="live-cg"><span class="lg lg-cg-cloud"></span><div><b>Hear the real voice.</b><p>Talk to a live CloudGreet assistant in your browser, or call the demo line at <span class="num">+1 (737) 937-0084</span>.</p></div><a class="btn btn-primary btn-sm" href="https://cloudgreet.com/#demo" target="_blank" rel="noopener">Talk to it live <span aria-hidden="true">↗</span></a></div>
+      <p class="call-note">A live assistant, right here in your browser. Allow your mic and talk. No mic? You get a scripted walkthrough instead.</p>
+      <div class="live-cg"><span class="lg lg-cg-cloud"></span><div><b>Hear the real voice.</b><p>Talk to a live CloudGreet assistant right on this page, or call the demo line at <span class="num">+1 (737) 937-0084</span>.</p></div><button class="btn btn-primary btn-sm" type="button" data-try>Talk to it live</button></div>
     </div>
     <aside class="cap"><h3>What it captured</h3><ul class="fields" data-fields></ul><div class="done" data-done hidden></div>
       <ul class="feats">
