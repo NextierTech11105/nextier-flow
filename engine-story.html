@@ -7,9 +7,9 @@
 /* Layout: a stage (the app's own screens, animated) beside a narration column, a chapter rail underneath; one chapter at a time. Single committed dark look, continuous with Story Mode and the Nextier app. */
 :root{
   --bg:#000000; --panel:#0D0D0D; --panel-2:#161616; --line:#2A2A2A;
-  --fg:#FFFFFF; --soft:#D5DDF0; --orange:#FF8A3D; --orange-soft:#FFB27A;
-  --blue:#4C8DFF; --blue-soft:#9CC0FF; --green:#2FD39A; --ink:#0A1022;
-  --app:#0B0F14; --app-2:#12181F; --app-line:#232B35; --gold:#E2B54A;
+  --fg:#FFFFFF; --soft:#f2f4f7; --orange:#FF8A3D; --orange-soft:#FFB27A;
+  --blue:#4C8DFF; --blue-soft:#9CC0FF; --green:#2FD39A; --ink:#0e0e0e;
+  --app:#0c0c0c; --app-2:#141414; --app-line:#232323; --gold:#E2B54A;
   --display:'Space Grotesk','Trebuchet MS',Arial,sans-serif;
   --body:'DM Sans','Segoe UI',Arial,sans-serif;
   color-scheme:dark;
@@ -51,33 +51,33 @@ button:focus-visible{outline:3px solid var(--orange);outline-offset:2px}
 .scene{position:absolute;inset:0;padding:22px;display:flex;align-items:center;justify-content:center}
 .scene[hidden]{display:none!important}
 .app{width:100%;max-width:640px;background:var(--app);border:1px solid var(--app-line);border-radius:16px;overflow:hidden;box-shadow:0 0 60px #4C8DFF22;font-size:14px}
-.abar{display:flex;align-items:center;gap:10px;padding:10px 14px;border-bottom:1px solid var(--app-line);background:#090C10;flex-wrap:wrap}
+.abar{display:flex;align-items:center;gap:10px;padding:10px 14px;border-bottom:1px solid var(--app-line);background:#0a0a0a;flex-wrap:wrap}
 .abar b{font-weight:700}
-.ws{border:1px solid #3A4450;border-radius:8px;padding:4px 10px;font-weight:700}
+.ws{border:1px solid #383838;border-radius:8px;padding:4px 10px;font-weight:700}
 .pill{font-size:11px;font-weight:700;letter-spacing:.1em;padding:3px 8px;border-radius:999px;background:#0F2A1E;color:#5BE3A8;border:1px solid #1E5A40}
 .abody{padding:14px;display:flex;flex-direction:column;gap:12px}
 .ah{font-family:var(--display);font-weight:700;font-size:18px}
 .chips{display:flex;flex-wrap:wrap;gap:6px}
 .ac{padding:6px 10px;border-radius:8px;background:var(--app-2);border:1px solid var(--app-line);font-weight:700;font-size:13px;color:#C9D2DC;white-space:nowrap}
-.ac.on{border-color:var(--blue);background:#13254A;color:#fff}
+.ac.on{border-color:var(--blue);background:#1e1e1e;color:#fff}
 .ac small{color:#8FA0B3;font-weight:700;margin-left:4px;font-variant-numeric:tabular-nums}
 .ac.hit{border-color:var(--gold);color:#fff}
 
 /* lead builder map */
 .amap{position:relative;height:220px;border-radius:12px;overflow:hidden;border:1px solid var(--app-line);
   background:
-   repeating-linear-gradient(28deg,transparent 0 38px,#1A222C 38px 40px),
-   repeating-linear-gradient(118deg,transparent 0 52px,#1A222C 52px 54px),
-   radial-gradient(ellipse 60% 50% at 62% 55%,#162016 0%,#10161C 70%)}
-.amap .water{position:absolute;right:-10%;bottom:-30%;width:70%;height:60%;border-radius:50%;background:#0B1624}
-.amap .road{position:absolute;height:3px;background:#3B4552;transform-origin:left center}
+   repeating-linear-gradient(28deg,transparent 0 38px,#1c1c1c 38px 40px),
+   repeating-linear-gradient(118deg,transparent 0 52px,#1c1c1c 52px 54px),
+   radial-gradient(ellipse 60% 50% at 62% 55%,#162016 0%,#121212 70%)}
+.amap .water{position:absolute;right:-10%;bottom:-30%;width:70%;height:60%;border-radius:50%;background:#111111}
+.amap .road{position:absolute;height:3px;background:#393939;transform-origin:left center}
 .amap .ctl{position:absolute;left:10px;top:10px;display:flex;flex-direction:column;gap:6px}
-.amap .ctl span{background:#0C1116;border:1px solid var(--app-line);border-radius:8px;padding:4px 10px;font-size:12px;font-weight:700}
-.amap .cnt{position:absolute;right:10px;top:10px;background:#0C1116;border:1px solid var(--app-line);border-radius:999px;padding:6px 12px;font-weight:700;font-variant-numeric:tabular-nums}
+.amap .ctl span{background:#0e0e0e;border:1px solid var(--app-line);border-radius:8px;padding:4px 10px;font-size:12px;font-weight:700}
+.amap .cnt{position:absolute;right:10px;top:10px;background:#0e0e0e;border:1px solid var(--app-line);border-radius:999px;padding:6px 12px;font-weight:700;font-variant-numeric:tabular-nums}
 .pin{position:absolute;width:14px;height:14px;margin:-7px 0 0 -7px;border-radius:50%;background:var(--blue);border:2px solid #fff;box-shadow:0 0 12px #4C8DFF}
 .go .pin{animation:drop .5s cubic-bezier(.2,1.4,.4,1) both var(--d)}
 .rows{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
-.rows .box{border:1px solid #3A4450;border-radius:8px;padding:6px 14px;font-weight:700;font-size:18px;font-variant-numeric:tabular-nums}
+.rows .box{border:1px solid #383838;border-radius:8px;padding:6px 14px;font-weight:700;font-size:18px;font-variant-numeric:tabular-nums}
 
 /* monitors */
 .mon{display:flex;justify-content:space-between;align-items:center;gap:12px;border:1px solid var(--app-line);border-radius:12px;padding:12px 14px;background:var(--app-2)}
@@ -88,7 +88,7 @@ button:focus-visible{outline:3px solid var(--orange);outline-offset:2px}
 .preset{border:1px solid var(--app-line);border-radius:10px;padding:10px 12px;background:var(--app-2)}
 .preset b{display:block;font-size:14px}.preset span{font-size:12px;color:#AEB9C6}
 .preset.on{border-color:var(--blue);background:#141414}
-.tick{display:flex;justify-content:space-between;align-items:center;border:1px dashed #3A4450;border-radius:10px;padding:10px 12px;font-weight:700}
+.tick{display:flex;justify-content:space-between;align-items:center;border:1px dashed #383838;border-radius:10px;padding:10px 12px;font-weight:700}
 .tick b{font-family:var(--display);font-size:22px;color:var(--green);font-variant-numeric:tabular-nums}
 
 /* signals */
@@ -118,15 +118,15 @@ table{border-collapse:collapse;width:100%;min-width:460px;font-size:13px;table-l
 td small{display:block;color:#8FA0B3;font-size:12px}
 td.w{white-space:normal}
 th:nth-child(1){width:34%}th:nth-child(2){width:18%}th:nth-child(3){width:18%}
-th{position:sticky;top:0;background:#0E1319;text-align:left;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:#AEB9C6;padding:8px 10px;border-bottom:1px solid var(--app-line)}
-td{padding:8px 10px;border-bottom:1px solid #1A2129;vertical-align:top;white-space:nowrap}
-tr.sel td{background:#161B22}
+th{position:sticky;top:0;background:#0f0f0f;text-align:left;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:#AEB9C6;padding:8px 10px;border-bottom:1px solid var(--app-line)}
+td{padding:8px 10px;border-bottom:1px solid #1b1b1b;vertical-align:top;white-space:nowrap}
+tr.sel td{background:#161616}
 .tgs{display:flex;flex-wrap:wrap;gap:4px;white-space:normal}
-.tg{font-size:11px;font-weight:700;padding:2px 7px;border-radius:999px;border:1px solid #3A4450;color:#E5EBF2;background:#161D25}
+.tg{font-size:11px;font-weight:700;padding:2px 7px;border-radius:999px;border:1px solid #383838;color:#E5EBF2;background:#181818}
 .tg.ev{border-color:var(--orange);color:var(--orange-soft)}
 .tg.ok{border-color:#1E5A40;color:#5BE3A8}
 .go .tg{animation:stamp .35s cubic-bezier(.2,1.4,.4,1) both var(--d)}
-.search{border:1px solid var(--app-line);border-radius:8px;padding:8px 10px;color:#8FA0B3;font-size:13px;background:#0E1319}
+.search{border:1px solid var(--app-line);border-radius:8px;padding:8px 10px;color:#8FA0B3;font-size:13px;background:#0f0f0f}
 .toprow{display:flex;justify-content:space-between;gap:10px;align-items:center;flex-wrap:wrap}
 .enzo{border:1px solid #1E5A40;color:#5BE3A8;border-radius:8px;padding:6px 10px;font-weight:700;font-size:12px}
 
@@ -134,16 +134,16 @@ tr.sel td{background:#161B22}
 .rec{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.1fr);gap:12px}
 @media (max-width:560px){.rec{grid-template-columns:minmax(0,1fr)}.rec .mini{display:none}}
 .mini{display:flex;flex-direction:column;gap:6px}
-.mini span{padding:7px 9px;border-radius:8px;background:#0E1319;border:1px solid #1A2129;font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.mini span.sel{background:#161B22;border-color:#2E3A48}
+.mini span{padding:7px 9px;border-radius:8px;background:#0f0f0f;border:1px solid #1b1b1b;font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.mini span.sel{background:#161616;border-color:#303030}
 .panel{border:1px solid var(--app-line);border-radius:12px;padding:12px;background:var(--app-2);display:flex;flex-direction:column;gap:10px;min-width:0}
 .panel .addr{font-weight:700;font-size:16px}
 .panel .cty{color:#AEB9C6;font-size:13px}
-.traced{align-self:flex-start;font-size:11px;font-weight:700;letter-spacing:.1em;border:1px solid #3A4450;border-radius:6px;padding:2px 8px}
+.traced{align-self:flex-start;font-size:11px;font-weight:700;letter-spacing:.1em;border:1px solid #383838;border-radius:6px;padding:2px 8px}
 .acts{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
 .acts .ph{font-family:var(--display);font-size:18px;color:#5BE3A8;font-variant-numeric:tabular-nums;margin-right:4px}
 .acts .call{background:#16A34A;color:#fff;border-radius:8px;padding:6px 12px;font-weight:700}
-.acts .bt{border:1px solid #3A4450;border-radius:8px;padding:6px 10px;font-weight:700}
+.acts .bt{border:1px solid #383838;border-radius:8px;padding:6px 10px;font-weight:700}
 .clock{border:1px solid #4A3A12;background:#1A160B;border-radius:10px;padding:10px}
 .clock b{font-size:11px;letter-spacing:.14em;color:var(--gold)}
 .clock .g{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px 10px;margin-top:6px;font-size:12px}
@@ -355,6 +355,7 @@ pre .k{color:var(--blue-soft)}pre .s{color:var(--orange-soft)}
         <button id="prev" type="button">Back</button>
         <button id="play" type="button">Play story</button>
         <button id="next" type="button">Next</button>
+        <button id="snd" type="button" aria-pressed="true">Sound on</button>
       </div>
     </div>
   </div>
@@ -440,5 +441,15 @@ document.addEventListener('keydown',e=>{if(e.key==='ArrowRight')go(cur+1);else i
 // Deep link: engine-story.html#ch6 opens on chapter 6.
 const m=/^#ch(\d+)$/.exec(location.hash||'');
 go(m?Math.min(Math.max(+m[1],1),CH.length)-1:0);
+</script>
+<audio id="song" src="media/nextier-story-song.m4a" preload="auto"></audio>
+<script>
+// Music follows the story clock: chapter i starts at i x 7 s of the song.
+const song=document.getElementById('song'),snd=document.getElementById('snd'),SEC=DUR/1000;
+let soundOn=true;
+function syncSong(){if(!soundOn||!playing){song.pause();return}const at=Math.min(cur*SEC+(performance.now()-t0)/1000,song.duration||1e9);if(Math.abs(song.currentTime-at)>.6)song.currentTime=at;if(song.paused)song.play().catch(()=>{})}
+const _go=go;go=function(i){_go(i);syncSong()};
+const _setPlay=setPlay;setPlay=function(on){_setPlay(on);syncSong()};
+snd.addEventListener('click',()=>{soundOn=!soundOn;snd.setAttribute('aria-pressed',String(soundOn));snd.textContent=soundOn?'Sound on':'Sound off';syncSong()});
 </script>
 </body></html>
