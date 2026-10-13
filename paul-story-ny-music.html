@@ -632,7 +632,7 @@ button:focus-visible{outline:3px solid var(--orange);outline-offset:2px}
 
 /* Clay crew at work INSIDE the scenes: scanner, records, tags, campaign blocks, owner cards */
 .cw-actor{position:absolute;pointer-events:none;z-index:3}
-.cw-actor>.clay-actor{display:block;width:100%;height:100%;max-width:none}
+.nxc-slot{display:block;width:132px;height:181px;max-width:100%}
 /* The scan: the scout runs the scanner from his lens */
 .cw-scan{left:18px;bottom:12px;width:110px;height:155px}
 .cw-beam{position:absolute;left:101px;bottom:37px;width:min(78%,600px);height:190px;transform-origin:0 50%;transform:rotate(-20deg);clip-path:polygon(0 48%,100% 0,100% 100%,0 52%);background:linear-gradient(90deg,rgba(143,188,255,.8),rgba(59,140,255,.3) 45%,rgba(59,140,255,0));mix-blend-mode:screen;opacity:0;z-index:2;pointer-events:none}
@@ -648,7 +648,7 @@ button:focus-visible{outline:3px solid var(--orange);outline-offset:2px}
 .cw-band-wrap{position:relative}
 .cw-moving .owner-time-band strong{padding-right:44px}
 .cw-actor.cw-carry{inset:0}
-.cw-actor.cw-carry>.clay-actor{position:absolute;top:8px;width:44px;height:62px;visibility:hidden}
+.cw-actor.cw-carry>.nxc-slot{position:absolute;top:8px;width:44px;height:62px;visibility:hidden}
 .cw-carry>.cw-at-when{right:10px}.cw-carry>.cw-at-soon{right:calc(33.333% + 13px)}.cw-carry>.cw-at-now{right:calc(66.667% + 16px)}
 .go .cw-carry>.cw-at-when{animation:cw-at-when 6.5s step-end both}.go .cw-carry>.cw-at-soon{animation:cw-at-soon 6.5s step-end both}.go .cw-carry>.cw-at-now{animation:cw-at-now 6.5s step-end both}
 @keyframes cw-at-when{0%{visibility:hidden}28%{visibility:visible}51%,100%{visibility:hidden}}
@@ -664,7 +664,6 @@ button:focus-visible{outline:3px solid var(--orange);outline-offset:2px}
 .intel-brief.cw-tagging{position:relative;padding-right:104px}
 .cw-tagging .intel-match{padding-right:42px}
 .cw-tagger{right:12px;bottom:10px;width:80px;height:113px}
-.go .cw-tagger{animation:cw-tag-dip 6.5s ease-in-out both}
 @keyframes cw-tag-dip{0%,37%{transform:none}41%{transform:translate(-9px,-2px) rotate(-5deg)}45%,54%{transform:none}58%{transform:translate(-9px,-2px) rotate(-5deg)}62%,71%{transform:none}75%{transform:translate(-9px,-2px) rotate(-5deg)}79%,100%{transform:none}}
 .cw-tag{position:absolute;right:8px;top:50%;width:24px;height:24px;margin-top:-12px;border-radius:50%;background:#3b8cff;color:#000;font:800 14px/24px var(--body);font-style:normal;text-align:center;opacity:0;transform:scale(.4);z-index:2}
 .go .cw-tag{animation:cw-tag-pop .35s cubic-bezier(.3,1.6,.5,1) calc(var(--intel-delay) + .55s) forwards}
@@ -679,7 +678,6 @@ button:focus-visible{outline:3px solid var(--orange);outline-offset:2px}
 .go .cw-block{animation:cw-block-in .55s cubic-bezier(.2,.8,.2,1) both var(--d),cw-block-set .4s ease-out calc(var(--d) + .55s) forwards}
 @keyframes cw-block-in{from{opacity:0;transform:translateX(-70px) rotate(-3deg)}to{opacity:1;transform:none}}
 @keyframes cw-block-set{to{border-color:#3b8cff;box-shadow:0 0 22px -10px #3b8cff}}
-.go .cw-stager{animation:cw-push 6.5s ease-in-out both}
 @keyframes cw-push{0%{opacity:0;transform:translateX(-14px)}12%{opacity:1;transform:translateX(-14px)}23%{transform:translateX(5px)}27%{transform:none}34%{transform:translateX(5px)}38%{transform:none}45%{transform:translateX(5px)}49%,100%{opacity:1;transform:none}}
 @media(max-width:560px){
  .cw-scan{left:12px;bottom:10px;width:78px;height:110px}
@@ -687,7 +685,10 @@ button:focus-visible{outline:3px solid var(--orange);outline-offset:2px}
  .db-core.cw-building{padding-right:64px}
  .cw-build{right:8px;bottom:8px;width:54px;height:76px}
  .cw-moving .owner-time-band span,.cw-moving .owner-time-band small{padding-right:34px}
- .cw-actor.cw-carry>.clay-actor{right:6px;width:34px;height:48px}.cw-carry>.cw-at-when{top:calc(66.667% + 11px)}.cw-carry>.cw-at-soon{top:calc(33.333% + 9px)}.cw-carry>.cw-at-now{top:6px}
+  .cw-actor.cw-carry>.nxc-slot{right:6px;width:34px;height:48px}
+ .nxc-slot{width:88px;height:121px}
+ .cw-build .nxc{--fly:-60px}
+ .cw-tagger .nxc i.nxc-tagfly{display:none}.cw-carry>.cw-at-when{top:calc(66.667% + 11px)}.cw-carry>.cw-at-soon{top:calc(33.333% + 9px)}.cw-carry>.cw-at-now{top:6px}
  .intel-brief.cw-tagging{padding-right:56px}
  .cw-tagging .intel-match{padding-right:32px}
  .cw-tagger{right:7px;bottom:8px;width:44px;height:62px}
@@ -701,10 +702,11 @@ button:focus-visible{outline:3px solid var(--orange);outline-offset:2px}
 @media(prefers-reduced-motion:reduce){
  .go .cw-beam,.go .cw-carry,.go .cw-tagger,.go .cw-tag,.go .cw-block,.go .cw-stager,.go .db-core.cw-building .db-record-layer,.go .cw-moving .owner-time-band{animation:none;opacity:1;transform:none}
  .go .cw-beam{opacity:.8;transform:rotate(-20deg)}
- .go .cw-carry>.clay-actor{animation:none}.go .cw-carry>.cw-at-now{visibility:visible}
+  .go .cw-carry>.nxc-slot{animation:none}.go .cw-carry>.cw-at-now{visibility:visible}
  .go .cw-moving .owner-time-band:nth-child(1){box-shadow:0 0 0 2px #8fbcff}
 }
 </style>
+<link rel="stylesheet" href="clay-crew.css">
 </head><body>
 <div class="wrap">
   <header>
@@ -728,9 +730,9 @@ button:focus-visible{outline:3px solid var(--orange);outline-offset:2px}
             <div class="stn end" style="--d:1.8s"><span></span><b>Contract</b></div>
           </div>
           <div class="clay-crew" aria-label="The intelligence team: detect, build, engage">
-  <div class="clay-role" style="--clay-delay:.2s"><span class="clay-actor clay-scout" aria-hidden="true"></span><b>Detect</b></div>
-  <div class="clay-role" style="--clay-delay:.8s"><span class="clay-actor clay-analyst" aria-hidden="true"></span><b>Build</b></div>
-  <div class="clay-role" style="--clay-delay:1.4s"><span class="clay-actor clay-operator" aria-hidden="true"></span><b>Engage</b></div>
+  <div class="clay-role" style="--clay-delay:.2s"><span class="nxc-slot"><span class="nxc" data-role="scout" data-act="walk idle" style="--delay:.2s;--from:-120px;--walk:1.2s"></span></span><b>Detect</b></div>
+  <div class="clay-role" style="--clay-delay:.8s"><span class="nxc-slot"><span class="nxc" data-role="analyst" data-act="walk idle" style="--delay:.8s;--from:-120px;--walk:1.2s"></span></span><b>Build</b></div>
+  <div class="clay-role" style="--clay-delay:1.4s"><span class="nxc-slot"><span class="nxc" data-role="operator" data-act="walk idle" style="--delay:1.4s;--from:-120px;--walk:1.2s"></span></span><b>Engage</b></div>
 </div>
           <div class="card claim in4"><p>We engineer the conditions that determine what becomes possible.</p></div>
           <p class="opening-outcome">Multiply execution capacity. Compound opportunity.</p>
@@ -762,8 +764,7 @@ button:focus-visible{outline:3px solid var(--orange);outline-offset:2px}
             <span class="de-stop" data-de-stop></span>
           </div>
           <span class="de-tag">3D view is an illustration</span>
-          <span class="cw-beam" aria-hidden="true"></span>
-          <span class="cw-actor cw-scan" aria-hidden="true"><span class="clay-actor clay-scout"></span></span>
+          <span class="cw-actor cw-scan" aria-hidden="true"><span class="nxc" data-role="scout" data-act="walk scan" style="--from:-150px;--walk:1.4s"></span></span>
         </div>
       </div>
 
@@ -810,7 +811,7 @@ button:focus-visible{outline:3px solid var(--orange);outline-offset:2px}
             <span style="--d:.2s">Territory</span><i>→</i><span style="--d:.7s">Buy box</span><i>→</i><span style="--d:1.2s">Build records</span>
           </div>
           <div class="db-core cw-building">
-            <span class="cw-actor cw-build" aria-hidden="true"><span class="clay-actor clay-analyst"></span></span>
+            <span class="cw-actor cw-build" aria-hidden="true"><span class="nxc" data-role="analyst" data-act="walk build" style="--from:120px;--walk:1.2s"></span></span>
             <div class="db-core-title"><svg viewBox="0 0 50 58" aria-hidden="true"><ellipse cx="25" cy="10" rx="21" ry="8"/><path d="M4 10v36c0 11 42 11 42 0V10M4 27c0 11 42 11 42 0M4 40c0 11 42 11 42 0"/></svg><div><small>Nextier Data Engine</small><b>Your foundational database</b></div></div>
             <div class="db-record-layer" style="--d:1.5s"><span>01</span><b>Property</b><small>Parcel · address · territory</small></div>
             <div class="db-record-layer" style="--d:2.2s"><span>02</span><b>Owner + contact</b><small>Ownership · reachable phone</small></div>
@@ -862,7 +863,7 @@ button:focus-visible{outline:3px solid var(--orange);outline-offset:2px}
             <div class="owner-time-band" style="--time-delay:1s"><b>SOON</b><strong>31–90 days</strong><span>Decision within 31–90 days.</span><small>Next move: follow the timing.</small></div>
             <div class="owner-time-band" style="--time-delay:1.4s"><b>WHEN</b><strong>Later or conditional</strong><span>Beyond 90 days or a trigger.</span><small>Next move: track the condition.</small></div>
           </div>
-            <span class="cw-actor cw-carry" aria-hidden="true"><span class="clay-actor clay-analyst cw-at-when"></span><span class="clay-actor clay-analyst cw-at-soon"></span><span class="clay-actor clay-analyst cw-at-now"></span></span>
+            <span class="cw-actor cw-carry" aria-hidden="true"><span class="nxc-slot cw-at-when"><span class="nxc" data-role="analyst" data-act="walk" style="--delay:1.82s;--from:46px;--walk:.7s"></span></span><span class="nxc-slot cw-at-soon"><span class="nxc" data-role="analyst" data-act="walk" style="--delay:3.3s;--from:46px;--walk:.7s"></span></span><span class="nxc-slot cw-at-now"><span class="nxc" data-role="analyst" data-act="walk" style="--delay:4.75s;--from:46px;--walk:.7s"></span></span></span>
           </div>
           <div class="owner-time-review"><b>Unclear timing → Needs review</b><span>Keep the evidence on the property record.</span></div>
           <p class="owner-time-foot">Human feedback updates the forecast. Keep the reason for every move.</p>
@@ -880,7 +881,7 @@ button:focus-visible{outline:3px solid var(--orange);outline-offset:2px}
           </div>
           <div class="intel-feed" aria-hidden="true"><i style="--intel-delay:.6s"></i><i style="--intel-delay:1.2s"></i><i style="--intel-delay:1.8s"></i><span>↓</span></div>
           <div class="intel-brief cw-tagging">
-            <span class="cw-actor cw-tagger" aria-hidden="true"><span class="clay-actor clay-analyst"></span></span>
+            <span class="cw-actor cw-tagger" aria-hidden="true"><span class="nxc" data-role="analyst" data-act="walk tag" style="--from:70px;--walk:1s"></span></span>
             <div class="intel-brief-head"><b>STORY MODE</b><span>Aligned tags + labels</span></div>
             <div class="intel-match" style="--intel-delay:2.25s"><b>Landowner</b><span class="intel-arrow" aria-hidden="true">→</span><span>Subdivision potential</span><i aria-hidden="true"></i><em class="cw-tag" aria-hidden="true">✓</em></div>
             <div class="intel-match" style="--intel-delay:3.35s"><b>Estate representative</b><span class="intel-arrow" aria-hidden="true">→</span><span>Inherited property</span><i aria-hidden="true"></i><em class="cw-tag" aria-hidden="true">✓</em></div>
@@ -917,7 +918,7 @@ button:focus-visible{outline:3px solid var(--orange);outline-offset:2px}
             <div class="core"><small>Decision engine</small><b>Context</b></div>
           </div>
           <div class="cw-stage-row" aria-label="Example: campaign blocks staged by signal and event month">
-            <span class="cw-actor cw-stager" aria-hidden="true"><span class="clay-actor clay-operator"></span></span>
+            <span class="cw-actor cw-stager" aria-hidden="true"><span class="nxc" data-role="operator" data-act="walk push" style="--from:-100px;--walk:1.2s"></span></span>
             <div class="cw-blocks">
               <span class="cw-block" style="--d:1.5s"><b>Estate</b><small>Oct 2026</small></span>
               <span class="cw-block" style="--d:2.2s"><b>Expired</b><small>Oct 2026</small></span>
@@ -1059,6 +1060,7 @@ button:focus-visible{outline:3px solid var(--orange);outline-offset:2px}
   <div class="foot">Buy box and territory counts come from your own listings and our Oct 9 scan of your territory. Replies and the funnel are real Nextier records, masked. The commercial-lot example is from your brief. On a 15-minute discovery call we walk any record end to end. · <a href="team-musso.html">Team Musso Story Mode</a> · <a href="core-engine-story.html">Core Engine Story Mode</a></div>
 </div>
 
+<script src="clay-crew.js"></script>
 <script>
 const CH=[
  {k:'Engineered opportunity',t:'NEXTIER engineers opportunity at the foundational level.',b:['Data intelligence: identify and understand opportunity.','Strategic positioning: create relevance and demand.','Adaptive engagement: build relationships at scale.','Coordinated execution: turn opportunity into progress.']},

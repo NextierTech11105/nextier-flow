@@ -1,0 +1,92 @@
+/* NEXTIER clay crew rig: the real clay figures, jointed so they walk in and do the work.
+   Each moving part uses its own transform channel (translate / rotate / scale), so a walk,
+   a lean and breathing can all run at once without overriding each other. */
+.nxc{position:relative;display:block;height:100%;aspect-ratio:var(--a,.56);margin:0 auto;pointer-events:none}
+.nxc i{position:absolute;display:block;font-style:normal}
+.nxc .nxc-fig,.nxc .nxc-p{inset:0}
+.nxc .nxc-p{background:no-repeat 0 0/100% 100%}
+.nxc .nxc-shadow{left:2%;right:2%;bottom:-2.2%;height:5%;border-radius:50%;background:radial-gradient(closest-side,rgba(0,0,0,.7),rgba(0,0,0,0))}
+.nxc-scout{--a:.5602}.nxc-analyst{--a:.5399}.nxc-operator{--a:.5689}
+.nxc-scout .nxc-leg-b{background-image:url(media/crew/scout-leg-b.png);transform-origin:20.43% 56.14%}
+.nxc-scout .nxc-leg-f{background-image:url(media/crew/scout-leg-f.png);transform-origin:39.78% 56.14%}
+.nxc-scout .nxc-body{background-image:url(media/crew/scout-body.png);transform-origin:30.11% 56.87%}
+.nxc-analyst .nxc-leg-b{background-image:url(media/crew/analyst-leg-b.png);transform-origin:42.05% 56.69%}
+.nxc-analyst .nxc-leg-f{background-image:url(media/crew/analyst-leg-f.png);transform-origin:68.18% 56.69%}
+.nxc-analyst .nxc-body{background-image:url(media/crew/analyst-body.png);transform-origin:54.55% 57.42%}
+.nxc-analyst .nxc-head{background-image:url(media/crew/analyst-head.png);transform-origin:46.59% 22.7%}
+.nxc-operator .nxc-leg-b{background-image:url(media/crew/operator-leg-b.png);transform-origin:25.26% 59.04%}
+.nxc-operator .nxc-leg-f{background-image:url(media/crew/operator-leg-f.png);transform-origin:51.58% 59.04%}
+.nxc-operator .nxc-body{background-image:url(media/crew/operator-body.png);transform-origin:38.95% 59.88%}
+.nxc-operator .nxc-fore{background-image:url(media/crew/operator-fore.png);transform-origin:67.58% 40.84%}
+
+/* Props that leave the hands */
+.nxc i.nxc-beam{left:66.67%;top:22.53%;width:640%;height:120%;translate:0 -50%;transform-origin:0 50%;rotate:-20deg;clip-path:polygon(0 47%,100% 0,100% 100%,0 53%);background:linear-gradient(90deg,rgba(188,214,255,.9),rgba(59,140,255,.34) 40%,rgba(59,140,255,0));opacity:0}
+.nxc i.nxc-card{left:23%;top:25.5%;width:26%;aspect-ratio:.8;border-radius:14%;background:linear-gradient(150deg,#8fbcff,#3b7cff 45%,#1c46b8);box-shadow:inset 1.5px 1.5px 2px rgba(255,255,255,.55),inset -2px -2px 3px rgba(0,0,0,.35),0 3px 6px rgba(0,0,0,.45);opacity:0}
+.nxc i.nxc-card::after{content:"";position:absolute;inset:20% 20% 38%;background:#fff;clip-path:polygon(50% 0,100% 48%,84% 48%,84% 100%,16% 100%,16% 48%,0 48%)}
+.nxc i.nxc-card::before{content:"";position:absolute;left:20%;right:20%;bottom:15%;height:8%;border-radius:3px;background:#e8f0ff}
+.nxc i.nxc-tagfly{left:25%;top:28%;width:24%;aspect-ratio:1;border-radius:50%;display:grid;place-items:center;background:#3b8cff;color:#000;font:800 10px/1 Arial,sans-serif;box-shadow:inset 1px 1px 2px rgba(255,255,255,.5),0 2px 5px rgba(0,0,0,.5);opacity:0}
+
+/* Motion vocabulary */
+@keyframes nxc-in{from{translate:var(--from,-140px) 0;opacity:0}22%{opacity:1}to{translate:0 0;opacity:1}}
+@keyframes nxc-stride{0%,100%{rotate:0deg}25%{rotate:13deg}75%{rotate:-13deg}}
+@keyframes nxc-bob{0%,100%{translate:0 0}50%{translate:0 -2.2%}}
+@keyframes nxc-breathe{from{scale:1 1}to{scale:1.006 1.016}}
+@keyframes nxc-plant-b{to{rotate:6deg}}
+@keyframes nxc-plant-f{to{rotate:-5deg}}
+@keyframes nxc-lean{to{rotate:var(--lean,4deg)}}
+
+/* walk: stride in from --from over --walk, then plant the feet */
+.go .nxc[data-act~="walk"]{animation:nxc-in var(--walk,1.4s) cubic-bezier(.3,.65,.4,1) var(--delay,0s) both}
+.go .nxc[data-act~="walk"] .nxc-leg-b{animation:nxc-stride calc(var(--walk,1.4s) / 2) ease-in-out var(--delay,0s) 2,nxc-plant-b .35s ease-out calc(var(--delay,0s) + var(--walk,1.4s)) forwards}
+.go .nxc[data-act~="walk"] .nxc-leg-f{animation:nxc-stride calc(var(--walk,1.4s) / 2) ease-in-out var(--delay,0s) 2 reverse,nxc-plant-f .35s ease-out calc(var(--delay,0s) + var(--walk,1.4s)) forwards}
+.go .nxc[data-act~="walk"] .nxc-fig{animation:nxc-bob calc(var(--walk,1.4s) / 4) ease-in-out var(--delay,0s) 4}
+.go .nxc .nxc-body{animation:nxc-breathe 1.8s ease-in-out infinite alternate}
+
+/* scan: the scout leans in over his magnifier and the beam sweeps the market */
+.nxc[data-act~="scan"]{--lean:5deg}
+.go .nxc[data-act~="scan"] .nxc-body{animation:nxc-breathe 1.8s ease-in-out infinite alternate,nxc-lean .5s ease-in-out 1.5s forwards}
+.go .nxc[data-act~="scan"] .nxc-beam{animation:nxc-beam-on .45s ease-out 1.9s forwards,nxc-beam-sweep 2.3s ease-in-out 1.9s infinite alternate}
+@keyframes nxc-beam-on{to{opacity:1}}
+@keyframes nxc-beam-sweep{from{rotate:-30deg}to{rotate:-4deg}}
+
+/* build: the analyst hands each record into the database, one row at a time */
+.go .nxc[data-act~="build"] .nxc-body{animation:nxc-breathe 1.8s ease-in-out infinite alternate,nxc-reach3 6.5s ease-in-out both}
+.go .nxc[data-act~="build"] .nxc-head{animation:nxc-nod3 6.5s ease-in-out both}
+.go .nxc[data-act~="build"] .nxc-card{animation:nxc-card-fly .65s ease-in both}
+.go .nxc[data-act~="build"] .nxc-c1{animation-delay:1.3s}
+.go .nxc[data-act~="build"] .nxc-c2{animation-delay:2s}
+.go .nxc[data-act~="build"] .nxc-c3{animation-delay:2.7s}
+@keyframes nxc-reach3{0%,18%{rotate:0deg}22%{rotate:-6deg}27%,29%{rotate:0deg}33%{rotate:-6deg}38%,40%{rotate:0deg}44%{rotate:-6deg}49%,100%{rotate:0deg}}
+@keyframes nxc-nod3{0%,19%{rotate:0deg}23%{rotate:-4deg}28%,30%{rotate:0deg}34%{rotate:-4deg}39%,41%{rotate:0deg}45%{rotate:-4deg}50%,100%{rotate:0deg}}
+@keyframes nxc-card-fly{0%{opacity:0;translate:0 0;scale:.9;rotate:0deg}15%{opacity:1}100%{opacity:0;translate:var(--fly,-125px) 4px;scale:.7;rotate:-12deg}}
+
+/* tag: the analyst presses a tag onto each aligned row */
+.go .nxc[data-act~="tag"] .nxc-body{animation:nxc-breathe 1.8s ease-in-out infinite alternate,nxc-tap3 6.5s ease-in-out both}
+.go .nxc[data-act~="tag"] .nxc-head{animation:nxc-look3 6.5s ease-in-out both}
+.go .nxc[data-act~="tag"] .nxc-tagfly{animation:nxc-tag-fly .45s ease-in both}
+.go .nxc[data-act~="tag"] .nxc-c1{animation-delay:2.35s;--tx:-72px;--ty:-46px}
+.go .nxc[data-act~="tag"] .nxc-c2{animation-delay:3.45s;--tx:-72px;--ty:3px}
+.go .nxc[data-act~="tag"] .nxc-c3{animation-delay:4.55s;--tx:-72px;--ty:52px}
+@keyframes nxc-tap3{0%,37%{rotate:0deg}41%{rotate:-7deg}45%,54%{rotate:0deg}58%{rotate:-7deg}62%,71%{rotate:0deg}75%{rotate:-7deg}79%,100%{rotate:0deg}}
+@keyframes nxc-look3{0%,36%{rotate:0deg}40%{rotate:-5deg}45%,53%{rotate:0deg}57%{rotate:-5deg}62%,70%{rotate:0deg}74%{rotate:-5deg}79%,100%{rotate:0deg}}
+@keyframes nxc-tag-fly{0%{opacity:0;translate:0 0;scale:.6}20%{opacity:1;scale:1}100%{opacity:0;translate:var(--tx) var(--ty);scale:1}}
+
+/* push: the operator shoulders each campaign block into the staged tray */
+.go .nxc[data-act~="push"] .nxc-body{animation:nxc-breathe 1.8s ease-in-out infinite alternate,nxc-push3 6.5s ease-in-out both}
+.go .nxc[data-act~="push"] .nxc-fore{animation:nxc-shove3 6.5s ease-in-out both}
+@keyframes nxc-push3{0%,20%{rotate:0deg}23%{rotate:7deg}27%,30%{rotate:1deg}34%{rotate:7deg}38%,41%{rotate:1deg}45%{rotate:7deg}50%,100%{rotate:1deg}}
+@keyframes nxc-shove3{0%,20%{rotate:0deg}23%{rotate:16deg}27%,30%{rotate:2deg}34%{rotate:16deg}38%,41%{rotate:2deg}45%{rotate:16deg}50%,100%{rotate:2deg}}
+
+/* idle: after arriving, each keeps working the way they would */
+.go .nxc-operator[data-act~="idle"] .nxc-fore{animation:nxc-gesture 1.4s ease-in-out calc(var(--delay,0s) + var(--walk,1.4s)) infinite alternate}
+.go .nxc-analyst[data-act~="idle"] .nxc-head{animation:nxc-tilt 2.2s ease-in-out calc(var(--delay,0s) + var(--walk,1.4s)) infinite alternate}
+.go .nxc-scout[data-act~="idle"] .nxc-body{animation:nxc-breathe 1.8s ease-in-out infinite alternate,nxc-peer 2.6s ease-in-out calc(var(--delay,0s) + var(--walk,1.4s)) infinite alternate}
+@keyframes nxc-gesture{from{rotate:-6deg}to{rotate:8deg}}
+@keyframes nxc-tilt{from{rotate:-2deg}to{rotate:3deg}}
+@keyframes nxc-peer{from{rotate:0deg}to{rotate:3deg}}
+
+@media(prefers-reduced-motion:reduce){
+ .go .nxc,.go .nxc i{animation:none!important}
+ .nxc i.nxc-card,.nxc i.nxc-tagfly{display:none}
+ .nxc i.nxc-beam{opacity:.7}
+}
