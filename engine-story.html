@@ -6,7 +6,7 @@
 <style>
 /* Layout: a stage (the app's own screens, animated) beside a narration column, a chapter rail underneath; one chapter at a time. Single committed dark look, continuous with Story Mode and the Nextier app. */
 :root{
-  --bg:#070B18; --panel:#0F1630; --panel-2:#141D3D; --line:#26335F;
+  --bg:#000000; --panel:#0D0D0D; --panel-2:#161616; --line:#2A2A2A;
   --fg:#FFFFFF; --soft:#D5DDF0; --orange:#FF8A3D; --orange-soft:#FFB27A;
   --blue:#4C8DFF; --blue-soft:#9CC0FF; --green:#2FD39A; --ink:#0A1022;
   --app:#0B0F14; --app-2:#12181F; --app-line:#232B35; --gold:#E2B54A;
@@ -16,7 +16,7 @@
 }
 *{box-sizing:border-box}
 html,body{height:100%}
-body{margin:0;background:radial-gradient(circle at 70% 20%,#16234D 0%,var(--bg) 60%) fixed,var(--bg);color:var(--fg);font-family:var(--body);font-size:17px;line-height:1.5}
+body{margin:0;background:var(--bg);color:var(--fg);font-family:var(--body);font-size:17px;line-height:1.5}
 .wrap{max-width:1240px;margin:0 auto;padding-inline:20px;padding-block:28px 40px;display:flex;flex-direction:column;gap:24px}
 header{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px}
 .brand{font-family:var(--display);font-weight:700;font-size:22px;letter-spacing:.08em}
@@ -87,7 +87,7 @@ button:focus-visible{outline:3px solid var(--orange);outline-offset:2px}
 .presets{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
 .preset{border:1px solid var(--app-line);border-radius:10px;padding:10px 12px;background:var(--app-2)}
 .preset b{display:block;font-size:14px}.preset span{font-size:12px;color:#AEB9C6}
-.preset.on{border-color:var(--blue);background:#101D38}
+.preset.on{border-color:var(--blue);background:#141414}
 .tick{display:flex;justify-content:space-between;align-items:center;border:1px dashed #3A4450;border-radius:10px;padding:10px 12px;font-weight:700}
 .tick b{font-family:var(--display);font-size:22px;color:var(--green);font-variant-numeric:tabular-nums}
 
@@ -102,7 +102,7 @@ button:focus-visible{outline:3px solid var(--orange);outline-offset:2px}
 .split{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:14px;width:min(520px,100%)}
 .lanebox{border-radius:16px;padding:14px;border:1px solid var(--line);background:var(--panel-2);display:flex;flex-direction:column;gap:8px}
 .lanebox h3{margin:0;font-family:var(--display);font-size:17px}
-.lanebox .o{padding:8px 10px;border-radius:10px;background:#0B1126;border:1px solid var(--line);font-size:14px}
+.lanebox .o{padding:8px 10px;border-radius:10px;background:#0A0A0A;border:1px solid var(--line);font-size:14px}
 .lanebox.go-l{border-color:var(--green)}.lanebox.go-l h3{color:var(--green)}
 .lanebox.rs-l h3{color:var(--blue-soft)}
 
@@ -120,7 +120,7 @@ td.w{white-space:normal}
 th:nth-child(1){width:34%}th:nth-child(2){width:18%}th:nth-child(3){width:18%}
 th{position:sticky;top:0;background:#0E1319;text-align:left;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:#AEB9C6;padding:8px 10px;border-bottom:1px solid var(--app-line)}
 td{padding:8px 10px;border-bottom:1px solid #1A2129;vertical-align:top;white-space:nowrap}
-tr.sel td{background:#122033}
+tr.sel td{background:#161B22}
 .tgs{display:flex;flex-wrap:wrap;gap:4px;white-space:normal}
 .tg{font-size:11px;font-weight:700;padding:2px 7px;border-radius:999px;border:1px solid #3A4450;color:#E5EBF2;background:#161D25}
 .tg.ev{border-color:var(--orange);color:var(--orange-soft)}
@@ -135,7 +135,7 @@ tr.sel td{background:#122033}
 @media (max-width:560px){.rec{grid-template-columns:minmax(0,1fr)}.rec .mini{display:none}}
 .mini{display:flex;flex-direction:column;gap:6px}
 .mini span{padding:7px 9px;border-radius:8px;background:#0E1319;border:1px solid #1A2129;font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.mini span.sel{background:#122033;border-color:#24406A}
+.mini span.sel{background:#161B22;border-color:#2E3A48}
 .panel{border:1px solid var(--app-line);border-radius:12px;padding:12px;background:var(--app-2);display:flex;flex-direction:column;gap:10px;min-width:0}
 .panel .addr{font-weight:700;font-size:16px}
 .panel .cty{color:#AEB9C6;font-size:13px}
@@ -153,7 +153,7 @@ tr.sel td{background:#122033}
 /* webhook */
 .hook{display:grid;grid-template-columns:minmax(0,1.1fr) 70px minmax(0,1fr);gap:8px;align-items:center;width:100%;max-width:640px}
 @media (max-width:560px){.hook{grid-template-columns:minmax(0,1fr)}.hook .wire{display:none}}
-pre{margin:0;padding:12px;border-radius:12px;background:#0B1126;border:1px solid var(--line);font-size:12px;line-height:1.45;color:#CFE0FF;overflow:auto;white-space:pre}
+pre{margin:0;padding:12px;border-radius:12px;background:#0A0A0A;border:1px solid var(--line);font-size:12px;line-height:1.45;color:#CFE0FF;overflow:auto;white-space:pre}
 pre .k{color:var(--blue-soft)}pre .s{color:var(--orange-soft)}
 .wire{position:relative;height:120px}
 .wire i{position:absolute;left:0;width:10px;height:10px;border-radius:50%;background:var(--orange-soft);box-shadow:0 0 10px var(--orange);animation:tf 1.8s linear infinite;animation-delay:var(--d)}
@@ -236,7 +236,7 @@ pre .k{color:var(--blue-soft)}pre .s{color:var(--orange-soft)}
       <div class="scene" hidden>
         <div class="sig">
           <div class="sc in1"><span class="ic" style="background:#2A1A10;color:var(--orange)">LP</span><div><b>Lis pendens filed</b><small>18 Birch Ln, Commack · filed this week</small></div><span class="new">NEW</span></div>
-          <div class="sc in2"><span class="ic" style="background:#1A2A55;color:var(--blue-soft)">IN</span><div><b>Inherited · estate transfer</b><small>402 Hawthorne Ave, Hempstead</small></div><span class="new">NEW</span></div>
+          <div class="sc in2"><span class="ic" style="background:#161616;color:var(--blue-soft)">IN</span><div><b>Inherited · estate transfer</b><small>402 Hawthorne Ave, Hempstead</small></div><span class="new">NEW</span></div>
           <div class="sc in3"><span class="ic" style="background:#13261D;color:var(--green)">EX</span><div><b>Listing expired</b><small>9 Maple Ct, Yonkers · off market 3 days</small></div><span class="new">NEW</span></div>
           <div class="sc in4"><span class="ic" style="background:#26201A;color:var(--gold)">TX</span><div><b>Tax delinquent</b><small>1260 NW 7th St, Miami · second year</small></div><span class="new">NEW</span></div>
         </div>
@@ -340,7 +340,7 @@ pre .k{color:var(--blue-soft)}pre .s{color:var(--orange-soft)}
       <!-- 10 · YOURS -->
       <div class="scene" hidden>
         <div class="sig">
-          <div class="sc in1"><span class="ic" style="background:#1A2A55;color:var(--blue-soft)">DB</span><div><b>Your own database</b><small>Every lead, tag and signal, owned by you</small></div></div>
+          <div class="sc in1"><span class="ic" style="background:#161616;color:var(--blue-soft)">DB</span><div><b>Your own database</b><small>Every lead, tag and signal, owned by you</small></div></div>
           <div class="sc in2"><span class="ic" style="background:#13261D;color:var(--green)">AM</span><div><b>Every morning, again</b><small>Only new matches. Tags re-stamp when data changes.</small></div></div>
           <div class="sc in3"><span class="ic" style="background:#2A1A10;color:var(--orange)">GO</span><div><b>Your move</b><small>Text it, call it, dial it, or send it to your CRM</small></div></div>
         </div>
