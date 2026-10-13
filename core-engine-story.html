@@ -38,7 +38,7 @@ button{font:inherit;font-weight:700;font-size:15px;color:var(--fg);background:va
 button:hover{border-color:var(--blue)}
 button:focus-visible{outline:3px solid var(--orange);outline-offset:2px}
 #play{background:var(--orange);border-color:var(--orange);color:var(--ink);min-width:120px}
-.rail{display:grid;grid-template-columns:repeat(10,minmax(0,1fr));gap:6px}
+.rail{display:grid;grid-template-columns:repeat(11,minmax(0,1fr));gap:6px}
 @media (max-width:1100px){.rail{grid-template-columns:repeat(6,minmax(0,1fr))}}
 @media (max-width:560px){.rail{grid-template-columns:repeat(2,minmax(0,1fr))}}
 .rail button{display:flex;flex-direction:column;align-items:flex-start;gap:8px;padding:10px;border-radius:12px;text-align:left;font-size:13px;color:var(--soft);min-width:0}
@@ -207,7 +207,7 @@ button:focus-visible{outline:3px solid var(--orange);outline-offset:2px}
 <div class="wrap">
   <header>
     <div class="brand">NEXT<span>IER</span> · CORE ENGINE</div>
-    <div class="tag">Story mode · with music · Illustrative example</div>
+    <div class="tag">Story mode · with music · Real records, masked</div>
   </header>
   <h1>Observe. Detect. Classify. Prioritize. Execute. <em>Learn.</em></h1>
 
@@ -229,46 +229,46 @@ button:focus-visible{outline:3px solid var(--orange);outline-offset:2px}
         </div>
       </div>
 
-      <!-- 2 · OBSERVE -->
+      <!-- 2 · OBSERVE (real: W. G., Broward County, FL) -->
       <div class="scene" hidden>
         <div class="flow">
-          <div class="kick in1">On the record · M. Alvarez · 18 Birch Ln</div>
-          <div class="fs" style="--d:.3s"><div><b>Initial SMS sent</b><small>Tue 5:02 PM</small></div><span class="ok">RECORDED</span></div>
-          <div class="fs" style="--d:.7s"><div><b>Delivered</b><small>Tue 5:02 PM · carrier receipt</small></div><span class="ok">RECORDED</span></div>
-          <div class="fs" style="--d:1.1s"><div><b>Reply: “Yes, call me after 5”</b><small>Wed 7:41 AM</small></div><span class="ok">RECORDED</span></div>
-          <div class="fs" style="--d:1.5s"><div><b>Call · 6 min · note added</b><small>Wed 5:04 PM</small></div><span class="ok">RECORDED</span></div>
-          <div class="fs" style="--d:1.9s"><div><b>Disposition: positive</b><small>pressed by a person</small></div><span class="ok">RECORDED</span></div>
+          <div class="kick in1">On the record · W. G. · Broward County, FL</div>
+          <div class="fs" style="--d:.3s"><div><b>Lis pendens recorded</b><small>Wed, Sept 30</small></div><span class="ok">RECORDED</span></div>
+          <div class="fs" style="--d:.7s"><div><b>Initial SMS delivered</b><small>Thu, Oct 8 · 12:34 PM</small></div><span class="ok">RECORDED</span></div>
+          <div class="fs" style="--d:1.1s"><div><b>Reply: “How fast could You buy my house ?”</b><small>Thu, Oct 8 · 2:59 PM</small></div><span class="ok">RECORDED</span></div>
+          <div class="fs" style="--d:1.5s"><div><b>Note: meeting today, third-party authorization</b><small>Mon, Oct 12 · 1:09 PM</small></div><span class="ok">RECORDED</span></div>
+          <div class="fs" style="--d:1.9s"><div><b>In-person meeting on the calendar</b><small>Mon, Oct 12 · 3:00 PM</small></div><span class="ok">RECORDED</span></div>
         </div>
       </div>
 
-      <!-- 3 · DETECT -->
+      <!-- 3 · DETECT (real, Sept 30–Oct 12) -->
       <div class="scene" hidden>
         <div class="flow">
-          <div class="fs hot" style="--d:.3s"><span class="no">LP</span><div><b>New signal · lis pendens filed</b><small>42 Oak St, Smithtown · recorded this morning</small></div><span class="ok">NEW</span></div>
-          <div class="fs hot" style="--d:.9s"><span class="no">✋</span><div><b>Hand raised</b><small>“Can you call me tomorrow?” · Estate of R. Klein</small></div><span class="ok">NEW</span></div>
-          <div class="fs hot" style="--d:1.5s"><span class="no">☎</span><div><b>Callback</b><small>(631) 555-0142 called the number back</small></div><span class="ok">NEW</span></div>
+          <div class="fs hot" style="--d:.3s"><span class="no">LP</span><div><b>New signal · lis pendens recorded</b><small>Broward County, FL · Sept 30</small></div><span class="ok">NEW</span></div>
+          <div class="fs hot" style="--d:.9s"><span class="no">✋</span><div><b>Hand raised</b><small>“You can call me at this number” · New York · Oct 8</small></div><span class="ok">NEW</span></div>
+          <div class="fs hot" style="--d:1.5s"><span class="no">☎</span><div><b>Callback asked</b><small>“Call 631-•••-•••• 4:15 to 4:30” · New York · Oct 12</small></div><span class="ok">NEW</span></div>
         </div>
       </div>
 
-      <!-- 4 · CLASSIFY -->
+      <!-- 4 · CLASSIFY (real positive replies, this week) -->
       <div class="scene" hidden>
         <div class="col">
-          <div class="q in1"><span>“Yes, what would you offer?”</span><span class="chip pos" style="--d:.6s">Positive 🔥</span></div>
-          <div class="q in2"><span>“Is this about the house on Oak?”</span><span class="chip" style="--d:1.3s">Question</span></div>
-          <div class="q in3"><span>“Maybe in the spring.”</span><span class="chip" style="--d:2s">Later</span></div>
-          <div class="q in4"><span>“STOP”</span><span class="chip stop" style="--d:2.7s">Opt-out · stopped</span></div>
+          <div class="q in1"><span>“How fast could You buy my house ? Do you have time for a call.”</span><span class="chip pos" style="--d:.6s">Positive 🔥</span></div>
+          <div class="q in2"><span>“You can call me at this number”</span><span class="chip pos" style="--d:1.3s">Hot 🔥</span></div>
+          <div class="q in3"><span>“Tomorrow morning is better after 9:30 AM”</span><span class="chip on" style="--d:2s">Scheduling</span></div>
+          <div class="q in4"><span>“absolutely”</span><span class="chip pos" style="--d:2.7s">Hot 🔥</span></div>
         </div>
       </div>
 
-      <!-- 5 · PRIORITIZE -->
+      <!-- 5 · PRIORITIZE (real, Oct 8–12) -->
       <div class="scene" hidden>
         <div class="col">
           <div class="kick in1">Your team's board · hottest first</div>
           <div class="queue in2">
-            <div class="q"><span>1 · M. Alvarez · wants an offer · call after 5</span><b>CALL</b></div>
-            <div class="q"><span>2 · J. Patel · called back</span><b>CALL</b></div>
-            <div class="q"><span>3 · Estate of R. Klein · asked a question</span><b>ANSWER</b></div>
-            <div class="q"><span>4 · K. Brennan · “maybe in spring”</span><b>NEXT TOUCH</b></div>
+            <div class="q"><span>1 · A. (NY) · “Call 631-•••-•••• 4:15 to 4:30”</span><b>CALL 4:15</b></div>
+            <div class="q"><span>2 · W. G. (FL) · “How fast could you buy my house?”</span><b>CALL</b></div>
+            <div class="q"><span>3 · NY owner · “Tomorrow morning is better after 9:30 AM”</span><b>CALL 9:30</b></div>
+            <div class="q"><span>4 · NY owner · “Anytime is fine”</span><b>CALL</b></div>
           </div>
         </div>
       </div>
@@ -298,8 +298,8 @@ button:focus-visible{outline:3px solid var(--orange);outline-offset:2px}
           <div class="kick in1">Every month</div>
           <div class="fs" style="--d:.4s"><div><b>Dispositions</b><small>what every conversation became</small></div></div>
           <div class="fs" style="--d:.8s"><div><b>Notes</b><small>what people actually said</small></div></div>
-          <div class="fs" style="--d:1.2s"><div><b>Messaging</b><small>which words earned the replies</small></div></div>
-          <div class="fs hot" style="--d:1.6s"><div><b>Against the numbers</b><small>texts out vs positive replies in</small></div></div>
+          <div class="fs" style="--d:1.2s"><div><b>Messaging</b><small>which words earned the positive replies</small></div></div>
+          <div class="fs hot" style="--d:1.6s"><div><b>Positive replies, month over month</b><small>48 in September · 38 in Oct 1–12</small></div></div>
           <div class="card in4"><p>Then the next month gets sharper.</p></div>
         </div>
       </div>
@@ -317,7 +317,19 @@ button:focus-visible{outline:3px solid var(--orange);outline-offset:2px}
         </div>
       </div>
 
-      <!-- 10 · IT COMPOUNDS -->
+      <!-- 10 · FIELD NOTE (real, anonymized: Thomas 2026-10-12 "MORE PROOF") -->
+      <div class="scene" hidden>
+        <div class="col">
+          <div class="kick in1">Field note · real · South Florida · this week</div>
+          <div class="fs" style="--d:.4s"><div><b>Thursday 12:34 PM</b><small>First text delivered</small></div><span class="ok">DELIVERED</span></div>
+          <div class="fs" style="--d:.9s"><div><b>Thursday 2:59 PM</b><small>The owner replies, same afternoon</small></div><span class="ok">REPLY</span></div>
+          <div class="fs hot" style="--d:1.4s"><div><b>Monday 3:00 PM</b><small>In person: third-party authorization, payoffs next</small></div><span class="ok">MEETING</span></div>
+          <div class="notes in3"><b>Operator note</b><span>“Meeting today in person around 3pm to get 3rd party signed. Need to get pay offs to see where numbers land. Wants to sell ASAP, willing to take a little less.”</span></div>
+          <div class="card in4"><p><b>Control the narrative and establish authority, then demonstrate competency to influence the decision.</b></p></div>
+        </div>
+      </div>
+
+      <!-- 11 · IT COMPOUNDS -->
       <div class="scene" hidden>
         <div class="tri">
           <div class="card in1"><h3>Sharper</h3><p>Every touch makes the next one sharper.</p></div>
@@ -328,7 +340,7 @@ button:focus-visible{outline:3px solid var(--orange);outline-offset:2px}
     </div>
 
     <div class="narr">
-      <div class="step" id="step">Chapter 1 of 10</div>
+      <div class="step" id="step">Chapter 1 of 11</div>
       <h2 id="ttl"></h2>
       <p id="txt"></p>
       <div class="controls">
@@ -360,7 +372,7 @@ button:focus-visible{outline:3px solid var(--orange);outline-offset:2px}
   <span class="tk dark"><span class="lg lg-ghl" role="img" aria-label="HighLevel" style="--w:124px;--h:27px"></span></span>
   <span class="tk"><span class="lg lg-fub" role="img" aria-label="Follow Up Boss" style="--w:94px;--h:36px"></span></span>
 </template>
-  <div class="foot">Illustrative story. Names, addresses, phone numbers (555) and counts are examples. Use the arrow keys or the chapter buttons to move through it. · <a href="engine-story.html">Data Engine Story Mode</a> · <a href="origination-story.html">Deal Origination Terminal Story Mode</a> · <a href="dataengine.html">The Data Engine</a></div>
+  <div class="foot">Every example here is a real record from Nextier’s operator files, with names, numbers and addresses masked. On a 15-minute discovery call we walk any of them end to end, with the full trace. Use the arrow keys or the chapter buttons to move through it. · <a href="engine-story.html">Data Engine Story Mode</a> · <a href="origination-story.html">Deal Origination Terminal Story Mode</a> · <a href="dataengine.html">The Data Engine</a></div>
 </div>
 
 <script>
@@ -368,12 +380,13 @@ const CH=[
  {k:'The loop',t:'One loop runs under every campaign',x:'The Data Engine powers the initial campaign engine. Then one loop runs under every campaign: observe, detect, classify, prioritize, execute, learn. The rails are fast, intentional and two-way.'},
  {k:'Observe',t:'Observe',x:'Every send, reply, call, note and disposition is on the record. Nothing that happens with an owner is lost.'},
  {k:'Detect',t:'Detect',x:'New signals, hand raises and callbacks surface the moment they happen, not at the end of the week.'},
- {k:'Classify',t:'Classify',x:'Every reply is sorted by intent: positive, question, later or opt-out. Opt-outs stop, for good.'},
+ {k:'Classify',t:'Classify',x:'Every reply is sorted by intent: positive, question, later or opt-out. These are real positive replies from this week.'},
  {k:'Prioritize',t:'Prioritize',x:'The hottest conversations jump to the top of your team’s board, so the next call is always the right one.'},
  {k:'Execute',t:'Execute',x:'A person presses launch, call or book. Texts go out, calls come in. One press authorizes one communication.'},
  {k:'Inbound calls',t:'Every inbound call answered',x:'Every inbound call is answered and mapped to its segment’s own channel, so each caller lands with the right context and the right person.'},
  {k:'Learn',t:'Learn',x:'Every month we review dispositions, notes and messaging against the numbers: texts out vs positive replies in. Then the next month gets sharper.'},
  {k:'Real numbers',t:'The numbers, at our first listing in contract',x:'67 positive replies, 8 appointments, 1 listing in contract. Nextier operator records, real estate, counted at the Aug 19, 2026 listing.'},
+ {k:'Field note',t:'First text to a sit-down in four days',x:'Real, from this week: the first text was delivered Thursday at 12:34 PM, the owner replied at 2:59 PM the same afternoon, and on Monday at 3 PM they sat down in person to sign a third-party authorization. Control the narrative, establish authority, then demonstrate competency.'},
  {k:'Compounds',t:'Every touch makes the next one sharper',x:'That is how it drives revenue at a much lower cost and gives your people their bandwidth back.'}
 ];
 // Integration partners: two copies of the logo strip make the loop seamless; the second is hidden from screen readers.
