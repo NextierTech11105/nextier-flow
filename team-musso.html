@@ -1,7 +1,7 @@
 <!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>Team Musso Story Mode</title>
 <meta name="robots" content="noindex">
-<meta name="description" content="Built for Team Musso: cold outreach stays in Nextier and only qualified owners reach Follow Up Boss; your buy box, territory counts, event signals, Claude on your own data engine, every channel, co-hosted on DigitalOcean with your own keys, and a first hunt ready at Initial SMS.">
+<meta name="description" content="Built for Team Musso: cold outreach stays in Nextier and only qualified owners reach Follow Up Boss; buy box, territory and signal counts, redevelopment sites, linked properties for portfolio owners, landlords and REITs, Claude on your own data engine, every channel, co-hosted on DigitalOcean with your own keys, and a first hunt ready at Initial SMS.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=DM+Sans:wght@400;500;700&display=swap">
 <style>
@@ -314,7 +314,25 @@ pre .k{color:var(--blue-soft)}pre .s{color:var(--orange-soft)}
 .bub.out{align-self:flex-end;background:var(--blue);color:var(--fg)}
 .bub.in{align-self:flex-start;background:#2A2A2A;color:var(--fg)}
 .bub small{display:block;font-size:11px;font-weight:700;letter-spacing:.08em;opacity:.85;margin-bottom:2px}
-.rail{grid-template-columns:repeat(11,minmax(0,1fr))}
+.redev{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;width:min(560px,100%)}
+@media (max-width:560px){.redev{grid-template-columns:minmax(0,1fr)}}
+.rd{padding:12px 14px;border-radius:14px;background:var(--panel-2);border:1px solid var(--line);display:flex;justify-content:space-between;align-items:center;gap:10px}
+.rd b{font-family:var(--display);font-size:17px}
+.rd .ct{display:flex;gap:12px;font-variant-numeric:tabular-nums}
+.rd .ct span{display:flex;flex-direction:column;align-items:flex-end;font-family:var(--display);font-size:22px;line-height:1}
+.rd .ct small{font-family:var(--body);font-size:10px;letter-spacing:.12em;color:var(--soft);margin-top:3px}
+.redev .wide{grid-column:1/-1;font-size:13px;color:var(--soft);padding:8px 12px;border-radius:10px;border:1px dashed var(--line)}
+.port{display:flex;flex-direction:column;gap:8px}
+.filt{display:flex;flex-wrap:wrap;gap:6px}
+.filt span{padding:6px 10px;border-radius:8px;border:1px solid var(--app-line);background:var(--app-2);font-size:13px;font-weight:700}
+.filt span b{color:var(--gold)}
+.po{display:grid;grid-template-columns:minmax(0,1.4fr) 70px minmax(0,1fr);gap:10px;align-items:center;padding:9px 12px;border-radius:10px;background:var(--app-2);border:1px solid var(--app-line);font-size:13px}
+.po b{font-size:14px}
+.po .n{font-family:var(--display);font-size:20px;text-align:center;font-variant-numeric:tabular-nums}
+.po .ty{justify-self:end;font-size:11px;font-weight:700;letter-spacing:.08em;padding:3px 9px;border-radius:999px;border:1px solid #3A4450}
+.po .ty.rs{border-color:#2E3A48;color:#9CC0FF}
+.go .po{animation:up .4s ease-out both var(--d)}
+.rail{grid-template-columns:repeat(7,minmax(0,1fr))}
 @media (max-width:1100px){.rail{grid-template-columns:repeat(6,minmax(0,1fr))}}
 @media (max-width:520px){.rail{grid-template-columns:repeat(2,minmax(0,1fr))}}
 </style>
@@ -387,6 +405,34 @@ pre .k{color:var(--blue-soft)}pre .s{color:var(--orange-soft)}
           <div class="sc in2"><span class="ic" style="background:#161616;color:var(--blue-soft)">ES</span><div><b>1,598 estates on 0.90+ acres</b><small>Heirs deciding what to do with land</small></div><span class="new">NOW</span></div>
           <div class="sc in3"><span class="ic" style="background:#26201A;color:var(--gold)">PF</span><div><b>601 pre-foreclosures on a big lot</b><small>A deadline on land you can split</small></div><span class="new">NOW</span></div>
           <div class="sc in4"><span class="ic" style="background:#13261D;color:var(--green)">↻</span><div><b>New ones every week</b><small>The radar re-checks your territory and only new matches come in</small></div></div>
+        </div>
+      </div>
+
+      <!-- 6 · REDEVELOPMENT -->
+      <div class="scene" hidden>
+        <div class="redev">
+          <div class="rd in1"><b>Parking lots</b><div class="ct"><span>481<small>SUFFOLK</small></span><span>231<small>NASSAU</small></span></div></div>
+          <div class="rd in1"><b>Strip centers</b><div class="ct"><span>241<small>SUFFOLK</small></span><span>317<small>NASSAU</small></span></div></div>
+          <div class="rd in2"><b>Car lots</b><div class="ct"><span>215<small>SUFFOLK</small></span><span>922<small>NASSAU</small></span></div></div>
+          <div class="rd in2"><b>Motels</b><div class="ct"><span>155<small>SUFFOLK</small></span><span>60<small>NASSAU</small></span></div></div>
+          <div class="rd in3"><b>Nightclubs and bars</b><div class="ct"><span>98<small>SUFFOLK</small></span><span>35<small>NASSAU</small></span></div></div>
+          <div class="rd in3" style="border-color:var(--gold)"><b>Your next site</b><div class="ct"><span style="color:var(--gold)">→</span></div></div>
+          <div class="wide in4">Most of these are company-owned, so they go to research first to find the person who decides.</div>
+        </div>
+      </div>
+
+      <!-- 7 · LINKED PROPERTIES -->
+      <div class="scene" hidden>
+        <div class="app">
+          <div class="abar"><b>Workspace</b><span class="ws">Team Musso · Development</span><span class="pill">REAL ESTATE</span><span style="margin-left:auto;color:#AEB9C6">Linked properties</span></div>
+          <div class="abody port">
+            <div class="filt in1"><span>Properties owned <b>5+</b></span><span>Portfolio value <b>$5M+</b></span><span>Portfolio equity <b>50%+</b></span><span>Mortgage</span><span>Active buyer</span></div>
+            <div class="po" style="--d:.8s"><div><b>Long-time landlord</b><br><span style="color:#AEB9C6">two-family homes · Hempstead, Freeport</span></div><span class="n">14</span><span class="ty">LANDLORD</span></div>
+            <div class="po" style="--d:1.1s"><div><b>Family portfolio, second generation</b><br><span style="color:#AEB9C6">mixed-use · Route 110 corridor</span></div><span class="n">9</span><span class="ty">PORTFOLIO</span></div>
+            <div class="po" style="--d:1.4s"><div><b>Retail REIT</b><br><span style="color:#AEB9C6">strip centers · Nassau and Suffolk</span></div><span class="n">22</span><span class="ty rs">REIT · RESEARCH</span></div>
+            <div class="po" style="--d:1.7s"><div><b>Active buyer, 3 buys this year</b><br><span style="color:#AEB9C6">land and older homes · out east</span></div><span class="n">6</span><span class="ty">BUYER</span></div>
+            <span style="font-size:12px;color:#AEB9C6">Examples. Every property an owner holds is linked, with total value and equity.</span>
+          </div>
         </div>
       </div>
 
@@ -485,7 +531,7 @@ pre .k{color:var(--blue-soft)}pre .s{color:var(--orange-soft)}
     </div>
 
     <div class="narr">
-      <div class="step" id="step">Chapter 1 of 11</div>
+      <div class="step" id="step">Chapter 1 of 13</div>
       <h2 id="ttl"></h2>
       <p id="txt"></p>
       <div class="controls">
@@ -505,7 +551,7 @@ pre .k{color:var(--blue-soft)}pre .s{color:var(--orange-soft)}
     <div><b>13 · 1</b><span>appointments and our first deal since September</span></div>
   </section>
 
-  <div class="foot">Counts on chapters 3–5 and 11 are from our 10-09 scan of your territory, individually owned only. Names, street addresses, phone numbers and the conversation are examples. Campaign numbers are from Nextier's own live New York campaign. · <a href="team-musso-nxtpost.html">NXTPOST for Team Musso</a> · <a href="development-story.html">Development Story Mode</a> · <a href="engine-story.html">Data Engine Story Mode</a></div>
+  <div class="foot">Counts on chapters 3–5 and 13 are from our 10-09 scan of your territory, individually owned only; redevelopment counts (chapter 6) are all owners. Names, street addresses, phone numbers and the conversation are examples. Campaign numbers are from Nextier's own live New York campaign. · <a href="team-musso-nxtpost.html">NXTPOST for Team Musso</a> · <a href="development-story.html">Development Story Mode</a> · <a href="engine-story.html">Data Engine Story Mode</a></div>
 </div>
 
 <script>
@@ -515,6 +561,8 @@ const CH=[
  {k:'Lead Builder',t:'Every lot that fits, on the map',x:'The Lead Builder lights up every parcel in your territory that matches your buy box, on the satellite view. Your first hunt is already sized: 1,208 subdivision-size lots in Riverhead and Mastic–Moriches.'},
  {k:'Territory',t:'Your hunting grounds, counted',x:'Route 110 north to south: 2,021 commercial properties owned by individuals for 5+ years. Out east: 842 subdivision-size lots around Riverhead and 366 in Mastic–Moriches.'},
  {k:'Signals',t:'Owners with a reason to move',x:'4,228 listings that expired and never came back, 940 of them on big lots. 1,598 estates on 0.90+ acres. 601 pre-foreclosures on land you can split. The radar checks your territory every week.'},
+ {k:'Redevelopment',t:'Redevelopment sites, counted',x:'Parking lots, strip centers, car lots, motels, nightclubs and bars: the sites that become your next project. Counted across Suffolk and Nassau. Most are company-owned, so research finds the person who decides first.'},
+ {k:'Linked',t:'Every property an owner holds, linked',x:'Find the owners with real portfolios: 5 or more properties, total value, total equity, mortgages, and who’s actively buying. That’s how you go after portfolio managers, landlords and REITs.'},
  {k:'Ask Claude',t:'Your team just asks',x:'Claude connects to your own data engine. Ask in plain English, like "every commercial expired in the last 24 months", and the list builds in your Property Book, tagged and ready.'},
  {k:'The book',t:'Every lot, tagged, in one list',x:'Subdivision-size, expired and not relisted, estate on a big lot, older home, commercial expired. Filter by any tag. Every row carries the owner and a verified mobile.'},
  {k:'Channels',t:'Lead gen on every channel',x:'One list, four ways out. Text gets the reply. Mail goes to your mail house with the owner’s mailing address. Email goes to your email tool. Calls are one click.'},
