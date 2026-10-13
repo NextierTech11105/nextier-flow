@@ -53,9 +53,9 @@
 .go .nxc[data-act~="build"] .nxc-body{animation:nxc-breathe 1.8s ease-in-out infinite alternate,nxc-reach3 6.5s ease-in-out both}
 .go .nxc[data-act~="build"] .nxc-head{animation:nxc-nod3 6.5s ease-in-out both}
 .go .nxc[data-act~="build"] .nxc-card{animation:nxc-card-fly .65s ease-in both}
-.go .nxc[data-act~="build"] .nxc-c1{animation-delay:1.3s}
-.go .nxc[data-act~="build"] .nxc-c2{animation-delay:2s}
-.go .nxc[data-act~="build"] .nxc-c3{animation-delay:2.7s}
+.go .nxc[data-act~="build"] .nxc-c1{animation-delay:var(--t1,1.3s)}
+.go .nxc[data-act~="build"] .nxc-c2{animation-delay:var(--t2,2s)}
+.go .nxc[data-act~="build"] .nxc-c3{animation-delay:var(--t3,2.7s)}
 @keyframes nxc-reach3{0%,18%{rotate:0deg}22%{rotate:-6deg}27%,29%{rotate:0deg}33%{rotate:-6deg}38%,40%{rotate:0deg}44%{rotate:-6deg}49%,100%{rotate:0deg}}
 @keyframes nxc-nod3{0%,19%{rotate:0deg}23%{rotate:-4deg}28%,30%{rotate:0deg}34%{rotate:-4deg}39%,41%{rotate:0deg}45%{rotate:-4deg}50%,100%{rotate:0deg}}
 @keyframes nxc-card-fly{0%{opacity:0;translate:0 0;scale:.9;rotate:0deg}15%{opacity:1}100%{opacity:0;translate:var(--fly,-125px) 4px;scale:.7;rotate:-12deg}}
@@ -64,9 +64,9 @@
 .go .nxc[data-act~="tag"] .nxc-body{animation:nxc-breathe 1.8s ease-in-out infinite alternate,nxc-tap3 6.5s ease-in-out both}
 .go .nxc[data-act~="tag"] .nxc-head{animation:nxc-look3 6.5s ease-in-out both}
 .go .nxc[data-act~="tag"] .nxc-tagfly{animation:nxc-tag-fly .45s ease-in both}
-.go .nxc[data-act~="tag"] .nxc-c1{animation-delay:2.35s;--tx:-72px;--ty:-46px}
-.go .nxc[data-act~="tag"] .nxc-c2{animation-delay:3.45s;--tx:-72px;--ty:3px}
-.go .nxc[data-act~="tag"] .nxc-c3{animation-delay:4.55s;--tx:-72px;--ty:52px}
+.go .nxc[data-act~="tag"] .nxc-c1{animation-delay:var(--t1,2.35s);--tx:var(--x1,-72px);--ty:var(--y1,-46px)}
+.go .nxc[data-act~="tag"] .nxc-c2{animation-delay:var(--t2,3.45s);--tx:var(--x2,-72px);--ty:var(--y2,3px)}
+.go .nxc[data-act~="tag"] .nxc-c3{animation-delay:var(--t3,4.55s);--tx:var(--x3,-72px);--ty:var(--y3,52px)}
 @keyframes nxc-tap3{0%,37%{rotate:0deg}41%{rotate:-7deg}45%,54%{rotate:0deg}58%{rotate:-7deg}62%,71%{rotate:0deg}75%{rotate:-7deg}79%,100%{rotate:0deg}}
 @keyframes nxc-look3{0%,36%{rotate:0deg}40%{rotate:-5deg}45%,53%{rotate:0deg}57%{rotate:-5deg}62%,70%{rotate:0deg}74%{rotate:-5deg}79%,100%{rotate:0deg}}
 @keyframes nxc-tag-fly{0%{opacity:0;translate:0 0;scale:.6}20%{opacity:1;scale:1}100%{opacity:0;translate:var(--tx) var(--ty);scale:1}}
