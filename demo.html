@@ -135,6 +135,10 @@ h1{font:700 clamp(36px,5.4vw,64px)/1.02 var(--display);letter-spacing:-.025em;ma
 .f-book span{font-size:15px;color:#27324f}
 .f-book .booked{background:var(--blue);color:#fff;font:700 13px/1 var(--body);letter-spacing:.1em;text-transform:uppercase;border-radius:999px;padding:9px 12px;margin-left:6px}
 @media (max-width:520px){.float{padding:9px 11px;gap:8px}.f-book b{font-size:15px}.f-book span{font-size:13px}.f-book .booked{display:none}}
+.hero-art .mslot.mascot-video{overflow:hidden;border-radius:50%;filter:drop-shadow(0 26px 44px rgba(59,140,255,.45))}
+.hero-art .mslot.mascot-video video{width:100%;height:100%;object-fit:cover;object-position:62% 44%;transform:scale(1.12);display:block;-webkit-mask-image:radial-gradient(circle at 50% 46%,#000 48%,rgba(0,0,0,.5) 66%,transparent 84%);mask-image:radial-gradient(circle at 50% 46%,#000 48%,rgba(0,0,0,.5) 66%,transparent 84%)}
+.hero-art .mslot.mascot-video::before{content:"";position:absolute;inset:0;z-index:1;border-radius:50%;pointer-events:none;background:radial-gradient(circle at 50% 46%,rgba(43,99,185,.26) 0%,rgba(43,99,185,.4) 56%,rgba(43,99,185,.2) 76%,transparent 84%)}
+.hero-art .mslot.mascot-video::after{content:"";position:absolute;inset:0;z-index:2;border-radius:50%;pointer-events:none;background:radial-gradient(circle at 50% 46%,transparent 46%,rgba(10,22,38,.58) 70%,rgba(10,22,38,.98) 100%)}
 .roles{list-style:none;margin-block:0;padding-block:6px 30px;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px}
 .role{position:relative;background:var(--panel);border:1px solid var(--line);border-radius:20px;padding:16px;display:flex;gap:12px;align-items:flex-start;min-width:0}
 .role+.role::before{content:"";position:absolute;left:-16px;top:38px;width:16px;height:2px;background:linear-gradient(90deg,var(--blue),var(--orange))}
@@ -701,7 +705,7 @@ figcaption{font-size:14px;color:var(--fg-3)}
     <div class="hero-art">
       <div class="halo"></div>
       <svg class="ring" viewBox="0 0 100 100" aria-hidden="true"><circle cx="50" cy="50" r="48"/></svg>
-      <div class="mslot" data-mascot="hero"></div>
+      <div class="mslot mascot-video"><video autoplay loop muted playsinline preload="auto"><source src="mascot-c.mp4" type="video/mp4"></video></div>
       <div class="float f-reply"><span class="tagpill tag-pos"><svg class="ic" aria-hidden="true"><use href="#i-check"/></svg>Positive reply</span><span class="f-sub">Classified · Prioritized · Routed</span></div>
       <div class="float f-book"><svg class="ic" aria-hidden="true"><use href="#i-cal"/></svg><div><small>Focus Calendar</small><b>15-minute discovery</b><span>Tomorrow · 10:00 AM</span></div><span class="booked">Booked</span></div>
     </div>
@@ -845,7 +849,7 @@ figcaption{font-size:14px;color:var(--fg-3)}
     <div class="hero-art">
       <div class="halo"></div>
       <svg class="ring" viewBox="0 0 100 100" aria-hidden="true"><circle cx="50" cy="50" r="48"/></svg>
-      <div class="mslot" data-mascot="hero"></div>
+      <div class="mslot mascot-video"><video autoplay loop muted playsinline preload="auto"><source src="mascot-c.mp4" type="video/mp4"></video></div>
       <div class="float f-reply"><span class="tagpill tag-pos"><svg class="ic" aria-hidden="true"><use href="#i-check"/></svg>Positive reply</span><span class="f-sub">Classified · Prioritized · Routed</span></div>
       <div class="float f-book"><svg class="ic" aria-hidden="true"><use href="#i-cal"/></svg><div><small>Focus Calendar</small><b>Discovery call</b><span>Thursday · 11:00 AM</span></div><span class="booked">Booked</span></div>
     </div>
@@ -931,7 +935,7 @@ figcaption{font-size:14px;color:var(--fg-3)}
     <div class="hero-art">
       <div class="halo"></div>
       <svg class="ring" viewBox="0 0 100 100" aria-hidden="true"><circle cx="50" cy="50" r="48"/></svg>
-      <div class="mslot" data-mascot="hero"></div>
+      <div class="mslot mascot-video"><video autoplay loop muted playsinline preload="auto"><source src="mascot-c.mp4" type="video/mp4"></video></div>
       <div class="float f-reply"><span class="tagpill tag-pos"><svg class="ic" aria-hidden="true"><use href="#i-check"/></svg>Positive reply</span><span class="f-sub">Classified · Prioritized · Routed</span></div>
       <div class="float f-book"><svg class="ic" aria-hidden="true"><use href="#i-bag"/></svg><div><small>Store calendar</small><b>Pickup hold</b><span>Today · until 6:00 PM</span></div><span class="booked">Held</span></div>
     </div>
@@ -2178,6 +2182,150 @@ function route(initial) {
 }
 window.addEventListener("hashchange", () => route(false));
 route(true);
+})();
+</script>
+
+<!-- Force the hero mascot clips to actually play (Chrome won't always honor the autoplay attr on a cross-origin, blended video). -->
+<script>
+(function () {
+  function kick() {
+    document.querySelectorAll('.mascot-video video').forEach(function (v) {
+      v.muted = true; v.defaultMuted = true;
+      var p = v.play(); if (p && p.catch) p.catch(function () {});
+    });
+  }
+  if (document.readyState !== 'loading') kick(); else document.addEventListener('DOMContentLoaded', kick);
+  window.addEventListener('load', kick);
+  document.addEventListener('pointerdown', kick, { once: true });
+  document.addEventListener('visibilitychange', function () { if (!document.hidden) kick(); });
+})();
+</script>
+
+<!-- Live agent: "Start the call" talks to a real CloudGreet demo agent in-browser,
+     with the scripted sample as an automatic fallback (mic denied / error). -->
+<style>
+  [data-transcript] .li-row{display:flex;gap:10px;margin:0 0 9px;font-size:14px;line-height:1.46}
+  [data-transcript] .li-row b{flex:0 0 34px;text-transform:uppercase;font-size:10px;letter-spacing:.08em;opacity:.5;margin-top:3px}
+  [data-transcript] .li-you{opacity:.82}
+  .live-done{margin-top:12px;padding-top:12px;border-top:1px solid rgba(0,0,0,.09)}
+  .live-done p{margin:0 0 10px;font-size:13.5px;opacity:.82}
+</style>
+<script type="module">
+(function () {
+  const CG = "https://cloudgreet.com/api/demo/web-call";
+  // demo panel id -> CloudGreet demo vertical (existing per-vertical agents)
+  const MAP = { "real-estate": "linden_vale", "b2b": "ridgeline", "retail": "fieldstone" };
+  const $ = (s, r = document) => r.querySelector(s);
+  const esc = s => String(s == null ? "" : s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+  const live = new WeakMap();
+
+  let SDK = null;
+  const loadSDK = async () => {
+    if (SDK) return SDK;
+    const m = await import("https://esm.sh/retell-client-js-sdk@2.0.8");
+    SDK = m.RetellWebClient;
+    return SDK;
+  };
+
+  const panelOf = el => (el.closest ? el.closest(".panel") : null);
+  const setStatus = (p, t, on) => { const s = $("[data-status]", p); if (s) { s.textContent = t; s.classList.toggle("live", !!on); } };
+  const toEndBtn = b => { if (!b) return; if (b.dataset.origHtml === undefined) b.dataset.origHtml = b.innerHTML; b.innerHTML = "End call"; };
+  const restoreBtn = p => { const b = $("[data-start]", p); if (b && b.dataset.origHtml !== undefined) b.innerHTML = b.dataset.origHtml; };
+
+  function renderTranscript(p, tx) {
+    const tr = $("[data-transcript]", p); if (!tr) return;
+    if (!tx.length) return;
+    tr.innerHTML = tx.map(t => {
+      const agent = t.role === "agent";
+      return `<div class="li-row ${agent ? "li-agent" : "li-you"}"><b>${agent ? "AI" : "You"}</b><span>${esc(t.content)}</span></div>`;
+    }).join("");
+    tr.scrollTop = tr.scrollHeight;
+  }
+
+  function endLive(p) {
+    const s = live.get(p); if (!s) return;
+    s.ended = true;
+    live.delete(p);
+    p._endedAt = Date.now();
+    // Tear the SDK down hard so no late call_started / auto-reconnect brings it back.
+    try { if (s.client.removeAllListeners) s.client.removeAllListeners(); } catch (e) {}
+    try { s.client.stopCall(); } catch (e) {}
+    restoreBtn(p);
+    const v = $("[data-voice]", p); if (v) v.style.display = "";
+    setStatus(p, "Call ended", false);
+    const tr = $("[data-transcript]", p);
+    if (tr && !$(".live-done", tr)) {
+      const d = document.createElement("div");
+      d.className = "live-done";
+      d.innerHTML = `<p>That was a live sample assistant. The real one answers your own business line, day and night.</p><a class="btn btn-primary btn-sm" href="#book">Book a real demo</a>`;
+      tr.appendChild(d);
+    }
+  }
+
+  function startLive(p) {
+    const vertical = MAP[p.id] || "default";
+    const btn = $("[data-start]", p), opts = $("[data-opts]", p), voice = $("[data-voice]", p), tr = $("[data-transcript]", p);
+    if (opts) opts.innerHTML = "";
+    if (voice) voice.style.display = "none";
+    setStatus(p, "Connecting", true);
+    if (tr) tr.innerHTML = '<p class="ph">Connecting you to a live assistant… allow microphone access when your browser asks.</p>';
+
+    return (async () => {
+      let token;
+      try {
+        const res = await fetch(CG, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ vertical }) });
+        if (!res.ok) throw new Error("token " + res.status);
+        token = (await res.json()).access_token;
+        if (!token) throw new Error("no token");
+      } catch (e) { return { ok: false, reason: "token" }; }
+
+      let Client;
+      try { Client = await loadSDK(); } catch (e) { return { ok: false, reason: "sdk" }; }
+
+      const client = new Client();
+      const state = { client, started: false };
+      live.set(p, state);
+
+      return await new Promise(resolve => {
+        let settled = false;
+        const done = v => { if (!settled) { settled = true; resolve(v); } };
+        client.on("call_started", () => { if (state.ended) { try { client.stopCall(); } catch (e) {} return; } state.started = true; setStatus(p, "Live", true); if (tr) tr.innerHTML = '<p class="ph">You’re connected. Say hello.</p>'; toEndBtn(btn); done({ ok: true }); });
+        client.on("call_ended", () => { if (!state.ended && live.get(p) === state) endLive(p); });
+        client.on("update", u => { if (!state.ended && u && Array.isArray(u.transcript)) renderTranscript(p, u.transcript); });
+        client.on("error", () => { if (!state.started) { live.delete(p); done({ ok: false, reason: "err" }); } else endLive(p); try { client.stopCall(); } catch (e) {} });
+        try { client.startCall({ accessToken: token }); }
+        catch (e) { if (!state.started) { live.delete(p); done({ ok: false, reason: "mic" }); } }
+        setTimeout(() => { if (!state.started) { try { client.stopCall(); } catch (e) {} live.delete(p); done({ ok: false, reason: "timeout" }); } }, 12000);
+      });
+    })();
+  }
+
+  function scripted(p) { try { restoreBtn(p); const v = $("[data-voice]", p); if (v) v.style.display = ""; p._call && p._call.start(); } catch (e) {} }
+
+  async function go(p) {
+    if (!p || !MAP[p.id]) return;
+    if (live.has(p)) { endLive(p); return; }             // second press = hang up
+    if (p._endedAt && Date.now() - p._endedAt < 1500) return;  // brief cooldown so a hang-up can't instantly re-dial
+    if (p.dataset.micDenied === "1") { scripted(p); return; }
+    const r = await startLive(p);
+    if (!r.ok) {
+      if (r.reason === "mic" || r.reason === "err") p.dataset.micDenied = "1";
+      scripted(p);                                         // graceful: run the polished scripted sample
+    }
+  }
+
+  // Capture phase so the page's own scripted click handler doesn't also fire.
+  document.addEventListener("click", e => {
+    const start = e.target.closest && e.target.closest("[data-start]");
+    const tryb = e.target.closest && e.target.closest("[data-try]");
+    const btn = start || tryb;
+    if (!btn) return;
+    const p = panelOf(btn);
+    if (!p || !MAP[p.id]) return;
+    e.preventDefault(); e.stopImmediatePropagation();
+    if (tryb) { const step = $("[data-call]", p); if (step && step.closest(".step")) step.closest(".step").scrollIntoView({ behavior: "smooth", block: "start" }); }
+    go(p);
+  }, true);
 })();
 </script>
 
