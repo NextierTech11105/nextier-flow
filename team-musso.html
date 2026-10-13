@@ -1,0 +1,584 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Team Musso Story Mode</title>
+<meta name="robots" content="noindex">
+<meta name="description" content="Built for Team Musso: cold outreach stays in Nextier and only qualified owners reach Follow Up Boss; your buy box, territory counts, event signals, Claude on your own data engine, every channel, co-hosted on DigitalOcean with your own keys, and a first hunt ready at Initial SMS.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=DM+Sans:wght@400;500;700&display=swap">
+<style>
+/* Layout: a stage (the app's own screens, animated) beside a narration column, a chapter rail underneath; one chapter at a time. Single committed dark look, continuous with Story Mode and the Nextier app. */
+:root{
+  --bg:#070B18; --panel:#0F1630; --panel-2:#141D3D; --line:#26335F;
+  --fg:#FFFFFF; --soft:#D5DDF0; --orange:#FF8A3D; --orange-soft:#FFB27A;
+  --blue:#4C8DFF; --blue-soft:#9CC0FF; --green:#2FD39A; --ink:#0A1022;
+  --app:#0B0F14; --app-2:#12181F; --app-line:#232B35; --gold:#E2B54A;
+  --display:'Space Grotesk','Trebuchet MS',Arial,sans-serif;
+  --body:'DM Sans','Segoe UI',Arial,sans-serif;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+html,body{height:100%}
+body{margin:0;background:radial-gradient(circle at 70% 20%,#16234D 0%,var(--bg) 60%) fixed,var(--bg);color:var(--fg);font-family:var(--body);font-size:17px;line-height:1.5}
+.wrap{max-width:1240px;margin:0 auto;padding-inline:20px;padding-block:28px 40px;display:flex;flex-direction:column;gap:24px}
+header{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px}
+.brand{font-family:var(--display);font-weight:700;font-size:22px;letter-spacing:.08em}
+.brand span{color:var(--orange)}
+.tag{font-size:13px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--soft);border:1px solid var(--line);border-radius:999px;padding:6px 12px}
+h1{font-family:var(--display);font-weight:700;font-size:clamp(30px,4.4vw,52px);line-height:1.05;margin:0;text-wrap:balance}
+h1 em{font-style:normal;color:var(--orange)}
+.main{display:grid;grid-template-columns:minmax(0,1.5fr) minmax(0,1fr);gap:24px;align-items:stretch}
+@media (max-width:920px){.main{grid-template-columns:minmax(0,1fr)}}
+.stage{position:relative;background:var(--panel);border:1px solid var(--line);border-radius:24px;min-height:500px;overflow:hidden}
+.narr{display:flex;flex-direction:column;gap:16px;padding:8px 4px;min-width:0}
+.step{font-size:13px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--orange)}
+.narr h2{font-family:var(--display);font-size:clamp(26px,3vw,36px);line-height:1.1;margin:0;text-wrap:balance}
+.narr p{margin:0;font-size:19px;max-width:36ch}
+.controls{display:flex;flex-wrap:wrap;gap:10px;margin-top:auto}
+button{font:inherit;font-weight:700;font-size:15px;color:var(--fg);background:var(--panel-2);border:1px solid var(--line);border-radius:12px;padding:10px 16px;cursor:pointer}
+button:hover{border-color:var(--blue)}
+button:focus-visible{outline:3px solid var(--orange);outline-offset:2px}
+#play{background:var(--orange);border-color:var(--orange);color:var(--ink);min-width:120px}
+.rail{display:grid;grid-template-columns:repeat(10,minmax(0,1fr));gap:6px}
+@media (max-width:1000px){.rail{grid-template-columns:repeat(5,minmax(0,1fr))}}
+@media (max-width:520px){.rail{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.rail button{display:flex;flex-direction:column;align-items:flex-start;gap:8px;padding:10px;border-radius:12px;text-align:left;font-size:13px;color:var(--soft);min-width:0}
+.rail .bar{display:block;width:100%;height:4px;border-radius:2px;background:var(--line);overflow:hidden}
+.rail .bar i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--blue),var(--orange))}
+.rail button[aria-current="step"]{color:var(--fg);border-color:var(--orange)}
+.rail .n{font-variant-numeric:tabular-nums;color:var(--orange)}
+.foot{font-size:14px;color:var(--soft)}
+.foot a{color:var(--fg)}
+
+/* ── the app, recreated ─────────────────────────────────────────────── */
+.scene{position:absolute;inset:0;padding:22px;display:flex;align-items:center;justify-content:center}
+.scene[hidden]{display:none!important}
+.app{width:100%;max-width:640px;background:var(--app);border:1px solid var(--app-line);border-radius:16px;overflow:hidden;box-shadow:0 0 60px #4C8DFF22;font-size:14px}
+.abar{display:flex;align-items:center;gap:10px;padding:10px 14px;border-bottom:1px solid var(--app-line);background:#090C10;flex-wrap:wrap}
+.abar b{font-weight:700}
+.ws{border:1px solid #3A4450;border-radius:8px;padding:4px 10px;font-weight:700}
+.pill{font-size:11px;font-weight:700;letter-spacing:.1em;padding:3px 8px;border-radius:999px;background:#0F2A1E;color:#5BE3A8;border:1px solid #1E5A40}
+.abody{padding:14px;display:flex;flex-direction:column;gap:12px}
+.ah{font-family:var(--display);font-weight:700;font-size:18px}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.ac{padding:6px 10px;border-radius:8px;background:var(--app-2);border:1px solid var(--app-line);font-weight:700;font-size:13px;color:#C9D2DC;white-space:nowrap}
+.ac.on{border-color:var(--blue);background:#13254A;color:#fff}
+.ac small{color:#8FA0B3;font-weight:700;margin-left:4px;font-variant-numeric:tabular-nums}
+.ac.hit{border-color:var(--gold);color:#fff}
+
+/* lead builder map */
+.amap{position:relative;height:220px;border-radius:12px;overflow:hidden;border:1px solid var(--app-line);
+  background:
+   repeating-linear-gradient(28deg,transparent 0 38px,#1A222C 38px 40px),
+   repeating-linear-gradient(118deg,transparent 0 52px,#1A222C 52px 54px),
+   radial-gradient(ellipse 60% 50% at 62% 55%,#162016 0%,#10161C 70%)}
+.amap .water{position:absolute;right:-10%;bottom:-30%;width:70%;height:60%;border-radius:50%;background:#0B1624}
+.amap .road{position:absolute;height:3px;background:#3B4552;transform-origin:left center}
+.amap .ctl{position:absolute;left:10px;top:10px;display:flex;flex-direction:column;gap:6px}
+.amap .ctl span{background:#0C1116;border:1px solid var(--app-line);border-radius:8px;padding:4px 10px;font-size:12px;font-weight:700}
+.amap .cnt{position:absolute;right:10px;top:10px;background:#0C1116;border:1px solid var(--app-line);border-radius:999px;padding:6px 12px;font-weight:700;font-variant-numeric:tabular-nums}
+.pin{position:absolute;width:14px;height:14px;margin:-7px 0 0 -7px;border-radius:50%;background:var(--blue);border:2px solid #fff;box-shadow:0 0 12px #4C8DFF}
+.go .pin{animation:drop .5s cubic-bezier(.2,1.4,.4,1) both var(--d)}
+.rows{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.rows .box{border:1px solid #3A4450;border-radius:8px;padding:6px 14px;font-weight:700;font-size:18px;font-variant-numeric:tabular-nums}
+
+/* monitors */
+.mon{display:flex;justify-content:space-between;align-items:center;gap:12px;border:1px solid var(--app-line);border-radius:12px;padding:12px 14px;background:var(--app-2)}
+.mon b{display:block;font-size:15px}
+.mon span{color:#C9D2DC;font-size:13px}
+.on-btn{background:#16A34A;color:#fff;font-weight:700;border-radius:8px;padding:8px 14px;flex:none}
+.presets{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.preset{border:1px solid var(--app-line);border-radius:10px;padding:10px 12px;background:var(--app-2)}
+.preset b{display:block;font-size:14px}.preset span{font-size:12px;color:#AEB9C6}
+.preset.on{border-color:var(--blue);background:#101D38}
+.tick{display:flex;justify-content:space-between;align-items:center;border:1px dashed #3A4450;border-radius:10px;padding:10px 12px;font-weight:700}
+.tick b{font-family:var(--display);font-size:22px;color:var(--green);font-variant-numeric:tabular-nums}
+
+/* signals */
+.sig{display:flex;flex-direction:column;gap:10px;width:min(460px,100%)}
+.sc{display:flex;gap:12px;align-items:center;padding:12px 14px;border-radius:14px;background:var(--panel-2);border:1px solid var(--line)}
+.sc .ic{flex:none;width:40px;height:40px;border-radius:10px;display:grid;place-items:center;font-weight:700;font-family:var(--display)}
+.sc b{display:block}.sc small{color:var(--soft);font-size:14px}
+.sc .new{margin-left:auto;flex:none;font-size:11px;font-weight:700;letter-spacing:.12em;padding:4px 8px;border-radius:999px;background:var(--orange);color:var(--ink)}
+
+/* owner split */
+.split{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:14px;width:min(520px,100%)}
+.lanebox{border-radius:16px;padding:14px;border:1px solid var(--line);background:var(--panel-2);display:flex;flex-direction:column;gap:8px}
+.lanebox h3{margin:0;font-family:var(--display);font-size:17px}
+.lanebox .o{padding:8px 10px;border-radius:10px;background:#0B1126;border:1px solid var(--line);font-size:14px}
+.lanebox.go-l{border-color:var(--green)}.lanebox.go-l h3{color:var(--green)}
+.lanebox.rs-l h3{color:var(--blue-soft)}
+
+/* trace */
+.trace{width:min(440px,100%);display:flex;flex-direction:column;gap:10px}
+.tr{display:flex;align-items:center;gap:10px;padding:12px 14px;border-radius:12px;background:var(--panel-2);border:1px solid var(--line)}
+.tr .ok{margin-left:auto;font-size:12px;font-weight:700;letter-spacing:.1em;padding:4px 10px;border-radius:999px;background:#0F2A1E;color:#5BE3A8;border:1px solid #1E5A40}
+.tr .num{font-family:var(--display);font-size:22px;color:var(--green);font-variant-numeric:tabular-nums}
+
+/* property book list */
+.tbl{border:1px solid var(--app-line);border-radius:10px;overflow:auto;max-height:250px}
+table{border-collapse:collapse;width:100%;min-width:460px;font-size:13px;table-layout:fixed}
+td small{display:block;color:#8FA0B3;font-size:12px}
+td.w{white-space:normal}
+th:nth-child(1){width:34%}th:nth-child(2){width:18%}th:nth-child(3){width:18%}
+th{position:sticky;top:0;background:#0E1319;text-align:left;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:#AEB9C6;padding:8px 10px;border-bottom:1px solid var(--app-line)}
+td{padding:8px 10px;border-bottom:1px solid #1A2129;vertical-align:top;white-space:nowrap}
+tr.sel td{background:#122033}
+.tgs{display:flex;flex-wrap:wrap;gap:4px;white-space:normal}
+.tg{font-size:11px;font-weight:700;padding:2px 7px;border-radius:999px;border:1px solid #3A4450;color:#E5EBF2;background:#161D25}
+.tg.ev{border-color:var(--orange);color:var(--orange-soft)}
+.tg.ok{border-color:#1E5A40;color:#5BE3A8}
+.go .tg{animation:stamp .35s cubic-bezier(.2,1.4,.4,1) both var(--d)}
+.search{border:1px solid var(--app-line);border-radius:8px;padding:8px 10px;color:#8FA0B3;font-size:13px;background:#0E1319}
+.toprow{display:flex;justify-content:space-between;gap:10px;align-items:center;flex-wrap:wrap}
+.enzo{border:1px solid #1E5A40;color:#5BE3A8;border-radius:8px;padding:6px 10px;font-weight:700;font-size:12px}
+
+/* record panel */
+.rec{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.1fr);gap:12px}
+@media (max-width:560px){.rec{grid-template-columns:minmax(0,1fr)}.rec .mini{display:none}}
+.mini{display:flex;flex-direction:column;gap:6px}
+.mini span{padding:7px 9px;border-radius:8px;background:#0E1319;border:1px solid #1A2129;font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.mini span.sel{background:#122033;border-color:#24406A}
+.panel{border:1px solid var(--app-line);border-radius:12px;padding:12px;background:var(--app-2);display:flex;flex-direction:column;gap:10px;min-width:0}
+.panel .addr{font-weight:700;font-size:16px}
+.panel .cty{color:#AEB9C6;font-size:13px}
+.traced{align-self:flex-start;font-size:11px;font-weight:700;letter-spacing:.1em;border:1px solid #3A4450;border-radius:6px;padding:2px 8px}
+.acts{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.acts .ph{font-family:var(--display);font-size:18px;color:#5BE3A8;font-variant-numeric:tabular-nums;margin-right:4px}
+.acts .call{background:#16A34A;color:#fff;border-radius:8px;padding:6px 12px;font-weight:700}
+.acts .bt{border:1px solid #3A4450;border-radius:8px;padding:6px 10px;font-weight:700}
+.clock{border:1px solid #4A3A12;background:#1A160B;border-radius:10px;padding:10px}
+.clock b{font-size:11px;letter-spacing:.14em;color:var(--gold)}
+.clock .g{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px 10px;margin-top:6px;font-size:12px}
+.clock .g small{display:block;color:#AEB9C6;letter-spacing:.08em;text-transform:uppercase;font-size:10px}
+.clock .g span{font-weight:700}
+
+/* webhook */
+.hook{display:grid;grid-template-columns:minmax(0,1.1fr) 70px minmax(0,1fr);gap:8px;align-items:center;width:100%;max-width:640px}
+@media (max-width:560px){.hook{grid-template-columns:minmax(0,1fr)}.hook .wire{display:none}}
+pre{margin:0;padding:12px;border-radius:12px;background:#0B1126;border:1px solid var(--line);font-size:12px;line-height:1.45;color:#CFE0FF;overflow:auto;white-space:pre}
+pre .k{color:var(--blue-soft)}pre .s{color:var(--orange-soft)}
+.wire{position:relative;height:120px}
+.wire i{position:absolute;left:0;width:10px;height:10px;border-radius:50%;background:var(--orange-soft);box-shadow:0 0 10px var(--orange);animation:tf 1.8s linear infinite;animation-delay:var(--d)}
+.wire i:nth-child(1){top:10px}.wire i:nth-child(2){top:40px}.wire i:nth-child(3){top:70px}.wire i:nth-child(4){top:100px}
+.dest{display:flex;flex-direction:column;gap:6px}
+.dest span{padding:8px 12px;border-radius:10px;background:var(--panel-2);border:1px solid var(--line);font-weight:700;font-size:14px}
+.go .dest span{animation:lit .5s ease-out both var(--d)}
+
+/* launch */
+.launch{display:flex;flex-direction:column;gap:10px}
+.blk{display:flex;justify-content:space-between;align-items:center;gap:10px;border:1px solid var(--app-line);border-radius:12px;padding:12px 14px;background:var(--app-2);flex-wrap:wrap}
+.blk b{display:block;font-size:15px}
+.blk span{font-size:13px;color:#C9D2DC}
+.ready{font-size:11px;font-weight:700;letter-spacing:.12em;padding:4px 10px;border-radius:999px;background:#0F2A1E;color:#5BE3A8;border:1px solid #1E5A40}
+.send{align-self:center;background:var(--orange);color:var(--ink);font-weight:700;font-size:18px;border-radius:14px;padding:14px 30px;box-shadow:0 0 0 0 #FF8A3D88}
+.go .send{animation:wait 1.8s ease-in-out infinite 1.5s}
+.halt{text-align:center;font-weight:700;color:var(--soft);font-size:14px}
+
+/* entrances: elements rest visible; .go replays them */
+.go .in1{animation:up .5s ease-out both .1s}.go .in2{animation:up .5s ease-out both .8s}
+.go .in3{animation:up .5s ease-out both 1.5s}.go .in4{animation:up .5s ease-out both 2.2s}
+.go .pop{animation:pop .45s cubic-bezier(.2,1.4,.4,1) both 2s}
+@keyframes up{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+@keyframes pop{from{opacity:0;transform:scale(.6)}to{opacity:1;transform:none}}
+@keyframes drop{from{opacity:0;transform:translateY(-22px) scale(.6)}to{opacity:1;transform:none}}
+@keyframes stamp{from{opacity:0;transform:scale(1.8)}to{opacity:1;transform:none}}
+@keyframes tf{0%{left:0;opacity:0}20%{opacity:1}100%{left:60px;opacity:0}}
+@keyframes lit{0%{background:var(--panel-2)}100%{background:#2A1A10;border-color:var(--orange);box-shadow:0 0 14px #FF8A3D55}}
+@keyframes wait{0%,100%{box-shadow:0 0 0 0 #FF8A3D66}50%{box-shadow:0 0 0 14px #FF8A3D00}}
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}}
+</style>
+<style>
+/* development additions: satellite parcels, the split, the FAR bar, corridors */
+.sat{position:relative;height:220px;border-radius:12px;overflow:hidden;border:1px solid var(--app-line);
+  background:
+   radial-gradient(circle at 20% 30%,#2E3B22 0 14%,transparent 15%),
+   radial-gradient(circle at 75% 70%,#2A361F 0 18%,transparent 19%),
+   radial-gradient(circle at 60% 20%,#3A3424 0 10%,transparent 11%),
+   linear-gradient(135deg,#25301C,#1C2417 45%,#2B2A1E)}
+.sat .rd{position:absolute;height:6px;background:#5B5A55;border-top:1px solid #77756E;border-bottom:1px solid #77756E;transform-origin:left center}
+.sat .lot{position:absolute;border:1.5px solid rgba(255,255,255,.35);background:rgba(255,255,255,.04)}
+.sat .lot.big{border:2px solid var(--gold);background:rgba(226,181,74,.14)}
+.go .sat .lot.big{animation:glow 1.6s ease-in-out both var(--d)}
+.sat .ctl{position:absolute;left:10px;top:10px;display:flex;flex-direction:column;gap:6px}
+.sat .ctl span{background:#0C1116;border:1px solid var(--app-line);border-radius:8px;padding:4px 10px;font-size:12px;font-weight:700}
+.sat .ctl span.on{border-color:var(--gold);color:#fff}
+.sat .cnt{position:absolute;right:10px;top:10px;background:#0C1116;border:1px solid var(--app-line);border-radius:999px;padding:6px 12px;font-weight:700;font-variant-numeric:tabular-nums}
+@keyframes glow{0%{box-shadow:none;opacity:.2}60%{box-shadow:0 0 18px var(--gold);opacity:1}100%{box-shadow:0 0 8px #E2B54A88;opacity:1}}
+
+.math{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:16px;width:min(560px,100%);align-items:center}
+@media (max-width:560px){.math{grid-template-columns:minmax(0,1fr)}}
+.parcel{position:relative;aspect-ratio:1/1.15;border:2px solid var(--gold);border-radius:6px;background:linear-gradient(160deg,#2B3A22,#1D2617);overflow:hidden;max-width:100%}
+.parcel .house{position:absolute;left:12%;top:10%;width:30%;height:20%;background:#8A8476;border-radius:3px}
+.parcel .cut{position:absolute;top:0;bottom:0;width:0;border-left:2px dashed #fff}
+.go .parcel .cut{animation:cutin .6s ease-out both var(--d)}
+.parcel .lbl{position:absolute;bottom:8px;font-size:12px;font-weight:700;color:#fff;text-shadow:0 1px 3px #000}
+@keyframes cutin{from{opacity:0;transform:scaleY(0)}to{opacity:1;transform:none}}
+.facts{display:flex;flex-direction:column;gap:8px}
+.fct{display:flex;justify-content:space-between;gap:10px;padding:10px 12px;border-radius:10px;background:var(--panel-2);border:1px solid var(--line)}
+.fct b{font-variant-numeric:tabular-nums}
+.far{padding:10px 12px;border-radius:10px;background:var(--panel-2);border:1px solid var(--line)}
+.far .track{position:relative;height:12px;border-radius:6px;background:#0B1126;margin-top:8px;overflow:hidden}
+.far .built{position:absolute;left:0;top:0;bottom:0;width:20%;background:var(--blue)}
+.far .gap{position:absolute;left:20%;top:0;bottom:0;width:0;background:repeating-linear-gradient(45deg,var(--orange) 0 6px,#B4480F 6px 12px)}
+.go .far .gap{animation:grow 1.4s ease-out both 1.4s}
+@keyframes grow{to{width:80%}}
+.far small{display:flex;justify-content:space-between;color:var(--soft);font-size:12px;margin-top:4px}
+
+.terr{position:relative;width:min(560px,100%);height:300px;border-radius:16px;border:1px solid var(--line);overflow:hidden;background:radial-gradient(ellipse 80% 50% at 50% 55%,#1B2550 0%,#121935 60%,#0B1126 100%)}
+.terr .isl{position:absolute;left:6%;right:4%;top:38%;height:30%;border-radius:40% 60% 50% 50%/60% 50% 50% 40%;background:#1E2A52;border:1px solid #2E3D70}
+.terr .c110{position:absolute;left:30%;top:28%;width:8px;height:48%;border-radius:4px;background:linear-gradient(var(--orange),#B4480F);box-shadow:0 0 16px var(--orange)}
+.terr .c110 b{position:absolute;left:14px;top:-4px;white-space:nowrap;font-size:13px;color:var(--orange-soft)}
+.terr .band{position:absolute;border:2px dashed var(--gold);border-radius:12px;background:rgba(226,181,74,.08)}
+.terr .band b{position:absolute;left:8px;top:-22px;white-space:nowrap;font-size:13px;color:var(--gold)}
+.terr .bub{position:absolute;width:var(--s);height:var(--s);margin:calc(var(--s)/-2) 0 0 calc(var(--s)/-2);border-radius:50%;background:#4C8DFF33;border:2px solid var(--blue);display:grid;place-items:center;font-size:12px;font-weight:700;font-variant-numeric:tabular-nums}
+.go .terr .bub{animation:pop .45s cubic-bezier(.2,1.4,.4,1) both var(--d)}
+.terr .key{position:absolute;left:10px;bottom:10px;font-size:12px;color:var(--soft)}
+
+.opener{align-self:stretch;padding:12px 14px;border-radius:14px;background:#0B1126;border:1px dashed var(--line)}
+.opener small{display:block;font-size:11px;letter-spacing:.12em;color:var(--blue-soft);font-weight:700;margin-bottom:4px}
+.opener span{font-size:15px}
+
+.host{width:min(560px,100%);display:flex;flex-direction:column;gap:10px}
+.host .prj{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;padding:12px 14px;border-radius:14px;background:#0B1126;border:1px solid var(--blue)}
+.host .prj b{font-family:var(--display);font-size:18px}
+.host .prj span{font-size:12px;font-weight:700;letter-spacing:.12em;color:var(--blue-soft)}
+.host .res{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+@media (max-width:560px){.host .res{grid-template-columns:minmax(0,1fr)}}
+.host .r{padding:10px 12px;border-radius:12px;background:var(--panel-2);border:1px solid var(--line)}
+.host .r small{display:block;font-size:11px;letter-spacing:.12em;color:var(--soft);font-weight:700}
+.host .r b{display:block;font-size:15px}
+.host .key{display:flex;justify-content:space-between;gap:10px;padding:9px 12px;border-radius:10px;background:var(--panel-2);border:1px solid var(--line);font-size:14px}
+.host .key em{font-style:normal;font-size:11px;font-weight:700;letter-spacing:.1em;padding:3px 8px;border-radius:999px;background:#0F2A1E;color:#5BE3A8;border:1px solid #1E5A40}
+.host .acc{display:flex;gap:8px;flex-wrap:wrap}
+.host .acc span{padding:6px 12px;border-radius:999px;border:1px solid var(--line);background:var(--panel-2);font-size:13px;font-weight:700}
+.host .acc span.you{border-color:var(--green);color:#5BE3A8}
+.rail{grid-template-columns:repeat(11,minmax(0,1fr))}
+@media (max-width:1100px){.rail{grid-template-columns:repeat(6,minmax(0,1fr))}}
+@media (max-width:520px){.rail{grid-template-columns:repeat(2,minmax(0,1fr))}}
+</style>
+<style>
+/* Team Musso additions: the CRM lesson, the Claude chat, channels, the CRM card, the proof strip */
+.lesson{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:16px;width:min(580px,100%)}
+@media (max-width:560px){.lesson{grid-template-columns:minmax(0,1fr)}}
+.lbox{border-radius:16px;padding:14px;display:flex;flex-direction:column;gap:6px;min-width:0}
+.lbox h3{margin:0 0 4px;font-family:var(--display);font-size:16px}
+.lbox.bad{border:1px dashed #5A3030;background:#1A0F14}
+.lbox.bad h3{color:#FF8B8B}
+.lbox.bad span{padding:6px 9px;border-radius:8px;background:#22141A;color:#B78E96;font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.lbox.good{border:1px solid var(--green);background:#0E1F1A}
+.lbox.good h3{color:var(--green)}
+.flowv{display:flex;flex-direction:column;gap:6px}
+.flowv span{padding:8px 10px;border-radius:10px;background:var(--panel-2);border:1px solid var(--line);font-size:14px;font-weight:700}
+.flowv span.crm{border-color:var(--green);background:#123326}
+.flowv i{font-style:normal;text-align:center;color:var(--soft);font-size:13px}
+.buy{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;width:min(560px,100%)}
+@media (max-width:560px){.buy{grid-template-columns:minmax(0,1fr)}}
+.buy .b{padding:14px;border-radius:14px;background:var(--panel-2);border:1px solid var(--line);text-align:center}
+.buy .b small{display:block;font-size:11px;letter-spacing:.14em;font-weight:700;color:var(--soft)}
+.buy .b b{display:block;font-family:var(--display);font-size:26px;line-height:1.15}
+.buy .wide{grid-column:1/-1;display:flex;justify-content:center;gap:8px;flex-wrap:wrap}
+.buy .wide span{padding:6px 12px;border-radius:999px;border:1px solid var(--line);background:var(--panel-2);font-size:13px;font-weight:700}
+.buy .wide span.p{border-color:var(--green);color:#5BE3A8}
+.chat{width:min(540px,100%);display:flex;flex-direction:column;gap:10px}
+.chat .cbar{display:flex;align-items:center;gap:8px;font-size:13px;font-weight:700;color:var(--soft)}
+.chat .cbar i{width:10px;height:10px;border-radius:50%;background:#D97757}
+.msg{padding:12px 14px;border-radius:16px;font-size:15px;line-height:1.4;max-width:92%}
+.msg.you{align-self:flex-end;background:var(--blue)}
+.msg.ai{align-self:flex-start;background:#1B2238;border:1px solid var(--line)}
+.msg small{display:block;font-size:11px;letter-spacing:.12em;font-weight:700;opacity:.85;margin-bottom:4px}
+.msg .tool{display:inline-block;margin:6px 0 2px;padding:3px 9px;border-radius:999px;font-size:12px;font-weight:700;background:#0B1126;border:1px solid #3A4570;color:var(--blue-soft)}
+.minirows{display:flex;flex-direction:column;gap:4px;margin-top:8px}
+.minirows span{display:flex;justify-content:space-between;gap:8px;padding:6px 9px;border-radius:8px;background:#0B1126;font-size:13px}
+.minirows em{font-style:normal;color:var(--orange-soft);font-weight:700;flex:none}
+.go .minirows span{animation:up .4s ease-out both var(--d)}
+.chans4{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;width:min(520px,100%)}
+.chans4 .c{padding:14px;border-radius:16px;background:var(--panel-2);border:1px solid var(--line);display:flex;flex-direction:column;gap:4px}
+.chans4 .c b{font-family:var(--display);font-size:18px}
+.chans4 .c span{font-size:14px;color:var(--soft)}
+.chans4 .c.lead{border-color:var(--orange)}
+.crmcard{width:min(460px,100%);border-radius:16px;background:#F3F5FB;color:#0A1022;padding:16px;display:flex;flex-direction:column;gap:8px;box-shadow:0 0 50px #2FD39A33}
+.crmcard .top{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap}
+.crmcard .top b{font-size:13px;letter-spacing:.14em;color:#4C5675}
+.crmcard .stg{background:#12B76A;color:#fff;border-radius:999px;padding:4px 12px;font-weight:700;font-size:13px}
+.crmcard h4{margin:0;font-family:var(--display);font-size:22px}
+.crmcard .ln{font-size:14px;color:#2B3350}
+.crmcard .note{padding:8px 10px;border-radius:10px;background:#E4E9F5;font-size:13px;color:#2B3350}
+.crmcard .src{font-size:12px;color:#4C5675}
+.proof{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
+@media (max-width:720px){.proof{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.proof div{padding:14px;border-radius:14px;background:var(--panel);border:1px solid var(--line)}
+.proof b{display:block;font-family:var(--display);font-size:30px;line-height:1.1;font-variant-numeric:tabular-nums}
+.proof span{font-size:14px;color:var(--soft)}
+.proof .g b{color:var(--green)}
+.thread{width:min(460px,100%);display:flex;flex-direction:column;gap:8px;padding:14px;border-radius:18px;background:#0A0F22;border:1px solid var(--line)}
+.bub{max-width:86%;padding:10px 13px;border-radius:16px;font-size:15px;line-height:1.35}
+.bub.out{align-self:flex-end;background:var(--blue);color:var(--fg)}
+.bub.in{align-self:flex-start;background:#2A2F45;color:var(--fg)}
+.bub small{display:block;font-size:11px;font-weight:700;letter-spacing:.08em;opacity:.85;margin-bottom:2px}
+.rail{grid-template-columns:repeat(11,minmax(0,1fr))}
+@media (max-width:1100px){.rail{grid-template-columns:repeat(6,minmax(0,1fr))}}
+@media (max-width:520px){.rail{grid-template-columns:repeat(2,minmax(0,1fr))}}
+</style>
+</head><body>
+<div class="wrap">
+  <header>
+    <div class="brand">NEXT<span>IER</span> × TEAM MUSSO</div>
+    <div class="tag">Story mode · Built for Team Musso</div>
+  </header>
+  <h1>Your land deals, found <em>before they list.</em></h1>
+
+  <div class="main">
+    <div class="stage" id="stage" aria-live="polite">
+
+      <!-- 1 · THE LESSON -->
+      <div class="scene">
+        <div class="lesson">
+          <div class="lbox bad in1"><h3>Cold data in your CRM</h3>
+            <span>12,000 cold rows imported</span><span>Owner unknown · no mobile</span><span>Duplicates · wrong numbers</span><span>Agents scrolling past dead leads</span><span>Real replies buried</span></div>
+          <div class="lbox good in2"><h3>Nextier holds the cold</h3>
+            <div class="flowv"><span>Cold outreach runs in Nextier</span><i>↓</i><span>Replies sorted and qualified</span><i>↓</i><span class="crm">Only hand-raisers go to Follow Up Boss</span></div></div>
+        </div>
+      </div>
+
+      <!-- 2 · YOUR BUY BOX -->
+      <div class="scene" hidden>
+        <div class="buy">
+          <div class="b in1"><small>YOU BUY</small><b>0.45–1.9 ac</b></div>
+          <div class="b in2"><small>YOU SPLIT INTO</small><b>2–4 lots</b></div>
+          <div class="b in3"><small>YOU SELL AT</small><b>$850K–$1.5M</b></div>
+          <div class="wide in4"><span class="p">Individually owned first</span><span>Long Island</span><span>The five boroughs</span><span>North to Orange County</span></div>
+        </div>
+      </div>
+
+      <!-- 3 · LEAD BUILDER, SATELLITE -->
+      <div class="scene" hidden>
+        <div class="app">
+          <div class="abar"><b>Workspace</b><span class="ws">Team Musso · Development</span><span class="pill">REAL ESTATE</span><span style="margin-left:auto;color:#AEB9C6">Lead Builder</span></div>
+          <div class="abody">
+            <div class="chips in1" id="segs">
+              <span class="ac">Vacant Land</span><span class="ac">Big Lot 0.90+ ac</span><span class="ac">Older Home ≤1975</span><span class="ac">Expired MLS</span><span class="ac">Inherited</span><span class="ac">Long-Term Owner</span><span class="ac">Commercial held 5+</span><span class="ac">Individually Owned</span>
+            </div>
+            <div class="sat in2" id="sat">
+              <div class="ctl"><span>Satellite</span><span class="on">Lot size</span><span>FAR Gap (NYC)</span></div>
+              <div class="cnt"><span id="pcount">0</span> parcels</div>
+            </div>
+            <div class="rows in3"><b>First hunt</b><span class="box">1,208</span><span style="color:#C9D2DC">subdivision-size lots, Riverhead + Mastic–Moriches</span></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 4 · HUNTING GROUNDS (real counts) -->
+      <div class="scene" hidden>
+        <div class="terr">
+          <div class="isl"></div>
+          <div class="c110"><b>Route 110 · commercial, north to south</b></div>
+          <div class="band" style="left:66%;top:40%;width:17%;height:22%"><b>Riverhead · out east</b></div>
+          <div class="band" style="left:48%;top:56%;width:15%;height:16%"><b>Mastic–Moriches</b></div>
+          <span class="bub" style="left:31%;top:46%;--s:62px;--d:.8s">2,021</span>
+          <span class="bub" style="left:74%;top:51%;--s:52px;--d:1.2s">842</span>
+          <span class="bub" style="left:55%;top:64%;--s:44px;--d:1.6s">366</span>
+          <span class="key">Individually owned · Route 110 = commercial held 5+ yrs · Riverhead, Mastic = subdivision-size lots</span>
+        </div>
+      </div>
+
+      <!-- 5 · SIGNALS (real counts) -->
+      <div class="scene" hidden>
+        <div class="sig">
+          <div class="sc in1"><span class="ic" style="background:#2A1A10;color:var(--orange)">EX</span><div><b>4,228 expired, never relisted, never sold</b><small>940 of them on a big lot · 675 in Suffolk</small></div><span class="new">NOW</span></div>
+          <div class="sc in2"><span class="ic" style="background:#1A2A55;color:var(--blue-soft)">ES</span><div><b>1,598 estates on 0.90+ acres</b><small>Heirs deciding what to do with land</small></div><span class="new">NOW</span></div>
+          <div class="sc in3"><span class="ic" style="background:#26201A;color:var(--gold)">PF</span><div><b>601 pre-foreclosures on a big lot</b><small>A deadline on land you can split</small></div><span class="new">NOW</span></div>
+          <div class="sc in4"><span class="ic" style="background:#13261D;color:var(--green)">↻</span><div><b>New ones every week</b><small>The radar re-checks your territory and only new matches come in</small></div></div>
+        </div>
+      </div>
+
+      <!-- 6 · ASK CLAUDE -->
+      <div class="scene" hidden>
+        <div class="chat">
+          <div class="cbar in1"><i></i>Claude · connected to your Nextier data engine</div>
+          <div class="msg you in1"><small>TEAM MUSSO</small>Pull every commercial expired in Nassau and Suffolk from the last 24 months. Owner-held, not relisted.</div>
+          <div class="msg ai in2"><small>CLAUDE</small>On it. Querying your data engine. <span class="tool">nextier · lead builder</span>
+            <div class="minirows">
+              <span style="--d:1.6s">220 Broadhollow Rd, Melville<em>expired 14 mo</em></span>
+              <span style="--d:1.9s">1801 Route 112, Medford<em>expired 9 mo</em></span>
+              <span style="--d:2.2s">45 E Main St, Riverhead<em>expired 20 mo</em></span>
+              <span style="--d:2.5s">310 Jericho Tpke, Mineola<em>expired 6 mo</em></span>
+            </div>
+          </div>
+          <div class="msg ai in4"><small>CLAUDE</small>Saved as a block in your Property Book. Text them, mail them, email them, or push the hand-raisers to Follow Up Boss?</div>
+        </div>
+      </div>
+
+      <!-- 7 · PROPERTY BOOK LIST -->
+      <div class="scene" hidden>
+        <div class="app">
+          <div class="abar"><b>Workspace</b><span class="ws">Team Musso · Development</span><span class="pill">REAL ESTATE</span><span style="margin-left:auto;color:#AEB9C6">Property Book</span></div>
+          <div class="abody">
+            <div class="toprow in1"><span class="ah">Property Book <span style="font-weight:500;color:#C9D2DC;font-size:15px">first hunt</span></span><span class="enzo">Export to your dialer · CSV</span></div>
+            <div class="chips in1">
+              <span class="ac hit">Subdivision-size</span><span class="ac hit">Expired, not relisted</span><span class="ac">Estate · big lot</span><span class="ac">Older home ≤1975</span><span class="ac">Commercial expired</span><span class="ac">Vacant land</span><span class="ac">Owned 30+ yrs</span>
+            </div>
+            <div class="tbl in2">
+              <table>
+                <thead><tr><th>Property</th><th>Lot</th><th>Mobile</th><th>Autotags</th></tr></thead>
+                <tbody id="book"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 8 · EVERY CHANNEL -->
+      <div class="scene" hidden>
+        <div class="chans4">
+          <div class="c lead in1"><b>Text</b><span>Initial SMS to the owner's verified mobile. The channel that gets the reply.</span></div>
+          <div class="c in2"><b>Mail</b><span>The owner's mailing address, ready for your mail house. Absentee owners included.</span></div>
+          <div class="c in3"><b>Email</b><span>Traced owner emails, ready for your email tool.</span></div>
+          <div class="c in4"><b>Call</b><span>One click from the Property Book, or a list for your dialer.</span></div>
+        </div>
+      </div>
+
+      <!-- 9 · ONLY QUALIFIED INTO FOLLOW UP BOSS -->
+      <div class="scene" hidden>
+        <div style="display:flex;flex-direction:column;align-items:center;gap:14px;width:100%">
+          <div class="thread in1">
+            <div class="bub out"><small>NEXTIER</small>Hi Rosa, we're seeing builder interest in larger lots near Old Country Rd. Would it help if I showed you what we're seeing?</div>
+            <div class="bub in in2"><small>ROSA</small>Yes, I've been thinking about it. Call me Thursday after 4.</div>
+          </div>
+          <div class="crmcard pop">
+            <div class="top"><b>FOLLOW UP BOSS</b><span class="stg">Appointment set</span></div>
+            <h4>Rosa C. · 14 Old Country Rd, Riverhead</h4>
+            <div class="ln">1.4 ac · room for 3 lots · listing expired, never relisted</div>
+            <div class="note">Call Thursday 4:00 PM. She's been thinking about it. Full text thread attached.</div>
+            <div class="src">Added by Nextier · qualified reply · set up for you</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 10 · CO-HOSTED, YOURS -->
+      <div class="scene" hidden>
+        <div class="host">
+          <div class="prj in1"><b>Team Musso · production</b><span>HOSTED ON DIGITALOCEAN</span></div>
+          <div class="res in2">
+            <div class="r"><small>DATABASE</small><b>Your Postgres cluster</b></div>
+            <div class="r"><small>ENGINE</small><b>Nextier, installed</b></div>
+            <div class="r"><small>BACKUPS</small><b>Daily, in your account</b></div>
+          </div>
+          <div class="key in3"><span>Property data key</span><em>YOURS</em></div>
+          <div class="key in3"><span>Skip trace key</span><em>YOURS</em></div>
+          <div class="key in3"><span>Texting lines and number</span><em>YOURS</em></div>
+          <div class="acc in4"><span class="you">Team Musso · owner, full infra access</span><span>Nextier · manages it for you</span></div>
+        </div>
+      </div>
+
+      <!-- 11 · FIRST HUNT, PREPPED -->
+      <div class="scene" hidden>
+        <div class="app">
+          <div class="abar"><b>Workspace</b><span class="ws">Team Musso · Development</span><span class="pill">REAL ESTATE</span><span style="margin-left:auto;color:#AEB9C6">Initial SMS</span></div>
+          <div class="abody launch">
+            <div class="blk in1"><div><b>Riverhead · Subdivision-size lots</b><span>842 owners · traced · tagged · checked</span></div><span class="ready">READY</span></div>
+            <div class="blk in2"><div><b>Mastic–Moriches · Subdivision-size lots</b><span>366 owners · traced · tagged · checked</span></div><span class="ready">READY</span></div>
+            <div class="opener in3"><small>OPENER, READY FOR YOUR REVIEW</small><span>Hi Rosa, we're seeing builder interest in larger lots near Old Country Rd. Would it help if I showed you what we're seeing?</span></div>
+            <span class="send in4">Send</span>
+            <div class="halt in4">0 sent. Nothing goes out until you press Send.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="narr">
+      <div class="step" id="step">Chapter 1 of 11</div>
+      <h2 id="ttl"></h2>
+      <p id="txt"></p>
+      <div class="controls">
+        <button id="prev" type="button">Back</button>
+        <button id="play" type="button">Play story</button>
+        <button id="next" type="button">Next</button>
+      </div>
+    </div>
+  </div>
+
+  <nav class="rail" id="rail" aria-label="Chapters"></nav>
+
+  <section class="proof" aria-label="Our live campaign">
+    <div><b>14,332</b><span>texts sent · our live NY campaign, Aug–Sep</span></div>
+    <div class="g"><b>80%</b><span>delivered to a real mobile</span></div>
+    <div class="g"><b>1,502</b><span>owners replied</span></div>
+    <div><b>13 · 1</b><span>appointments and our first deal since September</span></div>
+  </section>
+
+  <div class="foot">Counts on chapters 3–5 and 11 are from our 10-09 scan of your territory, individually owned only. Names, street addresses, phone numbers and the conversation are examples. Campaign numbers are from Nextier's own live New York campaign. · <a href="development-story.html">Development Story Mode</a> · <a href="engine-story.html">Data Engine Story Mode</a></div>
+</div>
+
+<script>
+const CH=[
+ {k:'The lesson',t:'Cold data doesn’t belong in your CRM',x:'We learned it the hard way: load raw cold lists into a CRM and it clogs. Agents scroll past dead rows and the real replies get buried. So all cold outreach runs in Nextier, and only qualified hand-raisers go into your Follow Up Boss.'},
+ {k:'Buy box',t:'Built from your own deals',x:'From your listings: you buy 0.45 to 1.9 acres, split into 2 to 4 lots and sell at $850K to $1.5M. Individually owned first, from Long Island through the boroughs and up to Orange County.'},
+ {k:'Lead Builder',t:'Every lot that fits, on the map',x:'The Lead Builder lights up every parcel in your territory that matches your buy box, on the satellite view. Your first hunt is already sized: 1,208 subdivision-size lots in Riverhead and Mastic–Moriches.'},
+ {k:'Territory',t:'Your hunting grounds, counted',x:'Route 110 north to south: 2,021 commercial properties owned by individuals for 5+ years. Out east: 842 subdivision-size lots around Riverhead and 366 in Mastic–Moriches.'},
+ {k:'Signals',t:'Owners with a reason to move',x:'4,228 listings that expired and never came back, 940 of them on big lots. 1,598 estates on 0.90+ acres. 601 pre-foreclosures on land you can split. The radar checks your territory every week.'},
+ {k:'Ask Claude',t:'Your team just asks',x:'Claude connects to your own data engine. Ask in plain English, like "every commercial expired in the last 24 months", and the list builds in your Property Book, tagged and ready.'},
+ {k:'The book',t:'Every lot, tagged, in one list',x:'Subdivision-size, expired and not relisted, estate on a big lot, older home, commercial expired. Filter by any tag. Every row carries the owner and a verified mobile.'},
+ {k:'Channels',t:'Lead gen on every channel',x:'One list, four ways out. Text gets the reply. Mail goes to your mail house with the owner’s mailing address. Email goes to your email tool. Calls are one click.'},
+ {k:'Follow Up Boss',t:'Only the qualified reach your CRM',x:'When an owner says yes, the reply is qualified and the appointment set, then it lands in Follow Up Boss with the whole conversation and the property story. Set up for you.'},
+ {k:'Yours',t:'Co-hosted. Yours. No developer bill.',x:'It runs in your own DigitalOcean account: your database, your API keys, your texting lines, and full access to the infrastructure. Nextier installs it and manages it. No developer taking you to the cleaners, and if you ever leave, everything stays with you.'},
+ {k:'First hunt',t:'Your first hunt is ready',x:'1,208 subdivision-size lots in Riverhead and Mastic–Moriches, traced, tagged and checked, with the opener drafted for your review. Zero texts go out until you press Send.'}
+];
+const DUR=8000;
+
+/* satellite parcels */
+const sat=document.getElementById('sat');
+[[0,58,100,-4],[22,0,120,72],[60,0,110,98]].forEach(([l,t,w,a])=>{const r=document.createElement('i');r.className='rd';r.style.left=l+'%';r.style.top=t+'%';r.style.width=w+'%';r.style.transform='rotate('+a+'deg)';sat.appendChild(r)});
+const LOTS=[[30,18,9,14,0],[40,20,7,10,0],[48,16,12,18,1],[62,24,8,11,0],[71,22,14,20,1],[34,66,10,13,0],[45,70,16,20,1],[63,68,8,12,0],[73,64,7,10,0],[12,30,11,16,1],[14,70,9,12,0],[84,40,10,15,1]];
+LOTS.forEach(([x,y,w,h,big],i)=>{const l=document.createElement('i');l.className='lot'+(big?' big':'');l.style.left=x+'%';l.style.top=y+'%';l.style.width=w+'%';l.style.height=h+'%';if(big)l.style.setProperty('--d',(1+i*.15)+'s');sat.appendChild(l)});
+const segs=[...document.querySelectorAll('#segs .ac')];
+
+/* the list */
+const ROWS=[
+ ['14 Old Country Rd, Riverhead, NY','Suffolk','1.4 ac · room for 3','(631) 555-0158',[['Expired, not relisted','ev'],['Subdivision-size',''],['Older home','']]],
+ ['8 Pine Hollow Ln, Center Moriches, NY','Suffolk','2.1 ac · room for 4','(631) 555-0136',[['Estate · big lot','ev'],['Subdivision-size','']]],
+ ['220 Broadhollow Rd, Melville, NY','Suffolk','1.9 ac · commercial','(631) 555-0191',[['Commercial expired','ev'],['Route 110','']]],
+ ['31 Fox Run, Calverton, NY','Suffolk','3.2 ac · vacant','(631) 555-0104',[['Vacant land',''],['Owned 30+ yrs','']]],
+ ['5 Bayview Ave, Mastic, NY','Suffolk','0.95 ac · room for 2','(631) 555-0122',[['Pre-foreclosure','ev'],['Older home','']]],
+ ['Oak Hollow Realty LLC · Riverhead','Suffolk','2.6 ac','—',[['Entity · research','']]]
+];
+const book=document.getElementById('book');
+ROWS.forEach((r,i)=>{const tr=document.createElement('tr');if(i===0)tr.className='sel';
+ tr.innerHTML='<td class="w">'+r[0]+'<small>'+r[1]+'</small></td><td class="w">'+r[2]+'</td><td>'+r[3]+'</td><td><div class="tgs"></div></td>';
+ const box=tr.querySelector('.tgs');r[4].forEach(([t,c],j)=>{const s=document.createElement('span');s.className='tg'+(c?' '+c:'');s.textContent=t;s.style.setProperty('--d',(1.2+i*.25+j*.12)+'s');box.appendChild(s)});
+ if(r[3]!=='—'){const s=document.createElement('span');s.className='tg ok';s.textContent='Mobile verified';s.style.setProperty('--d',(1.5+i*.25)+'s');box.appendChild(s)}
+ book.appendChild(tr)});
+
+let timers=[];
+function countUp(el,to,prefix,ms){const t0=performance.now();const f=now=>{const p=Math.min(1,(now-t0)/ms);el.textContent=prefix+Math.round(to*p).toLocaleString('en-US');if(p<1)timers.push(requestAnimationFrame(f))};timers.push(requestAnimationFrame(f))}
+
+const scenes=[...document.querySelectorAll('.scene')];
+const rail=document.getElementById('rail');
+const stepEl=document.getElementById('step'),ttl=document.getElementById('ttl'),txt=document.getElementById('txt'),playBtn=document.getElementById('play');
+CH.forEach((c,i)=>{const b=document.createElement('button');b.type='button';b.innerHTML='<span class="bar"><i></i></span><span><span class="n">'+String(i+1).padStart(2,'0')+'</span> '+c.k+'</span>';b.addEventListener('click',()=>go(i));rail.appendChild(b)});
+const railBtns=[...rail.children];
+let cur=0,playing=false,t0=0,raf=0,segT=0;
+function go(i){
+  cur=(i+CH.length)%CH.length;
+  scenes.forEach((s,j)=>{s.hidden=j!==cur;s.classList.remove('go')});
+  const s=scenes[cur];void s.offsetWidth;s.classList.add('go');
+  stepEl.textContent='Chapter '+(cur+1)+' of '+CH.length;ttl.textContent=CH[cur].t;txt.textContent=CH[cur].x;
+  railBtns.forEach((b,j)=>{b.querySelector('.bar i').style.width=j<cur?'100%':'0';if(j===cur)b.setAttribute('aria-current','step');else b.removeAttribute('aria-current')});
+  timers.forEach(cancelAnimationFrame);timers=[];clearInterval(segT);
+  if(cur===2){segs.forEach(e=>e.classList.remove('on'));let k=0;const pick=[1,2,0,3,7];segT=setInterval(()=>{if(k<pick.length){segs[pick[k]].classList.add('on');k++}},450);countUp(document.getElementById('pcount'),1208,'',3200)}
+  t0=performance.now();
+}
+function tick(now){
+  if(!playing)return;
+  const p=Math.min(1,(now-t0)/DUR);
+  railBtns[cur].querySelector('.bar i').style.width=(p*100)+'%';
+  if(p>=1){if(cur===CH.length-1){setPlay(false);return}go(cur+1)}
+  raf=requestAnimationFrame(tick);
+}
+function setPlay(on){playing=on;playBtn.textContent=on?'Pause':(cur===CH.length-1?'Replay':'Play story');cancelAnimationFrame(raf);if(on){if(cur===CH.length-1)go(0);t0=performance.now();raf=requestAnimationFrame(tick)}}
+playBtn.addEventListener('click',()=>setPlay(!playing));
+document.getElementById('next').addEventListener('click',()=>{go(cur+1);if(playing)t0=performance.now()});
+document.getElementById('prev').addEventListener('click',()=>{go(cur-1);if(playing)t0=performance.now()});
+document.addEventListener('keydown',e=>{if(e.key==='ArrowRight')go(cur+1);else if(e.key==='ArrowLeft')go(cur-1);else if(e.key===' '&&e.target===document.body){e.preventDefault();setPlay(!playing)}});
+const m=/^#ch(\d+)$/.exec(location.hash||'');
+go(m?Math.min(Math.max(+m[1],1),CH.length)-1:0);
+</script>
+</body></html>
