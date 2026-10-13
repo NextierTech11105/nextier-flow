@@ -194,7 +194,7 @@ button:focus-visible{outline:3px solid var(--orange);outline-offset:2px}
 .src{margin:0;font-size:15px;color:var(--soft)}
 .card.claim{border-color:var(--blue);background:#101010}
 .card.claim p{color:#fff;font:700 17px/1.4 var(--display)}
-@media (min-width:1101px){.rail{grid-template-columns:repeat(7,minmax(0,1fr))}}
+@media (min-width:1101px){.rail{grid-template-columns:repeat(8,minmax(0,1fr))}}
 /* The scan, reused from the Data Engine page (map or drawn city + HUD) */
 .scene.scan-scene{padding:12px}
 .de-stage{position:relative;width:100%;height:100%;border-radius:18px;overflow:hidden;border:1px solid var(--line);background:radial-gradient(circle at 50% 60%,#101010,#000 70%)}
@@ -235,7 +235,170 @@ button:focus-visible{outline:3px solid var(--orange);outline-offset:2px}
 .go .cg{animation:up .45s ease-out both var(--d)}
 @media (max-width:920px) and (min-width:561px){.cs small{display:none}}
 @media (max-width:560px){.cnt{grid-template-columns:minmax(0,1fr);gap:8px}.cg{padding:10px 12px;gap:6px}.cs b{font-size:22px}.cs small{display:none}.sites span{font-size:12px}.sites-k{font-size:14px}}
-/* Paul NY: the parcel map is the stage */
+
+/* Foundational database + Property Book */
+.db-scene{padding:22px}
+.db-build,.db-book-wrap{display:flex;flex-direction:column;gap:12px;width:100%;max-width:660px}
+.db-kicker{font:800 15px/1.25 var(--body);letter-spacing:.11em;text-transform:uppercase;color:#8fbcff;text-shadow:0 2px 8px #000}
+.db-territory{position:relative;height:108px;border:1px solid #3b8cff;border-radius:12px;background:rgba(0,0,0,.38);overflow:hidden}
+.db-territory-label{position:absolute;top:10px;left:12px;padding:5px 8px;background:#000;border-radius:5px;font-size:15px;font-weight:700}
+.db-territory svg{position:absolute;inset:24px 135px 0 5px;width:calc(100% - 140px);height:82px;stroke:#8fbcff;stroke-width:2;fill:rgba(59,140,255,.2)}
+.go .db-territory svg path{animation:db-parcels 2.2s ease-in-out both}
+@keyframes db-parcels{from{stroke-dasharray:30 220;fill:transparent}to{stroke-dasharray:250 0;fill:rgba(59,140,255,.28)}}
+.db-build-size{position:absolute;right:0;top:0;bottom:0;width:130px;background:rgba(0,0,0,.92);border-left:1px solid #3b8cff;padding:10px;display:flex;flex-direction:column;gap:3px}
+.db-build-size span,.db-build-size small{font-size:15px;line-height:1.2;color:#eee}
+.db-build-size b{font-size:28px;line-height:1;color:#fff}
+.db-build-steps{display:flex;align-items:center;gap:8px;font-size:15px;font-weight:700}
+.db-build-steps span{flex:1;border:1px solid #444;background:#000;padding:9px 6px;border-radius:6px;text-align:center}
+.db-build-steps i{font-style:normal;color:#8fbcff}
+.go .db-build-steps span{animation:db-step .5s ease-out both var(--d)}
+@keyframes db-step{from{opacity:.35}to{opacity:1;border-color:#3b8cff}}
+.db-core{border:1px solid #3b8cff;border-radius:12px;background:rgba(0,0,0,.94);padding:13px 16px;box-shadow:0 0 32px -18px #3b8cff}
+.db-core-title{display:flex;align-items:center;gap:12px;padding-bottom:10px}
+.db-core-title svg{width:36px;height:42px;flex:none;stroke:#3b8cff;stroke-width:2;fill:#000}
+.db-core-title small{display:block;font-size:15px;color:#ddd;margin-bottom:3px}
+.db-core-title b{display:block;font:700 clamp(19px,2vw,25px)/1.15 var(--display);color:#fff}
+.db-record-layer{display:grid;grid-template-columns:25px 130px minmax(0,1fr);gap:9px;align-items:center;padding:10px 0;border-top:1px solid #292929;font-size:15px;line-height:1.25}
+.db-record-layer>span{color:#8fbcff;font-variant-numeric:tabular-nums}
+.db-record-layer b{font-size:15px}.db-record-layer small{font-size:15px;color:#eee}
+.go .db-record-layer{animation:db-record .6s ease-out both var(--d)}
+@keyframes db-record{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+.db-foundation-line{font:700 18px/1.25 var(--body);color:#fff;text-align:center;text-shadow:0 2px 8px #000}
+.db-book{border:1px solid #555;border-radius:12px;overflow:hidden;background:#000;box-shadow:0 20px 60px -35px #3b8cff}
+.db-book-top{display:flex;align-items:center;justify-content:space-between;padding:13px 15px;border-bottom:1px solid #333}
+.db-book-top>b{font:700 22px/1.2 var(--display)}.db-book-top>span{font-size:15px;color:#8fbcff}
+.db-book-filters{display:flex;align-items:center;gap:8px;padding:10px 12px;border-bottom:1px solid #333;font-size:15px}
+.db-book-filters>span{flex:1;color:#eee;border:1px solid #444;padding:7px 9px}.db-book-filters>b{font-size:15px;border:1px solid #3b8cff;padding:7px 9px}
+.db-book-body{display:grid;grid-template-columns:minmax(0,.9fr) minmax(0,1.1fr)}
+.db-book-list{border-right:1px solid #333}.db-list-heading{padding:10px 12px;font-size:15px;color:#ccc;border-bottom:1px solid #333}
+.db-book-row{display:flex;flex-direction:column;gap:3px;padding:14px 12px;border-bottom:1px solid #242424;font-size:15px;line-height:1.25}
+.db-book-row>b{font-size:16px}.db-book-row>span{color:#eee}.db-book-row>i{font-style:normal;color:#8fbcff;margin-top:5px;font-size:15px}
+.go .db-book-row{animation:db-record .5s ease-out both var(--d)}
+.db-selected{background:#101010;border-left:3px solid #3b8cff;padding-left:9px}
+.go .db-selected{animation:db-record .5s ease-out both var(--d),db-selected 1s ease-out both 1.2s}
+@keyframes db-selected{to{box-shadow:inset 0 0 26px -16px #3b8cff}}
+.db-book-detail{padding:11px 13px;background:#101010;min-width:0}
+.go .db-book-detail{animation:db-record .6s ease-out both 1.6s}
+.db-record-label{font-size:15px;color:#8fbcff}.db-book-detail h3{font:700 21px/1.2 var(--display);margin:8px 0 3px;color:#fff}
+.db-book-detail p{font-size:15px;line-height:1.25;margin:0 0 10px;color:#eee}
+.db-traced{float:right;display:inline-block;border:1px solid #777;padding:3px 6px;text-transform:uppercase;font-size:15px}
+.db-contact{display:block;font-size:20px;color:#fff;margin:7px 0}
+.db-actions{display:flex;flex-wrap:wrap;gap:6px;font-size:15px;font-weight:700}.db-actions span{border:1px solid #3b8cff;padding:6px 9px;border-radius:4px}.db-actions span:first-child{background:#3b8cff;color:#000}
+.db-history{display:flex;flex-direction:column;gap:2px;border-left:2px solid #3b8cff;padding-left:9px;margin-top:9px;font-size:15px;line-height:1.2}
+.db-history small{font-size:15px;color:#ddd}.db-history b{font-size:15px}.db-history>span{font-size:15px;color:#ddd}
+.db-worked{display:inline-block;border:1px solid #666;padding:5px 8px;font-size:15px;margin-top:10px}
+.db-source{margin:0;font-size:15px;line-height:1.3;text-align:center;color:#ddd}
+@media(max-width:560px){
+ .db-scene{padding:15px}.db-build,.db-book-wrap{gap:10px}.db-kicker{font-size:15px;letter-spacing:.04em}
+ .db-territory{height:124px}.db-territory-label{right:125px;font-size:15px;line-height:1.2;left:7px}.db-build-size{width:116px}.db-territory svg{top:48px;width:calc(100% - 120px);height:66px}
+ .db-build-steps{gap:4px}.db-build-steps span{font-size:15px;padding:9px 4px}
+ .db-core{padding:13px 11px}.db-core-title{gap:8px}.db-core-title b{font-size:21px}.db-record-layer{grid-template-columns:24px minmax(0,1fr);gap:4px 8px;padding:11px 0}.db-record-layer small{grid-column:2}.db-foundation-line{font-size:17px}
+ .db-book-top{padding:10px 12px}.db-book-top>b{font-size:21px}.db-book-filters{padding:8px;gap:5px}.db-book-filters>span{font-size:15px;padding:6px}.db-book-filters>b{padding:6px}
+ .db-book-body{grid-template-columns:minmax(0,1fr)}.db-book-list{border-right:0;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));border-bottom:1px solid #444}
+ .db-list-heading{grid-column:1/-1;padding:7px 10px}.db-book-row{padding:9px;gap:2px}.db-book-row:last-child{display:none}.db-book-row>b{font-size:15px}.db-book-row>i{margin-top:2px}.db-selected{padding-left:6px}
+ .db-book-detail{padding:10px 12px}.db-book-detail h3{margin:4px 0 2px;font-size:20px}.db-book-detail p{margin-bottom:7px}.db-traced{float:right;margin-top:3px}.db-contact{font-size:19px;margin:6px 0}.db-history{margin-top:9px}.db-worked{margin-top:8px}.db-source{font-size:15px}
+}
+/* Workflow proof: animated record assembly and reply prioritization */
+.wf-shell{width:min(640px,100%);display:flex;flex-direction:column;gap:16px;color:#fff;font-family:var(--body);line-height:1.2;min-width:0}
+.wf-heading{display:flex;flex-direction:column;gap:6px}
+.wf-eyebrow{font-size:15px;font-weight:700;color:#8fbcff}
+.wf-heading h3{font:700 25px/1.16 var(--display);margin:0;color:#fff}
+.wf-build{display:grid;grid-template-columns:.92fr 1.08fr;gap:22px;align-items:center}
+.wf-steps{list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:15px;position:relative}
+.wf-steps::before{content:"";position:absolute;left:16px;top:17px;bottom:20px;width:2px;background:#1c2d49}
+.wf-steps::after{content:"";position:absolute;left:16px;top:17px;bottom:20px;width:2px;background:#5c9fff;transform:scaleY(0);transform-origin:top;box-shadow:0 0 12px #3b8cff}
+.wf-steps li{position:relative;display:flex;align-items:center;gap:12px;z-index:1;opacity:.35;transform:translateX(-5px)}
+.wf-step-dot{width:34px;height:34px;flex:none;display:grid;place-items:center;border:1px solid #385275;border-radius:50%;background:#101010;color:#8fbcff;font-size:15px;font-weight:700}
+.wf-steps b,.wf-steps small{display:block;line-height:1.25}
+.wf-steps b{font-size:17px}.wf-steps small{font-size:15px;color:#adb9cf;margin-top:3px}
+.wf-record{border:1px solid #325787;border-radius:16px;padding:18px;background:linear-gradient(145deg,#111,#000 80%);box-shadow:0 22px 54px -30px #247bff;position:relative;overflow:hidden}
+.wf-record-top{display:flex;justify-content:space-between;align-items:center;font-size:15px;font-weight:700;letter-spacing:.06em;color:#8fbcff;margin-bottom:13px}
+.wf-record-light{width:8px;height:8px;border-radius:50%;background:#74acff;box-shadow:0 0 12px #3b8cff}
+.wf-record h4{font:700 25px/1.12 var(--display);margin:0}
+.wf-location{font-size:15px;color:#b9c5d9;margin:5px 0 16px}
+.wf-record-field{display:flex;justify-content:space-between;gap:12px;font-size:15px;border-top:1px solid #23334d;padding:11px 0;opacity:0;transform:translateY(9px)}
+.wf-record-field>span{color:#a5b6d1}.wf-record-field b{font-weight:700;text-align:right}
+.wf-message{display:flex;align-items:center;gap:10px;border:1px solid #315688;border-radius:10px;padding:12px;margin-top:2px;background:#101010;opacity:0;transform:translateX(30px)}
+.wf-message b,.wf-message div>span{display:block;font-size:15px}.wf-message div>span{color:#8fbcff;margin-top:3px}
+.wf-envelope{width:22px;height:17px;border:1.5px solid #8fbcff;border-radius:3px;position:relative;flex:none;overflow:hidden}
+.wf-envelope::before{content:"";position:absolute;left:3px;top:-7px;width:13px;height:13px;border-right:1.5px solid #8fbcff;border-bottom:1.5px solid #8fbcff;transform:rotate(45deg)}
+.wf-delivery-check{margin-left:auto;font-size:20px;color:#8fbcff;opacity:0}
+.wf-saved{display:flex;align-items:center;gap:9px;margin-top:14px;padding-top:13px;border-top:1px solid #23334d;opacity:0;transform:translateY(10px)}
+.wf-saved b{display:block;font-size:15px}.wf-saved small{display:block;font-size:15px;color:#aebed7;line-height:1.25;margin-top:4px}
+.wf-book-icon{width:22px;height:25px;flex:none;border:1.5px solid #8fbcff;border-radius:2px 5px 5px 2px;box-shadow:inset 4px 0 #163c73}
+.wf-foot{font-size:16px;line-height:1.3;color:#b9d2f5;text-align:center;margin:0;opacity:0}
+.go .wf-steps::after{animation:wf-fill 3.5s linear .15s forwards}
+.go .wf-steps li{animation:wf-step .4s ease-out var(--wf-delay) forwards}
+.go .wf-step-dot{animation:wf-dot .35s ease-out var(--wf-delay) forwards}
+.go .wf-record-field,.go .wf-message{animation:wf-arrive .45s ease-out var(--wf-delay) forwards}
+.go .wf-delivery-check{animation:wf-arrive .3s ease-out 3.05s forwards}
+.go .wf-saved{animation:wf-arrive .5s ease-out 3.65s forwards}
+.go .wf-record{animation:wf-store .7s ease-out 3.65s both}
+.go .wf-foot{animation:wf-arrive .4s ease-out 4.1s forwards}
+.wf-inbound{gap:12px}
+.wf-inbound-work{display:grid;grid-template-columns:1fr 1fr;gap:14px;align-items:start}
+.wf-receipt{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));list-style:none;padding:0;margin:0;gap:5px}
+.wf-receipt li{font-size:15px;text-align:center;color:#788aa8;border-top:3px solid #20304a;padding-top:7px}
+.wf-reply{padding:15px 18px;border:1px solid #325787;border-radius:13px;background:#101010;position:relative;overflow:hidden;opacity:0;transform:translateY(-20px)}
+.wf-reply::after{content:"";position:absolute;inset:0;background:linear-gradient(100deg,transparent 15%,rgba(92,159,255,.16) 50%,transparent 85%);transform:translateX(-100%);pointer-events:none}
+.wf-reply-top{display:flex;align-items:center;justify-content:space-between;gap:8px;font-size:15px;color:#cadbf5}
+.wf-read{color:#8fbcff;opacity:0}
+.wf-reply blockquote{font-size:18px;line-height:1.35;margin:10px 0 12px;color:#fff;font-weight:500}
+.wf-classification{display:flex;gap:8px;flex-wrap:wrap;opacity:0;transform:translateY(8px)}
+.wf-classification>span{border:1px solid #315688;border-radius:6px;padding:5px 8px;font-size:15px;line-height:1.1;background:#101010;color:#b9d6ff}
+.wf-classification .wf-positive{border-color:#218557;background:#0c3020;color:#7fe0b0}
+.wf-queue{border:1px solid #263b5b;border-radius:12px;padding:12px;background:#000;--wf-row-step:60px}
+.wf-queue-heading{display:flex;align-items:center;justify-content:space-between;gap:8px;font-size:15px;margin-bottom:10px}
+.wf-priority-label{font-size:15px;color:#8fbcff;opacity:0}
+.wf-queue-items{height:112px;position:relative}
+.wf-queue-row{position:absolute;left:0;right:0;height:52px;display:flex;align-items:center;gap:11px;border-radius:8px;padding:8px 11px;font-size:15px;box-sizing:border-box}
+.wf-queue-row b,.wf-queue-row small{display:block;font-size:15px;line-height:1.2}.wf-queue-row small{color:#a9b9d0;margin-top:2px}
+.wf-rank{font-size:15px;font-weight:700;color:#8fbcff;font-variant-numeric:tabular-nums;flex:none}
+.wf-queue-routine{top:0;background:#101010;border:1px solid #243650}
+.wf-queue-call{top:var(--wf-row-step);background:#101010;border:1px solid #4b8ce6;opacity:0}
+.wf-waiting{margin-left:auto;color:#8295b2;font-size:15px}
+.wf-call-arrow{margin-left:auto;color:#8fbcff;font-size:24px}
+.wf-next{display:flex;align-items:center;justify-content:space-between;gap:12px;border-left:3px solid #5c9fff;background:#101010;padding:12px 14px;border-radius:0 9px 9px 0;opacity:0;transform:translateY(12px)}
+.wf-next div>span{display:block;color:#8fbcff;font-size:15px;font-weight:700;margin-bottom:4px}
+.wf-next b{font-size:16px;line-height:1.25;display:block}
+.wf-ready{border:1px solid #548ddd;border-radius:6px;padding:7px 9px;color:#c5dcff;font-size:15px;white-space:nowrap}
+.go .wf-receipt li{animation:wf-receipt .3s ease-out var(--wf-delay) forwards}
+.go .wf-reply{animation:wf-arrive .45s ease-out .15s forwards}
+.go .wf-reply::after{animation:wf-read-sweep .65s linear 1.05s both}
+.go .wf-read{animation:wf-arrive .3s ease-out 1.15s forwards}
+.go .wf-classification{animation:wf-arrive .45s ease-out 2s forwards}
+.go .wf-queue-call{animation:wf-arrive .3s ease-out 2.55s forwards,wf-raise .7s cubic-bezier(.2,.7,.2,1) 3.05s forwards}
+.go .wf-queue-routine{animation:wf-lower .7s cubic-bezier(.2,.7,.2,1) 3.05s forwards}
+.go .wf-priority-label{animation:wf-arrive .35s ease-out 3.05s forwards}
+.go .wf-next{animation:wf-arrive .5s ease-out 4.2s forwards}
+@keyframes wf-fill{to{transform:scaleY(1)}}
+@keyframes wf-step{to{opacity:1;transform:translateX(0)}}
+@keyframes wf-dot{to{background:#2363ba;border-color:#78adff;color:#fff;box-shadow:0 0 15px -3px #3b8cff}}
+@keyframes wf-arrive{to{opacity:1;transform:translate(0,0)}}
+@keyframes wf-store{50%{box-shadow:0 0 36px -9px #3b8cff;border-color:#8fbcff}}
+@keyframes wf-receipt{to{color:#d2e4ff;border-color:#5c9fff}}
+@keyframes wf-read-sweep{to{transform:translateX(100%)}}
+@keyframes wf-raise{to{top:0;box-shadow:0 0 22px -8px #3b8cff}}
+@keyframes wf-lower{to{top:var(--wf-row-step);opacity:.55}}
+@media(max-width:560px){
+ .wf-shell{gap:13px}.wf-heading h3{font-size:22px}.wf-build{grid-template-columns:1fr;gap:14px}
+ .wf-steps{gap:8px}.wf-steps li{gap:10px}.wf-steps b{font-size:16px}.wf-steps small{display:none}
+ .wf-step-dot{width:30px;height:30px}.wf-steps::before,.wf-steps::after{left:14px;top:15px;bottom:18px}
+ .wf-record{padding:13px 15px;display:grid;grid-template-columns:1fr 1fr;gap:0 12px}
+ .wf-record-top{grid-column:1/-1;margin-bottom:8px}.wf-record h4{font-size:21px}.wf-location{font-size:15px;margin:4px 0 9px;grid-column:1/-1}
+ .wf-record-field{display:block;font-size:15px;padding:8px 0}.wf-record-field b{display:block;text-align:left;margin-top:4px;font-size:15px}
+ .wf-message{grid-column:1/-1;margin:3px 0 0;padding:8px 10px}.wf-message div{display:flex;align-items:center;gap:14px}.wf-message div>span{margin:0}
+ .wf-saved{grid-column:1/-1;margin-top:9px;padding-top:9px}.wf-saved small{font-size:15px}.wf-foot{font-size:15px}
+ .wf-inbound{gap:12px}.wf-inbound-work{grid-template-columns:1fr;gap:10px}.wf-receipt{grid-template-columns:repeat(3,minmax(0,1fr));gap:9px 5px}.wf-receipt li{font-size:15px;padding-top:5px}
+ .wf-reply{padding:13px}.wf-reply blockquote{font-size:17px;line-height:1.35;margin:9px 0 11px}
+ .wf-queue{padding:10px;--wf-row-step:52px}.wf-queue-items{height:96px}.wf-queue-row{padding:6px 9px;gap:8px;height:44px}.wf-queue-row small{font-size:15px}.wf-waiting{display:none}
+ .wf-next{padding:10px 12px;align-items:flex-start;flex-direction:column;gap:8px}.wf-ready{padding:5px 8px}
+}
+@media(prefers-reduced-motion:reduce){
+ .go .wf-steps::after,.go .wf-steps li,.go .wf-step-dot,.go .wf-record-field,.go .wf-message,.go .wf-delivery-check,.go .wf-saved,.go .wf-record,.go .wf-foot,.go .wf-receipt li,.go .wf-reply,.go .wf-read,.go .wf-classification,.go .wf-queue-call,.go .wf-queue-routine,.go .wf-priority-label,.go .wf-next{animation:none;opacity:1;transform:none}
+ .go .wf-steps::after{transform:scaleY(1)}.go .wf-step-dot{background:#2363ba;color:#fff}.go .wf-receipt li{color:#d2e4ff;border-color:#5c9fff}
+ .go .wf-reply::after{display:none}.go .wf-queue-call{top:0}.go .wf-queue-routine{top:var(--wf-row-step);opacity:.55}
+}/* Paul NY: the parcel map is the stage */
 .stage .bgmap{position:absolute;inset:0;z-index:0;opacity:0;transition:opacity .8s ease}
 .stage.mapped .bgmap{opacity:1}
 .stage.mapped.dim .bgmap{opacity:.5}
@@ -403,11 +566,11 @@ button:focus-visible{outline:3px solid var(--orange);outline-offset:2px}
       <!-- 1 · DEAL FLOW · map: Long Island orbit -->
       <div class="scene" data-view="island">
         <div class="col">
-          <div class="pipe five" aria-label="Deal flow: parcel, owner, text, reply, contract">
+          <div class="pipe five" aria-label="Deal flow: database, qualify, reach, reply, contract">
             <div class="track"><i class="pulse"></i></div>
-            <div class="stn" style="--d:.2s"><span></span><b>Parcel</b></div>
-            <div class="stn" style="--d:.6s"><span></span><b>Owner</b></div>
-            <div class="stn" style="--d:1s"><span></span><b>Text</b></div>
+            <div class="stn" style="--d:.2s"><span></span><b>Database</b></div>
+            <div class="stn" style="--d:.6s"><span></span><b>Qualify</b></div>
+            <div class="stn" style="--d:1s"><span></span><b>Reach</b></div>
             <div class="stn" style="--d:1.4s"><span></span><b>Reply</b></div>
             <div class="stn end" style="--d:1.8s"><span></span><b>Contract</b></div>
           </div>
@@ -416,7 +579,7 @@ button:focus-visible{outline:3px solid var(--orange);outline-offset:2px}
             <div class="card in3"><h3>Repeatable</h3><p>One sequence. Every site.</p></div>
             <div class="card in4"><h3>Visible</h3><p>Every site. On the record.</p></div>
           </div>
-          <div class="card claim in4"><p>We manufacture inbound replies, position you in front of what drives opportunities, and systematically generate revenue.</p></div>
+          <div class="card claim in4"><p>We build your foundational database. Then turn qualified conversations into deal flow.</p></div>
         </div>
       </div>
 
@@ -471,18 +634,56 @@ button:focus-visible{outline:3px solid var(--orange);outline-offset:2px}
       </div>
 
 
-      <!-- HOW WE SNAPSHOT IT -->
-      <div class="scene" hidden data-view="snapshot">
-        <div class="col snap-col">
-          <div class="kick in1">How we snapshot your market</div>
-          <div class="snap">
-            <div class="fs" style="--d:.3s"><span class="no">1</span><div><b>Pull every parcel</b><small>Deed, owner, listing status</small></div></div>
-            <div class="fs" style="--d:.6s"><span class="no">2</span><div><b>Screen to your buy box</b><small>Individual owners first</small></div></div>
-            <div class="fs" style="--d:.9s"><span class="no">3</span><div><b>Count it and date it</b><small>Counted Oct 9, 2026</small></div></div>
-            <div class="fs" style="--d:1.2s"><span class="no">4</span><div><b>Re-check every morning</b><small>New expireds land daily</small></div></div>
-            <div class="fs hot wide" style="--d:1.5s"><span class="no">5</span><div><b>Stage it</b><small>Held blocks. You launch.</small></div><span class="ok">READY</span></div>
+
+      <!-- DATABASE FOUNDATION: territory becomes a reusable property and owner database -->
+      <div class="scene db-scene" hidden data-view="foundation">
+        <div class="db-build">
+          <div class="db-kicker">The foundation of your deal flow</div>
+          <div class="db-territory">
+            <span class="db-territory-label">Long Island · your territory</span>
+            <svg viewBox="0 0 480 100" aria-hidden="true"><path d="M80 13 150 8 165 66 93 72Z M163 7 231 15 229 75 177 68Z M246 18 317 8 336 69 246 78Z M332 11 402 20 388 85 349 74Z"/></svg>
+            <div class="db-build-size"><span>Rows to build</span><b>100</b><small>Selected batch size</small></div>
           </div>
-          <div class="feed-row in4"><span class="pill-k">Held blocks</span><i>→</i><span class="pill-k">SMS · calls · dialer</span><i>→</i><span class="pill-k on">Follow Up Boss · qualified only</span></div>
+          <div class="db-build-steps" aria-label="Select territory, screen to buy box, build records">
+            <span style="--d:.2s">Territory</span><i>→</i><span style="--d:.7s">Buy box</span><i>→</i><span style="--d:1.2s">Build records</span>
+          </div>
+          <div class="db-core">
+            <div class="db-core-title"><svg viewBox="0 0 50 58" aria-hidden="true"><ellipse cx="25" cy="10" rx="21" ry="8"/><path d="M4 10v36c0 11 42 11 42 0V10M4 27c0 11 42 11 42 0M4 40c0 11 42 11 42 0"/></svg><div><small>Nextier Data Engine</small><b>Your foundational database</b></div></div>
+            <div class="db-record-layer" style="--d:1.5s"><span>01</span><b>Property</b><small>Parcel · address · territory</small></div>
+            <div class="db-record-layer" style="--d:2.2s"><span>02</span><b>Owner + contact</b><small>Ownership · reachable phone</small></div>
+            <div class="db-record-layer" style="--d:2.9s"><span>03</span><b>Signals + history</b><small>Events · outreach · replies</small></div>
+          </div>
+          <div class="db-foundation-line">Build it. Enrich it. Keep working it.</div>
+        </div>
+      </div>
+
+
+      <!-- PROPERTY BOOK: a masked reconstruction of the supplied real workspace -->
+      <div class="scene db-scene" hidden>
+        <div class="db-book-wrap">
+          <div class="db-book">
+            <div class="db-book-top"><b>Property Book</b><span>Nextier</span></div>
+            <div class="db-book-filters"><span>⌕ Search property or owner</span><b>Delivered</b></div>
+            <div class="db-book-body">
+              <div class="db-book-list">
+                <div class="db-list-heading">Property · Suffolk, NY</div>
+                <div class="db-book-row" style="--d:.3s"><b>•• 3rd Ave</b><span>Brentwood, NY</span></div>
+                <div class="db-book-row db-selected" style="--d:.7s"><b>••• S 14th St</b><span>Lindenhurst, NY</span><i>Open record →</i></div>
+                <div class="db-book-row" style="--d:1.1s"><b>•• Smith St</b><span>Deer Park, NY</span></div>
+              </div>
+              <div class="db-book-detail">
+                <span class="db-record-label">Property + contact record</span>
+                <h3>••• S 14th St</h3><p>Lindenhurst · Suffolk, NY</p>
+                <span class="db-traced">Traced</span>
+                <b class="db-contact">516 ••• •922</b>
+                <div class="db-actions"><span>Call</span><span>Text</span><span>Open record ↗</span></div>
+                <div class="db-history"><small>Activity on this property</small><b>Initial SMS delivered</b><span>Oct 8, 2026</span></div>
+                <div class="db-worked">Mark worked</div>
+              </div>
+            </div>
+          </div>
+          <div class="db-foundation-line">Search. Filter. Call. Text. Track.</div>
+          <p class="db-source">From the supplied workspace · identifying details masked</p>
         </div>
       </div>
 
@@ -548,30 +749,54 @@ button:focus-visible{outline:3px solid var(--orange);outline-offset:2px}
         </div>
       </div>
 
-      <!-- 11 · THE SEQUENCE · pipeline pulse -->
+
+      <!-- OUTBOUND · signal becomes a worked Property Book record -->
       <div class="scene" hidden>
-        <div class="col">
-          <div class="kick in1">Once a site qualifies</div>
-          <div class="pipe">
-            <div class="track"><i class="pulse"></i></div>
-            <div class="stn" style="--d:.2s"><span>1</span><b>Pull the file</b></div>
-            <div class="stn" style="--d:.8s"><span>2</span><b>Review</b></div>
-            <div class="stn" style="--d:1.4s"><span>3</span><b>Reach the owner</b></div>
-            <div class="stn end" style="--d:2s"><span>✓</span><b>Contract or pass</b></div>
+        <div class="wf-shell wf-outbound">
+          <div class="wf-heading"><span class="wf-eyebrow">The outbound workflow</span><h3>A signal becomes a working record.</h3></div>
+          <div class="wf-build">
+            <ol class="wf-steps" aria-label="Outbound workflow">
+              <li style="--wf-delay:.15s"><span class="wf-step-dot">1</span><div><b>Event signal</b><small>Property event detected</small></div></li>
+              <li style="--wf-delay:.9s"><span class="wf-step-dot">2</span><div><b>Owner found</b><small>Linked to the property</small></div></li>
+              <li style="--wf-delay:1.65s"><span class="wf-step-dot">3</span><div><b>Enriched</b><small>Contact attached</small></div></li>
+              <li style="--wf-delay:2.5s"><span class="wf-step-dot">4</span><div><b>Initial SMS</b><small>Delivery recorded</small></div></li>
+              <li style="--wf-delay:3.65s"><span class="wf-step-dot">5</span><div><b>Property Book</b><small>Ready to work</small></div></li>
+            </ol>
+            <div class="wf-record" aria-label="Example Property Book record assembled from the workflow">
+              <div class="wf-record-top"><span>WORKFLOW EXAMPLE</span><i class="wf-record-light" aria-hidden="true"></i></div>
+              <h4>S 14th St</h4><p class="wf-location">Lindenhurst, NY</p>
+              <div class="wf-record-field" style="--wf-delay:.9s"><span>Owner</span><b>Linked to parcel</b></div>
+              <div class="wf-record-field" style="--wf-delay:1.65s"><span>Contact</span><b>516 ••• •922</b></div>
+              <div class="wf-message" style="--wf-delay:2.5s"><span class="wf-envelope" aria-hidden="true"></span><div><b>Initial SMS</b><span>Delivered</span></div><span class="wf-delivery-check" aria-label="Delivery recorded">✓</span></div>
+              <div class="wf-saved"><span class="wf-book-icon" aria-hidden="true"></span><div><b>Saved to Property Book</b><small>Contact + delivery history</small></div></div>
+            </div>
           </div>
-          <div class="card in4 center"><p>Nothing goes cold.</p></div>
+          <p class="wf-foot">Every step stays on the property record.</p>
         </div>
       </div>
 
-      <!-- 12 · CONVERSATIONS · lock screen, real replies -->
+      <!-- INBOUND · real reply is read, classified, prioritized and prepared for a call -->
       <div class="scene" hidden>
-        <div class="phone-wrap">
-          <div class="phone">
-            <div class="ph-time">2:59</div>
-            <div class="note" style="--d:.4s"><small><b>Homeowner</b><span>now</span></small>How fast could You buy my house ? Do you have time for a call.<span class="ntag pos">Hand raised</span></div>
-            <div class="note" style="--d:1.4s"><small><b>Homeowner</b></small>Tomorrow morning is better after 9:30 AM<span class="ntag">Call at 9:30</span></div>
+        <div class="wf-shell wf-inbound">
+          <div class="wf-heading"><span class="wf-eyebrow">The inbound workflow</span><h3>The reply changes the next move.</h3></div>
+          <ol class="wf-receipt" aria-label="Inbound processing steps">
+            <li style="--wf-delay:.15s">Observed</li><li style="--wf-delay:.6s">Detected</li><li style="--wf-delay:1.15s">Read</li><li style="--wf-delay:2s">Classified</li><li style="--wf-delay:3.05s">Prioritized</li><li style="--wf-delay:4.2s">Handled</li>
+          </ol>
+          <div class="wf-inbound-work">
+          <div class="wf-reply">
+            <div class="wf-reply-top"><b>Homeowner reply</b><span class="wf-read">Read ✓</span></div>
+            <blockquote>How fast could You buy my house ? Do you have time for a call.</blockquote>
+            <div class="wf-classification"><span class="wf-positive">Positive reply</span><span>Call requested</span></div>
           </div>
-          <div class="card claim in4"><p>Turn conversations into opportunities.</p></div>
+          <div class="wf-queue" aria-label="A call request rises to the top of the work queue">
+            <div class="wf-queue-heading"><b>Work queue</b><span class="wf-priority-label">Priority raised ↑</span></div>
+            <div class="wf-queue-items">
+              <div class="wf-queue-row wf-queue-routine"><span class="wf-rank">02</span><div><b>Scheduled follow-ups</b><small>Continue the sequence</small></div><span class="wf-waiting">Queued</span></div>
+              <div class="wf-queue-row wf-queue-call"><span class="wf-rank">01</span><div><b>Call requested</b><small>Homeowner raised their hand</small></div><span class="wf-call-arrow" aria-hidden="true">↗</span></div>
+            </div>
+          </div>
+          </div>
+          <div class="wf-next"><div><span>NEXT ACTION</span><b>Call to book a conversation</b></div><span class="wf-ready">Ready for call</span></div>
         </div>
       </div>
 
@@ -599,7 +824,7 @@ button:focus-visible{outline:3px solid var(--orange);outline-offset:2px}
     </div>
 
     <div class="narr">
-      <div class="step" id="step">Chapter 1 of 14</div>
+      <div class="step" id="step">Chapter 1 of 15</div>
       <h2 id="ttl"></h2>
       <p id="txt"></p>
       <div class="controls">
@@ -635,18 +860,19 @@ button:focus-visible{outline:3px solid var(--orange);outline-offset:2px}
 
 <script>
 const CH=[
- {k:'Deal flow',t:'Own the deal before it hits the MLS',x:'Adaptable. Repeatable. Visible. This is how you get there first.'},
+ {k:'Deal flow',t:'Your database. Your deal flow.',x:'We build your foundational database, then run the outreach that turns qualified conversations into opportunities.'},
  {k:'Buy box',t:'Your buy box',x:'We source, enrich and initiate conversations that drive revenue from your buy box. 0.45 to 1.9 acres. Two to four lots. $850K to $1.5M exits.'},
  {k:'The scan',t:'We scan every parcel',x:'Our Data Engine systematically builds a database of probable, profitable, reachable leads, statistically likely to sell inside 12 months. On Long Island alone: 1,208 subdivision-size lots.'},
  {k:'The count',t:'Your market, counted',x:'Every target, individually owned, counted Oct 9. No guesswork.'},
- {k:'Snapshot',t:'How we snapshot it',x:'Pull every parcel. Screen it. Count it. Re-check it every morning. Stage it.'},
+ {k:'Database',t:'We build your foundational database',x:'Define the territory. Screen to your buy box. Build property, owner and contact records. Enrich them with signals and keep the history together.'},
+ {k:'Property Book',t:'Every property. One working record.',x:'The foundation becomes a working Property Book: search and filter properties, reach the owner, and see delivery and activity on the record.'},
  {k:'What moves',t:'What moves a deal',x:'A filing. An estate. A dead listing. A tenant walking out. We see it first.'},
  {k:'Pull the file',t:'The file is pulled before you ask',x:'Rufus pulls the filing. Luci checks the deed.'},
  {k:'Decision engine',t:'A decision engine, not a list',x:'What changed. Does it pencil. Who signs. What’s the play. Every site, answered.'},
  {k:'Example',t:'Route 110',x:'The tenant moves. We tie it to the parcel, find who signs, and make the call first.'},
  {k:'Your rules',t:'Your rules',x:'Town. Acreage. Zoning. Event. Two signals at once jumps the line.'},
- {k:'Sequence',t:'Contract or pass',x:'Every site gets worked to a decision. Nothing goes cold.'},
- {k:'Conversations',t:'Turn conversations into opportunities',x:'They raise their hand. We put you in the room.'},
+ {k:'Initial outreach',t:'From event signal to delivered text',x:'Detect the event. Find the owner. Enrich the contact. Deliver the first text. The owner enters your Property Book, with the outreach on record.'},
+ {k:'Inbound execution',t:'From inbound reply to prioritized action',x:'Observe. Detect. Read. Classify. Prioritize. Handle. The reply stays tied to the property and owner, with the next action ready.'},
  {k:'Your call',t:'You call the shots',x:'Nothing goes out without your OK. You pick the deal. We run the machine.'},
  {k:'In contract',t:'What gets to the table',x:'67 positive replies. 8 sit-downs. 1 in contract. That’s the machine.'}
 ];
@@ -705,6 +931,7 @@ go(m?Math.min(Math.max(+m[1],1),CH.length)-1:0);
     scan: { tour: [["Riverhead", PL.riverhead, 434], ["Center Moriches", PL.centerMoriches, 237], ["Wading River", PL.wadingRiver, 218], ["Mastic Beach", PL.masticBeach, 16]], sweep: 1 },
     count: { center: [-73.0, 40.84], zoom: 9.4, pitch: 50, bearing: -8, orbit: 1, dim: 1 },
     snapshot: { center: [-72.95, 40.85], zoom: 10.2, pitch: 58, bearing: 24, sweep: 1, dim: 1 },
+    foundation: { center: PL.melville, zoom: 14.4, pitch: 66, bearing: -24, orbit: 1, sweep: 1 },
     signals: { center: [-73.05, 40.83], zoom: 10.8, pitch: 62, bearing: -42, orbit: 1, dim: 1 },
     file: { center: PL.centerMoriches, zoom: 16.6, pitch: 70, bearing: 35, orbit: 1, dim: 1 },
     route110: { center: PL.melville, zoom: 14.4, pitch: 66, bearing: -24, orbit: 1, pins: [["Route 110 corridor · 2,021 commercial", PL.melville]] },
