@@ -1,6 +1,6 @@
 <!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>Paul Musso Deal Flow</title>
-<meta name="description" content="Prepared for Paul Musso: own the deal before it hits the MLS.">
+<meta name="description" content="Anyone Can Automate a Task. Very Few Can Engineer an Outcome. NEXTIER engineers opportunity at the foundational level.">
 <meta name="robots" content="noindex">
 <link rel="canonical" href="https://nextiertech11105.github.io/nextier-flow/paul-story-ny.html">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -34,6 +34,7 @@ h1 em{font-style:normal;color:var(--orange)}
 .narr{display:flex;flex-direction:column;gap:16px;padding:8px 4px;min-width:0}
 .step{font-size:13px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--orange)}
 .narr h2{font-family:var(--display);font-size:clamp(26px,3vw,36px);line-height:1.1;margin:0;text-wrap:balance}
+.authority-points{margin:0;padding:0 0 0 1.15em;display:grid;gap:18px;font:700 22px/1.35 var(--body);color:#fff}.authority-points li{padding-left:4px}.authority-points li::marker{color:#3b8cff;font-size:1.1em}@media(max-width:560px){.authority-points{font-size:20px;gap:14px}}
 .narr p{margin:0;font-size:19px;max-width:38ch}
 .controls{display:flex;flex-wrap:wrap;gap:10px;margin-top:auto}
 button{font:inherit;font-weight:700;font-size:15px;color:var(--fg);background:var(--panel-2);border:1px solid var(--line);border-radius:12px;padding:10px 16px;cursor:pointer}
@@ -398,7 +399,84 @@ button:focus-visible{outline:3px solid var(--orange);outline-offset:2px}
  .go .wf-steps::after,.go .wf-steps li,.go .wf-step-dot,.go .wf-record-field,.go .wf-message,.go .wf-delivery-check,.go .wf-saved,.go .wf-record,.go .wf-foot,.go .wf-receipt li,.go .wf-reply,.go .wf-read,.go .wf-classification,.go .wf-queue-call,.go .wf-queue-routine,.go .wf-priority-label,.go .wf-next{animation:none;opacity:1;transform:none}
  .go .wf-steps::after{transform:scaleY(1)}.go .wf-step-dot{background:#2363ba;color:#fff}.go .wf-receipt li{color:#d2e4ff;border-color:#5c9fff}
  .go .wf-reply::after{display:none}.go .wf-queue-call{top:0}.go .wf-queue-routine{top:var(--wf-row-step);opacity:.55}
-}/* Paul NY: the parcel map is the stage */
+}
+.clay-crew{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;position:relative;isolation:isolate}
+.clay-role{display:flex;flex-direction:column;align-items:center;gap:5px;min-width:0}
+.clay-role b{font:700 17px/1.2 var(--body);color:#fff;border-bottom:2px solid #3b8cff;padding:0 6px 6px}
+.clay-actor{display:block;width:132px;height:181px;max-width:100%;background-image:url('media/clay-intelligence-team.png');background-size:300% 100%;background-repeat:no-repeat;filter:drop-shadow(0 9px 11px rgba(59,140,255,.18))}
+.clay-scout{background-position:0 0}.clay-analyst{background-position:50% 0}.clay-operator{background-position:100% 0}
+.clay-analyst{clip-path:inset(0 5% 0 7%)}
+.opening-outcome{margin:0;text-align:center;font:700 17px/1.25 var(--body);color:#fff}
+.go .clay-role{animation:clay-enter .6s ease-out both var(--clay-delay)}
+.go .clay-actor{animation:clay-work 3s ease-in-out infinite var(--clay-delay,0s)}
+@keyframes clay-enter{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+@keyframes clay-work{0%,100%{transform:translateY(0) rotate(0)}50%{transform:translateY(-4px) rotate(1deg)}}
+.intel-shell>.clay-crew{margin-bottom:-4px}.intel-shell>.clay-crew .clay-actor{width:65px;height:89px}.intel-shell>.clay-crew .clay-role b{font-size:15px;padding-bottom:3px}
+@media(max-width:560px){.clay-actor{width:88px;height:121px}.clay-role b{font-size:15px}.intel-shell>.clay-crew .clay-actor{width:46px;height:63px}.intel-shell>.clay-crew .clay-role{gap:1px}}
+@media(prefers-reduced-motion:reduce){.go .clay-role,.go .clay-actor{animation:none;opacity:1;transform:none}}
+/* Intelligence scanning: true black surfaces, visible sources, one brief */
+.intel-shell{width:min(640px,100%);display:flex;flex-direction:column;gap:11px;font-family:var(--body);line-height:1.2;color:#fff;min-width:0}
+.intel-heading{display:flex;align-items:baseline;justify-content:space-between;gap:12px}
+.intel-heading h3{font:700 23px/1.15 var(--display);margin:0;color:#fff}
+.intel-heading>span{font-size:15px;color:#fff;flex:none}
+.intel-sources{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.intel-lane{position:relative;padding:12px 10px;border:1px solid #34435b;border-radius:10px;background:#101010;overflow:hidden;min-width:0}
+.intel-lane>b{display:block;font-size:15px;line-height:1.2;margin-bottom:10px;white-space:nowrap}
+.intel-items{display:flex;align-items:center;justify-content:space-between;gap:5px;min-width:0}
+.intel-items>span{font-size:15px;color:#fff;border-bottom:2px solid #30476b;padding-bottom:5px;white-space:nowrap;opacity:.5}
+.intel-sweep{position:absolute;top:0;bottom:0;left:-40%;width:35%;background:linear-gradient(90deg,transparent,rgba(76,141,255,.25),transparent);border-right:1px solid #79afff;opacity:0;pointer-events:none}
+.intel-feed{height:19px;position:relative;margin-top:-5px;margin-bottom:-5px;display:flex;align-items:center;justify-content:center;color:#8fbcff;font-size:21px;line-height:1}
+.intel-feed::before{content:"";position:absolute;left:16.5%;right:16.5%;top:1px;height:8px;border:1px solid #355a94;border-top:0;border-radius:0 0 7px 7px}
+.intel-feed>i{position:absolute;top:0;width:6px;height:6px;border-radius:50%;background:#9cc0ff;box-shadow:0 0 9px #3b8cff;opacity:0}
+.intel-feed>i:nth-child(1){left:16.5%}.intel-feed>i:nth-child(2){left:50%}.intel-feed>i:nth-child(3){left:83.5%}
+.intel-feed>span{z-index:1;background:#000;padding:0 7px}
+.intel-brief{padding:12px;border:1px solid #4471af;border-radius:12px;background:#000;box-shadow:0 14px 40px -32px #3b8cff}
+.intel-brief-head{display:flex;align-items:center;justify-content:space-between;gap:10px;font-size:15px;padding:0 3px 9px}
+.intel-brief-head>b{font-weight:700;letter-spacing:.05em;color:#9cc0ff}.intel-brief-head>span{color:#fff}
+.intel-match{position:relative;display:grid;grid-template-columns:1fr 24px 1fr;align-items:center;gap:10px;min-height:43px;padding:9px 11px;border:1px solid #242424;border-radius:7px;background:#101010;overflow:hidden;opacity:.3;transform:translateY(5px)}
+.intel-match+.intel-match{margin-top:6px}
+.intel-match>b,.intel-match>span{font-size:16px;line-height:1.2;z-index:1}
+.intel-match>b{font-weight:700}.intel-match>.intel-arrow{color:#8fbcff;text-align:center;font-size:21px}
+.intel-match>i{position:absolute;inset:0;border-left:3px solid #7aaeff;background:linear-gradient(90deg,rgba(59,140,255,.18),transparent 75%);opacity:0}
+.intel-footer{font-size:17px;font-weight:700;line-height:1.25;text-align:center;color:#fff;margin:0;opacity:0;transform:translateY(5px)}
+.go .intel-lane{animation:intel-source .7s ease-out var(--intel-delay) both}
+.go .intel-sweep{animation:intel-scan .75s linear var(--intel-delay) both}
+.go .intel-items>span{animation:intel-item .35s ease-out calc(var(--intel-delay) + .15s) forwards}
+.go .intel-feed>i{animation:intel-feed .8s ease-in var(--intel-delay) both}
+.go .intel-match{animation:intel-reveal .5s ease-out var(--intel-delay) forwards}
+.go .intel-match>i{animation:intel-focus 1.15s ease-in-out var(--intel-delay) both}
+.go .intel-footer{animation:intel-reveal .4s ease-out 5.45s forwards}
+@keyframes intel-source{50%{border-color:#8fbcff;box-shadow:0 0 20px -8px #3b8cff}}
+@keyframes intel-scan{0%{left:-40%;opacity:0}10%{opacity:1}90%{opacity:1}100%{left:105%;opacity:0}}
+@keyframes intel-item{to{opacity:1;border-color:#7aaeff}}
+@keyframes intel-feed{0%{opacity:0}15%{opacity:1}70%{opacity:1}100%{left:50%;top:16px;opacity:0}}
+@keyframes intel-reveal{to{opacity:1;transform:translateY(0)}}
+@keyframes intel-focus{0%{opacity:0}20%,80%{opacity:1}100%{opacity:.4}}
+@media(max-width:560px){
+ .intel-shell{gap:8px}.intel-heading{flex-direction:column;align-items:flex-start;gap:5px}.intel-heading h3{font-size:21px}.intel-heading>span{font-size:15px}
+ .intel-sources{grid-template-columns:1fr;gap:7px}.intel-lane{padding:6px 10px;display:grid;grid-template-columns:92px minmax(0,1fr);align-items:center;gap:8px;min-height:50px}
+ .intel-lane>b{white-space:normal;margin:0;font-size:15px}.intel-items{gap:5px}.intel-items>span{font-size:15px;padding-bottom:4px}
+ .intel-feed{height:15px;margin-top:-4px;margin-bottom:-4px}.intel-feed::before{left:25%;right:25%;height:6px}.intel-feed>i:nth-child(1){left:25%}.intel-feed>i:nth-child(3){left:75%}
+ .intel-brief{padding:8px}.intel-brief-head{padding:0 1px 8px;gap:6px;font-size:15px}.intel-brief-head>b{letter-spacing:0}
+ .intel-match{grid-template-columns:1fr 16px 1fr;gap:6px;min-height:49px;padding:6px}.intel-match>b,.intel-match>span{font-size:15px;line-height:1.2}.intel-match>.intel-arrow{font-size:18px}
+ .intel-footer{font-size:15px}
+}
+@media(prefers-reduced-motion:reduce){
+ .go .intel-lane,.go .intel-items>span,.go .intel-match,.go .intel-match>i,.go .intel-footer{animation:none;opacity:1;transform:none}
+ .go .intel-match>i{opacity:.3}.go .intel-sweep,.go .intel-feed>i{animation:none;display:none}
+ .go .intel-items>span{border-color:#7aaeff}
+}
+.owner-time-shell{display:flex;flex-direction:column;gap:12px;width:min(650px,100%);font-family:var(--body);line-height:1.25}
+.owner-time-head{display:flex;align-items:center;gap:14px}.owner-time-head .clay-actor{width:82px;height:112px;flex:none}.owner-time-head small{font-size:15px;color:#8fbcff}.owner-time-head h3{margin:5px 0;font:700 26px/1.15 var(--display);color:#fff}.owner-time-head p{margin:0;font-size:15px;color:#eee}
+.owner-time-input{position:relative;display:flex;justify-content:space-between;gap:12px;padding:12px;border:1px solid #3b8cff;border-radius:8px;font-size:15px;background:#000;overflow:hidden}.owner-time-input i{position:absolute;inset:0;background:linear-gradient(100deg,transparent 25%,rgba(59,140,255,.4) 50%,transparent 75%);transform:translateX(-100%)}
+.go .owner-time-input i{animation:owner-time-scan 1.1s ease-in-out .1s both}@keyframes owner-time-scan{to{transform:translateX(100%)}}
+.owner-time-bands{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:9px}.owner-time-band{display:flex;flex-direction:column;gap:9px;padding:13px 11px;border:1px solid #444;border-radius:10px;background:#101010;min-width:0}.owner-time-band>b{font:800 25px/1 var(--display);color:#8fbcff}.owner-time-band strong{font-size:16px;line-height:1.2}.owner-time-band span,.owner-time-band small{font-size:15px;line-height:1.25;color:#eee}.owner-time-band small{border-top:1px solid #444;padding-top:8px}
+.go .owner-time-band{animation:owner-time-sort .6s ease-out both var(--time-delay)}@keyframes owner-time-sort{from{opacity:0;transform:translateY(-18px)}to{opacity:1;transform:translateY(0);border-color:#3b8cff}}
+.owner-time-review{display:flex;justify-content:space-between;gap:12px;padding:11px;border:1px dashed #666;border-radius:8px;font-size:15px}.owner-time-review span{color:#eee}.owner-time-foot{margin:0;text-align:center;color:#eee;font-size:15px;line-height:1.25}
+@media(max-width:560px){.owner-time-shell{gap:10px}.owner-time-head{gap:6px}.owner-time-head .clay-actor{width:61px;height:84px}.owner-time-head h3{font-size:22px}.owner-time-input{flex-direction:column;gap:4px;padding:9px}.owner-time-bands{grid-template-columns:1fr;gap:8px}.owner-time-band{display:grid;grid-template-columns:64px minmax(0,1fr);gap:3px 9px;padding:10px}.owner-time-band>b{grid-row:1/4;align-self:center;font-size:22px}.owner-time-band strong{font-size:15px}.owner-time-band span,.owner-time-band small{font-size:15px}.owner-time-band small{padding-top:4px;margin-top:3px}.owner-time-review{flex-direction:column;gap:4px;padding:9px}.owner-time-foot{font-size:15px}}
+@media(max-width:560px){.owner-time-band strong{display:none}.owner-time-band>b{grid-row:1/3}.owner-time-band small{font-size:15px}.owner-time-shell{gap:8px}}
+@media(prefers-reduced-motion:reduce){.go .owner-time-input i{display:none}.go .owner-time-band{animation:none;opacity:1;transform:none;border-color:#3b8cff}}
+/* Paul NY: the parcel map is the stage */
 .stage .bgmap{position:absolute;inset:0;z-index:0;opacity:0;transition:opacity .8s ease}
 .stage.mapped .bgmap{opacity:1}
 .stage.mapped.dim .bgmap{opacity:.5}
@@ -558,7 +636,7 @@ button:focus-visible{outline:3px solid var(--orange);outline-offset:2px}
     <div class="brand"><span class="lg lg-nx-mark" role="img" aria-label="Nextier logo" style="--w:34px;--h:34px"></span><span class="lg lg-nx-word" role="img" aria-label="Nextier" style="--w:132px;--h:22px"></span></div>
     <div class="tag">Prepared for Paul Musso · Long Island deal flow</div>
   </header>
-  <h1>Own the deal <em>before it hits the MLS.</em></h1>
+  <h1>Anyone Can Automate a Task. <em>Very Few Can Engineer an Outcome.</em></h1>
 
   <div class="main">
     <div class="stage" id="stage" aria-live="polite">
@@ -574,12 +652,13 @@ button:focus-visible{outline:3px solid var(--orange);outline-offset:2px}
             <div class="stn" style="--d:1.4s"><span></span><b>Reply</b></div>
             <div class="stn end" style="--d:1.8s"><span></span><b>Contract</b></div>
           </div>
-          <div class="tri">
-            <div class="card in2"><h3>Adaptable</h3><p>Your buy box. Changed on your word.</p></div>
-            <div class="card in3"><h3>Repeatable</h3><p>One sequence. Every site.</p></div>
-            <div class="card in4"><h3>Visible</h3><p>Every site. On the record.</p></div>
-          </div>
-          <div class="card claim in4"><p>We build your foundational database. Then turn qualified conversations into deal flow.</p></div>
+          <div class="clay-crew" aria-label="The intelligence team: detect, build, engage">
+  <div class="clay-role" style="--clay-delay:.2s"><span class="clay-actor clay-scout" aria-hidden="true"></span><b>Detect</b></div>
+  <div class="clay-role" style="--clay-delay:.8s"><span class="clay-actor clay-analyst" aria-hidden="true"></span><b>Build</b></div>
+  <div class="clay-role" style="--clay-delay:1.4s"><span class="clay-actor clay-operator" aria-hidden="true"></span><b>Engage</b></div>
+</div>
+          <div class="card claim in4"><p>We engineer the conditions that determine what becomes possible.</p></div>
+          <p class="opening-outcome">Multiply execution capacity. Compound opportunity.</p>
         </div>
       </div>
 
@@ -597,15 +676,21 @@ button:focus-visible{outline:3px solid var(--orange);outline-offset:2px}
         </div>
       </div>
 
-      <!-- 3 · THE SCAN · map: hamlet tour + radar -->
-      <div class="scene hud-scene" hidden data-view="scan">
-        <div class="de-hud">
-          <span class="de-scan"><i></i><span>Scanning · Long Island, NY</span></span>
-          <b class="de-count" data-count="1208">1,208</b>
-          <span class="de-label">Subdivision-size lots</span>
-          <span class="de-stop" data-ny-stop></span>
+      <!-- THE SCAN · 3D, reused from the Data Engine page -->
+      <div class="scene scan-scene" hidden>
+        <div class="de-stage" data-scan>
+          <canvas data-city aria-hidden="true"></canvas>
+          <div class="de-hud">
+            <span class="de-scan"><i></i><span>Scanning · Long Island, NY</span></span>
+            <b class="de-count" data-de-count>1,208</b>
+            <span class="de-label">Subdivision-size lots</span>
+            <span class="de-stop" data-de-stop></span>
+          </div>
+          <span class="de-tag">3D view is an illustration</span>
         </div>
       </div>
+
+
 
       <!-- YOUR MARKET, COUNTED (real: Oct 9 Long Island scan, individually owned) -->
       <div class="scene" hidden data-view="count">
@@ -687,14 +772,43 @@ button:focus-visible{outline:3px solid var(--orange);outline-offset:2px}
         </div>
       </div>
 
-      <!-- 6 · WHAT MOVES A DEAL · map: central Suffolk orbit -->
-      <div class="scene" hidden data-view="signals">
-        <div class="col">
-          <div class="kick in1">What moves a deal · detected on Long Island</div>
-          <div class="fs ping" style="--d:.3s"><span class="no">LP</span><div><b>Lis pendens</b><small>280 on big lots</small></div></div>
-          <div class="fs ping" style="--d:.7s"><span class="no">ES</span><div><b>Estate or inherited</b><small>1,598 on 0.90+ acres</small></div></div>
-          <div class="fs ping" style="--d:1.1s"><span class="no">EX</span><div><b>Expired, never relisted</b><small>707 on a big lot</small></div></div>
-          <div class="fs ping" style="--d:1.5s"><span class="no">BZ</span><div><b>Tenant leaving</b><small>Route 110 · 2,021 held 5+ years</small></div></div>
+
+      <!-- OWNER TIMING: classify what the owner says, separate from callback availability -->
+      <div class="scene" hidden>
+        <div class="owner-time-shell">
+          <div class="owner-time-head"><span class="clay-actor clay-analyst" aria-hidden="true"></span><div><small>Property Book · owner timing scan</small><h3>The owner sets the timeline.</h3><p>Replies + owner conversation notes</p></div></div>
+          <div class="owner-time-input"><span>Read the owner evidence</span><b>Classify the decision timing</b><i aria-hidden="true"></i></div>
+          <div class="owner-time-bands" aria-label="Owner timing criteria">
+            <div class="owner-time-band" style="--time-delay:1s"><b>NOW</b><strong>Inside 30 days</strong><span>Decision within 0–30 days.</span><small>Next move: work the decision.</small></div>
+            <div class="owner-time-band" style="--time-delay:2.1s"><b>SOON</b><strong>31–90 days</strong><span>Decision within 31–90 days.</span><small>Next move: follow the timing.</small></div>
+            <div class="owner-time-band" style="--time-delay:3.2s"><b>WHEN</b><strong>Later or conditional</strong><span>Beyond 90 days or a trigger.</span><small>Next move: track the condition.</small></div>
+          </div>
+          <div class="owner-time-review"><b>Unclear timing → Needs review</b><span>Keep the evidence on the property record.</span></div>
+          <p class="owner-time-foot">Human feedback updates the forecast. Keep the reason for every move.</p>
+        </div>
+      </div>
+
+      <!-- INTELLIGENCE · scan the sources and surface the client situation -->
+      <div class="scene" hidden>
+        <div class="intel-shell"><div class="clay-crew" aria-label="The intelligence team: detect, build, engage">
+  <div class="clay-role" style="--clay-delay:.2s"><span class="clay-actor clay-scout" aria-hidden="true"></span><b>Detect</b></div>
+  <div class="clay-role" style="--clay-delay:.8s"><span class="clay-actor clay-analyst" aria-hidden="true"></span><b>Build</b></div>
+  <div class="clay-role" style="--clay-delay:1.4s"><span class="clay-actor clay-operator" aria-hidden="true"></span><b>Engage</b></div>
+</div>
+          <div class="intel-heading"><h3>Scan the signals. See the fit.</h3><span>Criteria / workflow example</span></div>
+          <div class="intel-sources" aria-label="Three sources scanned into a Story Mode brief">
+            <div class="intel-lane" style="--intel-delay:.15s"><b>Event signals</b><div class="intel-items"><span>Estate</span><span>Expired</span><span>Filing</span></div><i class="intel-sweep" aria-hidden="true"></i></div>
+            <div class="intel-lane" style="--intel-delay:.75s"><b>Property updates</b><div class="intel-items"><span>Acreage</span><span>Zoning</span><span>Owner</span></div><i class="intel-sweep" aria-hidden="true"></i></div>
+            <div class="intel-lane" style="--intel-delay:1.35s"><b>Property Book notes</b><div class="intel-items"><span>Intent</span><span>Timing</span><span>Next move</span></div><i class="intel-sweep" aria-hidden="true"></i></div>
+          </div>
+          <div class="intel-feed" aria-hidden="true"><i style="--intel-delay:.6s"></i><i style="--intel-delay:1.2s"></i><i style="--intel-delay:1.8s"></i><span>↓</span></div>
+          <div class="intel-brief">
+            <div class="intel-brief-head"><b>STORY MODE</b><span>Client + situation</span></div>
+            <div class="intel-match" style="--intel-delay:2.25s"><b>Landowner</b><span class="intel-arrow" aria-hidden="true">→</span><span>Subdivision potential</span><i aria-hidden="true"></i></div>
+            <div class="intel-match" style="--intel-delay:3.35s"><b>Estate representative</b><span class="intel-arrow" aria-hidden="true">→</span><span>Inherited property</span><i aria-hidden="true"></i></div>
+            <div class="intel-match" style="--intel-delay:4.45s"><b>Commercial owner</b><span class="intel-arrow" aria-hidden="true">→</span><span>Tenant move</span><i aria-hidden="true"></i></div>
+          </div>
+          <p class="intel-footer">Who fits. What changed. Next move.</p>
         </div>
       </div>
 
@@ -824,9 +938,9 @@ button:focus-visible{outline:3px solid var(--orange);outline-offset:2px}
     </div>
 
     <div class="narr">
-      <div class="step" id="step">Chapter 1 of 15</div>
+      <div class="step" id="step">Chapter 1 of 16</div>
       <h2 id="ttl"></h2>
-      <p id="txt"></p>
+      <ul id="txt" class="authority-points"></ul>
       <div class="controls">
         <button id="prev" type="button">Back</button>
         <button id="play" type="button">Play story</button>
@@ -860,26 +974,27 @@ button:focus-visible{outline:3px solid var(--orange);outline-offset:2px}
 
 <script>
 const CH=[
- {k:'Deal flow',t:'Your database. Your deal flow.',x:'We build your foundational database, then run the outreach that turns qualified conversations into opportunities.'},
- {k:'Buy box',t:'Your buy box',x:'We source, enrich and initiate conversations that drive revenue from your buy box. 0.45 to 1.9 acres. Two to four lots. $850K to $1.5M exits.'},
- {k:'The scan',t:'We scan every parcel',x:'Our Data Engine systematically builds a database of probable, profitable, reachable leads, statistically likely to sell inside 12 months. On Long Island alone: 1,208 subdivision-size lots.'},
- {k:'The count',t:'Your market, counted',x:'Every target, individually owned, counted Oct 9. No guesswork.'},
- {k:'Database',t:'We build your foundational database',x:'Define the territory. Screen to your buy box. Build property, owner and contact records. Enrich them with signals and keep the history together.'},
- {k:'Property Book',t:'Every property. One working record.',x:'The foundation becomes a working Property Book: search and filter properties, reach the owner, and see delivery and activity on the record.'},
- {k:'What moves',t:'What moves a deal',x:'A filing. An estate. A dead listing. A tenant walking out. We see it first.'},
- {k:'Pull the file',t:'The file is pulled before you ask',x:'Rufus pulls the filing. Luci checks the deed.'},
- {k:'Decision engine',t:'A decision engine, not a list',x:'What changed. Does it pencil. Who signs. What’s the play. Every site, answered.'},
- {k:'Example',t:'Route 110',x:'The tenant moves. We tie it to the parcel, find who signs, and make the call first.'},
- {k:'Your rules',t:'Your rules',x:'Town. Acreage. Zoning. Event. Two signals at once jumps the line.'},
- {k:'Initial outreach',t:'From event signal to delivered text',x:'Detect the event. Find the owner. Enrich the contact. Deliver the first text. The owner enters your Property Book, with the outreach on record.'},
- {k:'Inbound execution',t:'From inbound reply to prioritized action',x:'Observe. Detect. Read. Classify. Prioritize. Handle. The reply stays tied to the property and owner, with the next action ready.'},
- {k:'Your call',t:'You call the shots',x:'Nothing goes out without your OK. You pick the deal. We run the machine.'},
- {k:'In contract',t:'What gets to the table',x:'67 positive replies. 8 sit-downs. 1 in contract. That’s the machine.'}
+ {k:'Engineered opportunity',t:'NEXTIER engineers opportunity at the foundational level.',b:['Data intelligence: identify and understand opportunity.','Strategic positioning: create relevance and demand.','Adaptive engagement: build relationships at scale.','Coordinated execution: turn opportunity into progress.']},
+ {k:'Buy box',t:'Your criteria drive the build.',b:['Target 0.45 to 1.9 acres.','Screen for two to four lots.','Work toward $850K to $1.5M exits.']},
+ {k:'The scan',t:'Map the market. Surface the targets.',b:['Scan the territory parcel by parcel.','Identify 1,208 subdivision-size lots.','Build the property and owner database.']},
+ {k:'The count',t:'Know the size of the play.',b:['Count the target properties.','Separate the opportunities by segment.','Date the snapshot: October 9, 2026.']},
+ {k:'Database',t:'We build your foundational database.',b:['Define the territory and buy box.','Connect property, owner and contact.','Enrich the record. Retain the history.']},
+ {k:'Property Book',t:'Put every property to work.',b:['Search and filter the Property Book.','Call or text from the working record.','Track delivery, replies and activity.']},
+ {k:'Decision forecasting',t:'The owner sets the timeline.',b:['Scan replies and owner conversation notes.','NOW: 0–30 days. SOON: 31–90. WHEN: later or conditional.','New human feedback moves the forecast. Keep the evidence.']},
+ {k:'Team intelligence',t:'Know the owner. Know the development play.',b:['Scan events, property updates and notes.','Match client personas to Long Island situations.','Give the team the intelligence to lead the conversation.']},
+ {k:'Pull the file',t:'Know the property. Know who signs.',b:['Pull the filing.','Check the deed and owner of record.','Put the property context beside the contact.']},
+ {k:'Decision engine',t:'Every site gets a decision.',b:['Identify what changed.','Test the economics. Confirm who signs.','Set the next move.']},
+ {k:'Example',t:'Route 110: follow the tenant move.',b:['Detect the tenant move.','Tie the change to the parcel and owner.','Initiate the conversation.']},
+ {k:'Your rules',t:'Your rules set the priority.',b:['Filter by town and acreage.','Screen zoning and event type.','Move stacked signals to the front.']},
+ {k:'Initial outreach',t:'Turn the signal into engagement.',b:['Find the owner. Enrich the contact.','Deliver the initial text.','Carry the owner into your Property Book.']},
+ {k:'Inbound execution',t:'Turn intent into action.',b:['Read and classify the reply.','Move urgent conversations to the top.','Answer. Call. Book the next step.']},
+ {k:'Your call',t:'You set the terms. We execute.',b:['You define the buy box.','You approve the launch.','We run the sequence and surface the next move.']},
+ {k:'In contract',t:'Proof that gets to the table.',b:['67 positive replies.','8 sit-downs.','1 property in contract.']}
 ];
 // Integration partners: two copies of the logo strip make the loop seamless; the second is hidden from screen readers.
 const ttpl=document.getElementById('ticker-tpl');
 document.querySelectorAll('[data-ticker]').forEach(vp=>{const track=document.createElement('div');track.className='tk-track';track.appendChild(ttpl.content.cloneNode(true));const copy=ttpl.content.cloneNode(true);[...copy.children].forEach(el=>{el.setAttribute('aria-hidden','true');track.appendChild(el)});vp.appendChild(track)});
-const DUR=7000;
+const DUR=6500;
 const scenes=[...document.querySelectorAll('.scene')];
 const rail=document.getElementById('rail');
 const stepEl=document.getElementById('step'),ttl=document.getElementById('ttl'),txt=document.getElementById('txt'),playBtn=document.getElementById('play');
@@ -890,7 +1005,7 @@ function go(i){
   cur=(i+CH.length)%CH.length;
   scenes.forEach((s,j)=>{s.hidden=j!==cur;s.classList.remove('go')});
   const s=scenes[cur];void s.offsetWidth;s.classList.add('go');
-  stepEl.textContent='Chapter '+(cur+1)+' of '+CH.length;ttl.textContent=CH[cur].t;txt.textContent=CH[cur].x;
+  stepEl.textContent='Chapter '+(cur+1)+' of '+CH.length;ttl.textContent=CH[cur].t;txt.replaceChildren(...CH[cur].b.map(point=>{const li=document.createElement('li');li.textContent=point;return li}));
   railBtns.forEach((b,j)=>{b.querySelector('.bar i').style.width=j<cur?'100%':'0';if(j===cur)b.setAttribute('aria-current','step');else b.removeAttribute('aria-current')});
   t0=performance.now();
 }
@@ -1056,6 +1171,243 @@ go(m?Math.min(Math.max(+m[1],1),CH.length)-1:0);
   const _goNy = go;
   go = function (i) { _goNy(i); onGo(); };
   onGo();
+})();
+</script>
+<script src="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+/* The scan, reused from the Data Engine page: a MapLibre night map with 3D buildings flying
+   hamlet to hamlet, or the drawn WebGL city when the map can't load. */
+(() => {
+  const stage = document.querySelector("[data-scan]");
+  if (!stage) return;
+  const idx = scenes.indexOf(stage.closest(".scene"));
+  const canvas = stage.querySelector("[data-city]"), countEl = stage.querySelector("[data-de-count]"), stopEl = stage.querySelector("[data-de-stop]");
+  const reduce = !!(window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches);
+  const nf = new Intl.NumberFormat("en-US");
+  const PL = { riverhead: [-72.662, 40.917], wadingRiver: [-72.8426, 40.9503], centerMoriches: [-72.7898, 40.8034], masticBeach: [-72.8521, 40.7668] };
+  const overview = { center: [-72.98, 40.86], zoom: 9.15, label: "Long Island, NY" };
+  const cat = { n: 1208, l: "Subdivision-size lots", p: .07, unit: "lots",
+    places: [["Riverhead", PL.riverhead, 434], ["Center Moriches", PL.centerMoriches, 237], ["Wading River", PL.wadingRiver, 218], ["Mastic Beach", PL.masticBeach, 16]] };
+  let engine = null, built = false;
+
+  function buildScene() {
+    const T = window.THREE;
+    if (!T || !canvas) return null;
+    let r;
+    try { r = new T.WebGLRenderer({ canvas, antialias: true, powerPreference: "high-performance" }); } catch (e) { return null; }
+    r.setPixelRatio(Math.min(2, window.devicePixelRatio || 1));
+    r.setClearColor(0x000000, 1);
+    const scene = new T.Scene();
+    scene.fog = new T.Fog(0x000000, 110, 250);
+    const cam = new T.PerspectiveCamera(38, 1.6, 1, 700);
+    scene.add(new T.HemisphereLight(0x9cc4ff, 0x000000, 0.85));
+    const sun = new T.DirectionalLight(0xffffff, 0.75); sun.position.set(50, 90, 40); scene.add(sun);
+    const cool = new T.DirectionalLight(0x3b8cff, 0.55); cool.position.set(-70, 30, -50); scene.add(cool);
+    const ground = new T.Mesh(new T.PlaneGeometry(700, 700), new T.MeshStandardMaterial({ color: 0x050505, roughness: 1 }));
+    ground.rotation.x = -Math.PI / 2; scene.add(ground);
+    const grid = new T.GridHelper(700, 280, 0x15214a, 0x0b1430); grid.position.y = 0.03; scene.add(grid);
+    let seed = 20261009;
+    const rnd = () => { seed = (Math.imul(seed, 1664525) + 1013904223) >>> 0; return seed / 4294967296; };
+    const N = 17, BLOCK = 8, STEP = 10.6, RAD = N * STEP * 0.5;
+    const lots = [];
+    for (let i = 0; i < N; i++) for (let j = 0; j < N; j++) {
+      const cx = (i - (N - 1) / 2) * STEP, cz = (j - (N - 1) / 2) * STEP;
+      if (Math.hypot(cx, cz) > RAD * (0.86 + rnd() * 0.18)) continue;
+      const nx = rnd() < 0.55 ? 2 : 3, nz = 2, w = BLOCK / nx, d = BLOCK / nz;
+      for (let a = 0; a < nx; a++) for (let b = 0; b < nz; b++) {
+        const x = cx - BLOCK / 2 + w * (a + 0.5), z = cz - BLOCK / 2 + d * (b + 0.5);
+        const core = Math.max(0, 1 - Math.hypot(x, z) / 46);
+        const vacant = rnd() < 0.09 && core < 0.6;
+        const h = vacant ? 0.22 : 0.9 + Math.pow(rnd(), 2.4) * (3 + core * 30);
+        lots.push({ x, z, w: w - 0.8, d: d - 0.8, h, vacant, core, dist: Math.hypot(x, z), r: rnd() });
+      }
+    }
+    const unit = new T.BoxGeometry(1, 1, 1); unit.translate(0, 0.5, 0);
+    const bMesh = new T.InstancedMesh(unit, new T.MeshStandardMaterial({ color: 0xffffff, roughness: 0.6, metalness: 0.15 }), lots.length);
+    const m4 = new T.Matrix4();
+    const BASE = new T.Color(0x1a2550), VAC = new T.Color(0x0e1630), HOT = new T.Color(0x4d9bff), HOT2 = new T.Color(0x8fbcff);
+    lots.forEach((L, k) => { m4.makeScale(L.w, L.h, L.d); m4.setPosition(L.x, 0, L.z); bMesh.setMatrixAt(k, m4); bMesh.setColorAt(k, L.vacant ? VAC : BASE); });
+    scene.add(bMesh);
+    const ep = [];
+    lots.forEach(L => {
+      if (L.vacant) return;
+      const x0 = L.x - L.w / 2, x1 = L.x + L.w / 2, z0 = L.z - L.d / 2, z1 = L.z + L.d / 2, y = L.h;
+      ep.push(x0, y, z0, x1, y, z0, x1, y, z0, x1, y, z1, x1, y, z1, x0, y, z1, x0, y, z1, x0, y, z0,
+              x0, 0, z0, x0, y, z0, x1, 0, z0, x1, y, z0, x1, 0, z1, x1, y, z1, x0, 0, z1, x0, y, z1);
+    });
+    const eg = new T.BufferGeometry(); eg.setAttribute("position", new T.Float32BufferAttribute(ep, 3));
+    scene.add(new T.LineSegments(eg, new T.LineBasicMaterial({ color: 0x3b8cff, transparent: true, opacity: 0.2 })));
+    const plateMat = new T.MeshBasicMaterial({ color: 0x3b8cff, transparent: true, opacity: 0.85, blending: T.AdditiveBlending, depthWrite: false });
+    const beamGeo = new T.CylinderGeometry(0.22, 0.22, 1, 8, 1, true); beamGeo.translate(0, 0.5, 0);
+    const beamMat = new T.MeshBasicMaterial({ color: 0x12b76a, transparent: true, opacity: 0.6, blending: T.AdditiveBlending, depthWrite: false });
+    const ringMat = new T.MeshBasicMaterial({ color: 0x8fbcff, transparent: true, opacity: 0.5, side: T.DoubleSide, blending: T.AdditiveBlending, depthWrite: false });
+    const ring = new T.Mesh(new T.RingGeometry(0.97, 1, 128), ringMat); ring.rotation.x = -Math.PI / 2; ring.position.y = 0.08; scene.add(ring);
+    const maxD = lots.reduce((m, L) => Math.max(m, L.dist), 0) + 8;
+    let plates = null, beams = null, targets = [], shown = 0, scanR = 0, scanning = false, onFrac = null, scanStarted = 0;
+    const fr = v => v - Math.floor(v);
+    const matches = (L, c, i) => !L.vacant && fr(L.r * 9.73 + i * 0.618) < (c.p || 0.1);
+    let ang = 0.75, elev = 0.6, visible = false, raf = 0, last = 0, t = 0;
+    const kick = () => { if (!raf) raf = requestAnimationFrame(frame); };
+    function select(c, i, cb) {
+      onFrac = cb;
+      lots.forEach((L, k) => bMesh.setColorAt(k, L.vacant ? VAC : BASE));
+      targets = [];
+      lots.forEach((L, k) => { if (matches(L, c, i)) targets.push({ L, k }); });
+      targets.sort((a, b) => a.L.dist - b.L.dist);
+      if (plates) scene.remove(plates);
+      if (beams) scene.remove(beams);
+      plates = new T.InstancedMesh(unit, plateMat, Math.max(1, targets.length));
+      targets.forEach(({ L }, n) => { m4.makeScale(L.w + 0.9, 0.16, L.d + 0.9); m4.setPosition(L.x, 0.04, L.z); plates.setMatrixAt(n, m4); });
+      plates.count = 0; scene.add(plates);
+      const stride = Math.max(1, Math.floor(targets.length / 16));
+      const top = targets.filter((x, n) => n % stride === 0).slice(0, 18);
+      beams = new T.InstancedMesh(beamGeo, beamMat, Math.max(1, top.length));
+      top.forEach(({ L }, n) => { m4.makeScale(1, 14 + L.r * 22, 1); m4.setPosition(L.x, L.h, L.z); beams.setMatrixAt(n, m4); });
+      beams.count = top.length; beams.visible = false; scene.add(beams);
+      shown = 0; scanR = reduce ? maxD : 0; scanning = true; scanStarted = performance.now();
+      bMesh.instanceColor.needsUpdate = true;
+      kick();
+    }
+    function size() {
+      const w = stage.clientWidth, h = stage.clientHeight;
+      if (!w || !h) return;
+      r.setSize(w, h, false); cam.aspect = w / h; cam.updateProjectionMatrix();
+    }
+    function frame(now) {
+      raf = 0;
+      const dt = Math.min(0.05, last ? (now - last) / 1000 : 0.016); last = now; t += dt;
+      if (!reduce) ang += dt * 0.07;
+      const D = 160;
+      cam.position.set(Math.cos(ang) * D * Math.cos(elev), D * Math.sin(elev), Math.sin(ang) * D * Math.cos(elev));
+      cam.lookAt(0, 6, 0);
+      if (scanning) {
+        scanR = reduce ? maxD : Math.min(maxD, (now - scanStarted) / 4500 * maxD);
+        while (shown < targets.length && targets[shown].L.dist <= scanR) { bMesh.setColorAt(targets[shown].k, HOT); shown++; }
+        bMesh.instanceColor.needsUpdate = true;
+        if (plates) plates.count = shown;
+        if (onFrac) onFrac(targets.length ? shown / targets.length : 1);
+        ring.scale.setScalar(Math.max(0.01, scanR)); ringMat.opacity = 0.55;
+        if (scanR >= maxD) { scanning = false; if (beams) beams.visible = true; if (onFrac) onFrac(1); }
+      } else {
+        ring.scale.setScalar(Math.max(0.01, (t * 30) % (maxD + 40))); ringMat.opacity = 0.14;
+      }
+      beamMat.opacity = 0.42 + 0.22 * Math.sin(t * 3);
+      r.render(scene, cam);
+      if (visible && (!reduce || scanning)) raf = requestAnimationFrame(frame);
+    }
+    size();
+    if ("ResizeObserver" in window) new ResizeObserver(() => { size(); kick(); }).observe(stage);
+    else window.addEventListener("resize", () => { size(); kick(); });
+    const setVis = on => { visible = on && !document.hidden; if (visible) { last = 0; kick(); } };
+    if ("IntersectionObserver" in window) new IntersectionObserver(es => es.forEach(e => setVis(e.isIntersecting))).observe(stage);
+    else setVis(true);
+    document.addEventListener("visibilitychange", () => setVis(!document.hidden && stage.offsetParent !== null));
+    return { select, stop() { } };
+  }
+
+  function buildMap() {
+    const mb = window.maplibregl;
+    if (!mb) return null;
+    try { if (typeof mb.supported === "function" && !mb.supported()) return null; } catch (e) { return null; }
+    const box = document.createElement("div");
+    box.className = "de-map";
+    stage.insertBefore(box, stage.firstChild);
+    let map;
+    try {
+      map = new mb.Map({ container: box, style: "https://tiles.openfreemap.org/styles/dark", center: overview.center, zoom: overview.zoom,
+        pitch: 52, bearing: -16, maxPitch: 75, interactive: false, attributionControl: { compact: true } });
+    } catch (e) { box.remove(); return null; }
+    let ready = false, dead = false, sel = null, pins = [], timer = 0, k = -1;
+    const fail = () => {
+      if (dead) return;
+      dead = true; clearTimeout(timer);
+      try { map.remove(); } catch (e) { }
+      box.remove(); stage.classList.remove("has-map");
+      engine = buildScene();
+      if (!engine) stage.classList.add("nogl");
+      run();
+    };
+    map.on("load", () => {
+      if (dead) return;
+      try {
+        const firstSym = (map.getStyle().layers.find(l => l.type === "symbol") || {}).id;
+        map.addLayer({ id: "nx-3d", type: "fill-extrusion", source: "openmaptiles", "source-layer": "building", minzoom: 12.5,
+          paint: {
+            "fill-extrusion-color": ["interpolate", ["linear"], ["coalesce", ["get", "render_height"], 6], 0, "#1b2a5a", 25, "#2f5fc4", 70, "#4d9bff"],
+            "fill-extrusion-height": ["coalesce", ["get", "render_height"], 6],
+            "fill-extrusion-base": ["coalesce", ["get", "render_min_height"], 0],
+            "fill-extrusion-opacity": 0.92
+          } }, firstSym);
+      } catch (e) { }
+      // The map never gets dragged here, so fold the credits to their (i) button the way a
+      // first drag would; they stay one tap away.
+      const credits = box.querySelector(".maplibregl-ctrl-attrib");
+      if (credits) credits.classList.remove("maplibregl-compact-show");
+      ready = true; stage.classList.add("has-map"); if (sel) tour();
+    });
+    map.on("error", e => {
+      const err = (e && e.error) || {};
+      const why = String(err.status || "") + " " + String(err.message || "");
+      (window.__deMapErrors = window.__deMapErrors || []).push(why.trim().slice(0, 140));
+      if (!ready && /(401|403)|unauthorized|forbidden|style/i.test(why)) fail();
+    });
+    setTimeout(() => { if (!ready) fail(); }, 20000);
+    const move = opts => (reduce ? map.jumpTo(opts) : map.flyTo(Object.assign({ duration: 5200, curve: 1.4, essential: true }, opts)));
+    function tour() {
+      clearTimeout(timer);
+      pins.forEach(p => p.marker.remove());
+      pins = [];
+      k = -1;
+      try { map.stop(); map.jumpTo({ center: overview.center, zoom: overview.zoom, pitch: 50, bearing: -16 }); } catch (e) { }
+      (sel.c.places || []).forEach(([name, at, n]) => {
+        const el = document.createElement("div");
+        el.className = "de-pin";
+        el.innerHTML = "<b></b><i></i>";
+        el.firstChild.textContent = n ? name + " · " + nf.format(n) : name;
+        pins.push({ el, marker: new mb.Marker({ element: el, anchor: "bottom" }).setLngLat(at).addTo(map) });
+      });
+      step();
+    }
+    function step() {
+      if (dead || !sel) return;
+      const places = sel.c.places || [];
+      k = (k + 1) % (places.length + 1);
+      pins.forEach((p, i) => p.el.classList.toggle("on", i === k));
+      if (k === places.length) {
+        move({ center: overview.center, zoom: overview.zoom, pitch: 50, bearing: -16 });
+        stopEl.textContent = overview.label;
+      } else {
+        const [name, at, n] = places[k];
+        move({ center: at, zoom: 15.6, pitch: 68, bearing: ((k * 70 + 20) % 360) - 180 });
+        stopEl.textContent = n ? (name + " · " + nf.format(n) + " " + (sel.c.unit || "")).trim() : name;
+      }
+      if (!reduce) timer = setTimeout(step, 8200);
+    }
+    return {
+      select(c, i, cb) {
+        sel = { c };
+        const t0 = performance.now();
+        const tickN = now => { const f = Math.min(1, (now - t0) / 1600); cb(f); if (f < 1) requestAnimationFrame(tickN); };
+        if (reduce) cb(1); else requestAnimationFrame(tickN);
+        if (ready) tour();
+      },
+      stop() { clearTimeout(timer); sel = null; try { map.stop(); } catch (e) { } }
+    };
+  }
+
+  function run() {
+    stopEl.textContent = "";
+    const cb = f => { countEl.textContent = nf.format(Math.round(cat.n * f)); };
+    if (engine) engine.select(cat, 0, cb); else cb(1);
+  }
+  function enter() {
+    if (!built) { built = true; engine = buildScene(); if (!engine) stage.classList.add("nogl"); }
+    run();
+  }
+  const _goScan = go;
+  go = function (i) { const was = cur; _goScan(i); if (cur === idx) enter(); else if (was === idx && engine) engine.stop(); };
+  if (cur === idx) enter();
 })();
 </script>
 </body></html>
