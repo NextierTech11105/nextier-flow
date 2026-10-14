@@ -238,6 +238,21 @@ tr.row-in td{animation:rowin .45s ease-out both}
 .blk.shoved{border-color:var(--orange);box-shadow:0 0 16px #FF8A3D44}
 .call.pressed{box-shadow:0 0 0 6px #16A34A55,0 0 22px #16A34A}
 .proofc{border-color:#1E5A40}.proofc b{color:#5BE3A8}
+.narr ul.bul{margin:0;padding-left:22px;display:flex;flex-direction:column;gap:8px;font-size:19px;max-width:36ch}
+.narr ul.bul li::marker{color:var(--orange)}
+.journey{display:flex;flex-wrap:wrap;align-items:center;gap:4px;font-size:12px;font-weight:700;color:#C9D2DC}
+.journey span{padding:3px 8px;border-radius:999px;border:1px solid #2c2c2c;background:#121212}
+.journey i{font-style:normal;color:var(--orange)}
+.tbl{max-height:290px}
+table{min-width:520px}
+th:nth-child(1){width:20%}th:nth-child(2){width:14%}th:nth-child(3){width:42%}th:nth-child(4){width:24%}
+.prio{display:inline-block;font:700 13px/1 var(--display);padding:4px 8px;border-radius:7px;border:1px solid #383838}
+.prio.p1{background:#2A1A10;border-color:var(--orange);color:var(--orange-soft)}
+.prio.p2{border-color:var(--blue);color:var(--blue-soft)}
+.jl{display:block;font-weight:700;font-size:13px}.jl.hot{color:#5BE3A8}
+.jt{display:flex;gap:3px;margin-top:5px}.jt i{width:10px;height:4px;border-radius:2px;background:#2a2a2a}.jt i.on{background:var(--orange)}
+.booknote{font-size:12px;color:#AEB9C6;text-align:right}
+th{z-index:2}
 @media (max-width:640px){.scene.has-l,.scene.has-r,.scene.trio{padding:22px 22px 30%}.crew{height:34%}.scene.trio .crew{height:30%}}
 @media (prefers-reduced-motion:reduce){.card-f{display:none}}
 
@@ -250,7 +265,7 @@ tr.row-in td{animation:rowin .45s ease-out both}
     <div class="brand">NEXT<span>IER</span> · JEM CONSULTANT GRP · NEW YORK</div>
     <div class="tag">Story mode · Real counts</div>
   </header>
-  <h1>From the city's files to <em>development and leasing deals.</em></h1>
+  <h1>Sites with room to build. <em>Buildings that need leasing.</em></h1>
 
   <div class="main">
     <div class="stage" id="stage" aria-live="polite">
@@ -261,13 +276,13 @@ tr.row-in td{animation:rowin .45s ease-out both}
         <div class="app">
           <div class="abar"><b>Workspace</b><span class="ws">JEM Consultant Grp · NYC</span><span class="pill">REAL ESTATE</span><span style="margin-left:auto;color:#AEB9C6">Lead Builder</span></div>
           <div class="abody">
-            <div class="chips in1" id="segs"><span class="ac">Room to build</span><span class="ac">Owned by a person</span><span class="ac">Vacant lot</span><span class="ac">Parking lot</span><span class="ac">New building filed</span><span class="ac">New certificate of occupancy</span></div>
+            <div class="chips in1" id="segs"><span class="ac">Room to build</span><span class="ac">Individually owned</span><span class="ac">Vacant lot</span><span class="ac">Parking lot</span><span class="ac">New building filed</span><span class="ac">New certificate of occupancy</span></div>
             <div class="amap in2" id="map1"><div id="map3d"></div>
               <div class="ctl"><span>3D</span><span>Lot size</span></div>
               <div class="cnt"><span id="pcount">0</span> rows</div>
               <div class="stop" id="mstop"></div>
             </div>
-            <div class="rows in3"><b>Rows to build</b><span class="box">3,089</span><span style="color:#C9D2DC">Astoria lots with room to build, owned by a person</span></div>
+            <div class="rows in3"><b>Rows to build</b><span class="box">3,089</span><span style="color:#C9D2DC">Astoria lots with room to build · individually owned</span></div>
           </div>
         </div>
       </div>
@@ -278,8 +293,8 @@ tr.row-in td{animation:rowin .45s ease-out both}
         <div class="app">
           <div class="abar"><b>Workspace</b><span class="ws">JEM Consultant Grp · NYC</span><span class="pill">REAL ESTATE</span><span style="margin-left:auto;color:#AEB9C6">Property Monitors</span></div>
           <div class="abody">
-            <div class="mon in1"><div><b>Daily sweep into Initial SMS</b><span>New matches go into the book and into one block every morning. Nothing sends until you press Send.</span></div><span class="on-btn" id="onbtn">ON</span></div>
-            <div class="presets in2"><div class="preset on"><b>Room to build</b><span>Zoning allows 60%+ more</span></div><div class="preset"><b>New buildings filed</b><span>10+ units, DOB filings</span></div><div class="preset"><b>New certificates of occupancy</b><span>Leasing up now</span></div><div class="preset"><b>Vacant + parking lots</b><span>Raw sites</span></div></div>
+            <div class="mon in1"><div><b>Daily sweep</b><span>New matches build one block each morning. Nothing sends without you.</span></div><span class="on-btn" id="onbtn">ON</span></div>
+            <div class="presets in2"><div class="preset on"><b>Room to build</b><span>Zoning allows 60%+ more</span></div><div class="preset"><b>New buildings</b><span>10+ units, filed</span></div><div class="preset"><b>Certificates of occupancy</b><span>Leasing up now</span></div><div class="preset"><b>Vacant and parking lots</b><span>Raw sites</span></div></div>
             <div class="chips in3"><span class="ac on">Astoria</span><span class="ac on">Woodside · Sunnyside</span><span class="ac on">LIC</span><span class="ac on">North Brooklyn</span><span class="ac on">Manhattan</span><span class="ac on">Daily</span></div>
             <div class="tick in4"><span>Only new matches, every morning</span><b>ON</b></div>
           </div>
@@ -289,15 +304,15 @@ tr.row-in td{animation:rowin .45s ease-out both}
       <!-- 3 · EVENT SIGNALS -->
       <div class="scene has-r" hidden>
         <span class="crew right" aria-hidden="true"><span class="nxc" data-role="analyst" data-act="walk tag" style="--from:180px;--walk:1.2s;--x1:-150px;--y1:-110px;--x2:-170px;--y2:-30px;--x3:-150px;--y3:50px"></span></span>
-        <div class="sig"><div class="sc in1" data-sig><span class="ic" style="background:#2A1A10;color:var(--orange)">NB</span><div><b>New buildings filed, 10+ units</b><small>529 since Oct 2024 · LIC 85 · Astoria 75</small></div><span class="new">NEW</span></div><div class="sc in2" data-sig><span class="ic" style="background:#13261D;color:var(--green)">CO</span><div><b>New certificate of occupancy</b><small>281 this year: leasing up now</small></div><span class="new">NEW</span></div><div class="sc in3" data-sig><span class="ic" style="background:#161616;color:var(--blue-soft)">RB</span><div><b>Room to build, owned by a person</b><small>12,669 lots · 42.3M sq ft</small></div><span class="new">NEW</span></div><div class="sc in4" data-sig><span class="ic" style="background:#26201A;color:var(--gold)">VL</span><div><b>Vacant + parking lots</b><small>Astoria 224 + 243 · Bushwick 346 + 290</small></div><span class="new">NEW</span></div></div>
+        <div class="sig"><div class="sc in1" data-sig><span class="ic" style="background:#2A1A10;color:var(--orange)">NB</span><div><b>New buildings filed, 10+ units</b><small>529 since Oct 2024 · LIC 85 · Astoria 75</small></div><span class="new">NEW</span></div><div class="sc in2" data-sig><span class="ic" style="background:#13261D;color:var(--green)">CO</span><div><b>Certificates of occupancy</b><small>281 this year · leasing up now</small></div><span class="new">NEW</span></div><div class="sc in3" data-sig><span class="ic" style="background:#161616;color:var(--blue-soft)">RB</span><div><b>Room to build</b><small>12,669 individually owned lots · 42.3M sq ft</small></div><span class="new">NEW</span></div><div class="sc in4" data-sig><span class="ic" style="background:#26201A;color:var(--gold)">VL</span><div><b>Vacant and parking lots</b><small>Astoria 467 · Bushwick 636</small></div><span class="new">NEW</span></div></div>
       </div>
 
       <!-- 4 · OWNER TYPE -->
       <div class="scene has-l" hidden>
         <span class="crew left" aria-hidden="true"><span class="nxc" data-role="analyst" data-act="walk idle" style="--from:-180px;--walk:1.2s;"></span></span>
         <div class="split">
-          <div class="lanebox go-l in1" data-lane="go"><h3>People → go first</h3><span class="o">Room to build</span><span class="o">Astoria · Woodside · Ridgewood</span><span class="o">Bushwick · Greenpoint</span><span class="o cnt-o"><b data-ln>0</b> sorted in</span></div>
-          <div class="lanebox rs-l in2" data-lane="rs"><h3>Entities → research</h3><span class="o">Developer LLC</span><span class="o">Trust</span><span class="o">Estate</span><span class="o" style="color:var(--soft)">Find the person behind it first</span><span class="o cnt-o"><b data-ln>0</b> sorted in</span></div>
+          <div class="lanebox go-l in1" data-lane="go"><h3>Individual owners → outreach</h3><span class="o">Room to build</span><span class="o">Astoria · Woodside · Ridgewood</span><span class="o">Bushwick · Greenpoint</span><span class="o cnt-o"><b data-ln>0</b> sorted in</span></div>
+          <div class="lanebox rs-l in2" data-lane="rs"><h3>Entities → research</h3><span class="o">Developer LLC</span><span class="o">Trust</span><span class="o">Estate</span><span class="o" style="color:var(--soft)">We find the principal</span><span class="o cnt-o"><b data-ln>0</b> sorted in</span></div>
         </div>
       </div>
 
@@ -305,11 +320,11 @@ tr.row-in td{animation:rowin .45s ease-out both}
       <div class="scene has-r" hidden>
         <span class="crew right" aria-hidden="true"><span class="nxc" data-role="analyst" data-act="walk tag" style="--from:180px;--walk:1.2s;--x1:-170px;--y1:-60px;--x2:-190px;--y2:0px;--x3:-170px;--y3:60px"></span></span>
         <div class="trace">
-          <div class="tr in1"><b>Every owner, before a single text</b></div>
-          <div class="tr in2">Mobile traced only if the record has none<span class="ok">NO WASTE</span></div>
+          <div class="tr in1"><b>Before the first text</b></div>
+          <div class="tr in2">Traced only if no mobile is on file<span class="ok">NO WASTE</span></div>
           <div class="tr in3">Line type: mobile<span class="ok">CHECKED</span></div>
           <div class="tr in3">Do-not-call and opt-outs<span class="ok">CLEAR</span></div>
-          <div class="tr in4">Landline first? Next ranked mobile<span class="ok">NEXT</span></div>
+          <div class="tr in4">Landline on file? Next mobile in line<span class="ok">NEXT</span></div>
         </div>
       </div>
 
@@ -321,7 +336,9 @@ tr.row-in td{animation:rowin .45s ease-out both}
           <div class="abody">
             <div class="toprow in1"><span class="ah">Property Book <span style="font-weight:500;color:#C9D2DC;font-size:15px">Queens · Brooklyn · Manhattan</span></span><span class="enzo">Export to your dialer · CSV</span></div>
             <div class="chips in1"><span class="ac hit">Room to build<small>12,669</small></span><span class="ac hit">New buildings<small>529</small></span><span class="ac">Leasing up now<small>281</small></span><span class="ac">Vacant lots<small>1,520</small></span><span class="ac">Parking lots<small>1,595</small></span><span class="ac">Manhattan<small>2,045</small></span></div>
-            <div class="tbl in2"><table><thead><tr><th>Area</th><th>List</th><th>Count</th><th>Autotags</th></tr></thead><tbody id="book"></tbody></table></div>
+            <div class="journey in1"><span>Sourced</span><i>›</i><span>Traced</span><i>›</i><span>Prepped</span><i>›</i><span>Texted</span><i>›</i><span>Replied</span><i>›</i><span>Positive</span><i>›</i><span>Opportunity</span></div>
+            <div class="tbl in2"><table><thead><tr><th>Priority</th><th>Owner</th><th>Autotags</th><th>Journey</th></tr></thead><tbody id="book"></tbody></table></div>
+            <div class="booknote in3">Nextier's live book · real records · names and numbers masked</div>
           </div>
         </div>
       </div>
@@ -333,9 +350,9 @@ tr.row-in td{animation:rowin .45s ease-out both}
           <div class="abar"><b>Workspace</b><span class="ws">JEM Consultant Grp · NYC</span><span class="pill">REAL ESTATE</span><span style="margin-left:auto;color:#AEB9C6">Property Book</span></div>
           <div class="abody">
             <div class="rec">
-              <div class="mini in1"><span class="sel">Astoria 11105 · Room to build</span><span>Bushwick 11221 · Room to build</span><span>Ridgewood 11385 · Room to build</span><span>Woodside 11377 · Room to build</span><span>Long Island City 11101 · New buildings filed</span><span>Greenpoint 11222 · Room to build</span></div>
+              <div class="mini in1"><span class="sel">C. H. · Queens</span><span>K. G. · Brooklyn</span><span>S. M. · Queens</span><span>B. E. · Brooklyn</span><span>D. P. · Queens</span><span>A. G. · Brooklyn</span></div>
               <div class="panel in2">
-                <div><div class="addr">W. G. · from Nextier's live book</div><div class="cty">Broward County, FL · real record, masked</div></div>
+                <div><div class="addr">W. G. · Broward County, FL</div><div class="cty">Real record from Nextier's live book, masked</div></div>
                 <span class="traced">TRACED</span>
                 <div class="acts"><span class="ph">(954) •••-••••</span><span class="call" id="callbtn">CALL</span><span class="bt">Text</span><span class="bt">Mark worked</span></div>
                 <div class="tgs"><span class="tg ev">Lis pendens</span><span class="tg">Owner-occupied</span><span class="tg ok">Mobile verified</span><span class="tg ok">Replied</span></div>
@@ -375,11 +392,11 @@ tr.row-in td{animation:rowin .45s ease-out both}
         <div class="app">
           <div class="abar"><b>Workspace</b><span class="ws">JEM Consultant Grp · NYC</span><span class="pill">REAL ESTATE</span><span style="margin-left:auto;color:#AEB9C6">Initial SMS</span></div>
           <div class="abody launch">
-            <div class="blk in1"><div><b>Astoria · room to build</b><span>3,089 lots · owned by a person · traced and checked at pull</span></div><span class="ready">READY</span></div>
-            <div class="blk in2"><div><b>Bushwick · room to build</b><span>2,836 lots · owned by a person · traced and checked at pull</span></div><span class="ready">READY</span></div>
-            <div class="blk in3"><div><b>LIC + Astoria · new buildings filed</b><span>160 developers to reach before lease-up</span></div><span class="ready">READY</span></div>
+            <div class="blk in1"><div><b>Astoria · room to build</b><span>3,089 lots · individually owned · traced · checked</span></div><span class="ready">READY</span></div>
+            <div class="blk in2"><div><b>Bushwick · room to build</b><span>2,836 lots · individually owned · traced · checked</span></div><span class="ready">READY</span></div>
+            <div class="blk in3"><div><b>LIC + Astoria · new buildings</b><span>160 developers to reach before lease-up</span></div><span class="ready">READY</span></div>
             <span class="send in4">Send</span>
-            <div class="halt in4">0 sent. Nothing goes out until a person presses Send.</div>
+            <div class="halt in4">0 sent. Nothing goes out until you press Send.</div>
           </div>
         </div>
       </div>
@@ -387,7 +404,7 @@ tr.row-in td{animation:rowin .45s ease-out both}
       <!-- 10 · YOURS -->
       <div class="scene trio" hidden>
         <span class="crew left" aria-hidden="true"><span class="nxc" data-role="scout" data-act="walk idle" style="--from:-180px;--walk:1.2s;"></span></span><span class="crew right" aria-hidden="true"><span class="nxc" data-role="operator" data-act="walk idle" style="--from:180px;--walk:1.2s;--delay:.4s"></span></span>
-        <div class="sig"><div class="sc in1"><span class="ic" style="background:#161616;color:var(--blue-soft)">DB</span><div><b>Your own book</b><small>Every lot, filing and tag, counted from the city's own files</small></div></div><div class="sc in2"><span class="ic" style="background:#13261D;color:var(--green)">AM</span><div><b>Every morning, again</b><small>New filings and new certificates of occupancy land daily</small></div></div><div class="sc in3"><span class="ic" style="background:#2A1A10;color:var(--orange)">GO</span><div><b>Your lines, your voice</b><small>Texts and calls go out on your own lines, when you press Send</small></div></div></div>
+        <div class="sig"><div class="sc in1"><span class="ic" style="background:#161616;color:var(--blue-soft)">DB</span><div><b>Your own book</b><small>Every lot and filing, from the city's own records</small></div></div><div class="sc in2"><span class="ic" style="background:#13261D;color:var(--green)">AM</span><div><b>Every morning</b><small>New filings and certificates of occupancy, daily</small></div></div><div class="sc in3"><span class="ic" style="background:#2A1A10;color:var(--orange)">GO</span><div><b>Your lines</b><small>Texts and calls go out on your numbers when you press Send</small></div></div></div>
       </div>
 
     </div>
@@ -395,7 +412,7 @@ tr.row-in td{animation:rowin .45s ease-out both}
     <div class="narr">
       <div class="step" id="step">Chapter 1 of 10</div>
       <h2 id="ttl"></h2>
-      <p id="txt"></p>
+      <ul id="txt" class="bul"></ul>
       <div class="controls">
         <button id="prev" type="button">Back</button>
         <button id="play" type="button">Play story</button>
@@ -407,18 +424,18 @@ tr.row-in td{animation:rowin .45s ease-out both}
   </div>
 
   <nav class="rail" id="rail" aria-label="Chapters"></nav>
-  <div class="foot">Every count is real, pulled October 13, 2026 from New York City's own files: the PLUTO parcel file for lots, owners and zoning, and Department of Buildings filings and certificates of occupancy. "Room to build" means today's zoning allows at least 60% more floor area than what stands there. The record in chapter 7 is a real one from Nextier's live book, masked. Map pins sit at the ZIP center, never on a property. Use the arrow keys or the chapter buttons to move through it.</div>
+  <div class="foot">All counts are real, pulled Oct 13, 2026 from NYC's parcel file (PLUTO) and Department of Buildings records. Room to build: zoning allows at least 60% more floor area than what stands. Chapter 7 is a real record from Nextier's live book, masked. Map pins mark ZIP centers, not properties. Arrow keys or the chapter buttons move through it.</div>
 </div>
 
 <script src="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.js"></script>
 <script src="clay-crew.js"></script>
 <script>
-const CH=[{"k":"Buy box","t":"Start with the hunt","x":"Lots where zoning allows at least 60% more than what stands there, owned by a person, plus every new building that will need a leasing team. The scout sweeps it on the live map: 3,089 in Astoria alone."},{"k":"Monitors","t":"It watches every morning","x":"The city's files are re-checked daily. Only new matches come in: a new building filing, a fresh certificate of occupancy, a lot that changed hands."},{"k":"Signals","t":"The reason to move","x":"529 new buildings with 10+ units filed since October 2024. 281 got a certificate of occupancy this year and are leasing up now. 12,669 lots with room to build."},{"k":"Owner","t":"People first","x":"Owners who are people go first. Developers' LLCs go to research, so the next step is finding the principal behind them."},{"k":"Trace","t":"No number, no conversation","x":"The owner's mobile is traced only when the record has none, then checked for line type, do-not-call and opt-outs."},{"k":"Book","t":"Your book, tagged","x":"Every lead lands stamped with its neighborhood, its zoning room and its filings. The Property Book shows the whole hunt, filterable by every tag."},{"k":"Record","t":"Everything on one record","x":"A real record from Nextier's live book, masked: the filing on Sept 30, the first text on Oct 8 at 12:34 PM, a reply at 2:59 PM, and a sit-down on Oct 12."},{"k":"Any tool","t":"Out on your own lines","x":"Ready leads go to Initial SMS, the Contact Center and the dialer on your own lines, or out by CSV."},{"k":"Staged","t":"Staged, not sent","x":"Astoria, Bushwick and the new-building developers wait at Initial SMS: traced, tagged and checked. Zero texts go out until you press Send."},{"k":"Yours","t":"Yours, every morning","x":"12,669 lots, 42 million square feet of room and 529 new buildings across Queens, North Brooklyn and Manhattan. We are hunting."}];
+const CH=[{"k":"The hunt","t":"The hunt.","x":["Zoning allows 60%+ more than what stands","Owner of record is a person","3,089 lots in Astoria alone"]},{"k":"Monitors","t":"Watched every morning.","x":["Re-checked daily","New filings, certificates of occupancy, ownership changes","Only what's new comes in"]},{"k":"Signals","t":"The reason to call.","x":["529 new buildings filed since Oct 2024","281 certificates of occupancy this year","12,669 lots with room to build"]},{"k":"Owners","t":"Owners first.","x":["Individual owners → outreach","Developer LLCs → research","We find the principal"]},{"k":"Trace","t":"No number, no conversation.","x":["Traced only when no mobile is on file","Line type checked","Do-not-call and opt-outs cleared"]},{"k":"Book","t":"The database, visible.","x":["Every record autotagged","Labeled by its place in the client journey","Ranked: hand-raisers first"]},{"k":"Record","t":"One record, end to end.","x":["Lis pendens filed Sept 30","First text Oct 8 · 12:34 PM","Reply 2:59 PM · sit-down Oct 12"]},{"k":"Your lines","t":"On your own lines.","x":["Texts and calls on your numbers","Call lists in the Contact Center","Any block exports to CSV"]},{"k":"Staged","t":"Staged. Not sent.","x":["Astoria · Bushwick · new-building developers","Traced, tagged, held","Nothing sends until you press Send"]},{"k":"The board","t":"The board.","x":["12,669 lots with room to build","42.3M sq ft · 529 new buildings","Queens · North Brooklyn · Manhattan"]}];
 const DUR=7000;
 const MAPCFG={"near":12.7,"start":{"center":[-73.935,40.752],"zoom":11.2,"pitch":58,"bearing":28},"stops":[["Astoria 11105",[-73.9086,40.7778],1284],["Astoria 11103",[-73.9126,40.7629],738],["Long Island City",[-73.9392,40.7482],85],["Woodside",[-73.904,40.7444],1227]]};
 const PICK=[0,1,4,5];
 const BLOCKN=3089;
-const ROWS=[["Astoria 11105","Queens","Room to build","1,284",[["7.1M sq ft","ev"],["Owned by a person",""]]],["Bushwick 11221","Brooklyn","Room to build","1,995",[["Zoning upside","ev"],["Owned by a person",""]]],["Ridgewood 11385","Queens","Room to build","1,947",[["4.0M sq ft","ev"],["Owned by a person",""]]],["Woodside 11377","Queens","Room to build","1,227",[["2.9M sq ft","ev"],["Owned by a person",""]]],["Long Island City 11101","Queens","New buildings filed","85",[["10+ units","ev"],["Leasing",""]]],["Greenpoint 11222","Brooklyn","Room to build","568",[["2.6M sq ft","ev"],["Owned by a person",""]]],["Harlem","Manhattan","Room to build","586",[["2.2M sq ft","ev"],["Owned by a person",""]]]];
+const ROWS=[["C. H.","Queens","POSITIVE",["Pre-foreclosure","Lis pendens","Oversized lot","Callback requested"]],["K. G.","Brooklyn","POSITIVE",["Inherited","Lis pendens","No mortgage","Mobile verified"]],["S. M.","Queens","OPPT",["Oversized lot","Vacant","High equity","No mortgage"]],["B. E.","Brooklyn","OPPT",["Inherited","Lis pendens","High equity"]],["D. P.","Queens","REPLIED",["Lis pendens","High equity","Mobile verified"]],["A. G.","Brooklyn","TEXTED",["Auction","Lis pendens","High equity"]],["D. D.","Brooklyn","PREPPED",["Estate","Inherited","Lis pendens","No mortgage"]],["M. W.","Queens","SOURCED",["Auction","Inherited","Lis pendens"]]];
 const reduce=!!(window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches);
 const nf=new Intl.NumberFormat('en-US');
 const stage=document.getElementById('stage');
@@ -452,9 +469,13 @@ function tour(){
 
 /* scene 6: the book, filled row by row by the analyst */
 const book=document.getElementById('book');
-ROWS.forEach((r)=>{const tr=document.createElement('tr');
-  tr.innerHTML='<td class="w">'+r[0]+'<small>'+r[1]+'</small></td><td class="w">'+r[2]+'</td><td>'+r[3]+'</td><td><div class="tgs"></div></td>';
-  const box=tr.querySelector('.tgs');r[4].forEach(([t,c])=>{const s=document.createElement('span');s.className='tg'+(c?' '+c:'');s.textContent=t;box.appendChild(s)});
+const JNAME={SOURCED:'Sourced',TRACED:'Traced',PREPPED:'Prepped',TEXTED:'Texted',REPLIED:'Replied',POSITIVE:'Positive',OPPT:'Opportunity'};
+const JSTEP=['SOURCED','TRACED','PREPPED','TEXTED','REPLIED','POSITIVE','OPPT'];
+const EVT=new Set(['Lis pendens','Pre-foreclosure','Estate','Inherited','Auction','Expired listing']);
+const prio=j=>j==='POSITIVE'||j==='OPPT'?['P1','Hand raised','p1']:j==='REPLIED'?['P2','Replied','p2']:['P3','Signal, not yet worked','p3'];
+ROWS.forEach((r)=>{const tr=document.createElement('tr');const p=prio(r[2]),k=JSTEP.indexOf(r[2]);
+  tr.innerHTML='<td><span class="prio '+p[2]+'">'+p[0]+'</span><small>'+p[1]+'</small></td><td class="w"><b>'+r[0]+'</b><small>'+r[1]+'</small></td><td><div class="tgs"></div></td><td><span class="jl '+(k>=5?'hot':'')+'">'+JNAME[r[2]]+(r[2]==='POSITIVE'?' 🔥':'')+'</span><span class="jt">'+JSTEP.map((x,j)=>'<i class="'+(j<=k?'on':'')+'"></i>').join('')+'</span></td>';
+  const box=tr.querySelector('.tgs');r[3].forEach(t=>{const s=document.createElement('span');s.className='tg'+(EVT.has(t)?' ev':t==='Mobile verified'?' ok':'');s.textContent=t;box.appendChild(s)});
   book.appendChild(tr)});
 
 /* the crew's hands: records and checks that travel from a person to the screen */
@@ -480,7 +501,7 @@ function work(i){
   if(i===3){const lanes={go:s.querySelector('[data-lane="go"]'),rs:s.querySelector('[data-lane="rs"]')},cnt={go:0,rs:0};Object.values(lanes).forEach(l=>l.querySelector('[data-ln]').textContent='0');
     for(let n=0;n<10;n++)timers.push(setTimeout(()=>{const k=n%3===2?'rs':'go',l=lanes[k];fly(rig('analyst','card'),at(l,.5,.55),'',650,()=>{cnt[k]++;l.querySelector('[data-ln]').textContent=cnt[k]})},1600+n*380))}
   if(i===4){const oks=[...s.querySelectorAll('.tr .ok')];oks.forEach(o=>o.classList.remove('hit'));oks.forEach((o,n)=>timers.push(setTimeout(()=>fly(rig('analyst','card'),at(o),'chk',600,()=>o.classList.add('hit')),1800+n*900)))}
-  if(i===5){const rows=[...book.children];rows.forEach(r=>r.classList.remove('row-in'));rows.forEach((r,n)=>timers.push(setTimeout(()=>fly(rig('analyst','card'),at(r,.15,.5),'',600,()=>r.classList.add('row-in')),1400+n*620)))}
+  if(i===5){const rows=[...book.children],tb=book.closest('.tbl');tb.scrollTop=0;rows.forEach(r=>r.classList.remove('row-in'));rows.forEach((r,n)=>timers.push(setTimeout(()=>fly(rig('analyst','card'),at(tb,.9,.92),'',560,()=>{r.classList.add('row-in');const bottom=r.offsetTop+r.offsetHeight;if(bottom>tb.scrollTop+tb.clientHeight)tb.scrollTo({top:bottom-tb.clientHeight,behavior:reduce?'auto':'smooth'})}),1100+n*560)))}
   if(i===6){const c=document.getElementById('callbtn');c.classList.remove('pressed');timers.push(setTimeout(()=>{c.classList.add('pressed');pulseEl(c)},2600))}
   if(i===7){const ds=[...s.querySelectorAll('.dest span')];ds.forEach(d=>d.classList.remove('hit'));const pre=s.querySelector('pre');ds.forEach((d,n)=>timers.push(setTimeout(()=>fly(at(pre,.85,.5),at(d,.08,.5),'',700,()=>d.classList.add('hit')),1500+n*620)))}
   if(i===8){const bl=[...s.querySelectorAll('.blk')];bl.forEach(b=>b.classList.remove('shoved'));bl.forEach((b,n)=>timers.push(setTimeout(()=>{fly(rig('operator','hand'),at(b,.1,.5),'',520,()=>b.classList.add('shoved'))},1300+n*700)))}
@@ -501,7 +522,7 @@ function go(i){
   cur=(i+CH.length)%CH.length;
   scenes.forEach((s,j)=>{s.hidden=j!==cur;s.classList.remove('go')});
   const s=scenes[cur];void s.offsetWidth;s.classList.add('go');
-  stepEl.textContent='Chapter '+(cur+1)+' of '+CH.length;ttl.textContent=CH[cur].t;txt.textContent=CH[cur].x;
+  stepEl.textContent='Chapter '+(cur+1)+' of '+CH.length;ttl.textContent=CH[cur].t;txt.innerHTML=CH[cur].x.map(b=>'<li>'+b+'</li>').join('');
   railBtns.forEach((b,j)=>{b.querySelector('.bar i').style.width=j<cur?'100%':'0';if(j===cur)b.setAttribute('aria-current','step');else b.removeAttribute('aria-current')});
   timers.forEach(t=>{clearTimeout(t);cancelAnimationFrame(t)});timers=[];clearInterval(segT);clearTimeout(stopT);fx.innerHTML='';
   work(cur);

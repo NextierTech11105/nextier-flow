@@ -238,6 +238,21 @@ tr.row-in td{animation:rowin .45s ease-out both}
 .blk.shoved{border-color:var(--orange);box-shadow:0 0 16px #FF8A3D44}
 .call.pressed{box-shadow:0 0 0 6px #16A34A55,0 0 22px #16A34A}
 .proofc{border-color:#1E5A40}.proofc b{color:#5BE3A8}
+.narr ul.bul{margin:0;padding-left:22px;display:flex;flex-direction:column;gap:8px;font-size:19px;max-width:36ch}
+.narr ul.bul li::marker{color:var(--orange)}
+.journey{display:flex;flex-wrap:wrap;align-items:center;gap:4px;font-size:12px;font-weight:700;color:#C9D2DC}
+.journey span{padding:3px 8px;border-radius:999px;border:1px solid #2c2c2c;background:#121212}
+.journey i{font-style:normal;color:var(--orange)}
+.tbl{max-height:290px}
+table{min-width:520px}
+th:nth-child(1){width:20%}th:nth-child(2){width:14%}th:nth-child(3){width:42%}th:nth-child(4){width:24%}
+.prio{display:inline-block;font:700 13px/1 var(--display);padding:4px 8px;border-radius:7px;border:1px solid #383838}
+.prio.p1{background:#2A1A10;border-color:var(--orange);color:var(--orange-soft)}
+.prio.p2{border-color:var(--blue);color:var(--blue-soft)}
+.jl{display:block;font-weight:700;font-size:13px}.jl.hot{color:#5BE3A8}
+.jt{display:flex;gap:3px;margin-top:5px}.jt i{width:10px;height:4px;border-radius:2px;background:#2a2a2a}.jt i.on{background:var(--orange)}
+.booknote{font-size:12px;color:#AEB9C6;text-align:right}
+th{z-index:2}
 @media (max-width:640px){.scene.has-l,.scene.has-r,.scene.trio{padding:22px 22px 30%}.crew{height:34%}.scene.trio .crew{height:30%}}
 @media (prefers-reduced-motion:reduce){.card-f{display:none}}
 
@@ -250,7 +265,7 @@ tr.row-in td{animation:rowin .45s ease-out both}
     <div class="brand">NEXT<span>IER</span> · TEAM MUSSO · LONG ISLAND</div>
     <div class="tag">Story mode · Real counts</div>
   </header>
-  <h1>From your buy box to <em>Long Island deals.</em></h1>
+  <h1>Own the deal <em>before it hits the MLS.</em></h1>
 
   <div class="main">
     <div class="stage" id="stage" aria-live="polite">
@@ -267,7 +282,7 @@ tr.row-in td{animation:rowin .45s ease-out both}
               <div class="cnt"><span id="pcount">0</span> rows</div>
               <div class="stop" id="mstop"></div>
             </div>
-            <div class="rows in3"><b>Rows to build</b><span class="box">1,208</span><span style="color:#C9D2DC">subdivision-size lots, Riverhead area + Mastic to the Moriches</span></div>
+            <div class="rows in3"><b>Rows to build</b><span class="box">1,208</span><span style="color:#C9D2DC">subdivision-size lots · Riverhead area + the Moriches</span></div>
           </div>
         </div>
       </div>
@@ -278,8 +293,8 @@ tr.row-in td{animation:rowin .45s ease-out both}
         <div class="app">
           <div class="abar"><b>Workspace</b><span class="ws">Team Musso · Long Island</span><span class="pill">REAL ESTATE</span><span style="margin-left:auto;color:#AEB9C6">Property Monitors</span></div>
           <div class="abody">
-            <div class="mon in1"><div><b>Daily sweep into Initial SMS</b><span>New matches go into the book and into one block every morning. Nothing sends until you press Send.</span></div><span class="on-btn" id="onbtn">ON</span></div>
-            <div class="presets in2"><div class="preset on"><b>Expired, not relisted</b><span>Off the MLS, never sold</span></div><div class="preset"><b>Estate + inherited</b><span>Oversized lots only</span></div><div class="preset"><b>Vacant land</b><span>0.40+ acres</span></div><div class="preset"><b>Subdivision-size</b><span>0.90+ acres, not listed</span></div></div>
+            <div class="mon in1"><div><b>Daily sweep</b><span>New matches build one block each morning. Nothing sends without you.</span></div><span class="on-btn" id="onbtn">ON</span></div>
+            <div class="presets in2"><div class="preset on"><b>Expired, not relisted</b><span>Off the MLS, never sold</span></div><div class="preset"><b>Estate and inherited</b><span>Oversized lots</span></div><div class="preset"><b>Vacant land</b><span>0.40+ acres</span></div><div class="preset"><b>Subdivision-size</b><span>0.90+ acres, not listed</span></div></div>
             <div class="chips in3"><span class="ac on">Nassau + Suffolk</span><span class="ac on">Riverhead area</span><span class="ac on">Mastic to the Moriches</span><span class="ac">Route 110</span><span class="ac on">Daily</span></div>
             <div class="tick in4"><span>Only new matches, every morning</span><b>ON</b></div>
           </div>
@@ -289,15 +304,15 @@ tr.row-in td{animation:rowin .45s ease-out both}
       <!-- 3 · EVENT SIGNALS -->
       <div class="scene has-r" hidden>
         <span class="crew right" aria-hidden="true"><span class="nxc" data-role="analyst" data-act="walk tag" style="--from:180px;--walk:1.2s;--x1:-150px;--y1:-110px;--x2:-170px;--y2:-30px;--x3:-150px;--y3:50px"></span></span>
-        <div class="sig"><div class="sc in1" data-sig><span class="ic" style="background:#13261D;color:var(--green)">EX</span><div><b>Expired, never relisted or sold</b><small>1,560 · 707 on a big lot</small></div><span class="new">NEW</span></div><div class="sc in2" data-sig><span class="ic" style="background:#2A1A10;color:var(--orange)">ES</span><div><b>Estate + inherited, oversized lots</b><small>4,120 · 1,598 on 0.90+ acres</small></div><span class="new">NEW</span></div><div class="sc in3" data-sig><span class="ic" style="background:#161616;color:var(--blue-soft)">LP</span><div><b>Pre-foreclosure on a big lot</b><small>280 across Long Island</small></div><span class="new">NEW</span></div><div class="sc in4" data-sig><span class="ic" style="background:#26201A;color:var(--gold)">LT</span><div><b>Subdivision-size lots</b><small>1,208 · 0.90+ acres, owned by a person</small></div><span class="new">NEW</span></div></div>
+        <div class="sig"><div class="sc in1" data-sig><span class="ic" style="background:#13261D;color:var(--green)">EX</span><div><b>Expired, never relisted or sold</b><small>1,560 · 707 on a big lot</small></div><span class="new">NEW</span></div><div class="sc in2" data-sig><span class="ic" style="background:#2A1A10;color:var(--orange)">ES</span><div><b>Estate and inherited, oversized lots</b><small>4,120 · 1,598 on 0.90+ acres</small></div><span class="new">NEW</span></div><div class="sc in3" data-sig><span class="ic" style="background:#161616;color:var(--blue-soft)">LP</span><div><b>Pre-foreclosure on a big lot</b><small>280 across Long Island</small></div><span class="new">NEW</span></div><div class="sc in4" data-sig><span class="ic" style="background:#26201A;color:var(--gold)">LT</span><div><b>Subdivision-size lots</b><small>1,208 · 0.90+ acres · individually owned</small></div><span class="new">NEW</span></div></div>
       </div>
 
       <!-- 4 · OWNER TYPE -->
       <div class="scene has-l" hidden>
         <span class="crew left" aria-hidden="true"><span class="nxc" data-role="analyst" data-act="walk idle" style="--from:-180px;--walk:1.2s;"></span></span>
         <div class="split">
-          <div class="lanebox go-l in1" data-lane="go"><h3>People → go first</h3><span class="o">Older homes, big lots</span><span class="o">Subdivision-size lots</span><span class="o">Vacant land</span><span class="o cnt-o"><b data-ln>0</b> sorted in</span></div>
-          <div class="lanebox rs-l in2" data-lane="rs"><h3>Entities → research</h3><span class="o">LLC</span><span class="o">Trust</span><span class="o">Estate</span><span class="o" style="color:var(--soft)">Find the person behind it first</span><span class="o cnt-o"><b data-ln>0</b> sorted in</span></div>
+          <div class="lanebox go-l in1" data-lane="go"><h3>Individual owners → outreach</h3><span class="o">Older homes, big lots</span><span class="o">Subdivision-size lots</span><span class="o">Vacant land</span><span class="o cnt-o"><b data-ln>0</b> sorted in</span></div>
+          <div class="lanebox rs-l in2" data-lane="rs"><h3>Entities → research</h3><span class="o">LLC</span><span class="o">Trust</span><span class="o">Estate</span><span class="o" style="color:var(--soft)">We find the decision-maker</span><span class="o cnt-o"><b data-ln>0</b> sorted in</span></div>
         </div>
       </div>
 
@@ -305,11 +320,11 @@ tr.row-in td{animation:rowin .45s ease-out both}
       <div class="scene has-r" hidden>
         <span class="crew right" aria-hidden="true"><span class="nxc" data-role="analyst" data-act="walk tag" style="--from:180px;--walk:1.2s;--x1:-170px;--y1:-60px;--x2:-190px;--y2:0px;--x3:-170px;--y3:60px"></span></span>
         <div class="trace">
-          <div class="tr in1"><b>Every owner, before a single text</b></div>
-          <div class="tr in2">Mobile traced only if the record has none<span class="ok">NO WASTE</span></div>
+          <div class="tr in1"><b>Before the first text</b></div>
+          <div class="tr in2">Traced only if no mobile is on file<span class="ok">NO WASTE</span></div>
           <div class="tr in3">Line type: mobile<span class="ok">CHECKED</span></div>
           <div class="tr in3">Do-not-call and opt-outs<span class="ok">CLEAR</span></div>
-          <div class="tr in4">Landline first? Next ranked mobile<span class="ok">NEXT</span></div>
+          <div class="tr in4">Landline on file? Next mobile in line<span class="ok">NEXT</span></div>
         </div>
       </div>
 
@@ -321,7 +336,9 @@ tr.row-in td{animation:rowin .45s ease-out both}
           <div class="abody">
             <div class="toprow in1"><span class="ah">Property Book <span style="font-weight:500;color:#C9D2DC;font-size:15px">4 lists ready</span></span><span class="enzo">Export to your dialer · CSV</span></div>
             <div class="chips in1"><span class="ac hit">Subdivision-size<small>1,208</small></span><span class="ac hit">Vacant land<small>2,058</small></span><span class="ac">Older homes, big lots<small>15,036</small></span><span class="ac">Estate + inherited<small>4,120</small></span><span class="ac">Expired<small>1,560</small></span><span class="ac">Commercial 5+ yrs<small>3,170</small></span></div>
-            <div class="tbl in2"><table><thead><tr><th>Area</th><th>List</th><th>Count</th><th>Autotags</th></tr></thead><tbody id="book"></tbody></table></div>
+            <div class="journey in1"><span>Sourced</span><i>›</i><span>Traced</span><i>›</i><span>Prepped</span><i>›</i><span>Texted</span><i>›</i><span>Replied</span><i>›</i><span>Positive</span><i>›</i><span>Opportunity</span></div>
+            <div class="tbl in2"><table><thead><tr><th>Priority</th><th>Owner</th><th>Autotags</th><th>Journey</th></tr></thead><tbody id="book"></tbody></table></div>
+            <div class="booknote in3">Nextier's live book · real records · names and numbers masked</div>
           </div>
         </div>
       </div>
@@ -333,9 +350,9 @@ tr.row-in td{animation:rowin .45s ease-out both}
           <div class="abar"><b>Workspace</b><span class="ws">Team Musso · Long Island</span><span class="pill">REAL ESTATE</span><span style="margin-left:auto;color:#AEB9C6">Property Book</span></div>
           <div class="abody">
             <div class="rec">
-              <div class="mini in1"><span class="sel">Smithtown · Older homes, big lots</span><span>Riverhead 11901 · Subdivision-size lots</span><span>Manorville · Vacant land</span><span>Center Moriches 11934 · Subdivision-size lots</span><span>Route 110 corridor · Commercial, held 5+ yrs</span><span>Smithtown · Estate + inherited</span></div>
+              <div class="mini in1"><span class="sel">D. S. · Suffolk</span><span>A. P. · Nassau</span><span>A. F. · Suffolk</span><span>K. S. · Suffolk</span><span>G. A. · Suffolk</span><span>H. V. · Suffolk</span></div>
               <div class="panel in2">
-                <div><div class="addr">W. G. · from Nextier's live book</div><div class="cty">Broward County, FL · real record, masked</div></div>
+                <div><div class="addr">W. G. · Broward County, FL</div><div class="cty">Real record from Nextier's live book, masked</div></div>
                 <span class="traced">TRACED</span>
                 <div class="acts"><span class="ph">(954) •••-••••</span><span class="call" id="callbtn">CALL</span><span class="bt">Text</span><span class="bt">Mark worked</span></div>
                 <div class="tgs"><span class="tg ev">Lis pendens</span><span class="tg">Owner-occupied</span><span class="tg ok">Mobile verified</span><span class="tg ok">Replied</span></div>
@@ -375,11 +392,11 @@ tr.row-in td{animation:rowin .45s ease-out both}
         <div class="app">
           <div class="abar"><b>Workspace</b><span class="ws">Team Musso · Long Island</span><span class="pill">REAL ESTATE</span><span style="margin-left:auto;color:#AEB9C6">Initial SMS</span></div>
           <div class="abody launch">
-            <div class="blk in1"><div><b>Riverhead area · subdivision-size</b><span>842 lots · owned by a person · traced and checked at pull</span></div><span class="ready">READY</span></div>
-            <div class="blk in2"><div><b>Mastic to the Moriches · subdivision-size</b><span>366 lots · owned by a person · traced and checked at pull</span></div><span class="ready">READY</span></div>
-            <div class="blk in3"><div><b>Route 110 · commercial, held 5+ years</b><span>2,021 parcels · owned by a person · traced and checked at pull</span></div><span class="ready">READY</span></div>
+            <div class="blk in1"><div><b>Riverhead area · subdivision-size</b><span>842 lots · individually owned · traced · checked</span></div><span class="ready">READY</span></div>
+            <div class="blk in2"><div><b>Mastic to the Moriches · subdivision-size</b><span>366 lots · individually owned · traced · checked</span></div><span class="ready">READY</span></div>
+            <div class="blk in3"><div><b>Route 110 · commercial, held 5+ years</b><span>2,021 parcels · individually owned · traced · checked</span></div><span class="ready">READY</span></div>
             <span class="send in4">Send</span>
-            <div class="halt in4">0 sent. Nothing goes out until a person presses Send.</div>
+            <div class="halt in4">0 sent. Nothing goes out until you press Send.</div>
           </div>
         </div>
       </div>
@@ -387,7 +404,7 @@ tr.row-in td{animation:rowin .45s ease-out both}
       <!-- 10 · YOURS -->
       <div class="scene trio" hidden>
         <span class="crew left" aria-hidden="true"><span class="nxc" data-role="scout" data-act="walk idle" style="--from:-180px;--walk:1.2s;"></span></span><span class="crew right" aria-hidden="true"><span class="nxc" data-role="operator" data-act="walk idle" style="--from:180px;--walk:1.2s;--delay:.4s"></span></span>
-        <div class="sig"><div class="sc in1"><span class="ic" style="background:#161616;color:var(--blue-soft)">DB</span><div><b>Your own database</b><small>Every lot, tag and signal, owned by you, on your own keys</small></div></div><div class="sc in2"><span class="ic" style="background:#13261D;color:var(--green)">AM</span><div><b>Every morning, again</b><small>New expireds land, sold ones drop out, tags re-stamp</small></div></div><div class="sc in3"><span class="ic" style="background:#2A1A10;color:var(--orange)">GO</span><div><b>Qualified only, into your CRM</b><small>Nextier works the cold outreach. Hand-raisers go to Follow Up Boss or HighLevel.</small></div></div><div class="sc in4 proofc"><div><b>Nextier's live book since Sept 1: 86 owners replied positive, 45 in New York</b><small>1010 Pine View, $699K, in contract</small></div></div></div>
+        <div class="sig"><div class="sc in1"><span class="ic" style="background:#161616;color:var(--blue-soft)">DB</span><div><b>Your own database</b><small>Every parcel, tag and signal, on your own keys</small></div></div><div class="sc in2"><span class="ic" style="background:#13261D;color:var(--green)">AM</span><div><b>Every morning</b><small>New expireds in. Sold ones out. Tags re-stamped.</small></div></div><div class="sc in3"><span class="ic" style="background:#2A1A10;color:var(--orange)">GO</span><div><b>Qualified only</b><small>Hand-raisers go to Follow Up Boss or HighLevel</small></div></div><div class="sc in4 proofc"><div><b>86 positive replies since Sept 1</b><small>45 in New York · 1010 Pine View, $699K, in contract · Nextier's live book</small></div></div></div>
       </div>
 
     </div>
@@ -395,7 +412,7 @@ tr.row-in td{animation:rowin .45s ease-out both}
     <div class="narr">
       <div class="step" id="step">Chapter 1 of 10</div>
       <h2 id="ttl"></h2>
-      <p id="txt"></p>
+      <ul id="txt" class="bul"></ul>
       <div class="controls">
         <button id="prev" type="button">Back</button>
         <button id="play" type="button">Play story</button>
@@ -407,18 +424,18 @@ tr.row-in td{animation:rowin .45s ease-out both}
   </div>
 
   <nav class="rail" id="rail" aria-label="Chapters"></nav>
-  <div class="foot">Every count is real: individually owned unless noted, counted October 9, 2026 across Nassau and Suffolk. The record in chapter 7 is a real one from Nextier's live book with the name, number and address masked; we walk it end to end on a 15-minute call. Map pins sit at the hamlet or ZIP center, never on a property. Use the arrow keys or the chapter buttons to move through it.</div>
+  <div class="foot">All counts are real: individually owned, counted Oct 9, 2026, Nassau and Suffolk. Chapter 7 is a real record from Nextier's live book, masked; we walk it end to end on a 15-minute call. Map pins mark hamlet and ZIP centers, not properties. Arrow keys or the chapter buttons move through it.</div>
 </div>
 
 <script src="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.js"></script>
 <script src="clay-crew.js"></script>
 <script>
-const CH=[{"k":"Buy box","t":"Start with your buy box","x":"Lots of 0.45 to 1.9 acres that split into 2 to 4 homes, owned by a person, not listed. The scout sweeps Long Island on the live map and builds 1,208 subdivision-size lots into one block."},{"k":"Monitors","t":"It watches every morning","x":"Monitors re-check your hamlets daily. Only new matches come in: a fresh expired, an estate filing, a lot that came off the market."},{"k":"Signals","t":"The reason to move","x":"1,560 expired and never relisted. 4,120 estates on oversized lots. 280 pre-foreclosures on big lots. Each one is stamped with why this owner might act now."},{"k":"Owner","t":"People first","x":"Owners who are people go first. LLCs, trusts and estates go to research, so the next step is finding the person behind them."},{"k":"Trace","t":"No number, no conversation","x":"The owner's mobile is traced only when the record has none, then checked for line type, do-not-call and opt-outs."},{"k":"Book","t":"Your Property Book, tagged","x":"Every lead lands stamped with its list, its signal and its lot facts. The Property Book shows the whole book, filterable by every tag."},{"k":"Record","t":"Everything on one record","x":"A real record from Nextier's live book, masked: the lis pendens on Sept 30, the first text on Oct 8 at 12:34 PM, a reply at 2:59 PM, and a sit-down on Oct 12."},{"k":"Your CRM","t":"Into your CRM, qualified only","x":"Raw cold data clogs a CRM. Nextier works the cold outreach, and only owners who raise a hand go into Follow Up Boss or HighLevel."},{"k":"Staged","t":"Staged, not sent","x":"Riverhead, Mastic to the Moriches and Route 110 wait at Initial SMS: traced, tagged and checked. Zero texts go out until you press Send."},{"k":"Yours","t":"Yours, every morning","x":"Your own database, refreshed daily. The crew finds and prepares; you decide what goes out. Own the deal before it hits the MLS."}];
+const CH=[{"k":"Buy box","t":"Your buy box.","x":["0.45 to 1.9 acres","Splits into 2 to 4 lots","Individually owned · not listed","1,208 parcels fit on Long Island"]},{"k":"Monitors","t":"Watched every morning.","x":["Re-checked daily","New expireds, estate filings, off-market lots","Only what's new comes in"]},{"k":"Signals","t":"The reason to sell.","x":["1,560 expired, never relisted","4,120 estates on oversized lots","280 pre-foreclosures on big lots"]},{"k":"Owners","t":"Owners first.","x":["Individual owners → outreach","LLCs, trusts, estates → research","We find the decision-maker"]},{"k":"Trace","t":"No number, no conversation.","x":["Traced only when no mobile is on file","Line type checked","Do-not-call and opt-outs cleared"]},{"k":"Book","t":"The database, visible.","x":["Every record autotagged","Labeled by its place in the client journey","Ranked: hand-raisers first"]},{"k":"Record","t":"One record, end to end.","x":["Lis pendens filed Sept 30","First text Oct 8 · 12:34 PM","Reply 2:59 PM · sit-down Oct 12"]},{"k":"CRM","t":"Qualified only.","x":["Cold outreach stays in Nextier","Hand-raisers go to your CRM","Follow Up Boss or HighLevel"]},{"k":"Staged","t":"Staged. Not sent.","x":["Riverhead · the Moriches · Route 110","Traced, tagged, held","Nothing sends until you press Send"]},{"k":"Yours","t":"Your database. Your deals.","x":["Refreshed every morning","We source, enrich and start the conversation","You take the sit-downs"]}];
 const DUR=7000;
 const MAPCFG={"near":10.7,"start":{"center":[-72.95,40.86],"zoom":8.9,"pitch":55,"bearing":-14},"stops":[["Riverhead",[-72.6483,40.9281],434],["Wading River",[-72.8256,40.9551],218],["Calverton",[-72.7656,40.9422],184],["Center Moriches",[-72.7951,40.8021],237]]};
 const PICK=[0,1,3,4];
 const BLOCKN=1208;
-const ROWS=[["Smithtown","Suffolk","Older homes, big lots","2,373",[["Built ≤1975","ev"],["0.40+ ac",""],["Not listed",""]]],["Riverhead 11901","Suffolk","Subdivision-size lots","434",[["0.90+ ac","ev"],["Owned by a person",""]]],["Manorville","Suffolk","Vacant land","269",[["Vacant","ev"],["0.40+ ac",""]]],["Center Moriches 11934","Suffolk","Subdivision-size lots","237",[["0.90+ ac","ev"],["Owned by a person",""]]],["Route 110 corridor","Suffolk","Commercial, held 5+ yrs","2,021",[["Commercial","ev"],["Held 5+ yrs",""]]],["Smithtown","Suffolk","Estate + inherited","316",[["Estate","ev"],["Oversized lot",""]]],["Syosset","Nassau","Older homes, big lots","933",[["Built ≤1975","ev"],["0.40+ ac",""]]]];
+const ROWS=[["D. S.","Suffolk","POSITIVE",["Inherited","Lis pendens","Oversized lot","No mortgage","Mobile verified"]],["A. P.","Nassau","POSITIVE",["Lis pendens","Oversized lot","High equity","Owner-occupied"]],["A. F.","Suffolk","OPPT",["Estate","Inherited","Oversized lot","No mortgage"]],["K. S.","Suffolk","REPLIED",["Estate","Inherited","Oversized lot","High equity"]],["G. A.","Suffolk","TEXTED",["Lis pendens","Oversized lot","No mortgage","Mobile verified"]],["H. V.","Suffolk","SOURCED",["Pre-foreclosure","Oversized lot","Owner-occupied"]],["M. Z.","Suffolk","TRACED",["Estate","Inherited","Oversized lot"]],["L. C.","Suffolk","SOURCED",["Expired listing","Oversized lot","High equity"]]];
 const reduce=!!(window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches);
 const nf=new Intl.NumberFormat('en-US');
 const stage=document.getElementById('stage');
@@ -452,9 +469,13 @@ function tour(){
 
 /* scene 6: the book, filled row by row by the analyst */
 const book=document.getElementById('book');
-ROWS.forEach((r)=>{const tr=document.createElement('tr');
-  tr.innerHTML='<td class="w">'+r[0]+'<small>'+r[1]+'</small></td><td class="w">'+r[2]+'</td><td>'+r[3]+'</td><td><div class="tgs"></div></td>';
-  const box=tr.querySelector('.tgs');r[4].forEach(([t,c])=>{const s=document.createElement('span');s.className='tg'+(c?' '+c:'');s.textContent=t;box.appendChild(s)});
+const JNAME={SOURCED:'Sourced',TRACED:'Traced',PREPPED:'Prepped',TEXTED:'Texted',REPLIED:'Replied',POSITIVE:'Positive',OPPT:'Opportunity'};
+const JSTEP=['SOURCED','TRACED','PREPPED','TEXTED','REPLIED','POSITIVE','OPPT'];
+const EVT=new Set(['Lis pendens','Pre-foreclosure','Estate','Inherited','Auction','Expired listing']);
+const prio=j=>j==='POSITIVE'||j==='OPPT'?['P1','Hand raised','p1']:j==='REPLIED'?['P2','Replied','p2']:['P3','Signal, not yet worked','p3'];
+ROWS.forEach((r)=>{const tr=document.createElement('tr');const p=prio(r[2]),k=JSTEP.indexOf(r[2]);
+  tr.innerHTML='<td><span class="prio '+p[2]+'">'+p[0]+'</span><small>'+p[1]+'</small></td><td class="w"><b>'+r[0]+'</b><small>'+r[1]+'</small></td><td><div class="tgs"></div></td><td><span class="jl '+(k>=5?'hot':'')+'">'+JNAME[r[2]]+(r[2]==='POSITIVE'?' 🔥':'')+'</span><span class="jt">'+JSTEP.map((x,j)=>'<i class="'+(j<=k?'on':'')+'"></i>').join('')+'</span></td>';
+  const box=tr.querySelector('.tgs');r[3].forEach(t=>{const s=document.createElement('span');s.className='tg'+(EVT.has(t)?' ev':t==='Mobile verified'?' ok':'');s.textContent=t;box.appendChild(s)});
   book.appendChild(tr)});
 
 /* the crew's hands: records and checks that travel from a person to the screen */
@@ -480,7 +501,7 @@ function work(i){
   if(i===3){const lanes={go:s.querySelector('[data-lane="go"]'),rs:s.querySelector('[data-lane="rs"]')},cnt={go:0,rs:0};Object.values(lanes).forEach(l=>l.querySelector('[data-ln]').textContent='0');
     for(let n=0;n<10;n++)timers.push(setTimeout(()=>{const k=n%3===2?'rs':'go',l=lanes[k];fly(rig('analyst','card'),at(l,.5,.55),'',650,()=>{cnt[k]++;l.querySelector('[data-ln]').textContent=cnt[k]})},1600+n*380))}
   if(i===4){const oks=[...s.querySelectorAll('.tr .ok')];oks.forEach(o=>o.classList.remove('hit'));oks.forEach((o,n)=>timers.push(setTimeout(()=>fly(rig('analyst','card'),at(o),'chk',600,()=>o.classList.add('hit')),1800+n*900)))}
-  if(i===5){const rows=[...book.children];rows.forEach(r=>r.classList.remove('row-in'));rows.forEach((r,n)=>timers.push(setTimeout(()=>fly(rig('analyst','card'),at(r,.15,.5),'',600,()=>r.classList.add('row-in')),1400+n*620)))}
+  if(i===5){const rows=[...book.children],tb=book.closest('.tbl');tb.scrollTop=0;rows.forEach(r=>r.classList.remove('row-in'));rows.forEach((r,n)=>timers.push(setTimeout(()=>fly(rig('analyst','card'),at(tb,.9,.92),'',560,()=>{r.classList.add('row-in');const bottom=r.offsetTop+r.offsetHeight;if(bottom>tb.scrollTop+tb.clientHeight)tb.scrollTo({top:bottom-tb.clientHeight,behavior:reduce?'auto':'smooth'})}),1100+n*560)))}
   if(i===6){const c=document.getElementById('callbtn');c.classList.remove('pressed');timers.push(setTimeout(()=>{c.classList.add('pressed');pulseEl(c)},2600))}
   if(i===7){const ds=[...s.querySelectorAll('.dest span')];ds.forEach(d=>d.classList.remove('hit'));const pre=s.querySelector('pre');ds.forEach((d,n)=>timers.push(setTimeout(()=>fly(at(pre,.85,.5),at(d,.08,.5),'',700,()=>d.classList.add('hit')),1500+n*620)))}
   if(i===8){const bl=[...s.querySelectorAll('.blk')];bl.forEach(b=>b.classList.remove('shoved'));bl.forEach((b,n)=>timers.push(setTimeout(()=>{fly(rig('operator','hand'),at(b,.1,.5),'',520,()=>b.classList.add('shoved'))},1300+n*700)))}
@@ -501,7 +522,7 @@ function go(i){
   cur=(i+CH.length)%CH.length;
   scenes.forEach((s,j)=>{s.hidden=j!==cur;s.classList.remove('go')});
   const s=scenes[cur];void s.offsetWidth;s.classList.add('go');
-  stepEl.textContent='Chapter '+(cur+1)+' of '+CH.length;ttl.textContent=CH[cur].t;txt.textContent=CH[cur].x;
+  stepEl.textContent='Chapter '+(cur+1)+' of '+CH.length;ttl.textContent=CH[cur].t;txt.innerHTML=CH[cur].x.map(b=>'<li>'+b+'</li>').join('');
   railBtns.forEach((b,j)=>{b.querySelector('.bar i').style.width=j<cur?'100%':'0';if(j===cur)b.setAttribute('aria-current','step');else b.removeAttribute('aria-current')});
   timers.forEach(t=>{clearTimeout(t);cancelAnimationFrame(t)});timers=[];clearInterval(segT);clearTimeout(stopT);fx.innerHTML='';
   work(cur);
