@@ -630,7 +630,7 @@ th{z-index:2}
         <button id="next" type="button">Next</button>
         <button id="snd" type="button" aria-pressed="true">Sound on</button>
       </div>
-      <div class="ytwrap"><div id="ytbox"></div><small>Music: ADHD Relief Music · Greenred Productions, on YouTube</small></div>
+      <span class="foot">Press Play. Best with the sound on.</span>
     </div>
   </div>
 
@@ -756,14 +756,21 @@ document.addEventListener('keydown',e=>{if(e.key==='ArrowRight')go(cur+1);else i
 const m=/^#ch(\d+)$/.exec(location.hash||'');
 go(m?Math.min(Math.max(+m[1],1),CH.length)-1:0);
 </script>
+<audio id="song" src="media/story-song-105s.m4a" preload="auto"></audio>
 <script>
-let yt=null,ytReady=false,ytWant=false,ytStarted=false,soundOn=true,ytIv=0;
-function ytFade(to,ms,done){clearInterval(ytIv);if(!ytReady){if(done)done();return}let v=yt.getVolume?yt.getVolume():to;const steps=Math.max(1,Math.round(ms/40)),dv=(to-v)/steps;let n=0;ytIv=setInterval(()=>{n++;v+=dv;try{yt.setVolume(Math.max(0,Math.min(100,v)))}catch(e){}if(n>=steps){clearInterval(ytIv);if(done)done()}},40)}
-function ytPlay(){if(!soundOn)return;if(!ytReady){ytWant=true;return}try{if(!ytStarted){yt.seekTo(1531,true);ytStarted=true}yt.setVolume(0);yt.playVideo();ytFade(80,900)}catch(e){}}
-function ytPause(){if(!ytReady)return;ytFade(0,700,()=>{try{yt.pauseVideo()}catch(e){}})}
-window.onYouTubeIframeAPIReady=function(){yt=new YT.Player('ytbox',{width:'240',height:'200',videoId:'K2sTA6-dJ3Y',playerVars:{start:1531,rel:0,playsinline:1,modestbranding:1},events:{onReady:()=>{ytReady=true;if(ytWant&&playing)ytPlay()}}})};
-const _setPlayM=setPlay;setPlay=function(on){_setPlayM(on);if(on)ytPlay();else ytPause()};
-document.getElementById('snd').addEventListener('click',()=>{soundOn=!soundOn;const b=document.getElementById('snd');b.setAttribute('aria-pressed',String(soundOn));b.textContent=soundOn?'Sound on':'Sound off';if(soundOn&&playing)ytPlay();else ytPause()});
+const song=document.getElementById('song'),snd=document.getElementById('snd'),SEC=DUR/1000;
+const canFade=(()=>{try{const a=document.createElement('audio');a.volume=.5;return Math.abs(a.volume-.5)<.01}catch(e){return false}})();
+let soundOn=true,fadeIv=0;
+function fadeTo(v,ms,done){clearInterval(fadeIv);fadeIv=0;if(!canFade||ms<=0){if(canFade)song.volume=v;if(done)done();return}const a=Math.sqrt(song.volume),b=Math.sqrt(v),s=performance.now();fadeIv=setInterval(()=>{const k=Math.min(1,(performance.now()-s)/ms),x=a+(b-a)*k;song.volume=Math.max(0,Math.min(1,x*x));if(k>=1){clearInterval(fadeIv);fadeIv=0;if(done)done()}},30)}
+function songAt(){return Math.min(cur*SEC+(performance.now()-t0)/1000,song.duration||1e9)}
+function syncSong(){
+  if(!soundOn||!playing){if(!song.paused)fadeTo(0,soundOn?900:400,()=>song.pause());return}
+  if(song.paused){try{song.currentTime=songAt()}catch(e){}if(canFade)song.volume=0;const p=song.play();if(p&&p.then)p.then(()=>fadeTo(1,500)).catch(()=>{});else fadeTo(1,500);return}
+  if(Math.abs(song.currentTime-songAt())>.6){fadeTo(0,150,()=>{try{song.currentTime=songAt()}catch(e){}fadeTo(1,400)});return}
+  fadeTo(1,300);
+}
+const _go=go;go=function(i){_go(i);syncSong()};
+const _setPlay=setPlay;setPlay=function(on){_setPlay(on);syncSong()};
+snd.addEventListener('click',()=>{soundOn=!soundOn;snd.setAttribute('aria-pressed',String(soundOn));snd.textContent=soundOn?'Sound on':'Sound off';syncSong()});
 </script>
-<script src="https://www.youtube.com/iframe_api"></script>
 </body></html>
