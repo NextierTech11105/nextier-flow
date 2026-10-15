@@ -177,6 +177,7 @@ tbody tr:last-child td { border-bottom: 0; } tr.tot td { font-weight: 700; backg
 .ag b { font: 700 17px/1.1 var(--display); font-variant-numeric: tabular-nums; } .ag b.t { color: var(--green); font-size: 22px; margin-top: 6px; } .ag em { font-style: normal; font-size: 13px; color: var(--ink2); }
 .ag.next { border-style: dashed; } .ag.next b { color: var(--ink2); font-size: 15px; }
 .st-did li b.g { color: var(--green); }
+.flow.wide div { grid-template-columns: 132px minmax(0, 1fr); } .flow.wide b { font-size: 30px; }
 
 </style>
 
@@ -277,7 +278,12 @@ function engineHTML() {
 }
 
 /* ---------------- story mode ---------------- */
+const SEG_COUNT = 8; // rows in segmapHTML()
 const CH = [
+  { pain: "Foundational Data Engine", h: "Foundational Database Built for Deal Origination.",
+    b: ["Every parcel and every owner, direct from government records.", "Engineered and segmented for your buy box: subdivision, land, commercial.", "Researched down to reachable targets, ranked and ready for first contact.", "Your database. Your keys. Your deal flow."],
+    vis: () => `<div class="flow wide"><div><b>${n0(F.parcels)}</b><span>Suffolk parcels · direct from government records</span></div><div><b>${SEG_COUNT}</b><span>Segments engineered for your buy box</span></div><div><b>${n0(F.segA)}</b><span>Expireds in your buy box · the worked example</span></div><div class="crm"><b>${BOOK.length}</b><span>Researched, reachable targets · ready for first contact</span></div></div>`,
+    src: "Suffolk County tax map · NYS assessment roll 2025 · MLS snapshot Oct 4, 2026" },
   { pain: "Positioning", h: "Development deal specialist first. Licensed agent second.",
     b: ["Visibility is a commodity. Analysis is the edge.", "Development deals are won before first contact: yield, zoning, title history.", "The Foundational Data Engine produces that work on every target, every week. That is leverage."],
     vis: () => `<table class="mt vs"><tbody>
@@ -406,6 +412,7 @@ document.addEventListener("keydown", (e) => {
 function renderAll() {
   report.innerHTML = `
     <div class="hero">
+      <span class="st-pain">Foundational Database Built for Deal Origination</span>
       <h1>Ten Long Island subdivision targets.</h1>
       <div class="st-did"><ul>
         <li>Each listing expired and was never relisted or sold. The owner has already tried to sell.</li>
