@@ -1,0 +1,176 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="robots" content="noindex,nofollow">
+<title>1068 Martinstein Avenue Lead</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.css">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo+Narrow:wght@600;700&family=Public+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600&display=swap">
+<style>
+/* One-property subdivision lead: masthead, street photo, live 3D lot, the split math, the event, the owner path, precedent. True black, blue, green for good news only. */
+:root { --bg:#000000; --panel:#0c0f14; --line:#222a35; --fg:#ffffff; --fg2:#d3dbe6; --blue:#3b8cff; --green:#12b76a; --amber:#f2b44a;
+  --display:"Archivo Narrow","Arial Narrow","Roboto Condensed",sans-serif; --body:"Public Sans","Segoe UI",Arial,sans-serif; --mono:"IBM Plex Mono",Consolas,"Courier New",monospace; color-scheme:dark; }
+* { box-sizing:border-box; } html,body { margin:0; }
+body { background:var(--bg); color:var(--fg); font:400 16px/1.55 var(--body); padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px); }
+.wrap { max-width:1080px; margin:0 auto; padding-left:max(16px,env(safe-area-inset-left,0px)); padding-right:max(16px,env(safe-area-inset-right,0px)); padding-block:28px 56px; display:grid; gap:28px; }
+.mast { display:grid; gap:10px; }
+.eyebrow { font:600 15px/1.2 var(--mono); letter-spacing:.08em; text-transform:uppercase; color:var(--blue); display:flex; flex-wrap:wrap; gap:6px 16px; }
+h1 { margin:0; font:700 clamp(40px,7vw,66px)/1 var(--display); text-wrap:balance; }
+.sub { margin:0; font:500 18px/1.45 var(--body); color:var(--fg2); max-width:68ch; } .sub b { color:var(--green); }
+.ids { display:flex; flex-wrap:wrap; gap:6px 18px; font:500 15px/1.4 var(--mono); color:var(--fg2); }
+h2 { margin:0; font:700 28px/1.1 var(--display); text-wrap:balance; }
+.visuals { display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1fr); gap:14px; }
+@media (max-width:860px) { .visuals { grid-template-columns:1fr; } }
+figure { margin:0; display:grid; gap:8px; min-width:0; }
+figure img { width:100%; height:340px; object-fit:cover; border-radius:8px; border:1px solid var(--line); display:block; background:var(--panel); }
+figcaption { font-size:15px; color:var(--fg2); }
+.mapbox { position:relative; height:340px; border-radius:8px; border:1px solid var(--line); overflow:hidden; background:var(--panel); }
+#map { position:absolute; inset:0; }
+.legend { position:absolute; left:10px; bottom:10px; display:grid; gap:4px; padding:8px 10px; border-radius:6px; background:rgba(0,0,0,.72); font-size:15px; pointer-events:none; }
+.legend span { display:flex; align-items:center; gap:8px; } .legend i { width:14px; height:14px; border-radius:3px; display:inline-block; }
+.maprow { display:flex; flex-wrap:wrap; gap:8px 16px; align-items:center; justify-content:space-between; }
+.btn { display:inline-flex; align-items:center; gap:8px; font:600 15px/1 var(--body); color:var(--fg); border:1px solid var(--blue); border-radius:6px; padding:10px 14px; text-decoration:none; }
+.btn:hover { background:rgba(59,140,255,.16); }
+.band { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); border:1px solid var(--line); border-radius:8px; overflow:hidden; }
+@media (max-width:760px) { .band { grid-template-columns:repeat(2,minmax(0,1fr)); } } @media (max-width:420px) { .band { grid-template-columns:1fr; } }
+.cell { padding:16px 18px; border-right:1px solid var(--line); border-bottom:1px solid var(--line); display:grid; gap:4px; align-content:start; min-width:0; background:var(--panel); }
+.cell .k { font:600 15px/1.2 var(--body); letter-spacing:.04em; text-transform:uppercase; color:var(--fg2); }
+.cell .v { font:700 28px/1.1 var(--display); font-variant-numeric:tabular-nums; overflow-wrap:anywhere; } .cell .n { font-size:15px; color:var(--fg2); }
+.cell.good .v { color:var(--green); }
+section { display:grid; gap:14px; }
+.lede { margin:0; max-width:70ch; color:var(--fg2); } .lede b { color:var(--fg); }
+dl { margin:0; display:grid; grid-template-columns:repeat(auto-fit,minmax(320px,1fr)); column-gap:24px; border-top:1px solid var(--line); }
+dl div { display:grid; grid-template-columns:42% 58%; gap:12px; padding:11px 0; border-bottom:1px solid var(--line); }
+dt { color:var(--fg2); font-weight:600; } dd { margin:0; overflow-wrap:anywhere; }
+.ltw { overflow-x:auto; border:1px solid var(--line); border-radius:8px; }
+table { border-collapse:collapse; width:100%; min-width:600px; font-size:15px; }
+th,td { text-align:left; padding:10px 14px; border-bottom:1px solid var(--line); vertical-align:top; }
+th { font:600 15px/1.2 var(--body); letter-spacing:.04em; text-transform:uppercase; color:var(--fg2); background:var(--panel); }
+tbody tr:last-child td { border-bottom:0; } tr.tot td { font-weight:700; color:var(--green); background:var(--panel); }
+td .s { display:block; color:var(--fg2); }
+.src { font:500 15px/1.4 var(--mono); color:var(--fg2); }
+.pitch { margin:0; border-left:4px solid var(--blue); padding:14px 18px; background:var(--panel); max-width:76ch; }
+.tag { display:inline-block; font:600 15px/1.2 var(--mono); padding:2px 8px; border-radius:4px; border:1px solid var(--line); color:var(--amber); }
+.foot { margin:0; font-size:15px; color:var(--fg2); border-top:1px solid var(--line); padding-top:14px; max-width:80ch; }
+.maplibregl-ctrl-attrib { font-size:11px; }
+:focus-visible { outline:3px solid var(--blue); outline-offset:2px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="mast">
+    <div class="eyebrow"><span>Lead report</span><span>Baywood, Islip</span><span>Oct 15, 2026</span><span>Subdivision target</span></div>
+    <h1>1068 Martinstein Avenue</h1>
+    <p class="sub">A 1.00-acre lot with a 1968 house in Baywood, zoned A (11,250 sq ft lots). Listed at $550,000 and the listing expired without a sale or a relist. Under town zoning and the county septic rule it holds <b>2 house lots</b>. Last deed recorded 2005.</p>
+    <div class="ids"><span>SCTM 0500-26400-0300-018002</span><span>SWIS 472889 · 264.-3-18.2</span><span>Bay Shore, NY 11706</span></div>
+  </header>
+
+  <div class="visuals">
+    <figure>
+      <img src="media/lead-1068-martinstein-avenue-street.jpg" alt="Street view toward 1068 Martinstein Avenue" width="1600" height="712">
+      <figcaption>Street view, Dec 2021, from Martinstein Ave, facing the lot.</figcaption>
+    </figure>
+    <figure>
+      <div class="mapbox">
+        <div id="map" role="img" aria-label="3D map of the lot at 1068 Martinstein Avenue with neighboring lots"></div>
+        <div class="legend"><span><i style="background:#12b76a"></i>The lot · 1.00 ac</span><span><i style="background:#ffffff"></i>Buildings on it</span><span><i style="background:transparent;border:2px solid #3b8cff"></i>Neighbor lots</span></div>
+      </div>
+      <div class="maprow"><figcaption>Live 3D map. Drag to turn, scroll to zoom.</figcaption><a class="btn" href="https://www.google.com/maps/@40.747143,-73.288196,170a,35y,60t/data=!3m1!1e3" target="_blank" rel="noopener">Open in Google 3D</a></div>
+    </figure>
+  </div>
+
+  <div class="band" aria-label="Key numbers"><div class="cell"><div class="k">Lot</div><div class="v">1.00 ac</div><div class="n">43,539 sq ft</div></div><div class="cell"><div class="k">Zoning</div><div class="v">A</div><div class="n">11,250 sq ft per house</div></div><div class="cell good"><div class="k">Lots by right</div><div class="v">2</div><div class="n">septic rule binds</div></div><div class="cell"><div class="k">Last asking</div><div class="v">$550K</div><div class="n">expired · 26 days on market</div></div><div class="cell"><div class="k">Last deed</div><div class="v">2005</div><div class="n">price not recorded</div></div><div class="cell"><div class="k">Owner</div><div class="v">R. R.</div><div class="n">Lives at the property</div></div></div>
+
+  <section>
+    <h2>Subdivision math</h2>
+    <div class="ltw"><table><thead><tr><th>Step</th><th>Figure</th><th>Basis</th></tr></thead><tbody><tr><td>Lot area</td><td>43,539 sq ft · 1.00 ac</td><td>County tax map parcel outline</td></tr><tr><td>Wetlands on the lot</td><td>None mapped</td><td>County freshwater + tidal wetland maps</td></tr><tr><td>Net buildable area</td><td>43,539 sq ft</td><td></td></tr><tr><td>Zoning minimum per house</td><td>11,250 sq ft</td><td>A · Islip Zoning Ordinance §68-81(A) · Residence A</td></tr><tr><td>Septic minimum per house</td><td>20,000 sq ft</td><td>Groundwater Zone VII · §760-608(B)</td></tr><tr><td>Binding rule</td><td>County septic rule</td><td>20,000 sq ft per house</td></tr><tr class="tot"><td>House lots by right</td><td>2</td><td>2–3 lots usually work with a flag lot or shared drive</td></tr></tbody></table></div>
+    <p class="lede"><b>What this means:</b> the lot divides into <b>2</b> conforming house lots before roads, frontage and flag-lot rules. Lots under 40,000 sq ft need public water (§760-609). A surveyor's yield map confirms the count.</p>
+    <div class="src">Source: Islip Zoning Ordinance §68-81(A) · Residence A · Suffolk County Sanitary Code Article 6 §760-608(B), §760-609 · Suffolk County tax map (lot area) · county wetland maps</div>
+  </section>
+  <section>
+    <h2>Listing history · the event</h2>
+    <dl><div><dt>Last asking price</dt><dd><b>$550,000</b></dd></div><div><dt>Times listed</dt><dd>1</dd></div><div><dt>Days on market</dt><dd>26</dd></div><div><dt>Expired</dt><dd>3 to 6 months before Oct 4</dd></div><div><dt>Relisted since</dt><dd>No</dd></div><div><dt>Sold since</dt><dd>No</dd></div><div><dt>Listing said</dt><dd>3 bed · 2 full bath · 1,430 sq ft · built 1968</dd></div><div><dt>Lot per listing</dt><dd>100 ac · county map says 1.00 ac</dd></div></dl>
+    <p class="lede"><b>Why now:</b> the owner already decided to sell and the market didn't take it at $550K. The listing agreement is over, so the owner can talk to anyone.</p>
+    <div class="src">Source: MLS snapshot pulled Oct 4, 2026 (expired, active and sold listings, last 12 months)</div>
+  </section>
+  <section>
+    <h2>Owner & how to reach them</h2>
+    <dl><div><dt>Owner of record</dt><dd><b>R. R.</b> · name on file</dd></div><div><dt>Owner type</dt><dd>Lives at the property</dd></div><div><dt>Mailing address</dt><dd>Same as the property</dd></div><div><dt>Held since</dt><dd>Deed 2005 · same owner on the 2025 roll</dd></div><div><dt>Deed on record</dt><dd>Jun 2005 · liber/page 12394 0698</dd></div><div><dt>Price on that deed</dt><dd>Not recorded</dd></div><div><dt>Owner phone</dt><dd>Not traced · filled at install (NY bundle, then skip trace on misses)</dd></div><div><dt>Reach tier</dt><dd>R1 · Lives at the property</dd></div></dl>
+    
+    <div class="src">Source: NYS assessment roll 2025 + 2021 (data.ny.gov 7vem-aaz7) · Suffolk County deed transfers</div>
+  </section>
+  <section>
+    <h2>Portfolio linkage · other parcels, same owner</h2>
+    <div class="ltw"><table><thead><tr><th>Address</th><th>Town</th><th>Use</th><th>2025 value</th><th>Link</th></tr></thead><tbody><tr><td>1070 Martinstein Ave</td><td>Islip</td><td>One-family home</td><td>—</td><td>Name + mailing address</td></tr></tbody></table></div>
+    
+    <div class="src">Source: NYS assessment roll 2025, Suffolk County · matched on owner name + mailing address</div>
+  </section>
+  <section>
+    <h2>Site checks</h2>
+    <dl><div><dt>Groundwater zone</dt><dd>Zone VII · 20,000 sq ft per house on septic</dd></div><div><dt>Sewer district</dt><dd>None · septic</dd></div><div><dt>Freshwater wetlands</dt><dd>None within 100 ft</dd></div><div><dt>Tidal wetlands</dt><dd>None</dd></div><div><dt>Flood zone</dt><dd>Not in a mapped flood hazard area</dd></div><div><dt>Pine Barrens</dt><dd>Outside</dd></div><div><dt>Development rights sold</dt><dd>None on file</dd></div><div><dt>Filed subdivision map</dt><dd>Causeway Farms, Sec 2 · map 01572, lot 225P, 226</dd></div><div><dt>Nearest LIRR station</dt><dd>Deer Park · 1.6 mi (LIRR Main Line)</dd></div><div><dt>School district</dt><dd></dd></div></dl>
+    <p class="lede">The lot sits on a filed subdivision map, so a re-subdivision goes back to the town planning board as a map amendment.</p>
+    <div class="src">Source: Suffolk County GIS: groundwater management zones, sanitation districts, wetlands, Pine Barrens, conservation easements, farmland PDR, filed maps · FEMA flood hazard layer</div>
+  </section>
+  <section>
+    <h2>Neighbors · assemblage</h2>
+    <div class="ltw"><table><thead><tr><th>Address</th><th>Lot</th><th>Use</th><th>Owner</th></tr></thead><tbody><tr><td>1055 Joselson Avenue</td><td>0.94 ac</td><td>One-family home</td><td>Individual · lives there</td></tr><tr><td>1053 Joselson Avenue</td><td>0.89 ac</td><td>One-family home</td><td>Individual · lives there</td></tr><tr><td>1070 Martinstein Avenue</td><td>0.82 ac</td><td>One-family home</td><td>—</td></tr><tr><td>1064 Martinstein Avenue</td><td>0.30 ac</td><td>One-family home</td><td>Individual · lives there</td></tr><tr><td>55 East Belmont Street</td><td>0.29 ac</td><td>One-family home</td><td>Individual · lives there</td></tr><tr><td>53 East Belmont Street</td><td>0.29 ac</td><td>One-family home</td><td>Individual · lives there</td></tr><tr><td>47 East Belmont Street</td><td>0.29 ac</td><td>One-family home</td><td>Individual · lives there</td></tr><tr><td>51 East Belmont Street</td><td>0.29 ac</td><td>One-family home</td><td>Individual · lives there</td></tr></tbody></table></div>
+    
+    <div class="src">Source: Suffolk County tax map · NYS assessment roll 2025</div>
+  </section>
+  <section>
+    <h2>New houses nearby · the exit</h2>
+    <div class="ltw"><table><thead><tr><th>Address</th><th>Lot</th><th>2025 market value</th><th>Distance</th></tr></thead><tbody><tr><td>1022 Martinstein Avenue</td><td>0.40 ac</td><td>—</td><td>0.37 mi</td></tr><tr><td>17 Duke Street</td><td>0.45 ac</td><td>—</td><td>0.54 mi</td></tr><tr><td>5 Palfrey Street</td><td>0.14 ac</td><td>—</td><td>1.49 mi</td></tr></tbody></table></div>
+    <p class="lede"><b>3 new houses</b> went up on vacant lots within 1.5 miles since 2021. Assessor values run behind sale prices.</p>
+    <div class="src">Source: NYS assessment rolls 2021 → 2025 (lots vacant in 2021 that carry a house in 2025) · Suffolk County tax map</div>
+  </section>
+  <section>
+    <h2>Splits nearby since 2021 · precedent</h2>
+    <div class="ltw"><table><thead><tr><th>Where</th><th>Before</th><th>After</th><th>Built so far</th><th>Distance</th></tr></thead><tbody><tr><td>1022 Joselson Ave<span class='s'>Islip</span></td><td>1 parcel</td><td>2 lots</td><td>1 house · 1 vacant</td><td>0.28 mi</td></tr><tr><td>1098 Joselson Ave<span class='s'>Islip</span></td><td>1 parcel</td><td>2 lots</td><td>1 house · 1 vacant</td><td>0.4 mi</td></tr><tr><td>1434 N Clinton Ave<span class='s'>Islip</span></td><td>1 parcel</td><td>2 lots</td><td>1 house · 1 vacant</td><td>1.22 mi</td></tr><tr><td>Beech St<span class='s'>Islip</span></td><td>1 parcel</td><td>2 lots</td><td>1 house · 1 vacant</td><td>1.59 mi</td></tr><tr><td>1808 Heckscher Ave<span class='s'>Islip</span></td><td>1 parcel</td><td>2 lots</td><td>2 houses · 0 vacant</td><td>1.68 mi</td></tr></tbody></table></div>
+    
+    <div class="src">Source: NYS assessment rolls 2021 → 2025, parcel split detector (same engine that found Sycamore Estates)</div>
+  </section>
+
+  <p class="pitch"><b>The offer that fits:</b> buy the parcel at land-split value from an owner who already tried to sell, divide it into 2 conforming lots, and sell new houses into a market where new construction on vacant lots nearby carries strong values.</p>
+
+  <p class="foot"><span class="tag">Estimates</span> Lot counts assume the full parcel minus mapped wetlands, before roads and frontage, and need a surveyor's yield map. Owner names are masked; the full record, the phone and the trace are walked through on a call. Pulled Oct 15, 2026 from Suffolk County and New York State public records, town zoning maps and an Oct 4 MLS snapshot.</p>
+</div>
+
+<script src="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.js"></script>
+<script>
+(function () {
+  if (!window.maplibregl) return;
+  var reduce = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  var lot = {"type":"Feature","properties":{},"geometry":{"type":"Polygon","coordinates":[[[-73.2875072,40.7472861],[-73.287506,40.7470644],[-73.2877892,40.7470635],[-73.2880629,40.7470627],[-73.2883345,40.7470619],[-73.2886155,40.747061],[-73.2892203,40.7470591],[-73.2892216,40.7473107],[-73.2875074,40.747316],[-73.2875072,40.7472861]]]}};
+  var houses = {"type":"FeatureCollection","features":[{"type":"Feature","properties":{"h":4.5},"geometry":{"type":"Polygon","coordinates":[[[-73.2881009,40.7471342],[-73.2880654,40.7471342],[-73.288066,40.7470966],[-73.2881009,40.7470966],[-73.2881009,40.7471342]]]}},{"type":"Feature","properties":{"h":8.5},"geometry":{"type":"Polygon","coordinates":[[[-73.2890497,40.7470956],[-73.2890464,40.7472541],[-73.2890464,40.7472557],[-73.289045,40.7472998],[-73.2889183,40.7472983],[-73.2889196,40.7472557],[-73.2889203,40.7472257],[-73.2889015,40.7472257],[-73.2889022,40.7471962],[-73.2888962,40.7471962],[-73.2888968,40.7471627],[-73.2889029,40.7471632],[-73.2889035,40.7471185],[-73.2889143,40.747119],[-73.2889149,40.7471002],[-73.2889612,40.7471012],[-73.2889612,40.7470946],[-73.2890497,40.7470956]]]}}]};
+  var neighbors = {"type":"FeatureCollection","features":[{"type":"Feature","properties":{},"geometry":{"type":"Polygon","coordinates":[[[-73.287228,40.747063],[-73.287226,40.746612],[-73.28751,40.746612],[-73.287506,40.747064],[-73.287228,40.747063]]]}},{"type":"Feature","properties":{},"geometry":{"type":"Polygon","coordinates":[[[-73.288335,40.746611],[-73.288614,40.74661],[-73.288616,40.747061],[-73.288335,40.747062],[-73.288335,40.746611]]]}},{"type":"Feature","properties":{},"geometry":{"type":"Polygon","coordinates":[[[-73.288062,40.746611],[-73.288335,40.746611],[-73.288335,40.747062],[-73.288063,40.747063],[-73.288062,40.746611]]]}},{"type":"Feature","properties":{},"geometry":{"type":"Polygon","coordinates":[[[-73.285788,40.747289],[-73.287507,40.747286],[-73.287509,40.747522],[-73.285788,40.747523],[-73.285788,40.747289]]]}},{"type":"Feature","properties":{},"geometry":{"type":"Polygon","coordinates":[[[-73.285788,40.747065],[-73.287506,40.747064],[-73.287507,40.747286],[-73.285788,40.747289],[-73.285788,40.747065]]]}},{"type":"Feature","properties":{},"geometry":{"type":"Polygon","coordinates":[[[-73.28751,40.746612],[-73.287789,40.746612],[-73.287789,40.747064],[-73.287506,40.747064],[-73.28751,40.746612]]]}},{"type":"Feature","properties":{},"geometry":{"type":"Polygon","coordinates":[[[-73.288615,40.746847],[-73.289219,40.746845],[-73.28922,40.747059],[-73.288616,40.747061],[-73.288615,40.746847]]]}},{"type":"Feature","properties":{},"geometry":{"type":"Polygon","coordinates":[[[-73.287507,40.747316],[-73.289222,40.747311],[-73.289223,40.747517],[-73.287509,40.747522],[-73.287507,40.747316]]]}},{"type":"Feature","properties":{},"geometry":{"type":"Polygon","coordinates":[[[-73.287789,40.746612],[-73.288062,40.746611],[-73.288063,40.747063],[-73.287789,40.747064],[-73.287789,40.746612]]]}}]};
+  var map = new maplibregl.Map({ container: "map", style: "https://tiles.openfreemap.org/styles/dark", center: [-73.288196, 40.747143], zoom: 17.3, pitch: 58, bearing: -24, maxPitch: 75, attributionControl: { compact: true } });
+  map.addControl(new maplibregl.NavigationControl({ visualizePitch: true }), "top-right");
+  map.on("load", function () {
+    map.addLayer({ id: "nx-3d", type: "fill-extrusion", source: "openmaptiles", "source-layer": "building", minzoom: 13,
+      paint: { "fill-extrusion-color": ["interpolate", ["linear"], ["coalesce", ["get", "render_height"], 6], 0, "#1b2a5a", 25, "#2f5fc4", 70, "#4d9bff"], "fill-extrusion-height": ["coalesce", ["get", "render_height"], 6], "fill-extrusion-base": ["coalesce", ["get", "render_min_height"], 0], "fill-extrusion-opacity": 0.8 } });
+    map.addSource("nb", { type: "geojson", data: neighbors });
+    map.addLayer({ id: "nb-line", type: "line", source: "nb", paint: { "line-color": "#3b8cff", "line-width": 1.6, "line-opacity": 0.9 } });
+    map.addSource("lot", { type: "geojson", data: lot });
+    map.addLayer({ id: "lot-fill", type: "fill-extrusion", source: "lot", paint: { "fill-extrusion-color": "#12b76a", "fill-extrusion-height": 1.2, "fill-extrusion-base": 0, "fill-extrusion-opacity": 0.55 } });
+    map.addLayer({ id: "lot-line", type: "line", source: "lot", paint: { "line-color": "#12b76a", "line-width": 3 } });
+    map.addSource("asm", { type: "geojson", data: {"type":"FeatureCollection","features":[]} });
+    map.addLayer({ id: "asm-fill", type: "fill-extrusion", source: "asm", paint: { "fill-extrusion-color": "#7fe0b0", "fill-extrusion-height": 0.8, "fill-extrusion-base": 0, "fill-extrusion-opacity": 0.45 } });
+    map.addLayer({ id: "asm-line", type: "line", source: "asm", paint: { "line-color": "#7fe0b0", "line-width": 2.5, "line-dasharray": [2, 1.5] } });
+    map.addSource("hs", { type: "geojson", data: houses });
+    map.addLayer({ id: "hs", type: "fill-extrusion", source: "hs", paint: { "fill-extrusion-color": "#ffffff", "fill-extrusion-height": ["get", "h"], "fill-extrusion-base": 1.2, "fill-extrusion-opacity": 0.96 } });
+    map.once("idle", function () { window.__mapIdle = true; });
+    if (!reduce) {
+      var spinning = true;
+      var spin = function () { if (spinning) map.easeTo({ bearing: map.getBearing() + 30, duration: 14000, easing: function (t) { return t; } }); };
+      map.on("moveend", spin);
+      ["mousedown", "touchstart", "wheel", "dragstart"].forEach(function (ev) { map.on(ev, function () { spinning = false; }); });
+      spin();
+    }
+  });
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,176 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="robots" content="noindex,nofollow">
+<title>379 Smith Road Lead</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.css">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo+Narrow:wght@600;700&family=Public+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600&display=swap">
+<style>
+/* One-property subdivision lead: masthead, street photo, live 3D lot, the split math, the event, the owner path, precedent. True black, blue, green for good news only. */
+:root { --bg:#000000; --panel:#0c0f14; --line:#222a35; --fg:#ffffff; --fg2:#d3dbe6; --blue:#3b8cff; --green:#12b76a; --amber:#f2b44a;
+  --display:"Archivo Narrow","Arial Narrow","Roboto Condensed",sans-serif; --body:"Public Sans","Segoe UI",Arial,sans-serif; --mono:"IBM Plex Mono",Consolas,"Courier New",monospace; color-scheme:dark; }
+* { box-sizing:border-box; } html,body { margin:0; }
+body { background:var(--bg); color:var(--fg); font:400 16px/1.55 var(--body); padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px); }
+.wrap { max-width:1080px; margin:0 auto; padding-left:max(16px,env(safe-area-inset-left,0px)); padding-right:max(16px,env(safe-area-inset-right,0px)); padding-block:28px 56px; display:grid; gap:28px; }
+.mast { display:grid; gap:10px; }
+.eyebrow { font:600 15px/1.2 var(--mono); letter-spacing:.08em; text-transform:uppercase; color:var(--blue); display:flex; flex-wrap:wrap; gap:6px 16px; }
+h1 { margin:0; font:700 clamp(40px,7vw,66px)/1 var(--display); text-wrap:balance; }
+.sub { margin:0; font:500 18px/1.45 var(--body); color:var(--fg2); max-width:68ch; } .sub b { color:var(--green); }
+.ids { display:flex; flex-wrap:wrap; gap:6px 18px; font:500 15px/1.4 var(--mono); color:var(--fg2); }
+h2 { margin:0; font:700 28px/1.1 var(--display); text-wrap:balance; }
+.visuals { display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1fr); gap:14px; }
+@media (max-width:860px) { .visuals { grid-template-columns:1fr; } }
+figure { margin:0; display:grid; gap:8px; min-width:0; }
+figure img { width:100%; height:340px; object-fit:cover; border-radius:8px; border:1px solid var(--line); display:block; background:var(--panel); }
+figcaption { font-size:15px; color:var(--fg2); }
+.mapbox { position:relative; height:340px; border-radius:8px; border:1px solid var(--line); overflow:hidden; background:var(--panel); }
+#map { position:absolute; inset:0; }
+.legend { position:absolute; left:10px; bottom:10px; display:grid; gap:4px; padding:8px 10px; border-radius:6px; background:rgba(0,0,0,.72); font-size:15px; pointer-events:none; }
+.legend span { display:flex; align-items:center; gap:8px; } .legend i { width:14px; height:14px; border-radius:3px; display:inline-block; }
+.maprow { display:flex; flex-wrap:wrap; gap:8px 16px; align-items:center; justify-content:space-between; }
+.btn { display:inline-flex; align-items:center; gap:8px; font:600 15px/1 var(--body); color:var(--fg); border:1px solid var(--blue); border-radius:6px; padding:10px 14px; text-decoration:none; }
+.btn:hover { background:rgba(59,140,255,.16); }
+.band { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); border:1px solid var(--line); border-radius:8px; overflow:hidden; }
+@media (max-width:760px) { .band { grid-template-columns:repeat(2,minmax(0,1fr)); } } @media (max-width:420px) { .band { grid-template-columns:1fr; } }
+.cell { padding:16px 18px; border-right:1px solid var(--line); border-bottom:1px solid var(--line); display:grid; gap:4px; align-content:start; min-width:0; background:var(--panel); }
+.cell .k { font:600 15px/1.2 var(--body); letter-spacing:.04em; text-transform:uppercase; color:var(--fg2); }
+.cell .v { font:700 28px/1.1 var(--display); font-variant-numeric:tabular-nums; overflow-wrap:anywhere; } .cell .n { font-size:15px; color:var(--fg2); }
+.cell.good .v { color:var(--green); }
+section { display:grid; gap:14px; }
+.lede { margin:0; max-width:70ch; color:var(--fg2); } .lede b { color:var(--fg); }
+dl { margin:0; display:grid; grid-template-columns:repeat(auto-fit,minmax(320px,1fr)); column-gap:24px; border-top:1px solid var(--line); }
+dl div { display:grid; grid-template-columns:42% 58%; gap:12px; padding:11px 0; border-bottom:1px solid var(--line); }
+dt { color:var(--fg2); font-weight:600; } dd { margin:0; overflow-wrap:anywhere; }
+.ltw { overflow-x:auto; border:1px solid var(--line); border-radius:8px; }
+table { border-collapse:collapse; width:100%; min-width:600px; font-size:15px; }
+th,td { text-align:left; padding:10px 14px; border-bottom:1px solid var(--line); vertical-align:top; }
+th { font:600 15px/1.2 var(--body); letter-spacing:.04em; text-transform:uppercase; color:var(--fg2); background:var(--panel); }
+tbody tr:last-child td { border-bottom:0; } tr.tot td { font-weight:700; color:var(--green); background:var(--panel); }
+td .s { display:block; color:var(--fg2); }
+.src { font:500 15px/1.4 var(--mono); color:var(--fg2); }
+.pitch { margin:0; border-left:4px solid var(--blue); padding:14px 18px; background:var(--panel); max-width:76ch; }
+.tag { display:inline-block; font:600 15px/1.2 var(--mono); padding:2px 8px; border-radius:4px; border:1px solid var(--line); color:var(--amber); }
+.foot { margin:0; font-size:15px; color:var(--fg2); border-top:1px solid var(--line); padding-top:14px; max-width:80ch; }
+.maplibregl-ctrl-attrib { font-size:11px; }
+:focus-visible { outline:3px solid var(--blue); outline-offset:2px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="mast">
+    <div class="eyebrow"><span>Lead report</span><span>Centereach, Brookhaven</span><span>Oct 15, 2026</span><span>Subdivision target</span></div>
+    <h1>379 Smith Road</h1>
+    <p class="sub">A 3.13-acre lot with a 1996 house in Centereach, zoned B1 (22,500 sq ft lots). Listed at $1,999,000 and the listing expired without a sale or a relist. Under town zoning and the county septic rule it holds <b>6 house lots</b>. Last deed recorded 2021.</p>
+    <div class="ids"><span>SCTM 0200-62200-0100-014004</span><span>SWIS 472289 · 622.00-01-014.004</span><span>Ronkonkoma, NY 11779</span></div>
+  </header>
+
+  <div class="visuals">
+    <figure>
+      <img src="media/lead-379-smith-road-street.jpg" alt="Street view toward 379 Smith Road" width="1600" height="712">
+      <figcaption>Street view, Jul 2024, from Smith Rd, facing the lot.</figcaption>
+    </figure>
+    <figure>
+      <div class="mapbox">
+        <div id="map" role="img" aria-label="3D map of the lot at 379 Smith Road with neighboring lots"></div>
+        <div class="legend"><span><i style="background:#12b76a"></i>The lot · 3.13 ac</span><span><i style="background:#ffffff"></i>Buildings on it</span><span><i style="background:transparent;border:2px solid #3b8cff"></i>Neighbor lots</span></div>
+      </div>
+      <div class="maprow"><figcaption>Live 3D map. Drag to turn, scroll to zoom.</figcaption><a class="btn" href="https://www.google.com/maps/@40.838530,-73.087966,170a,35y,60t/data=!3m1!1e3" target="_blank" rel="noopener">Open in Google 3D</a></div>
+    </figure>
+  </div>
+
+  <div class="band" aria-label="Key numbers"><div class="cell"><div class="k">Lot</div><div class="v">3.13 ac</div><div class="n">136,299 sq ft</div></div><div class="cell"><div class="k">Zoning</div><div class="v">B1</div><div class="n">22,500 sq ft per house</div></div><div class="cell good"><div class="k">Lots by right</div><div class="v">6</div><div class="n">zoning binds</div></div><div class="cell"><div class="k">Last asking</div><div class="v">$2M</div><div class="n">expired · 60 days on market</div></div><div class="cell"><div class="k">Last deed</div><div class="v">2021</div><div class="n">price not recorded</div></div><div class="cell"><div class="k">Owner</div><div class="v">S. W.</div><div class="n">Lives at the property</div></div></div>
+
+  <section>
+    <h2>Subdivision math</h2>
+    <div class="ltw"><table><thead><tr><th>Step</th><th>Figure</th><th>Basis</th></tr></thead><tbody><tr><td>Lot area</td><td>136,299 sq ft · 3.13 ac</td><td>County tax map parcel outline</td></tr><tr><td>Wetlands on the lot</td><td>None mapped</td><td>County freshwater + tidal wetland maps</td></tr><tr><td>Net buildable area</td><td>136,299 sq ft</td><td></td></tr><tr><td>Zoning minimum per house</td><td>22,500 sq ft</td><td>B1 · Brookhaven zoning sheet 04-20-26 · §85-177</td></tr><tr><td>Septic minimum per house</td><td>20,000 sq ft</td><td>Groundwater Zone I · §760-608(B)</td></tr><tr><td>Binding rule</td><td>Town zoning</td><td>22,500 sq ft per house</td></tr><tr class="tot"><td>House lots by right</td><td>6</td><td>about 5 after a road takes ~15%</td></tr></tbody></table></div>
+    <p class="lede"><b>What this means:</b> the lot divides into <b>6</b> conforming house lots before roads, frontage and flag-lot rules. Lots under 40,000 sq ft need public water (§760-609). A surveyor's yield map confirms the count.</p>
+    <div class="src">Source: Brookhaven zoning sheet 04-20-26 · §85-177 · Suffolk County Sanitary Code Article 6 §760-608(B), §760-609 · Suffolk County tax map (lot area) · county wetland maps</div>
+  </section>
+  <section>
+    <h2>Listing history · the event</h2>
+    <dl><div><dt>Last asking price</dt><dd><b>$1,999,000</b></dd></div><div><dt>Times listed</dt><dd>1</dd></div><div><dt>Days on market</dt><dd>60</dd></div><div><dt>Expired</dt><dd>3 to 6 months before Oct 4</dd></div><div><dt>Relisted since</dt><dd>No</dd></div><div><dt>Sold since</dt><dd>No</dd></div><div><dt>Listing said</dt><dd>4 bed · 3 full bath · 4,216 sq ft · built 1996</dd></div><div><dt>Lot per listing</dt><dd>3.3 ac · county map says 3.13 ac</dd></div></dl>
+    <p class="lede"><b>Why now:</b> the owner already decided to sell and the market didn't take it at $2M. The listing agreement is over, so the owner can talk to anyone.</p>
+    <div class="src">Source: MLS snapshot pulled Oct 4, 2026 (expired, active and sold listings, last 12 months)</div>
+  </section>
+  <section>
+    <h2>Owner & how to reach them</h2>
+    <dl><div><dt>Owner of record</dt><dd><b>S. W.</b> · name on file</dd></div><div><dt>Owner type</dt><dd>Lives at the property</dd></div><div><dt>Mailing address</dt><dd>Same as the property</dd></div><div><dt>Held since</dt><dd>Deed 2021 · same owner on the 2025 roll</dd></div><div><dt>Deed on record</dt><dd>Apr 2021 · liber/page 13100 0943</dd></div><div><dt>Price on that deed</dt><dd>Not recorded</dd></div><div><dt>Owner phone</dt><dd>Not traced · filled at install (NY bundle, then skip trace on misses)</dd></div><div><dt>Reach tier</dt><dd>R1 · Lives at the property</dd></div></dl>
+    
+    <div class="src">Source: NYS assessment roll 2025 + 2021 (data.ny.gov 7vem-aaz7) · Suffolk County deed transfers</div>
+  </section>
+  <section>
+    <h2>Portfolio linkage · other parcels, same owner</h2>
+    <div class="ltw"><table><thead><tr><th>Result</th></tr></thead><tbody><tr><td>No other Suffolk parcel under this owner's name and mailing address.</td></tr></tbody></table></div>
+    
+    <div class="src">Source: NYS assessment roll 2025, Suffolk County · matched on owner name + mailing address</div>
+  </section>
+  <section>
+    <h2>Site checks</h2>
+    <dl><div><dt>Groundwater zone</dt><dd>Zone I · 20,000 sq ft per house on septic</dd></div><div><dt>Sewer district</dt><dd>None · septic</dd></div><div><dt>Freshwater wetlands</dt><dd>None within 100 ft</dd></div><div><dt>Tidal wetlands</dt><dd>None</dd></div><div><dt>Flood zone</dt><dd>Not in a mapped flood hazard area</dd></div><div><dt>Pine Barrens</dt><dd>Outside</dd></div><div><dt>Development rights sold</dt><dd>None on file</dd></div><div><dt>Filed subdivision map</dt><dd>First Agricultural City Co. At Ronkonkoma · map 00580, lot OP</dd></div><div><dt>Nearest LIRR station</dt><dd>Ronkonkoma · 2.3 mi (LIRR Main Line)</dd></div><div><dt>School district</dt><dd></dd></div></dl>
+    <p class="lede">The lot sits on a filed subdivision map, so a re-subdivision goes back to the town planning board as a map amendment.</p>
+    <div class="src">Source: Suffolk County GIS: groundwater management zones, sanitation districts, wetlands, Pine Barrens, conservation easements, farmland PDR, filed maps · FEMA flood hazard layer</div>
+  </section>
+  <section>
+    <h2>Neighbors · assemblage</h2>
+    <div class="ltw"><table><thead><tr><th>Address</th><th>Lot</th><th>Use</th><th>Owner</th></tr></thead><tbody><tr><td>225 Rustic Road</td><td>4.75 ac</td><td>One-family home</td><td>Individual · lives there</td></tr><tr><td>256 Holbrook Avenue</td><td>1.41 ac</td><td>One-family home</td><td>Individual · lives there</td></tr><tr><td>383 Smith Road</td><td>1.35 ac</td><td>One-family home</td><td>Individual · lives there</td></tr><tr><td>367 Smith Road</td><td>0.91 ac</td><td>One-family home</td><td>Individual · lives there</td></tr><tr><td>235 Rustic Road</td><td>0.71 ac</td><td>One-family home</td><td>Individual · lives there</td></tr><tr><td>35 Shelton Court</td><td>0.58 ac</td><td>One-family home</td><td>Individual · lives there</td></tr><tr><td>375 Smith Road</td><td>0.56 ac</td><td>One-family home</td><td>Individual · lives there</td></tr></tbody></table></div>
+    
+    <div class="src">Source: Suffolk County tax map · NYS assessment roll 2025</div>
+  </section>
+  <section>
+    <h2>New houses nearby · the exit</h2>
+    <div class="ltw"><table><thead><tr><th>Address</th><th>Lot</th><th>2025 market value</th><th>Distance</th></tr></thead><tbody><tr><td></td><td>0.99 ac</td><td>$1,041,666</td><td>0.11 mi</td></tr><tr><td>59 Woodview Lane</td><td>0.34 ac</td><td>$729,167</td><td>0.48 mi</td></tr><tr><td></td><td>0.25 ac</td><td>$729,167</td><td>0.76 mi</td></tr><tr><td>179 Avenue B</td><td>0.28 ac</td><td>$770,834</td><td>0.94 mi</td></tr><tr><td></td><td>0.27 ac</td><td>$791,667</td><td>1.08 mi</td></tr><tr><td>159 Holbrook Road</td><td>0.49 ac</td><td>$437,500</td><td>1.09 mi</td></tr></tbody></table></div>
+    <p class="lede"><b>14 new houses</b> went up on vacant lots within 1.5 miles since 2021, median 2025 market value <b>$765,626</b>. Assessor values run behind sale prices.</p>
+    <div class="src">Source: NYS assessment rolls 2021 → 2025 (lots vacant in 2021 that carry a house in 2025) · Suffolk County tax map</div>
+  </section>
+  <section>
+    <h2>Splits nearby since 2021 · precedent</h2>
+    <div class="ltw"><table><thead><tr><th>Result</th></tr></thead><tbody><tr><td>No residential splits within 3 miles on the 2021 → 2025 rolls.</td></tr></tbody></table></div>
+    
+    <div class="src">Source: NYS assessment rolls 2021 → 2025, parcel split detector (same engine that found Sycamore Estates)</div>
+  </section>
+
+  <p class="pitch"><b>The offer that fits:</b> buy the parcel at land-split value from an owner who already tried to sell, divide it into 6 conforming lots, and sell new houses into a market where new construction on vacant lots nearby carries a median $765,626 assessed market value.</p>
+
+  <p class="foot"><span class="tag">Estimates</span> Lot counts assume the full parcel minus mapped wetlands, before roads and frontage, and need a surveyor's yield map. Owner names are masked; the full record, the phone and the trace are walked through on a call. Pulled Oct 15, 2026 from Suffolk County and New York State public records, town zoning maps and an Oct 4 MLS snapshot.</p>
+</div>
+
+<script src="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.js"></script>
+<script>
+(function () {
+  if (!window.maplibregl) return;
+  var reduce = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  var lot = {"type":"Feature","properties":{},"geometry":{"type":"Polygon","coordinates":[[[-73.087469,40.8388794],[-73.0873724,40.8382333],[-73.0873029,40.8377686],[-73.0881092,40.8376881],[-73.088187,40.8381868],[-73.0886538,40.8381468],[-73.0886892,40.8383846],[-73.0887431,40.8387466],[-73.0877156,40.8388566],[-73.0878195,40.839456],[-73.0875587,40.8394789],[-73.087469,40.8388794]]]}};
+  var houses = {"type":"FeatureCollection","features":[{"type":"Feature","properties":{"h":8.5},"geometry":{"type":"Polygon","coordinates":[[[-73.0878545,40.8380589],[-73.0878445,40.8380589],[-73.0878485,40.8381121],[-73.0877519,40.8381162],[-73.0877506,40.8380984],[-73.0876976,40.8381005],[-73.0876983,40.8381081],[-73.087644,40.8381101],[-73.0876433,40.8381025],[-73.0876319,40.838103],[-73.0876326,40.8381106],[-73.0875474,40.8381142],[-73.0875394,40.8380021],[-73.0876245,40.8379985],[-73.0876232,40.8379742],[-73.0876889,40.8379716],[-73.0876909,40.837996],[-73.0877345,40.8379939],[-73.0877338,40.8379914],[-73.0877942,40.8379889],[-73.0877942,40.8379919],[-73.0878498,40.8379894],[-73.0878545,40.8380589]]]}},{"type":"Feature","properties":{"h":8.5},"geometry":{"type":"Polygon","coordinates":[[[-73.0883756,40.8386458],[-73.0881838,40.8386611],[-73.0881596,40.838487],[-73.0883514,40.8384718],[-73.0883756,40.8386458]]]}},{"type":"Feature","properties":{"h":4.5},"geometry":{"type":"Polygon","coordinates":[[[-73.0880436,40.8382623],[-73.0879658,40.8382684],[-73.0879558,40.8381969],[-73.0880336,40.8381908],[-73.0880436,40.8382623]]]}},{"type":"Feature","properties":{"h":8.5},"geometry":{"type":"Polygon","coordinates":[[[-73.0882649,40.8383947],[-73.0881992,40.8383998],[-73.0881965,40.838377],[-73.0880872,40.8383856],[-73.0880765,40.838308],[-73.0881858,40.8382993],[-73.0881865,40.8383034],[-73.0882193,40.8383009],[-73.0882186,40.8382963],[-73.0882508,40.8382938],[-73.0882602,40.8383602],[-73.088228,40.8383628],[-73.0882294,40.8383744],[-73.0882616,40.8383719],[-73.0882649,40.8383947]]]}},{"type":"Feature","properties":{"h":4.5},"geometry":{"type":"Polygon","coordinates":[[[-73.0876292,40.8385454],[-73.0875736,40.8385474],[-73.0875709,40.8385139],[-73.0875863,40.8385134],[-73.087585,40.8384926],[-73.0876252,40.8384911],[-73.0876292,40.8385454]]]}},{"type":"Feature","properties":{"h":4.5},"geometry":{"type":"Polygon","coordinates":[[[-73.0885794,40.8384997],[-73.0885432,40.8385002],[-73.0885425,40.8384749],[-73.0885794,40.8384744],[-73.0885794,40.8384997]]]}}]};
+  var neighbors = {"type":"FeatureCollection","features":[{"type":"Feature","properties":{},"geometry":{"type":"Polygon","coordinates":[[[-73.087303,40.837769],[-73.087469,40.838879],[-73.087181,40.838898],[-73.087139,40.83852],[-73.086761,40.838544],[-73.086679,40.837799],[-73.087303,40.837769]]]}},{"type":"Feature","properties":{},"geometry":{"type":"Polygon","coordinates":[[[-73.088109,40.837688],[-73.088325,40.837666],[-73.088573,40.837626],[-73.088654,40.838147],[-73.088187,40.838187],[-73.088109,40.837688]]]}},{"type":"Feature","properties":{},"geometry":{"type":"Polygon","coordinates":[[[-73.087819,40.839456],[-73.087716,40.838857],[-73.089685,40.838651],[-73.08972,40.838855],[-73.090168,40.838811],[-73.090282,40.839484],[-73.087864,40.839721],[-73.087819,40.839456]]]}},{"type":"Feature","properties":{},"geometry":{"type":"Polygon","coordinates":[[[-73.088689,40.838385],[-73.089194,40.838334],[-73.089182,40.838267],[-73.089376,40.838247],[-73.089439,40.838621],[-73.090106,40.838555],[-73.090115,40.838609],[-73.088743,40.838747],[-73.088689,40.838385]]]}},{"type":"Feature","properties":{},"geometry":{"type":"Polygon","coordinates":[[[-73.086932,40.839266],[-73.086214,40.839326],[-73.086176,40.838984],[-73.087469,40.838879],[-73.087559,40.839479],[-73.086935,40.839535],[-73.086932,40.839266]]]}},{"type":"Feature","properties":{},"geometry":{"type":"Polygon","coordinates":[[[-73.087341,40.839915],[-73.087353,40.839498],[-73.087819,40.839456],[-73.087889,40.839872],[-73.087507,40.840079],[-73.087511,40.840054],[-73.087504,40.840016],[-73.087469,40.839965],[-73.08741,40.83993],[-73.087341,40.839915]]]}},{"type":"Feature","properties":{},"geometry":{"type":"Polygon","coordinates":[[[-73.088654,40.838147],[-73.088573,40.837626],[-73.089072,40.837547],[-73.089194,40.838334],[-73.088689,40.838385],[-73.088654,40.838147]]]}}]};
+  var map = new maplibregl.Map({ container: "map", style: "https://tiles.openfreemap.org/styles/dark", center: [-73.087966, 40.83853], zoom: 16.9, pitch: 58, bearing: -24, maxPitch: 75, attributionControl: { compact: true } });
+  map.addControl(new maplibregl.NavigationControl({ visualizePitch: true }), "top-right");
+  map.on("load", function () {
+    map.addLayer({ id: "nx-3d", type: "fill-extrusion", source: "openmaptiles", "source-layer": "building", minzoom: 13,
+      paint: { "fill-extrusion-color": ["interpolate", ["linear"], ["coalesce", ["get", "render_height"], 6], 0, "#1b2a5a", 25, "#2f5fc4", 70, "#4d9bff"], "fill-extrusion-height": ["coalesce", ["get", "render_height"], 6], "fill-extrusion-base": ["coalesce", ["get", "render_min_height"], 0], "fill-extrusion-opacity": 0.8 } });
+    map.addSource("nb", { type: "geojson", data: neighbors });
+    map.addLayer({ id: "nb-line", type: "line", source: "nb", paint: { "line-color": "#3b8cff", "line-width": 1.6, "line-opacity": 0.9 } });
+    map.addSource("lot", { type: "geojson", data: lot });
+    map.addLayer({ id: "lot-fill", type: "fill-extrusion", source: "lot", paint: { "fill-extrusion-color": "#12b76a", "fill-extrusion-height": 1.2, "fill-extrusion-base": 0, "fill-extrusion-opacity": 0.55 } });
+    map.addLayer({ id: "lot-line", type: "line", source: "lot", paint: { "line-color": "#12b76a", "line-width": 3 } });
+    map.addSource("asm", { type: "geojson", data: {"type":"FeatureCollection","features":[]} });
+    map.addLayer({ id: "asm-fill", type: "fill-extrusion", source: "asm", paint: { "fill-extrusion-color": "#7fe0b0", "fill-extrusion-height": 0.8, "fill-extrusion-base": 0, "fill-extrusion-opacity": 0.45 } });
+    map.addLayer({ id: "asm-line", type: "line", source: "asm", paint: { "line-color": "#7fe0b0", "line-width": 2.5, "line-dasharray": [2, 1.5] } });
+    map.addSource("hs", { type: "geojson", data: houses });
+    map.addLayer({ id: "hs", type: "fill-extrusion", source: "hs", paint: { "fill-extrusion-color": "#ffffff", "fill-extrusion-height": ["get", "h"], "fill-extrusion-base": 1.2, "fill-extrusion-opacity": 0.96 } });
+    map.once("idle", function () { window.__mapIdle = true; });
+    if (!reduce) {
+      var spinning = true;
+      var spin = function () { if (spinning) map.easeTo({ bearing: map.getBearing() + 30, duration: 14000, easing: function (t) { return t; } }); };
+      map.on("moveend", spin);
+      ["mousedown", "touchstart", "wheel", "dragstart"].forEach(function (ev) { map.on(ev, function () { spinning = false; }); });
+      spin();
+    }
+  });
+})();
+</script>
+</body>
+</html>

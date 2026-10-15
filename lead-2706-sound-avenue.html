@@ -1,0 +1,182 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="robots" content="noindex,nofollow">
+<title>2706 Sound Avenue Lead</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.css">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo+Narrow:wght@600;700&family=Public+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600&display=swap">
+<style>
+/* One-property subdivision lead: masthead, street photo, live 3D lot, the split math, the event, the owner path, precedent. True black, blue, green for good news only. */
+:root { --bg:#000000; --panel:#0c0f14; --line:#222a35; --fg:#ffffff; --fg2:#d3dbe6; --blue:#3b8cff; --green:#12b76a; --amber:#f2b44a;
+  --display:"Archivo Narrow","Arial Narrow","Roboto Condensed",sans-serif; --body:"Public Sans","Segoe UI",Arial,sans-serif; --mono:"IBM Plex Mono",Consolas,"Courier New",monospace; color-scheme:dark; }
+* { box-sizing:border-box; } html,body { margin:0; }
+body { background:var(--bg); color:var(--fg); font:400 16px/1.55 var(--body); padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px); }
+.wrap { max-width:1080px; margin:0 auto; padding-left:max(16px,env(safe-area-inset-left,0px)); padding-right:max(16px,env(safe-area-inset-right,0px)); padding-block:28px 56px; display:grid; gap:28px; }
+.mast { display:grid; gap:10px; }
+.eyebrow { font:600 15px/1.2 var(--mono); letter-spacing:.08em; text-transform:uppercase; color:var(--blue); display:flex; flex-wrap:wrap; gap:6px 16px; }
+h1 { margin:0; font:700 clamp(40px,7vw,66px)/1 var(--display); text-wrap:balance; }
+.sub { margin:0; font:500 18px/1.45 var(--body); color:var(--fg2); max-width:68ch; } .sub b { color:var(--green); }
+.ids { display:flex; flex-wrap:wrap; gap:6px 18px; font:500 15px/1.4 var(--mono); color:var(--fg2); }
+h2 { margin:0; font:700 28px/1.1 var(--display); text-wrap:balance; }
+.visuals { display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1fr); gap:14px; }
+@media (max-width:860px) { .visuals { grid-template-columns:1fr; } }
+figure { margin:0; display:grid; gap:8px; min-width:0; }
+figure img { width:100%; height:340px; object-fit:cover; border-radius:8px; border:1px solid var(--line); display:block; background:var(--panel); }
+figcaption { font-size:15px; color:var(--fg2); }
+.mapbox { position:relative; height:340px; border-radius:8px; border:1px solid var(--line); overflow:hidden; background:var(--panel); }
+#map { position:absolute; inset:0; }
+.legend { position:absolute; left:10px; bottom:10px; display:grid; gap:4px; padding:8px 10px; border-radius:6px; background:rgba(0,0,0,.72); font-size:15px; pointer-events:none; }
+.legend span { display:flex; align-items:center; gap:8px; } .legend i { width:14px; height:14px; border-radius:3px; display:inline-block; }
+.maprow { display:flex; flex-wrap:wrap; gap:8px 16px; align-items:center; justify-content:space-between; }
+.btn { display:inline-flex; align-items:center; gap:8px; font:600 15px/1 var(--body); color:var(--fg); border:1px solid var(--blue); border-radius:6px; padding:10px 14px; text-decoration:none; }
+.btn:hover { background:rgba(59,140,255,.16); }
+.band { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); border:1px solid var(--line); border-radius:8px; overflow:hidden; }
+@media (max-width:760px) { .band { grid-template-columns:repeat(2,minmax(0,1fr)); } } @media (max-width:420px) { .band { grid-template-columns:1fr; } }
+.cell { padding:16px 18px; border-right:1px solid var(--line); border-bottom:1px solid var(--line); display:grid; gap:4px; align-content:start; min-width:0; background:var(--panel); }
+.cell .k { font:600 15px/1.2 var(--body); letter-spacing:.04em; text-transform:uppercase; color:var(--fg2); }
+.cell .v { font:700 28px/1.1 var(--display); font-variant-numeric:tabular-nums; overflow-wrap:anywhere; } .cell .n { font-size:15px; color:var(--fg2); }
+.cell.good .v { color:var(--green); }
+section { display:grid; gap:14px; }
+.lede { margin:0; max-width:70ch; color:var(--fg2); } .lede b { color:var(--fg); }
+dl { margin:0; display:grid; grid-template-columns:repeat(auto-fit,minmax(320px,1fr)); column-gap:24px; border-top:1px solid var(--line); }
+dl div { display:grid; grid-template-columns:42% 58%; gap:12px; padding:11px 0; border-bottom:1px solid var(--line); }
+dt { color:var(--fg2); font-weight:600; } dd { margin:0; overflow-wrap:anywhere; }
+.ltw { overflow-x:auto; border:1px solid var(--line); border-radius:8px; }
+table { border-collapse:collapse; width:100%; min-width:600px; font-size:15px; }
+th,td { text-align:left; padding:10px 14px; border-bottom:1px solid var(--line); vertical-align:top; }
+th { font:600 15px/1.2 var(--body); letter-spacing:.04em; text-transform:uppercase; color:var(--fg2); background:var(--panel); }
+tbody tr:last-child td { border-bottom:0; } tr.tot td { font-weight:700; color:var(--green); background:var(--panel); }
+td .s { display:block; color:var(--fg2); }
+.src { font:500 15px/1.4 var(--mono); color:var(--fg2); }
+.pitch { margin:0; border-left:4px solid var(--blue); padding:14px 18px; background:var(--panel); max-width:76ch; }
+.tag { display:inline-block; font:600 15px/1.2 var(--mono); padding:2px 8px; border-radius:4px; border:1px solid var(--line); color:var(--amber); }
+.foot { margin:0; font-size:15px; color:var(--fg2); border-top:1px solid var(--line); padding-top:14px; max-width:80ch; }
+.maplibregl-ctrl-attrib { font-size:11px; }
+:focus-visible { outline:3px solid var(--blue); outline-offset:2px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="mast">
+    <div class="eyebrow"><span>Lead report</span><span>Baiting Hollow, Riverhead</span><span>Oct 15, 2026</span><span>Subdivision target</span></div>
+    <h1>2706 Sound Avenue</h1>
+    <p class="sub">A 13.15-acre lot with a 2001 house in Baiting Hollow, zoned RA-80 (80,000 sq ft lots). Listed at $1,600,000 and the listing expired without a sale or a relist. Under town zoning and the county septic rule it holds <b>7 house lots</b>. Last deed recorded 2026.</p>
+    <div class="ids"><span>SCTM 0600-04100-0100-003020</span><span>SWIS 473000 · 41.-1-3.20</span><span>Riverhead, NY 11901</span></div>
+  </header>
+
+  <div class="visuals">
+    <figure>
+      <img src="media/lead-2706-sound-avenue-street.jpg" alt="Street view toward 2706 Sound Avenue" width="1600" height="712">
+      <figcaption>Street view, Aug 2024, from Sound Ave, facing the lot.</figcaption>
+    </figure>
+    <figure>
+      <div class="mapbox">
+        <div id="map" role="img" aria-label="3D map of the lot at 2706 Sound Avenue with neighboring lots"></div>
+        <div class="legend"><span><i style="background:#12b76a"></i>The lot · 13.15 ac</span><span><i style="background:#ffffff"></i>Buildings on it</span><span><i style="background:transparent;border:2px solid #3b8cff"></i>Neighbor lots</span></div>
+      </div>
+      <div class="maprow"><figcaption>Live 3D map. Drag to turn, scroll to zoom.</figcaption><a class="btn" href="https://www.google.com/maps/@40.960305,-72.730814,170a,35y,60t/data=!3m1!1e3" target="_blank" rel="noopener">Open in Google 3D</a></div>
+    </figure>
+  </div>
+
+  <div class="band" aria-label="Key numbers"><div class="cell"><div class="k">Lot</div><div class="v">13.15 ac</div><div class="n">572,697 sq ft</div></div><div class="cell"><div class="k">Zoning</div><div class="v">RA-80</div><div class="n">80,000 sq ft per house</div></div><div class="cell good"><div class="k">Lots by right</div><div class="v">7</div><div class="n">zoning binds</div></div><div class="cell"><div class="k">Last asking</div><div class="v">$1.6M</div><div class="n">expired · 103 days on market</div></div><div class="cell"><div class="k">Last deed</div><div class="v">2026</div><div class="n">price not recorded</div></div><div class="cell"><div class="k">Owner</div><div class="v">K. P.</div><div class="n">Lives at the property</div></div></div>
+
+  <section>
+    <h2>Subdivision math</h2>
+    <div class="ltw"><table><thead><tr><th>Step</th><th>Figure</th><th>Basis</th></tr></thead><tbody><tr><td>Lot area</td><td>572,697 sq ft · 13.15 ac</td><td>County tax map parcel outline</td></tr><tr><td>Wetlands on the lot</td><td>None mapped</td><td>County freshwater + tidal wetland maps</td></tr><tr><td>Net buildable area</td><td>572,697 sq ft</td><td></td></tr><tr><td>Zoning minimum per house</td><td>80,000 sq ft</td><td>RA-80 · Riverhead Ch. 301 RA80 · Zoning Schedule (confirm)</td></tr><tr><td>Septic minimum per house</td><td>20,000 sq ft</td><td>Groundwater Zone VIII · §760-608(B)</td></tr><tr><td>Binding rule</td><td>Town zoning</td><td>80,000 sq ft per house</td></tr><tr class="tot"><td>House lots by right</td><td>7</td><td>about 6 after a road takes ~15%</td></tr></tbody></table></div>
+    <p class="lede"><b>What this means:</b> the lot divides into <b>7</b> conforming house lots before roads, frontage and flag-lot rules.  A surveyor's yield map confirms the count.</p>
+    <div class="src">Source: Riverhead Ch. 301 RA80 · Zoning Schedule (confirm) · Suffolk County Sanitary Code Article 6 §760-608(B), §760-609 · Suffolk County tax map (lot area) · county wetland maps</div>
+  </section>
+  <section>
+    <h2>Research flags</h2>
+    <dl><div><dt>Check first</dt><dd>New deed recorded Jul 2026, after the 2025 roll. The owner may have changed; confirm before outreach.</dd></div><div><dt>Also</dt><dd>13 acres on Sound Avenue next to a 349-acre golf course parcel; check for farmland or open-space restrictions before pricing the split.</dd></div></dl>
+    
+    <div class="src">Source: Suffolk County deed transfers · FEMA flood hazard layer · NYS assessment roll 2025</div>
+  </section>
+  <section>
+    <h2>Listing history · the event</h2>
+    <dl><div><dt>Last asking price</dt><dd><b>$1,600,000</b></dd></div><div><dt>Times listed</dt><dd>1</dd></div><div><dt>Days on market</dt><dd>103</dd></div><div><dt>Expired</dt><dd>6 to 12 months before Oct 4</dd></div><div><dt>Relisted since</dt><dd>No</dd></div><div><dt>Sold since</dt><dd>No</dd></div><div><dt>Listing said</dt><dd>4 bed · 2 full bath · 2,640 sq ft · built 2001</dd></div><div><dt>Lot per listing</dt><dd>13.15 ac · county map says 13.15 ac</dd></div></dl>
+    <p class="lede"><b>Why now:</b> the owner already decided to sell and the market didn't take it at $1.6M. The listing agreement is over, so the owner can talk to anyone.</p>
+    <div class="src">Source: MLS snapshot pulled Oct 4, 2026 (expired, active and sold listings, last 12 months)</div>
+  </section>
+  <section>
+    <h2>Owner & how to reach them</h2>
+    <dl><div><dt>Owner of record</dt><dd><b>K. P.</b> · name on file</dd></div><div><dt>Owner type</dt><dd>Lives at the property</dd></div><div><dt>Mailing address</dt><dd>Same as the property</dd></div><div><dt>Held since</dt><dd>Deed 2026 · recorded after the 2025 roll, verify</dd></div><div><dt>Deed on record</dt><dd>Jul 2026 · liber/page 13341 0468</dd></div><div><dt>Price on that deed</dt><dd>Not recorded</dd></div><div><dt>Owner phone</dt><dd>Not traced · filled at install (NY bundle, then skip trace on misses)</dd></div><div><dt>Reach tier</dt><dd>R1 · Lives at the property</dd></div></dl>
+    
+    <div class="src">Source: NYS assessment roll 2025 + 2021 (data.ny.gov 7vem-aaz7) · Suffolk County deed transfers</div>
+  </section>
+  <section>
+    <h2>Portfolio linkage · other parcels, same owner</h2>
+    <div class="ltw"><table><thead><tr><th>Result</th></tr></thead><tbody><tr><td>No other Suffolk parcel under this owner's name and mailing address.</td></tr></tbody></table></div>
+    
+    <div class="src">Source: NYS assessment roll 2025, Suffolk County · matched on owner name + mailing address</div>
+  </section>
+  <section>
+    <h2>Site checks</h2>
+    <dl><div><dt>Groundwater zone</dt><dd>Zone VIII · 20,000 sq ft per house on septic</dd></div><div><dt>Sewer district</dt><dd>None · septic</dd></div><div><dt>Freshwater wetlands</dt><dd>None within 100 ft</dd></div><div><dt>Tidal wetlands</dt><dd>Adjacent Area (AA)</dd></div><div><dt>Flood zone</dt><dd>Not in a mapped flood hazard area</dd></div><div><dt>Pine Barrens</dt><dd>Outside</dd></div><div><dt>Development rights sold</dt><dd>None on file</dd></div><div><dt>Filed subdivision map</dt><dd>Johnstone Farm · map 08881, lot 45</dd></div><div><dt>Nearest LIRR station</dt><dd>Riverhead · 4.3 mi (LIRR Main Line)</dd></div><div><dt>School district</dt><dd></dd></div></dl>
+    <p class="lede">The lot sits on a filed subdivision map, so a re-subdivision goes back to the town planning board as a map amendment.</p>
+    <div class="src">Source: Suffolk County GIS: groundwater management zones, sanitation districts, wetlands, Pine Barrens, conservation easements, farmland PDR, filed maps · FEMA flood hazard layer</div>
+  </section>
+  <section>
+    <h2>Neighbors · assemblage</h2>
+    <div class="ltw"><table><thead><tr><th>Address</th><th>Lot</th><th>Use</th><th>Owner</th></tr></thead><tbody><tr><td>No street address</td><td>348.98 ac</td><td>Class 552</td><td>—</td></tr><tr><td>2746 Sound Avenue</td><td>4.47 ac</td><td>One-family home</td><td>—</td></tr><tr><td>104 Baywood Drive</td><td>0.92 ac</td><td>One-family home</td><td>—</td></tr></tbody></table></div>
+    
+    <div class="src">Source: Suffolk County tax map · NYS assessment roll 2025</div>
+  </section>
+  <section>
+    <h2>New houses nearby · the exit</h2>
+    <div class="ltw"><table><thead><tr><th>Result</th></tr></thead><tbody><tr><td>No vacant-to-house conversions within 1.5 miles on the 2021 and 2025 rolls.</td></tr></tbody></table></div>
+    
+    <div class="src">Source: NYS assessment rolls 2021 → 2025 (lots vacant in 2021 that carry a house in 2025) · Suffolk County tax map</div>
+  </section>
+  <section>
+    <h2>Splits nearby since 2021 · precedent</h2>
+    <div class="ltw"><table><thead><tr><th>Where</th><th>Before</th><th>After</th><th>Built so far</th><th>Distance</th></tr></thead><tbody><tr><td>8 Woodlawn Dr<span class='s'>Riverhead</span></td><td>1 parcel</td><td>4 lots</td><td>2 houses · 1 vacant</td><td>1.3 mi</td></tr></tbody></table></div>
+    
+    <div class="src">Source: NYS assessment rolls 2021 → 2025, parcel split detector (same engine that found Sycamore Estates)</div>
+  </section>
+
+  <p class="pitch"><b>The offer that fits:</b> buy the parcel at land-split value from an owner who already tried to sell, divide it into 7 conforming lots, and sell new houses into a market where new construction on vacant lots nearby carries strong values.</p>
+
+  <p class="foot"><span class="tag">Estimates</span> Lot counts assume the full parcel minus mapped wetlands, before roads and frontage, and need a surveyor's yield map. Owner names are masked; the full record, the phone and the trace are walked through on a call. Pulled Oct 15, 2026 from Suffolk County and New York State public records, town zoning maps and an Oct 4 MLS snapshot.</p>
+</div>
+
+<script src="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.js"></script>
+<script>
+(function () {
+  if (!window.maplibregl) return;
+  var reduce = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  var lot = {"type":"Feature","properties":{},"geometry":{"type":"Polygon","coordinates":[[[-72.7282526,40.9605596],[-72.7294139,40.9600263],[-72.7286742,40.9592531],[-72.7294423,40.9592369],[-72.7303585,40.9590622],[-72.7303842,40.9590577],[-72.7304103,40.9590577],[-72.730436,40.9590621],[-72.7304606,40.9590708],[-72.7304833,40.9590835],[-72.7305035,40.9591],[-72.7305207,40.9591196],[-72.7305343,40.9591419],[-72.7305475,40.9591818],[-72.7305845,40.9592764],[-72.7306275,40.9593684],[-72.7306765,40.9594574],[-72.7307312,40.9595429],[-72.7307913,40.9596248],[-72.7308566,40.9597025],[-72.7309269,40.9597758],[-72.7310018,40.9598444],[-72.731081,40.9599079],[-72.7312701,40.9600557],[-72.7313278,40.9600999],[-72.731381,40.9601496],[-72.731429,40.9602043],[-72.7314715,40.9602633],[-72.731508,40.9603263],[-72.7315381,40.9603925],[-72.7315616,40.9604614],[-72.7315783,40.9605322],[-72.7315879,40.9606043],[-72.7315904,40.960677],[-72.7315858,40.9607496],[-72.7315742,40.9608215],[-72.7315555,40.9608918],[-72.7315301,40.9609599],[-72.7314981,40.9610253],[-72.7314599,40.9610872],[-72.7314157,40.9611451],[-72.7313662,40.9611983],[-72.7313116,40.9612465],[-72.7312527,40.9612891],[-72.7311898,40.9613257],[-72.7311236,40.961356],[-72.7307961,40.9615372],[-72.7307359,40.961573],[-72.7306793,40.9616141],[-72.7306267,40.9616602],[-72.7305784,40.9617109],[-72.730535,40.9617657],[-72.7298501,40.9614908],[-72.7293438,40.9617561],[-72.7282526,40.9605596]]]}};
+  var houses = {"type":"FeatureCollection","features":[{"type":"Feature","properties":{"h":8.5},"geometry":{"type":"Polygon","coordinates":[[[-72.7300056,40.9596795],[-72.7297823,40.9597473],[-72.72973,40.9596501],[-72.7299533,40.9595817],[-72.7300056,40.9596795]]]}},{"type":"Feature","properties":{"h":8.5},"geometry":{"type":"Polygon","coordinates":[[[-72.7304663,40.9595615],[-72.7303503,40.9595974],[-72.7303456,40.9595883],[-72.7302376,40.9596212],[-72.7302094,40.9595686],[-72.7302638,40.9595519],[-72.730245,40.9595174],[-72.7302986,40.9595012],[-72.7304153,40.9594658],[-72.7304663,40.9595615]]]}}]};
+  var neighbors = {"type":"FeatureCollection","features":[{"type":"Feature","properties":{},"geometry":{"type":"Polygon","coordinates":[[[-72.724684,40.970492],[-72.720453,40.96538],[-72.71821,40.962702],[-72.719651,40.961775],[-72.719995,40.962101],[-72.720355,40.961905],[-72.720019,40.961544],[-72.720102,40.961491],[-72.720429,40.961789],[-72.720896,40.961494],[-72.721018,40.961628],[-72.721575,40.961278],[-72.721163,40.960823],[-72.722371,40.960052],[-72.722868,40.960593],[-72.723314,40.960358],[-72.722787,40.959784],[-72.723219,40.959505],[-72.723578,40.959341],[-72.724873,40.958886],[-72.725641,40.958749],[-72.726161,40.958772],[-72.726782,40.958907],[-72.727363,40.959584],[-72.733387,40.966189],[-72.734779,40.965924],[-72.734976,40.966121],[-72.73554,40.965949],[-72.735883,40.966293],[-72.736587,40.965971],[-72.740108,40.969916],[-72.738957,40.970122],[-72.738079,40.970302],[-72.736696,40.970548],[-72.735723,40.970793],[-72.735797,40.970875],[-72.732137,40.971763],[-72.728327,40.972465],[-72.72668,40.972935],[-72.726007,40.972067],[-72.724684,40.970492]],[[-72.73447,40.967593],[-72.734117,40.96721],[-72.733357,40.967613],[-72.73371,40.967996],[-72.73447,40.967593]]]}},{"type":"Feature","properties":{},"geometry":{"type":"Polygon","coordinates":[[[-72.729529,40.961959],[-72.729344,40.961756],[-72.72985,40.961491],[-72.730535,40.961766],[-72.73048,40.961861],[-72.73046,40.961913],[-72.730435,40.962021],[-72.729529,40.961959]]]}},{"type":"Feature","properties":{},"geometry":{"type":"Polygon","coordinates":[[[-72.726782,40.958907],[-72.727973,40.959166],[-72.728674,40.959253],[-72.729414,40.960026],[-72.728253,40.96056],[-72.727363,40.959584],[-72.726782,40.958907]]]}}]};
+  var map = new maplibregl.Map({ container: "map", style: "https://tiles.openfreemap.org/styles/dark", center: [-72.730814, 40.960305], zoom: 16.4, pitch: 58, bearing: -24, maxPitch: 75, attributionControl: { compact: true } });
+  map.addControl(new maplibregl.NavigationControl({ visualizePitch: true }), "top-right");
+  map.on("load", function () {
+    map.addLayer({ id: "nx-3d", type: "fill-extrusion", source: "openmaptiles", "source-layer": "building", minzoom: 13,
+      paint: { "fill-extrusion-color": ["interpolate", ["linear"], ["coalesce", ["get", "render_height"], 6], 0, "#1b2a5a", 25, "#2f5fc4", 70, "#4d9bff"], "fill-extrusion-height": ["coalesce", ["get", "render_height"], 6], "fill-extrusion-base": ["coalesce", ["get", "render_min_height"], 0], "fill-extrusion-opacity": 0.8 } });
+    map.addSource("nb", { type: "geojson", data: neighbors });
+    map.addLayer({ id: "nb-line", type: "line", source: "nb", paint: { "line-color": "#3b8cff", "line-width": 1.6, "line-opacity": 0.9 } });
+    map.addSource("lot", { type: "geojson", data: lot });
+    map.addLayer({ id: "lot-fill", type: "fill-extrusion", source: "lot", paint: { "fill-extrusion-color": "#12b76a", "fill-extrusion-height": 1.2, "fill-extrusion-base": 0, "fill-extrusion-opacity": 0.55 } });
+    map.addLayer({ id: "lot-line", type: "line", source: "lot", paint: { "line-color": "#12b76a", "line-width": 3 } });
+    map.addSource("asm", { type: "geojson", data: {"type":"FeatureCollection","features":[]} });
+    map.addLayer({ id: "asm-fill", type: "fill-extrusion", source: "asm", paint: { "fill-extrusion-color": "#7fe0b0", "fill-extrusion-height": 0.8, "fill-extrusion-base": 0, "fill-extrusion-opacity": 0.45 } });
+    map.addLayer({ id: "asm-line", type: "line", source: "asm", paint: { "line-color": "#7fe0b0", "line-width": 2.5, "line-dasharray": [2, 1.5] } });
+    map.addSource("hs", { type: "geojson", data: houses });
+    map.addLayer({ id: "hs", type: "fill-extrusion", source: "hs", paint: { "fill-extrusion-color": "#ffffff", "fill-extrusion-height": ["get", "h"], "fill-extrusion-base": 1.2, "fill-extrusion-opacity": 0.96 } });
+    map.once("idle", function () { window.__mapIdle = true; });
+    if (!reduce) {
+      var spinning = true;
+      var spin = function () { if (spinning) map.easeTo({ bearing: map.getBearing() + 30, duration: 14000, easing: function (t) { return t; } }); };
+      map.on("moveend", spin);
+      ["mousedown", "touchstart", "wheel", "dragstart"].forEach(function (ev) { map.on(ev, function () { spinning = false; }); });
+      spin();
+    }
+  });
+})();
+</script>
+</body>
+</html>
