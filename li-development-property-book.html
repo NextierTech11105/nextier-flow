@@ -88,6 +88,9 @@ h1, h2, h3 { text-wrap: balance; }
 .play { background: var(--playbg); color: var(--onbar); border-radius: 16px; padding: 24px; display: grid; gap: 8px; }
 .play .eyebrow { color: var(--onbar2); }
 .play p { margin: 0; font: 700 clamp(20px, 3vw, 25px)/1.35 var(--sans); }
+.playul { margin: 0; padding-left: 24px; display: grid; gap: 8px; font: 700 clamp(19px, 2.6vw, 23px)/1.35 var(--sans); }
+.playul li::marker { color: var(--amber); }
+.slide ul.sbody { margin: 0; padding-left: 28px; display: grid; gap: 12px; }
 .big { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 200px), 1fr)); gap: 14px; }
 .big div { background: var(--card); border: 1px solid var(--rule); border-radius: 14px; padding: 18px; display: grid; gap: 4px; }
 .big .v { font: 900 clamp(28px, 4vw, 36px)/1.05 var(--sans); font-variant-numeric: tabular-nums; }
@@ -379,7 +382,7 @@ const V = {
   "li1": {
     hood:"Riverhead, Suffolk", type:"Ranch · built 1961", hot:true, tags:["senior","big"],
     signal:"Senior on Enhanced STAR. Life estate. 1.70 acres.",
-    play:"A senior owner on 1.70 acres, on title as a life estate, same owner on every roll since 2021. The lot is subdivision-size and the street is part industrial. The conversation is what happens to the land next.",
+    play:"Senior owner, on title as a life estate|Same owner on every roll since 2021|1.70 acres: subdivision-size, on a part-industrial street|The conversation: what happens to the land next",
     big:[["Market value", 542892, "2025 roll", ""], ["Lot", "1.70 ac", "74,052 sq ft · subdivision-size", "debt"], ["Owner", "65+", "Enhanced STAR · life estate", ""]],
     money:{ title:"Market value, roll by roll · up 45% since 2021", rows: roll([[2021,375424],[2022,436884],[2023,476857],[2024,531175],[2025,542892]]) },
     tl:[
@@ -393,7 +396,7 @@ const V = {
   "li2": {
     hood:"Riverhead, Suffolk", type:"Ranch · built 1957", hot:true, tags:["estate","away","big"],
     signal:"Estate on title. 3.30 acres. Changed hands on the 2025 roll.",
-    play:"A 1957 ranch on 3.30 acres. Title moved from a trust beneficiary to an estate on the 2025 roll, with a new deed on file, and the mail goes to family in Nassau. Estates sell, often to whoever calls first with a plan for the land.",
+    play:"1957 ranch on 3.30 acres|Trust → estate on the 2025 roll, new deed on file|Mail goes to family in Nassau|Estates sell, often to whoever calls first with a plan for the land",
     big:[["Market value", 683824, "2025 roll", ""], ["Lot", "3.30 ac", "143,748 sq ft · subdivision-size", "debt"], ["Changed hands", "2025", "Trust → estate · new deed", ""]],
     money:{ title:"Market value, roll by roll · up 45% since 2021", rows: roll([[2021,472881],[2022,550296],[2023,600646],[2024,669065],[2025,683824]]) },
     tl:[
@@ -406,7 +409,7 @@ const V = {
   "li3": {
     hood:"Riverhead, Suffolk", type:"Old-style house · built 1930", hot:true, tags:["away","big"],
     signal:"5.50 acres. Owner mails from Pennsylvania. Same surname on an estate down the road.",
-    play:"A 966 sq ft 1930 house on 5.50 acres, held by an owner who lives in Pennsylvania. A parcel on the same road carries the same family name and sits in an estate. Two family parcels on one road is an assemblage conversation.",
+    play:"966 sq ft house from 1930 on 5.50 acres|Owner lives in Pennsylvania|Same family name on an estate parcel down the road|Two family parcels on one road: an assemblage conversation",
     big:[["Market value", 502451, "2025 roll", ""], ["Lot", "5.50 ac", "239,580 sq ft · subdivision-size", "debt"], ["Owner lives in", "PA", "Absentee · same owner since 2021", ""]],
     money:{ title:"Market value, roll by roll · up 45% since 2021", rows: roll([[2021,347458],[2022,404339],[2023,441335],[2024,491607],[2025,502451]]) },
     tl:[
@@ -419,7 +422,7 @@ const V = {
   "li4": {
     hood:"Brookhaven, Suffolk", type:"Residential vacant land", hot:true, tags:["land","away","big"],
     signal:"2 vacant acres on a state route. Owner mails from Alabama.",
-    play:"Two acres of residential vacant land, same owner on every roll since 2021, who lives in Alabama. Value up 54% since 2021. Land with no house and an owner out of state is a straight site conversation.",
+    play:"2 acres of residential vacant land|Same owner on every roll since 2021, lives in Alabama|Value up 54% since 2021|No house + owner out of state: a straight site conversation",
     big:[["Market value", 125000, "2025 roll", ""], ["Lot", "2.00 ac", "87,120 sq ft · vacant", "debt"], ["Owner lives in", "AL", "Same owner since 2021", ""]],
     money:{ title:"Market value, roll by roll · up 54% since 2021", rows: roll([[2021,81081],[2022,96774],[2023,111111],[2024,113208],[2025,125000]]) },
     tl:[
@@ -431,7 +434,7 @@ const V = {
   "li5": {
     hood:"Glen Cove, Nassau", type:"One-family home", hot:true, tags:["senior","big"],
     signal:"Senior on Enhanced STAR on a 0.92-acre Nassau lot.",
-    play:"An owner 65+ on Enhanced STAR, living in a one-family home on 0.92 acre in Glen Cove, same owner on every roll since 2021. Lots this size are scarce in Nassau, and the street has homes on the roll up to $1.57M.",
+    play:"Owner 65+ on Enhanced STAR, living there|0.92 acre, same owner on every roll since 2021|Lots this size are scarce in Nassau|Homes on the street run up to $1.57M on the roll",
     big:[["Market value", 560000, "2025 roll", ""], ["Lot", "0.92 ac", "151 × 264 ft · subdivision-size", "debt"], ["Owner", "65+", "Enhanced STAR · lives there", ""]],
     money:{ title:"This home vs. the street (market value on the roll)", rows:[
       ["This home", 560000, "var(--blue)", ""],
@@ -577,7 +580,7 @@ function detailView(k) {
       <button type="button" class="storybtn" id="dstory"><svg viewBox="0 0 10 10" aria-hidden="true"><path d="M1 0l9 5-9 5z"/></svg> Play story mode</button>
     </div>
 
-    <div class="play"><div class="eyebrow">The play</div><p>${v.play}</p></div>
+    <div class="play"><div class="eyebrow">The play</div>${`<ul class="playul">${v.play.split("|").map((x) => `<li>${x}</li>`).join("")}</ul>`}</div>
 
     <div class="big">${v.big.map(([l, n, note, cls]) => `<div><span class="eyebrow">${l}</span><span class="v" style="color:${cls === "debt" ? "var(--amber)" : cls === "clear" ? "var(--green)" : "var(--ink)"}">${fmtBig(l, n)}</span><span class="n">${note}</span></div>`).join("")}</div>
 
@@ -624,7 +627,7 @@ function buildStory(k) {
   const p = R[k], v = V[k], c = covN(k), S = [];
   S.push({ e: v.hood, html: `<h2 class="shero">${p.title}</h2><p class="ssub">${p.sub}</p><div class="chips">${p.chips.map(([cl, t]) => `<span class="chip ${cl}">${t}</span>`).join("")}</div>` });
   S.push({ e: "The signal", html: `<div class="signal ${v.hot ? "" : "calm"}" style="font-size:clamp(22px,4vw,30px)">${v.signal}</div>` });
-  S.push({ e: "The play", html: `<p class="sbody">${v.play}</p>` });
+  S.push({ e: "The play", html: `<ul class="sbody playul">${v.play.split("|").map((x) => `<li>${x}</li>`).join("")}</ul>` });
   v.big.forEach(([l, n, note, cls]) => S.push({ e: l, html: `<div class="snum" style="color:${cls === "debt" ? "var(--amber)" : cls === "clear" ? "var(--green)" : "var(--ink)"}">${fmtBig(l, n)}</div><p class="ssub">${note}</p>` }));
   S.push({ e: "The money", html: `<h2 class="shero" style="font-size:clamp(26px,5vw,40px)">${v.money.title}</h2><div class="sbox">${moneyChart(v)}</div>` });
   const L = { deed: "Ownership", loan: "Loans", build: "Construction" };
