@@ -43,7 +43,9 @@ figcaption { font-size: 15px; color: var(--fg2); }
 .maprow { display: flex; flex-wrap: wrap; gap: 8px 16px; align-items: center; justify-content: space-between; }
 .btn { display: inline-flex; align-items: center; gap: 8px; font: 600 15px/1 var(--body); color: var(--fg); background: transparent; border: 1px solid var(--blue); border-radius: 6px; padding: 10px 14px; text-decoration: none; cursor: pointer; }
 .btn:hover { background: rgba(59,140,255,.16); }
-.band { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); border: 1px solid var(--line); border-radius: 8px; overflow: hidden; }
+.band { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); border: 1px solid var(--line); border-radius: 8px; overflow: hidden; }
+@media (max-width: 760px) { .band { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 420px) { .band { grid-template-columns: 1fr; } }
 .cell { padding: 16px 18px; border-right: 1px solid var(--line); border-bottom: 1px solid var(--line); display: grid; gap: 4px; align-content: start; min-width: 0; background: var(--panel); }
 .cell .k { font: 600 15px/1.2 var(--body); letter-spacing: .04em; text-transform: uppercase; color: var(--fg2); }
 .cell .v { font: 700 28px/1.1 var(--display); font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
@@ -191,6 +193,9 @@ td .s { display: block; color: var(--fg2); }
   var ring = [[-73.921598531398,40.76748611907],[-73.921635912099,40.767439374112],[-73.921697552581,40.767474685167],[-73.921676678532,40.767495748181],[-73.921906099911,40.767627168603],[-73.921684732277,40.7678505505],[-73.921531504895,40.768005171772],[-73.921515634855,40.768021185434],[-73.921515527145,40.768021123226],[-73.92139646031,40.76795291802],[-73.9212790283,40.767885649432],[-73.921396187907,40.767739145352],[-73.921598531398,40.76748611907]];
   var H = 18.24;          // roof height, 59.84 ft (city building outline)
   var EXTRA = 4.6;        // ~19,000 sq ft over a ~16,500 sq ft footprint ≈ 1.15 floors (estimate)
+  // Push our outline ~1.5% outward so its white walls sit just outside the base map's copy of the same building.
+  var cx = 0, cy = 0; ring.slice(0, -1).forEach(function (q) { cx += q[0]; cy += q[1]; }); cx /= ring.length - 1; cy /= ring.length - 1;
+  ring = ring.map(function (q) { return [cx + (q[0] - cx) * 1.015, cy + (q[1] - cy) * 1.015]; });
   var bldg = { type: "Feature", properties: {}, geometry: { type: "Polygon", coordinates: [ring] } };
   var map = new maplibregl.Map({
     container: "map", style: "https://tiles.openfreemap.org/styles/dark",
