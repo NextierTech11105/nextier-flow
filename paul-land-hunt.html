@@ -146,7 +146,7 @@ section > .wrap > p.intro { margin: 0 0 22px; color: var(--soft); max-width: 70c
 .tools select { background: #05070c; border: 1px solid var(--rule); border-radius: 8px; padding: 9px 10px; font-size: 15px; }
 .count { font-family: var(--mono); color: var(--soft); font-size: 15px; }
 .tablewrap { overflow-x: auto; border: 1px solid var(--rule); border-radius: 12px; }
-table { border-collapse: collapse; width: 100%; font-size: 15px; min-width: 980px; }
+table { border-collapse: collapse; width: 100%; font-size: 15px; min-width: 1080px; }
 th, td { text-align: left; padding: 11px 12px; border-bottom: 1px solid var(--rule); vertical-align: top; }
 thead th { font-family: var(--mono); font-size: 12px; letter-spacing: .1em; text-transform: uppercase; color: var(--soft); font-weight: 600; background: #070a10; position: sticky; top: 0; }
 tbody tr { cursor: pointer; } tbody tr:hover { background: #0a1220; }
@@ -337,7 +337,7 @@ footer .fl { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; 
       </div>
       <div class="tablewrap">
         <table>
-          <thead><tr><th>#</th><th>Property</th><th>Acres</th><th>Split</th><th>Expired</th><th>Last asking</th><th>Owner</th><th>Mobile</th><th></th></tr></thead>
+          <thead><tr><th>#</th><th>Property</th><th>Acres</th><th>Split</th><th>Expired</th><th>Last asking</th><th>Owner</th><th>Mobile</th><th>Email</th><th></th></tr></thead>
           <tbody id="rows"></tbody>
         </table>
       </div>
@@ -355,7 +355,7 @@ footer .fl { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; 
         <div class="st"><b>MLS · land class</b><span>Expired, live and sold land for two years. Checked so nothing relisted or sold stays in the book.</span></div>
         <div class="st"><b>Web data</b><span>Listing sites, maps and classifieds, swept weekly for what just listed and what just died.</span></div>
         <div class="st"><b>Property data</b><span>Owner of record, mailing address, mortgages, liens and portfolio linkage across every parcel.</span></div>
-        <div class="st"><b>Skip trace + verification</b><span>Mobiles, landlines, email, line type and Do Not Call. Validated before the first text.</span></div>
+        <div class="st"><b>Skip trace + verification</b><span>Mobiles, landlines, emails, line type, carrier and Do Not Call. Validated before the first text or email.</span></div>
         <div class="st"><b>Event signals</b><span>Expired, aged expired, estate, pre-foreclosure, new deeds, builder moves. Each lot gets a reason to call now.</span></div>
         <div class="st db"><b>Your own database</b><span>AI-ready Postgres on your DigitalOcean account. <span class="g">Fully managed. Nothing to learn. No training.</span> Every update, trace, signal and reply lands in it. It compounds, and it stays yours.</span></div>
       </div>
@@ -457,7 +457,8 @@ function renderList() {
     <td class="r">${money(r.p)}</td>
     <td>${esc(r.k)}<div class="sub">${esc(r.rch)}</div></td>
     <td><span class="trace">skip trace</span></td>
-    <td><a href="#lot-${r.rank}" aria-label="Open ${esc(r.a)}">Open</a></td></tr>`).join("") || `<tr><td colspan="9" style="color:var(--soft)">No lots match. Clear a filter or the search.</td></tr>`;
+    <td><span class="trace">skip trace</span></td>
+    <td><a href="#lot-${r.rank}" aria-label="Open ${esc(r.a)}">Open</a></td></tr>`).join("") || `<tr><td colspan="10" style="color:var(--soft)">No lots match. Clear a filter or the search.</td></tr>`;
   $("#count").textContent = `${n0(f.length)} of ${n0(R.length)} lots`;
   const left = f.length - rows.length;
   $("#moreBtn").hidden = left <= 0;
@@ -652,7 +653,7 @@ function mathCard(r) {
     <div class="note">Suffolk lots get this full check today: ${S.suffolkByRight.researched} researched from government records, ${S.suffolkByRight.split} split by right. Every county gets the same check at install.</div>`;
 }
 function traceBox(r) {
-  const F2 = ["Mobile 1", "Mobile 2", "Mobile 3", "Landline", "Email", "Line type", "Do Not Call", "Verified"];
+  const F2 = ["Mobile 1", "Mobile 2", "Mobile 3", "Landline", "Email 1", "Email 2", "Email 3", "Line type", "Carrier", "Do Not Call", "TCPA", "Verified"];
   return `<div class="tracebox"><div class="th"><span class="lg lg-tracerfy" style="width:96px;height:24px" role="img" aria-label="Skip trace"></span><b>Skip trace + verification</b><span>Fills on your key · validated before the first text</span></div>
     <div class="tfields">${F2.map((f) => `<div class="tf"><span class="l">${f}</span><span class="v">— lands here</span></div>`).join("")}</div></div>`;
 }
