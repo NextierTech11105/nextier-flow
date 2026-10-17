@@ -235,6 +235,34 @@ table.math tr.res td { color: var(--green); font-weight: 600; }
 .tf .l { font-family: var(--mono); font-size: 12px; letter-spacing: .08em; text-transform: uppercase; color: var(--blue-soft); }
 .tf .v { font-family: var(--mono); font-size: 15px; color: var(--soft); }
 .dnav { display: flex; gap: 10px; justify-content: space-between; margin-top: 18px; flex-wrap: wrap; }
+#satmap { height: 420px; position: relative; background: #05070c; }
+.pushbar { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; margin-top: 4px; }
+.btn.go { border-color: var(--green); background: rgba(18,183,106,.12); }
+.btn.go:hover { background: var(--green); color: #000; }
+.notes textarea { width: 100%; min-height: 96px; resize: vertical; background: #05070c; border: 1px solid var(--rule); border-radius: 8px; padding: 10px 12px; font: 16px/1.5 var(--body); color: var(--text); }
+.notes textarea::placeholder { color: #9fb0c8; }
+.nlist { display: grid; gap: 8px; margin: 0; padding: 0; list-style: none; }
+.nlist li { background: var(--panel-2); border: 1px solid var(--rule); border-radius: 8px; padding: 10px 12px; display: grid; gap: 2px; }
+.nlist .t { font-family: var(--mono); font-size: 13px; color: var(--soft); }
+.nlist .b { white-space: pre-wrap; overflow-wrap: anywhere; font-size: 16px; }
+.story { position: fixed; inset: 0; z-index: 60; background: rgba(0,0,0,.9); display: grid; place-items: center; padding: 16px; }
+.story[hidden] { display: none; }
+.story .sbox { width: min(780px, 100%); max-height: calc(100dvh - 32px); overflow: auto; background: var(--panel); border: 1px solid var(--rule); border-radius: 14px; display: grid; align-content: start; }
+.story .shead { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 14px 18px; border-bottom: 1px solid var(--rule); }
+.story .shead b { font-family: var(--display); font-stretch: 100%; font-size: 19px; }
+.story .steps { display: flex; gap: 6px; padding: 12px 18px 0; }
+.story .steps button { height: 6px; flex: 1; min-width: 0; padding: 0; border: 0; border-radius: 3px; background: var(--rule); cursor: pointer; }
+.story .steps button.on { background: var(--blue); }
+.story .steps button.done { background: #2b4f8f; }
+.story .chap { padding: 20px 18px 22px; display: grid; gap: 12px; min-height: 260px; align-content: start; }
+.story .chap h3 { font-size: clamp(26px, 4.4vw, 38px); font-weight: 800; line-height: 1.05; }
+.story .chap p { margin: 0; font-size: 18px; max-width: 62ch; }
+.story .chap p .g { color: var(--green); font-weight: 600; }
+.story .sfoot { display: flex; justify-content: space-between; gap: 10px; padding: 14px 18px; border-top: 1px solid var(--rule); }
+.fubcard { border: 1px solid #1f6b47; border-radius: 12px; background: rgba(18,183,106,.05); padding: 14px; display: grid; gap: 12px; }
+.fubcard .th { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.fubcard .th b { font-family: var(--display); font-stretch: 100%; font-size: 19px; }
+.fubcard dl.kv dd { overflow-wrap: anywhere; }
 footer { border-top: 1px solid var(--rule); padding-block: 26px 44px; color: var(--soft); font-size: 14px; margin-top: 40px; }
 footer .fl { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
 
@@ -245,6 +273,12 @@ footer .fl { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; 
   .stack { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .dbody { grid-template-columns: 1fr; } .dindex { position: static; grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .tfields { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 760px) {
+  #lotmap, #satmap { height: 320px; }
+  .story { padding: 0; place-items: stretch; }
+  .story .sbox { max-height: 100dvh; border-radius: 0; border: 0; }
+  dl.kv { grid-template-columns: 1fr; gap: 2px 0; } dl.kv dd { margin-bottom: 8px; }
 }
 @media (max-width: 760px) {
   .hero { height: auto; min-height: 0; display: grid; }
@@ -415,6 +449,15 @@ footer .fl { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; 
 
 <div id="lotview" hidden>
   <div class="wrap" id="lotinner"></div>
+</div>
+
+<div class="story" id="story" hidden role="dialog" aria-modal="true" aria-labelledby="storyh">
+  <div class="sbox">
+    <div class="shead"><div><div class="eyebrow">Story mode</div><b id="storyh"></b></div><button class="btn ghost" type="button" data-sclose>Close</button></div>
+    <div class="steps" id="ssteps"></div>
+    <div class="chap" id="schap" aria-live="polite"></div>
+    <div class="sfoot"><button class="btn ghost" type="button" data-sprev>← Back</button><button class="btn" type="button" data-snext>Next →</button></div>
+  </div>
 </div>
 
 <footer>
@@ -725,9 +768,81 @@ function traceBox(r) {
   return `<div class="tracebox"><div class="th"><span class="lg lg-tracerfy" style="width:96px;height:24px" role="img" aria-label="Skip trace"></span><b>Skip trace + verification</b><span>Fills on your key · validated before the first text</span></div>
     <div class="tfields">${F2.map((f) => `<div class="tf"><span class="l">${f}</span><span class="v">— lands here</span></div>`).join("")}</div></div>`;
 }
+// ---------- notes (this device only on the showcase; the workspace saves them to the lead) ----------
+const NKEY = (r) => `tm-notes-${r.rank}`;
+function readNotes(r) { try { const v = JSON.parse(localStorage.getItem(NKEY(r)) || "[]"); return Array.isArray(v) ? v : []; } catch (e) { return []; } }
+function writeNotes(r, list) { try { localStorage.setItem(NKEY(r), JSON.stringify(list)); } catch (e) {} }
+const when = (iso) => { try { return new Date(iso).toLocaleString("en-US", { month: "short", day: "numeric", hour: "numeric", minute: "2-digit" }); } catch (e) { return ""; } };
+function drawNotes(r) {
+  const el = $("#nlist"); if (!el) return;
+  const list = readNotes(r);
+  el.innerHTML = list.length ? list.slice().reverse().map((n) => `<li><span class="t">${esc(when(n.at))}</span><span class="b">${esc(n.t)}</span></li>`).join("") : `<li><span class="b" style="color:var(--soft)">No notes yet.</span></li>`;
+}
+
+// ---------- the push: what lands in Follow Up Boss, and the story that rides with it ----------
+const fubTags = (r) => ["expired_land", r.win ? `expired_${r.win}` : ""].filter(Boolean);
+const lotSize = (r) => r.ac ? `${acf(r.ac)} ac · ${n0(Math.round(r.ac * 43560))} sq ft` : "At install";
+const placeOf = (r) => [r.h, r.t && r.t !== r.h ? r.t : "", r.co ? r.co + " County" : ""].filter(Boolean).join(", ");
+function storyLine(r) {
+  const d = document.createElement("div"); d.innerHTML = sentence(r); return d.textContent.trim();
+}
+function pushCard(r) {
+  const notes = readNotes(r);
+  return `<div class="fubcard"><div class="th"><span class="lg lg-fub" style="width:26px;height:26px" role="img" aria-label="Follow Up Boss"></span><b>What lands in Follow Up Boss</b></div>
+    <dl class="kv">
+      <dt>Person</dt><dd>Owner of record · name and phones from your workspace</dd>
+      <dt>Property</dt><dd>${esc(r.a)}${placeOf(r) ? ", " + esc(placeOf(r)) : ""}</dd>
+      <dt>Event</dt><dd>Expired listing · ${esc(r.win ? WIN[r.win] : "window at install")} · never relisted</dd>
+      <dt>Tags</dt><dd class="mono">${fubTags(r).map(esc).join(" · ")}</dd>
+      <dt>Lot size</dt><dd>${esc(lotSize(r))}</dd>
+      <dt>Last asking</dt><dd>${money(r.p)}</dd>
+      <dt>Story</dt><dd>${esc(storyLine(r))}</dd>
+      <dt>Notes</dt><dd id="pnotes">${notes.length ? `${notes.length} note${notes.length === 1 ? "" : "s"} · newest: ${esc(notes[notes.length - 1].t)}` : "Your notes ride along"}</dd>
+      <dt>Lead source</dt><dd>Team Musso Hunt Engine</dd>
+    </dl></div>`;
+}
+function chapters(r) {
+  const notes = readNotes(r);
+  const owner = r.oos ? "Lives out of state." : (r.sig || []).includes("absentee") ? "Lives at a different address in New York." : r.rch === "Lives there" ? "Lives on the property." : "";
+  const opp = r.sg === "verified" ? `<span class="g">${r.lots} lots by right</span> under town zoning and the county septic rule.`
+    : r.sg === "nyc" ? `Zoned ${esc(r.nyc.zone || "")}: <span class="g">${n0(r.nyc.build)} sq ft buildable</span>.`
+    : r.sg === "cand" ? `Sized to split${r.prec && r.prec.s ? `. <span class="g">${r.prec.s} subdivisions</span> in ${esc(r.t || "this town")} since 2021, ${n0(r.prec.l)} lots created` : ""}. The zoning check runs at install.`
+    : r.c ? "A single buildable lot. The zoning check runs at install." : "The parcel record lands at install.";
+  return [
+    ["The land", esc(r.a), `${r.ac ? `A <b>${acf(r.ac)}-acre</b> lot` : "A lot"} in ${esc(placeOf(r) || "New York")}.${r.v === true ? " Vacant land." : ""}`],
+    ["The listing", r.p ? `Asked ${money(r.p)}` : "Listed for sale", `Listed ${r.x > 1 ? `<b>${r.x} times</b>` : "once"}${r.dom ? `, <b>${n0(r.dom)} days</b> on the market` : ""}. No buyer.`],
+    ["The event · why now", r.win ? WIN[r.win] : "Expired", `The listing <b>expired without a sale</b>. Never relisted. Not sold since. The owner tried to sell and is still holding it.`],
+    ["The owner", esc(r.k || "Owner of record"), `${owner} ${esc(r.rch && r.rch !== "Lives there" ? r.rch + "." : "")} Name, phones and emails sit in your workspace, never on a page.`],
+    ["The opportunity", r.sg === "verified" ? `${r.lots} lots by right` : r.sg === "nyc" ? "Room to build" : r.sg === "cand" ? "Split candidate" : "Land to buy", opp],
+    ["Your notes", notes.length ? `${notes.length} note${notes.length === 1 ? "" : "s"}` : "No notes yet", notes.length ? notes.slice().reverse().map((n) => `<span style="display:block;margin-bottom:6px"><span class="mono" style="color:var(--soft);font-size:14px">${esc(when(n.at))}</span><br>${esc(n.t)}</span>`).join("") : "Add a note on the lot page. Every note rides along in the push."],
+    ["Into Follow Up Boss", "One press. One push.", `${pushCard(r)}<div class="pushbar" style="margin-top:4px"><button class="btn go" type="button" data-send>Send to Follow Up Boss</button></div><div class="note" id="sendnote" hidden>Ready. In your workspace this sends the moment your Follow Up Boss key is connected. One push per lead, never anyone who opted out.</div>`],
+  ];
+}
+let storyR = null, storyAt = 0;
+function drawStory() {
+  const ch = chapters(storyR); storyAt = Math.max(0, Math.min(ch.length - 1, storyAt));
+  const [k, h, p] = ch[storyAt];
+  $("#storyh").textContent = `${storyR.a} · #${storyR.rank}`;
+  $("#ssteps").innerHTML = ch.map((c, i) => `<button type="button" class="${i === storyAt ? "on" : i < storyAt ? "done" : ""}" data-sgo="${i}" aria-label="${esc(c[0])}"></button>`).join("");
+  $("#schap").innerHTML = `<div class="eyebrow">${storyAt + 1} of ${ch.length} · ${esc(k)}</div><h3>${h}</h3>${storyAt === ch.length - 1 ? p : `<p>${p}</p>`}`;
+  $("[data-sprev]").disabled = storyAt === 0;
+  const nx = $("[data-snext]"); nx.textContent = storyAt === ch.length - 1 ? "Done" : "Next →";
+  const send = $("[data-send]"); if (send) send.addEventListener("click", () => { $("#sendnote").hidden = false; send.disabled = true; send.textContent = "Ready to send"; });
+}
+function openStory(r, at) { storyR = r; storyAt = at === "last" ? 99 : Number(at) || 0; $("#story").hidden = false; document.body.style.overflow = "hidden"; drawStory(); $("[data-sclose]").focus(); }
+function closeStory() { $("#story").hidden = true; document.body.style.overflow = ""; }
+$("[data-sclose]").addEventListener("click", closeStory);
+$("[data-sprev]").addEventListener("click", () => { storyAt--; drawStory(); });
+$("[data-snext]").addEventListener("click", () => { if (storyAt >= chapters(storyR).length - 1) closeStory(); else { storyAt++; drawStory(); } });
+$("#ssteps").addEventListener("click", (e) => { const b = e.target.closest("[data-sgo]"); if (b) { storyAt = Number(b.dataset.sgo); drawStory(); } });
+$("#story").addEventListener("click", (e) => { if (e.target.id === "story") closeStory(); });
+document.addEventListener("keydown", (e) => { if ($("#story").hidden) return; if (e.key === "Escape") closeStory(); else if (e.key === "ArrowRight") { storyAt++; drawStory(); } else if (e.key === "ArrowLeft") { storyAt--; drawStory(); } });
+
+let satMap = null;
+const SAT_STYLE = { version: 8, sources: { sat: { type: "raster", tiles: ["https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}"], tileSize: 256, maxzoom: 19, attribution: "Imagery © Esri, Maxar, Earthstar Geographics" } }, layers: [{ id: "sat", type: "raster", source: "sat" }] };
 function openLot(rank) {
   const r = byRank.get(rank); if (!r) { location.hash = "book"; return; }
-  stopTour();
+  stopTour(); closeStory();
   $("#mainview").hidden = true; $("#lotview").hidden = false;
   const win = r.win ? WIN[r.win] : "Expired · window at install";
   const chips = [
@@ -749,7 +864,7 @@ function openLot(rank) {
     ["Listed", r.x ? `${r.x}×` : "—", r.x > 1 ? "expired more than once" : "one listing"],
     ["Owner", r.k, r.rch],
   ];
-  const secs = [["map", "Live 3D lot"], ["math", "Subdivision math"], ["event", "Listing history · the event"], ["owner", "Owner & how to reach them"], ["record", "Parcel record"]];
+  const secs = [["map", "Live 3D lot"], ["sat", "Live satellite"], ["push", "Story · push"], ["notes", "Notes"], ["math", "Subdivision math"], ["event", "Listing history · the event"], ["owner", "Owner & how to reach them"], ["record", "Parcel record"]];
   const m = r.m || {};
   const prev = R[R.indexOf(r) - 1], next = R[R.indexOf(r) + 1];
   $("#lotinner").innerHTML = `
@@ -759,6 +874,7 @@ function openLot(rank) {
       <h1>${esc(r.a)}</h1>
       <div class="sentence">${sentence(r)}</div>
       <div class="chips">${chips}</div>
+      <div class="pushbar"><button class="btn" type="button" data-story="0">▶ Story mode</button><button class="btn go" type="button" data-story="last"><span class="lg lg-fub" style="width:22px;height:22px" aria-hidden="true"></span>Push to Follow Up Boss</button></div>
     </div>
     <div class="facts">${facts.map(([l, v, n, c]) => `<div class="fact"><div class="l">${l}</div><div class="v ${c || ""}">${esc(v)}</div>${n ? `<div class="n">${esc(n)}</div>` : ""}</div>`).join("")}</div>
     <div class="dbody">
@@ -767,6 +883,18 @@ function openLot(rank) {
         <section class="card" id="d-map"><h2>Live 3D lot</h2><div id="lotmap">${r.c ? "" : `<div class="loading">Parcel outline lands at install. The listing is real: MLS land class, expired, never relisted.</div>`}</div>
           <div class="pad" style="padding-top:12px">${r.c ? `<div><a class="btn ghost" href="https://www.google.com/maps/search/?api=1&query=${r.c[1]},${r.c[0]}" target="_blank" rel="noopener">Open in Google Maps</a></div>` : ""}</div>
           <div class="src">Source: ${r.rings ? "NYS tax parcel map outline" : r.c ? "NYC lot file location" : "—"} · 3D buildings from OpenStreetMap</div></section>
+        <section class="card" id="d-sat"><h2>Live satellite</h2><div id="satmap">${r.c ? "" : `<div class="loading">Satellite view lands with the parcel outline at install.</div>`}</div>
+          <div class="pad" style="padding-top:12px"><div class="note">Live imagery. Drag and pinch to look around the lot, the road frontage and the neighbors. ${r.rings ? "The line is the parcel boundary." : "The box marks the location; the parcel boundary lands at install."}</div></div>
+          <div class="src">Source: live satellite imagery · ${r.rings ? "parcel outline from the NYS tax parcel map" : "location from the listing"}</div></section>
+        <section class="card" id="d-push"><h2>Story · push to Follow Up Boss</h2><div class="pad">${pushCard(r)}
+          <div class="pushbar"><button class="btn" type="button" data-story="0">▶ Play the story</button><button class="btn go" type="button" data-story="last">Push to Follow Up Boss</button></div></div>
+          <div class="src">One push per lead. Anyone who opted out never goes. Sends on your own Follow Up Boss key.</div></section>
+        <section class="card notes" id="d-notes"><h2>Notes</h2><div class="pad">
+          <label for="nbox" style="font-size:15px;color:var(--soft)">Add a note on this lot</label>
+          <textarea id="nbox" placeholder="Called the owner, left a message. Ask about splitting the back acre."></textarea>
+          <div class="pushbar"><button class="btn" type="button" id="nadd">Save note</button></div>
+          <ul class="nlist" id="nlist"></ul>
+          <div class="note">In your workspace every note saves to the lead and rides along in the Follow Up Boss push. On this page notes stay on this device.</div></div></section>
         <section class="card" id="d-math"><h2>Subdivision math</h2><div class="pad">${mathCard(r)}</div>
           <div class="src">Source: ${r.m ? esc([m.zoningSrc, m.art6Src].filter(Boolean).join(" · ")) + " · Suffolk County tax map + wetland maps" : r.nyc ? "NYC lot file (MapPLUTO) · NYC zoning" : "NYS assessment rolls 2021–2025 · statewide split detector"}</div></section>
         <section class="card" id="d-event"><h2>Listing history · the event</h2><div class="pad"><dl class="kv">
@@ -794,8 +922,30 @@ function openLot(rank) {
     </div>
     <div class="dnav">${prev ? `<a class="btn ghost" href="#lot-${prev.rank}">← #${prev.rank} ${esc(prev.a)}</a>` : "<span></span>"}${next ? `<a class="btn ghost" href="#lot-${next.rank}">#${next.rank} ${esc(next.a)} →</a>` : ""}</div>`;
   $("#lotinner").querySelectorAll("[data-jump]").forEach((a) => a.addEventListener("click", (e) => { e.preventDefault(); document.getElementById(a.dataset.jump).scrollIntoView({ behavior: reduce ? "auto" : "smooth" }); }));
+  $("#lotinner").querySelectorAll("[data-story]").forEach((b) => b.addEventListener("click", () => openStory(r, b.dataset.story)));
+  drawNotes(r);
+  $("#nadd").addEventListener("click", () => {
+    const t = $("#nbox").value.trim(); if (!t) { $("#nbox").focus(); return; }
+    const list = readNotes(r); list.push({ t: t.slice(0, 2000), at: new Date().toISOString() }); writeNotes(r, list);
+    $("#nbox").value = ""; drawNotes(r);
+    const pn = $("#pnotes"); if (pn) pn.textContent = `${list.length} note${list.length === 1 ? "" : "s"} · newest: ${t}`;
+  });
   window.scrollTo(0, 0);
   if (lotMap) { lotMap.remove(); lotMap = null; }
+  if (satMap) { satMap.remove(); satMap = null; }
+  if (r.c && window.maplibregl) {
+    try {
+      satMap = new maplibregl.Map({ container: "satmap", style: SAT_STYLE, center: r.c, zoom: r.rings ? 17 : 17.5, attributionControl: { compact: false } });
+      satMap.scrollZoom.disable();
+      satMap.on("load", () => {
+        const shape = r.rings || square(r.c, Math.max(40, Math.sqrt((r.ac || 0.2) * 4047)));
+        satMap.addSource("lot", { type: "geojson", data: { type: "Feature", properties: {}, geometry: { type: "Polygon", coordinates: shape } } });
+        satMap.addLayer({ id: "lot-f", type: "fill", source: "lot", paint: { "fill-color": r.sg === "verified" ? "#12b76a" : "#3b8cff", "fill-opacity": 0.14 } });
+        satMap.addLayer({ id: "lot-l", type: "line", source: "lot", paint: { "line-color": r.sg === "verified" ? "#12b76a" : "#ffffff", "line-width": 3 } });
+        if (r.rings) { const xs = r.rings[0].map((p) => p[0]), ys = r.rings[0].map((p) => p[1]); satMap.fitBounds([[Math.min(...xs), Math.min(...ys)], [Math.max(...xs), Math.max(...ys)]], { padding: 60, duration: 0, maxZoom: 19 }); }
+      });
+    } catch (e) { $("#satmap").innerHTML = `<div class="loading">The live satellite needs WebGL on this device.</div>`; }
+  }
   if (r.c && window.maplibregl) {
     try {
       lotMap = new maplibregl.Map({ container: "lotmap", style: "https://tiles.openfreemap.org/styles/dark", center: r.c, zoom: r.rings ? 16.2 : 16.6, pitch: 62, bearing: -20, attributionControl: { compact: false }, antialias: true });
@@ -817,7 +967,9 @@ function route() {
   const h = (location.hash || "").replace("#", "");
   const m = h.match(/^lot-(\d+)$/);
   if (m) { openLot(Number(m[1])); return; }
+  closeStory();
   if (lotMap) { lotMap.remove(); lotMap = null; }
+  if (satMap) { satMap.remove(); satMap = null; }
   if ($("#mainview").hidden) { $("#lotview").hidden = true; $("#mainview").hidden = false; if (map) map.resize(); if (h) { const el = document.getElementById(h); if (el) setTimeout(() => el.scrollIntoView(), 30); } }
 }
 window.addEventListener("hashchange", route);
