@@ -64,7 +64,12 @@ details.glass:not([open]) > summary::after { content: " \25B8"; }
 .chip[aria-pressed="false"] { opacity: .42; }
 .chip i { width: 10px; height: 10px; border-radius: 2px; flex: none; box-shadow: 0 0 8px currentColor; }
 .chip b { font: 600 13px/1 var(--mono); }
-.funnel { display: grid; gap: 6px; margin-bottom: 4px; }
+.funnel { display: grid; gap: 6px; margin-top: 9px; }
+.urows > summary { cursor: pointer; list-style: none; font: 600 14px/1.2 var(--display); letter-spacing: .06em; text-transform: uppercase; color: var(--soft); }
+.urows > summary::-webkit-details-marker { display: none; }
+.urows > summary::after { content: " ▸"; font-size: 12px; }
+.urows[open] > summary::after { content: " ▾"; }
+.urows .rows { margin-top: 8px; }
 .fb { display: grid; grid-template-columns: 70px 1fr auto; align-items: center; column-gap: 8px; padding: 7px 10px; border-radius: 8px; border: 1px solid var(--c); background: rgba(8, 16, 32, .9); box-shadow: inset 4px 0 0 var(--c); }
 .fb b { font: 700 14px/1 var(--display); letter-spacing: .08em; color: var(--c); }
 .fb span { font-size: 14px; line-height: 1.25; }
@@ -150,11 +155,13 @@ details.glass:not([open]) > summary::after { content: " \25B8"; }
   <aside class="glass universe" id="universe"></aside>
 </div>
 <div class="col right">
-  <details class="glass triggers" id="triggers" open><summary>&#9889; Material change triggers</summary><div class="trig" id="trig"></div></details>
-  <details class="glass layers" id="layersbox" open><summary>Signals on the map</summary><div class="lay" id="layers"></div></details>
+  <details class="glass layers" id="funnelbox" open><summary>The funnel</summary><div class="lay" id="funnel"></div></details>
+  <details class="glass layers" id="layersbox" open><summary>Aged expireds</summary><div class="lay" id="layers"></div></details>
+  <details class="glass layers" id="ownersbox"><summary>Owners on the land</summary><div class="lay" id="owners"></div></details>
+  <details class="glass triggers" id="triggers"><summary>&#9889; Change triggers</summary><div class="trig" id="trig"></div></details>
 </div>
 <section class="glass mbx" id="mbx" hidden></section>
-<details class="glass engine" id="enginebox" open><summary>The engine &middot; 7 steps</summary><div class="steps" id="engine"></div></details>
+<details class="glass engine" id="enginebox"><summary>The engine &middot; 7 steps</summary><div class="steps" id="engine"></div></details>
 
 <div class="glass tip" id="tip" hidden></div>
 <div class="glass note" id="note" hidden></div>
@@ -195,14 +202,13 @@ const VIEWS = {
 // ---------- panels ----------
 const U = D.universe;
 $("#universe").innerHTML = `<div class="big">${fmt(U.total)}</div><div class="cap">Parcels under surveillance<br>(Nassau + Suffolk)</div>
-<div class="rows">${U.rows.map(([l, n]) => `<div class="row"><span>${l}</span><b>${fmt(n)}</b></div>`).join("")}
-<div class="row"><span>Statewide, every county</span><b>${fmt(D.statewideParcels)}</b></div></div>`;
+<details class="urows"><summary>What's in it</summary><div class="rows">${U.rows.map(([l, n]) => `<div class="row"><span>${l}</span><b>${fmt(n)}</b></div>`).join("")}
+<div class="row"><span>Statewide, every county</span><b>${fmt(D.statewideParcels)}</b></div></div></details>`;
 $("#trig").innerHTML = D.triggers.map(([l, live]) => `<div class="${live ? "live" : "inst"}"><i>${live ? "LIVE" : "AT INSTALL"}</i><span>${l}</span></div>`).join("");
 $("#engine").innerHTML = D.engine.map(([t, p, live], i) => `<div class="step"><span class="n">${i + 1}</span><b>${t}</b><p>${p}</p><em class="${live ? "live" : "inst"}">${live ? "LIVE" : "AT INSTALL"}</em></div>`).join("");
 // phones open on the map: panels start folded; the engine strip's real height drives the column limits
-if (matchMedia("(max-width: 860px)").matches) ["#triggers", "#layersbox", "#enginebox"].forEach((s) => ($(s).open = false));
-// short desktop screens: the signal counts come first, the trigger list opens on a tap
-else if (innerHeight < 1000) $("#triggers").open = false;
+// everything but the funnel and the expireds starts folded; on a phone only the funnel stays open
+if (matchMedia("(max-width: 860px)").matches) $("#layersbox").open = false;
 // the camera centers on the open space between the panels, so nothing important sits under a column
 function padFor() {
   const eng = $("#enginebox").offsetHeight;
@@ -215,10 +221,11 @@ $("#enginebox").addEventListener("toggle", syncEng); addEventListener("resize", 
 const act = { land: true, shbl: true, com: true, sh: true, sl: true, bh: true, rd: true, lp: true };
 const EV = D.lanes;
 const F = D.funnel;
-const funnelHtml = F ? `<h3>The funnel</h3><div class="funnel">${F.rows.map(([band, label, n, own, color]) => `<div class="fb" style="--c:${color}"><b>${band}</b><span>${label}</span><em>${fmt(n)}</em>${own != null ? `<small>${fmt(own)} in Paul's counties</small>` : ""}</div>`).join("")}</div>` : "";
-$("#layers").innerHTML = funnelHtml + `<h3>Expired, never relisted, not sold · aged</h3><div class="chips" id="c-exp"></div>
-<div class="lane">Paul's counties ${fmt(EV.own)} · partner agents ${fmt(EV.partner)} · fresh this month ${fmt(EV.fresh)}</div>
-<h3>Owners on the land Paul wants · Long Island</h3><div class="chips" id="c-own"></div>`;
+const funnelHtml = F ? `<div class="funnel">${F.rows.map(([band, label, n, own, color]) => `<div class="fb" style="--c:${color}"><b>${band}</b><span>${label}</span><em>${fmt(n)}</em>${own != null ? `<small>${fmt(own)} in Paul's counties</small>` : ""}</div>`).join("")}</div>` : "";
+if (F) $("#funnel").innerHTML = funnelHtml; else $("#funnelbox").hidden = true;
+$("#layers").innerHTML = `<h3>Never relisted, not sold · 1 to 2 years</h3><div class="chips" id="c-exp"></div>
+<div class="lane">Paul's counties ${fmt(EV.own)} · partner agents ${fmt(EV.partner)} · fresh this month ${fmt(EV.fresh)}</div>`;
+$("#owners").innerHTML = `<h3>Long Island · 1 km squares</h3><div class="chips" id="c-own"></div>`;
 function chipRow(el, items, counts) {
   el.innerHTML = items.map(([k, l, c]) => `<button class="chip" type="button" id="chip-${k}" data-k="${k}" aria-pressed="true"><i style="background:${c};color:${c}"></i>${l}<b>${fmt(counts[k])}</b></button>`).join("");
   el.addEventListener("click", (e) => { const b = e.target.closest("button"); if (!b) return; const k = b.dataset.k; act[k] = !act[k]; b.setAttribute("aria-pressed", act[k]); applyLayers(); });
