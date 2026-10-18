@@ -3,13 +3,15 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Team Musso News Desk</title>
+<meta name="robots" content="noindex, nofollow">
+<title>Team Musso Intelligence</title>
 <meta name="description" content="Local and statewide news that moves land, approvals and buyers, for Team Musso.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@100..125,600..800&family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
-/* A news desk for one land team: what moved this month, and why it matters to the book. Same palette as the hunt page. */
+/* Nextier Intelligence — one template for every client. Everything client-specific lives in the DESK block in the script.
+   The same stories render five ways: the feed, Story, Memo, Briefing, and a public Blog post (each with Copy). */
 :root {
   --ink: #000; --panel: #07090e; --panel-2: #0b101a; --rule: #1b2433;
   --text: #f6f9ff; --soft: #cfd8e8; --blue: #3b8cff; --blue-soft: #8cbcff; --blue-deep: #0c1a33; --green: #12b76a;
@@ -32,25 +34,33 @@ h1, h2, h3 { font-family: var(--display); font-stretch: 112%; margin: 0; text-wr
 .bar .wrap { display: flex; align-items: center; gap: 14px; padding-block: 10px; flex-wrap: wrap; }
 .brand { font-family: var(--display); font-weight: 750; font-stretch: 100%; font-size: 17px; white-space: nowrap; }
 .brand .sep { color: var(--soft); font-weight: 400; margin: 0 6px; }
-.bar nav { display: flex; gap: 6px; margin-left: auto; }
+.bar nav { display: flex; gap: 6px; margin-left: auto; flex-wrap: wrap; }
 .bar nav a { color: var(--text); text-decoration: none; font-size: 15px; padding: 6px 11px; border: 1px solid var(--rule); border-radius: 999px; white-space: nowrap; }
 .bar nav a:hover, .bar nav a[aria-current] { border-color: var(--blue); }
 header.hero { padding: 40px 0 18px; border-bottom: 1px solid var(--rule); }
 .hero h1 { font-size: clamp(36px, 6vw, 60px); font-weight: 800; line-height: .98; margin: 8px 0 12px; }
 .hero p { margin: 0; color: var(--soft); font-size: 18px; max-width: 64ch; }
 .updated { margin-top: 12px; font-family: var(--mono); font-size: 14px; color: var(--soft); }
-.chips { display: flex; flex-wrap: wrap; gap: 7px; margin: 18px 0 4px; }
+.modes { display: flex; flex-wrap: wrap; gap: 7px; align-items: center; margin: 20px 0 4px; }
+.modes .mlabel { font-family: var(--mono); font-size: 13px; letter-spacing: .12em; text-transform: uppercase; color: var(--green); margin-right: 4px; }
+.mode { border: 1px solid var(--rule); background: #0d1320; border-radius: 999px; padding: 8px 14px; font-size: 15px; cursor: pointer; font-weight: 600; }
+.mode:hover { border-color: var(--blue); }
+.mode[aria-pressed="true"] { border-color: var(--blue); background: var(--blue-deep); }
+.chips { display: flex; flex-wrap: wrap; gap: 7px; margin: 14px 0 4px; }
 .chip { border: 1px solid var(--rule); background: #0d1320; border-radius: 999px; padding: 7px 12px; font-size: 15px; cursor: pointer; }
 .chip:hover { border-color: var(--blue); }
 .chip[aria-pressed="true"] { border-color: var(--blue); background: var(--blue-deep); }
 .chip .ct { font-family: var(--mono); font-size: 13px; color: var(--soft); margin-left: 6px; }
-section { padding-top: 30px; scroll-margin-top: 70px; }
+section { padding-top: 22px; scroll-margin-top: 70px; }
 section > h2 { font-size: clamp(24px, 3.4vw, 32px); font-weight: 760; margin-bottom: 12px; display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; }
 section > h2 small { font-family: var(--body); font-stretch: 100%; font-size: 15px; font-weight: 400; color: var(--soft); }
 .top { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; }
 .list { display: grid; gap: 12px; }
 .item { background: var(--panel); border: 1px solid var(--rule); border-radius: 12px; padding: 16px 18px; display: grid; gap: 8px; min-width: 0; }
-.item.lead { border-color: #1f4f99; background: linear-gradient(180deg, #0a1426, var(--panel)); }
+.item.lead { border-color: #1f4f99; background: linear-gradient(180deg, #0a1426, var(--panel)); position: relative; padding-top: 18px; }
+.item .num { font-family: var(--display); font-weight: 800; font-size: 54px; line-height: .8; color: var(--blue); }
+.item.edge-b { border-left: 4px solid var(--blue); } .item.edge-g { border-left: 4px solid var(--green); } .item.edge-w { border-left: 4px solid #f6f9ff; } .item.edge-n { border-left: 4px solid #5a6b85; }
+.ic { width: 20px; height: 20px; flex: none; fill: none; stroke: var(--blue-soft); stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
 .meta { display: flex; flex-wrap: wrap; gap: 6px 10px; align-items: center; font-family: var(--mono); font-size: 13px; color: var(--soft); }
 .pill { font-family: var(--mono); font-size: 12px; letter-spacing: .06em; text-transform: uppercase; padding: 2px 8px; border-radius: 999px; border: 1px solid var(--rule); color: var(--soft); }
 .pill.b { border-color: var(--blue); color: var(--blue-soft); }
@@ -64,145 +74,198 @@ section > h2 small { font-family: var(--body); font-stretch: 100%; font-size: 15
 .why b { color: #6fe3a8; font-weight: 600; }
 .src { font-family: var(--mono); font-size: 13px; color: var(--soft); overflow-wrap: anywhere; }
 .boards { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+.region > summary.rh { cursor: pointer; list-style: none; font-family: var(--display); font-stretch: 112%; font-size: clamp(22px, 3vw, 28px); font-weight: 760; padding: 14px 16px; border: 1px solid var(--rule); border-radius: 12px; background: var(--panel); display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; }
+.region > summary.rh::-webkit-details-marker { display: none; }
+.region > summary.rh::after { content: "▸"; margin-left: auto; font-size: 18px; color: var(--blue-soft); }
+.region[open] > summary.rh::after { content: "▾"; }
+.region > summary.rh small { font-family: var(--body); font-stretch: 100%; font-size: 15px; font-weight: 400; color: var(--soft); }
+.region[open] > summary.rh { margin-bottom: 12px; border-color: var(--blue); }
+.more > summary { cursor: pointer; font-size: 15px; color: var(--blue-soft); width: fit-content; }
+.more p { margin: 8px 0 6px; }
+/* the remixed formats: one readable column */
+.doctools { display: flex; gap: 8px; justify-content: flex-end; flex-wrap: wrap; max-width: 780px; margin: 22px auto 0; }
+.tool { border: 1px solid var(--rule); background: #0d1320; border-radius: 999px; padding: 8px 14px; font-size: 15px; cursor: pointer; }
+.tool:hover { border-color: var(--blue); }
+.tool.ok { border-color: var(--green); color: #6fe3a8; }
+.doc { max-width: 780px; margin: 12px auto 0; background: var(--panel); border: 1px solid var(--rule); border-radius: 14px; padding: 28px clamp(18px, 4vw, 44px) 32px; }
+.doc h2 { font-size: clamp(26px, 3.6vw, 36px); font-weight: 780; margin: 8px 0 14px; line-height: 1.08; }
+.doc h3 { font-size: 21px; font-stretch: 100%; font-weight: 740; margin: 26px 0 8px; }
+.doc h4 { font-family: var(--body); font-size: 16px; font-weight: 600; margin: 16px 0 6px; color: var(--blue-soft); }
+.doc p, .doc li { font-size: 17px; line-height: 1.62; }
+.doc p { margin: 0 0 12px; }
+.doc ul, .doc ol { margin: 0 0 12px; padding-left: 22px; }
+.doc li { margin-bottom: 8px; }
+.doc .lede { font-size: 19px; }
+.doc .small { font-family: var(--mono); font-size: 14px; color: var(--soft); }
+.memohead { display: grid; grid-template-columns: 64px 1fr; gap: 6px 12px; font-family: var(--mono); font-size: 15px; border-bottom: 1px solid var(--rule); padding-bottom: 14px; margin: 6px 0 4px; }
+.memohead b { color: var(--soft); font-weight: 600; }
+.brief li { margin-bottom: 14px; }
+.brief .pill { margin-right: 6px; vertical-align: 2px; }
 footer { border-top: 1px solid var(--rule); padding-block: 24px 44px; color: var(--soft); font-size: 15px; margin-top: 40px; }
 [hidden] { display: none !important; }
 @media (max-width: 900px) { .top { grid-template-columns: 1fr; } .boards { grid-template-columns: 1fr; } }
-@media (max-width: 560px) { .bar nav { margin-left: 0; } .item h3 { font-size: 19px; } }
+@media (max-width: 560px) { .bar nav { margin-left: 0; } .item h3 { font-size: 19px; } .memohead { grid-template-columns: 52px 1fr; font-size: 14px; } }
+@media print { .bar, .modes, .chips, .doctools, footer { display: none !important; } body { background: #fff; color: #000; } .doc { border: 0; background: #fff; } .doc a { color: #000; } }
 </style>
 </head>
 <body>
 <div class="bar"><div class="wrap">
-  <div class="brand">Team Musso<span class="sep">·</span>News Desk</div>
-  <nav aria-label="Pages"><a href="paul-land-hunt.html">Hunt Engine</a><a href="paul-land-hunt.html#book">Property Book</a><a href="#top" aria-current="page">News</a></nav>
+  <div class="brand" id="brand"></div>
+  <nav aria-label="Pages" id="nav"></nav>
 </div></div>
 
 <main class="wrap" id="top">
   <header class="hero">
-    <div class="eyebrow">Local + statewide · land, approvals, buyers</div>
-    <h1>What moved this month, and what it means for your book</h1>
-    <p>Every story here touches one of three things: how much land can still be built on, how fast a town approves a split, and who is buying. Each one says why it matters to you.</p>
-    <div class="updated">Updated Saturday, October 17, 2026 · every story links to its source</div>
-    <div class="chips" id="chips" role="group" aria-label="Filter by area"></div>
+    <div class="eyebrow" id="eyebrow"></div>
+    <h1 id="h1"></h1>
+    <p id="intro"></p>
+    <div class="updated" id="updated"></div>
+    <div class="modes" role="group" aria-label="Format"><span class="mlabel">Read it as</span><span id="modes"></span></div>
   </header>
 
-  <section id="first"><h2>Read these first <small>three things that change the next 90 days</small></h2><div class="top" id="toplist"></div></section>
-  <section id="statewide"><h2>Statewide <small>laws, programs, rates</small></h2><div class="list" data-area="statewide"></div></section>
-  <section id="li"><h2>Long Island <small>Nassau · Suffolk</small></h2><div class="list" data-area="li"></div></section>
-  <section id="hv"><h2>Hudson Valley + Westchester <small>Westchester · Putnam · Dutchess · Orange · Ulster · Columbia</small></h2><div class="list" data-area="hv"></div></section>
-  <section id="nyc"><h2>Bronx + NYC <small>background that still shapes the market</small></h2><div class="list" data-area="nyc"></div></section>
-  <section id="boards"><h2>Boards to watch <small>where splits get approved</small></h2><div class="boards" id="boardlist"></div></section>
+  <div id="feedview">
+    <section id="first"><h2>Read these first <small>three things that change the next 90 days</small></h2><div class="top" id="toplist"></div></section>
+    <div id="areas"></div>
+    <section id="boards"><details class="region"><summary class="rh" id="boards-h"></summary><div class="boards" id="boardlist"></div></details></section>
+  </div>
+
+  <div id="remixview" hidden>
+    <div class="doctools"><button class="tool" type="button" id="copy">Copy text</button><button class="tool" type="button" id="print">Print / PDF</button><button class="tool" type="button" id="back">Back to the feed</button></div>
+    <article class="doc" id="doc" aria-live="polite"></article>
+  </div>
 </main>
 
-<footer><div class="wrap">Sources are the publishers linked on each story. "Background" marks a story older than three months that still shapes the market. Pending bills are pending: nothing here assumes they pass.</div></footer>
+<footer><div class="wrap" id="footer"></div></footer>
 
 <script>
 (() => {
 "use strict";
-// [id, area, date, source, headline, url, summary, why, kind, background?]
-const N = [
-  ["shoreham", "li", "2026-10-15", "LongIsland.com", "Hochul announces the largest Long Island land acquisition by the DEC in history", "https://www.longisland.com/news/10-15-26/governor-hochul-announces-largest-long-island-dec-land-acquisition-in-history.html",
-    "The state is acquiring nearly 750 acres of open space around the former Shoreham nuclear plant in Suffolk County, to protect the pine barrens and the aquifer.",
-    "750 acres in Brookhaven come off the buildable map for good. Private land nearby that can still be split just got scarcer.", "Land"],
-  ["rates", "statewide", "2026-10-15", "Freddie Mac via FRED", "The 30-year mortgage is at 7.40%", "https://fred.stlouisfed.org/graph/?g=1XU7Y",
-    "Freddie Mac's weekly average held at 7.40% for the weeks of October 8 and 15, after 7.28% on October 1, when a year earlier it was 6.34% (Trading Economics). Rates crossed 7% for the first time since early 2025.",
-    "Retail buyers are priced out at 7%. The land buyers right now are builders and cash investors, and the owners who could not sell last year are the ones to call.", "Rates"],
-  ["nar", "statewide", "2026-10-13", "National Association of Realtors", "Home sales eke out an uptick, but the mortgage rate threat looms", "https://www.nar.realtor/news/real-estate-news/economy/home-sales-eke-out-uptick-but-mortgage-rate-threat-looms",
-    "Existing-home sales edged up in September, with more buyers closing than in August. With rates above 7%, many buyers are recalculating what they can afford.",
-    "Thin retail demand keeps expired listings expired. Your aged expired book grows every month this lasts.", "Market"],
-  ["beacon", "hv", "2026-10-13", "Westfair Communications", "Developer wants to add to an approved Beacon project", "https://westfaironline.com/apartments/developer-wants-to-add-to-approved-beacon-project/",
-    "A developer returned to the City of Beacon with an amended plan to expand a project approved in 2023 at 393 and 397 Fishkill Ave. and 7 Conklin St.",
-    "A developer growing an approved site is a buyer for the land next to it. That is the developer-on-deal signal on every lot page.", "Development"],
-  ["lijobs", "li", "2026-10-05", "Melville Chamber of Commerce", "Long Island construction jobs fall 1,400 in a year, among the steepest drops in the U.S.", "https://melvillechamber.org/news/long-island-construction-jobs-down-1400-agc-metro-ranking/",
-    "Nassau and Suffolk lost 1,400 construction jobs in a year. Only 13 of 360 U.S. metro areas lost more.",
-    "Fewer builders are active. The ones still building are the land buyers to know by name.", "Market"],
-  ["wpbonds", "hv", "2026-09-21", "Westfair Communications", "Westchester legislators approve $10.4M for an affordable housing project in White Plains", "https://westfaironline.com/affordable-housing/westchester-legislators-approve-10-4m-for-affordable-housing-project-in-white-plains/",
-    "The county legislature approved bonds of up to $8.81 million to buy the land for an affordable housing building in White Plains.",
-    "The county itself buys land for housing. Public buyers belong on the buyer list next to developers.", "Development"],
-  ["liprices", "li", "2026-09-29", "Long Island Guide", "Nassau and Suffolk prices rise despite slower sales and limited inventory", "https://www.longislandguide.com/2026/09/29/long-island-housing-market-pushes-higher-as-nassau-and-suffolk-prices-rise-despite-slower-sales-limited-inventory/",
-    "Single-family medians in August: Nassau $911,000, up 4.7% from a year earlier; Suffolk $760,000, up 7.0%. Closed sales fell in both counties and inventory stayed tight.",
-    "Finished homes keep getting more valuable while supply stays short. The math on a buildable lot still works.", "Market"],
-  ["villages", "li", "2026-08-12", "Long Island Press", "Villages lead in housing development on Long Island", "https://www.longislandpress.com/2026/08/12/villages-and-housing/",
-    "Villages approved 33% more building permits per person than the unincorporated areas the towns govern directly.",
-    "Land inside a village tends to move through approvals faster. Each lot page now shows its town's permit count.", "Approvals"],
-  ["qwest", "hv", "2026-08", "Governor's Office", "Construction underway on a 229-home affordable development in Mount Vernon", "https://www.governor.ny.gov/news/governor-hochul-announces-construction-underway-229-unit-affordable-housing-development",
-    "QWest Towers, a $160 million development, is under construction and will create 229 homes in Mount Vernon.",
-    "Southern Westchester keeps absorbing density near transit. Sites near stations price off this.", "Development", true],
-  ["orangesub", "hv", "2026-07-07", "Orange County Planning Board", "17 lots proposed on a 189-acre site that is 4 lots today", "https://www.orangecountyny.gov/AgendaCenter/ViewFile/Minutes/_07072026-2808",
-    "The county planning board reviewed a 17-lot residential subdivision on 188.99 acres, each lot with its own septic and well, and the re-approval of a 72-unit Tuxedo Reserve North Ridge plan.",
-    "This is the exact play in your book: big acreage, split into lots on septic and well. The board minutes are where the next one shows up first.", "Approvals", true],
-  ["s8662", "statewide", "2026-01-07", "NY State Senate", "S8662: towns could not cut how many homes a lot allows", "https://www.nysenate.gov/legislation/bills/2025/S8662",
-    "Introduced January 7, 2026, the bill would bar cities, towns and villages from adopting rules that reduce the number or density of homes allowed. Companion bill A8834 sits in the Assembly Local Governments Committee. Pending, not law.",
-    "If it passes, a town cannot down-zone a lot in your book. Density would only move one way.", "Policy"],
-  ["s8730", "statewide", "Pending", "NY State Senate", "S8730: rezoning before the comprehensive plan is finished", "https://www.nysenate.gov/legislation/bills/2025/S8730",
-    "The bill would let cities, villages and towns adopt or amend comprehensive rezoning plans before their comprehensive plans are done. The sponsor notes many codes have not been updated in decades. Pending, not law.",
-    "Faster rezonings mean the upside on raw land arrives sooner.", "Policy"],
-  ["prohousing", "statewide", "2026-08-10", "Governor's Office", "$62 million open to make housing safe, affordable and accessible", "https://www.governor.ny.gov/news/governor-hochul-announces-62-million-available-make-housing-safe-affordable-and-accessible",
-    "Applications opened for more than $62 million through state housing programs. Separately, certified Pro-Housing Communities received $5 million in planning grants in February, and certification is tied to up to $650 million in state funding.",
-    "A Pro-Housing town wants approvals, because state money depends on it. Those are the towns to split land in.", "Policy"],
-  ["sewer", "li", "2024-11", "The Nature Conservancy", "Suffolk's sewer and septic fund: what it pays for and where it lands first", "https://www.nature.org/en-us/newsroom/suffolk-approves-prop2/",
-    "Voters approved an eighth-cent sales tax in November 2024 to fund sewer expansion and septic upgrades through 2060. Per the county and local advocates, the Forge River sewer in Mastic-Shirley is expected to finish in 2026, and Oakdale 1A to start construction in 2026.",
-    "In Suffolk the septic rule usually caps how many lots a parcel yields. Where a sewer arrives, that cap lifts. Watch the sewer map against your book.", "Approvals", true],
-  ["hvmarket", "hv", "Fall 2026", "Century 21 Alliance Group", "Hudson Valley housing market report, fall 2026", "https://www.c21alliancegroup.com/content/hudson-valley-housing-market-report-fall-2026",
-    "The Mid-Hudson (Dutchess, Orange, Ulster) is normalizing: move-in-ready homes sell fast, homes that need major work sit longer.",
-    "Land and projects that need work sit, then expire. That is where your aged expired targets come from.", "Market"],
-  ["trailblazers", "hv", "2026-10", "City & State New York", "The 2026 Hudson Valley Trailblazers", "https://www.cityandstateny.com/power-lists/2026/10/2026-hudson-valley-trailblazers/416333/",
-    "City & State's list of the people moving the region this year: officials, developers and civic leaders.",
-    "The people who sign off on approvals and the developers who need land, in one list.", "People"],
-  ["bronx", "nyc", "2024-08", "City Limits", "East Bronx rezoning: about 7,000 homes around four new Metro-North stations", "https://citylimits.org/council-approves-rezoning-to-spur-7k-new-homes-around-future-east-bronx-train-stations/",
-    "The Council approved the rezoning of about 46 blocks around the new stations, with roughly 1,700 of the 7,000 homes income-restricted, plus close to $500 million in local infrastructure.",
-    "Lots near the new stations are priced on that rezoning. It still sets the comps in the East Bronx.", "Approvals", true],
-  ["cityofyes", "nyc", "Filed Mar 2025", "Bronx Times", "Some Bronx neighborhoods say no to City of Yes in an ongoing lawsuit", "https://www.bxtimes.com/some-bronx-neighborhoods-say-no-to-city-of-yes-in-ongoing-lawsuit/",
-    "A lawsuit filed in March 2025 by more than 100 plaintiffs challenges the three City of Yes rezonings, which the city expects to add 82,000 homes over 15 years. No ruling was found.",
-    "Until the case resolves, City of Yes density is the rule, with a question mark next to it.", "Policy", true],
-];
-const TOP = ["shoreham", "rates", "s8662"];
-const BOARDS = [
-  ["Southampton Planning Board", "Public hearings October 8 and October 22", "https://www.southamptontownny.gov/320/Planning-Board"],
-  ["Islip Zoning Board of Appeals", "Met October 13 at Town Hall West", "https://www.islipny.gov/news/announcements/715-zoning-board-of-appeals-meeting-october-13th-2026"],
-  ["Riverhead Town Board + ZBA", "Town Board October 6 · ZBA and work session October 8", "https://riverheadminutes.com/"],
-  ["Suffolk County Planning Commission", "Reviews subdivisions and zoning changes that cross county thresholds", "https://www.suffolkcountyny.gov/Departments/Economic-Development-and-Planning/Planning-and-Environment/Regulatory-Review/Suffolk-County-Planning-Commission"],
-  ["Orange County Planning Board", "Monthly minutes list every subdivision referred", "https://www.orangecountyny.gov/AgendaCenter/ViewFile/Minutes/_07072026-2808"],
-  ["NYS Guide to Planning and Zoning Laws", "The 2026 edition: how subdivision review works, board by board", "https://dos.ny.gov/system/files/documents/2026/02/guide-to-planning-and-zoning-laws-in-nys.pdf"],
-];
-const AREAS = [["all", "All"], ["statewide", "Statewide"], ["li", "Long Island"], ["hv", "Hudson Valley + Westchester"], ["nyc", "Bronx + NYC"]];
-const AREA_LABEL = { statewide: "Statewide", li: "Long Island", hv: "Hudson Valley", nyc: "Bronx + NYC" };
+// ═══════════════ DESK: the only part that changes per client ═══════════════
+// items: [id, area, date (YYYY-MM-DD | YYYY-MM | label), source, headline, url, summary, why it matters to the client, kind, background?]
+// "why" is written TO the client (their book, their lots). The public Blog post uses the summaries only, never the "why".
+const DESK = {"slug":"team-musso","client":"Team Musso","desk":"Intelligence","from":"Nextier Intelligence","nav":[["Hunt Engine","paul-land-hunt.html"],["Property Book","paul-land-hunt.html#book"]],"eyebrow":"Local + statewide · land, approvals, buyers","title":"What moved this month, and what it means for your book","intro":"Three things to know first. Everything else is one tap away, with why it matters to you.","description":"Local and statewide news that moves land, approvals and buyers, for Team Musso.","updated":"2026-10-17","areas":[{"key":"statewide","label":"Statewide","sub":"laws, programs, rates","pill":""},{"key":"li","label":"Long Island","sub":"Nassau · Suffolk","pill":"b"},{"key":"hv","label":"Hudson Valley + Westchester","short":"Hudson Valley","sub":"Westchester · Putnam · Dutchess · Orange · Ulster · Columbia","pill":"g"},{"key":"nyc","label":"Bronx + NYC","sub":"background that still shapes the market","pill":"w"}],"top":["shoreham","rates","s8662"],"sortDates":{"Pending":"2026-01-08","Fall 2026":"2026-09-22","Filed Mar 2025":"2025-03"},"items":[["shoreham","li","2026-10-15","LongIsland.com","Hochul announces the largest Long Island land acquisition by the DEC in history","https://www.longisland.com/news/10-15-26/governor-hochul-announces-largest-long-island-dec-land-acquisition-in-history.html","The state is acquiring nearly 750 acres of open space around the former Shoreham nuclear plant in Suffolk County, to protect the pine barrens and the aquifer.","750 acres in Brookhaven come off the buildable map for good. Private land nearby that can still be split just got scarcer.","Land"],["rates","statewide","2026-10-15","Freddie Mac via FRED","The 30-year mortgage is at 7.40%","https://fred.stlouisfed.org/graph/?g=1XU7Y","Freddie Mac's weekly average held at 7.40% for the weeks of October 8 and 15, after 7.28% on October 1, when a year earlier it was 6.34% (Trading Economics). Rates crossed 7% for the first time since early 2025.","Retail buyers are priced out at 7%. The land buyers right now are builders and cash investors, and the owners who could not sell last year are the ones to call.","Rates"],["nar","statewide","2026-10-13","National Association of Realtors","Home sales eke out an uptick, but the mortgage rate threat looms","https://www.nar.realtor/news/real-estate-news/economy/home-sales-eke-out-uptick-but-mortgage-rate-threat-looms","Existing-home sales edged up in September, with more buyers closing than in August. With rates above 7%, many buyers are recalculating what they can afford.","Thin retail demand keeps expired listings expired. Your aged expired book grows every month this lasts.","Market"],["beacon","hv","2026-10-13","Westfair Communications","Developer wants to add to an approved Beacon project","https://westfaironline.com/apartments/developer-wants-to-add-to-approved-beacon-project/","A developer returned to the City of Beacon with an amended plan to expand a project approved in 2023 at 393 and 397 Fishkill Ave. and 7 Conklin St.","A developer growing an approved site is a buyer for the land next to it. That is the developer-on-deal signal on every lot page.","Development"],["lijobs","li","2026-10-05","Melville Chamber of Commerce","Long Island construction jobs fall 1,400 in a year, among the steepest drops in the U.S.","https://melvillechamber.org/news/long-island-construction-jobs-down-1400-agc-metro-ranking/","Nassau and Suffolk lost 1,400 construction jobs in a year. Only 13 of 360 U.S. metro areas lost more.","Fewer builders are active. The ones still building are the land buyers to know by name.","Market"],["wpbonds","hv","2026-09-21","Westfair Communications","Westchester legislators approve $10.4M for an affordable housing project in White Plains","https://westfaironline.com/affordable-housing/westchester-legislators-approve-10-4m-for-affordable-housing-project-in-white-plains/","The county legislature approved bonds of up to $8.81 million to buy the land for an affordable housing building in White Plains.","The county itself buys land for housing. Public buyers belong on the buyer list next to developers.","Development"],["liprices","li","2026-09-29","Long Island Guide","Nassau and Suffolk prices rise despite slower sales and limited inventory","https://www.longislandguide.com/2026/09/29/long-island-housing-market-pushes-higher-as-nassau-and-suffolk-prices-rise-despite-slower-sales-limited-inventory/","Single-family medians in August: Nassau $911,000, up 4.7% from a year earlier; Suffolk $760,000, up 7.0%. Closed sales fell in both counties and inventory stayed tight.","Finished homes keep getting more valuable while supply stays short. The math on a buildable lot still works.","Market"],["villages","li","2026-08-12","Long Island Press","Villages lead in housing development on Long Island","https://www.longislandpress.com/2026/08/12/villages-and-housing/","Villages approved 33% more building permits per person than the unincorporated areas the towns govern directly.","Land inside a village tends to move through approvals faster. Each lot page now shows its town's permit count.","Approvals"],["qwest","hv","2026-08","Governor's Office","Construction underway on a 229-home affordable development in Mount Vernon","https://www.governor.ny.gov/news/governor-hochul-announces-construction-underway-229-unit-affordable-housing-development","QWest Towers, a $160 million development, is under construction and will create 229 homes in Mount Vernon.","Southern Westchester keeps absorbing density near transit. Sites near stations price off this.","Development",true],["orangesub","hv","2026-07-07","Orange County Planning Board","17 lots proposed on a 189-acre site that is 4 lots today","https://www.orangecountyny.gov/AgendaCenter/ViewFile/Minutes/_07072026-2808","The county planning board reviewed a 17-lot residential subdivision on 188.99 acres, each lot with its own septic and well, and the re-approval of a 72-unit Tuxedo Reserve North Ridge plan.","This is the exact play in your book: big acreage, split into lots on septic and well. The board minutes are where the next one shows up first.","Approvals",true],["s8662","statewide","2026-01-07","NY State Senate","S8662: towns could not cut how many homes a lot allows","https://www.nysenate.gov/legislation/bills/2025/S8662","Introduced January 7, 2026, the bill would bar cities, towns and villages from adopting rules that reduce the number or density of homes allowed. Companion bill A8834 sits in the Assembly Local Governments Committee. Pending, not law.","If it passes, a town cannot down-zone a lot in your book. Density would only move one way.","Policy"],["s8730","statewide","Pending","NY State Senate","S8730: rezoning before the comprehensive plan is finished","https://www.nysenate.gov/legislation/bills/2025/S8730","The bill would let cities, villages and towns adopt or amend comprehensive rezoning plans before their comprehensive plans are done. The sponsor notes many codes have not been updated in decades. Pending, not law.","Faster rezonings mean the upside on raw land arrives sooner.","Policy"],["prohousing","statewide","2026-08-10","Governor's Office","$62 million open to make housing safe, affordable and accessible","https://www.governor.ny.gov/news/governor-hochul-announces-62-million-available-make-housing-safe-affordable-and-accessible","Applications opened for more than $62 million through state housing programs. Separately, certified Pro-Housing Communities received $5 million in planning grants in February, and certification is tied to up to $650 million in state funding.","A Pro-Housing town wants approvals, because state money depends on it. Those are the towns to split land in.","Policy"],["sewer","li","2024-11","The Nature Conservancy","Suffolk's sewer and septic fund: what it pays for and where it lands first","https://www.nature.org/en-us/newsroom/suffolk-approves-prop2/","Voters approved an eighth-cent sales tax in November 2024 to fund sewer expansion and septic upgrades through 2060. Per the county and local advocates, the Forge River sewer in Mastic-Shirley is expected to finish in 2026, and Oakdale 1A to start construction in 2026.","In Suffolk the septic rule usually caps how many lots a parcel yields. Where a sewer arrives, that cap lifts. Watch the sewer map against your book.","Approvals",true],["hvmarket","hv","Fall 2026","Century 21 Alliance Group","Hudson Valley housing market report, fall 2026","https://www.c21alliancegroup.com/content/hudson-valley-housing-market-report-fall-2026","The Mid-Hudson (Dutchess, Orange, Ulster) is normalizing: move-in-ready homes sell fast, homes that need major work sit longer.","Land and projects that need work sit, then expire. That is where your aged expired targets come from.","Market"],["trailblazers","hv","2026-10","City & State New York","The 2026 Hudson Valley Trailblazers","https://www.cityandstateny.com/power-lists/2026/10/2026-hudson-valley-trailblazers/416333/","City & State's list of the people moving the region this year: officials, developers and civic leaders.","The people who sign off on approvals and the developers who need land, in one list.","People"],["bronx","nyc","2024-08","City Limits","East Bronx rezoning: about 7,000 homes around four new Metro-North stations","https://citylimits.org/council-approves-rezoning-to-spur-7k-new-homes-around-future-east-bronx-train-stations/","The Council approved the rezoning of about 46 blocks around the new stations, with roughly 1,700 of the 7,000 homes income-restricted, plus close to $500 million in local infrastructure.","Lots near the new stations are priced on that rezoning. It still sets the comps in the East Bronx.","Approvals",true],["cityofyes","nyc","Filed Mar 2025","Bronx Times","Some Bronx neighborhoods say no to City of Yes in an ongoing lawsuit","https://www.bxtimes.com/some-bronx-neighborhoods-say-no-to-city-of-yes-in-ongoing-lawsuit/","A lawsuit filed in March 2025 by more than 100 plaintiffs challenges the three City of Yes rezonings, which the city expects to add 82,000 homes over 15 years. No ruling was found.","Until the case resolves, City of Yes density is the rule, with a question mark next to it.","Policy",true]],"boardsTitle":"Boards to watch","boardsSub":"where splits get approved","boards":[["Southampton Planning Board","Public hearings October 8 and October 22","https://www.southamptontownny.gov/320/Planning-Board"],["Islip Zoning Board of Appeals","Met October 13 at Town Hall West","https://www.islipny.gov/news/announcements/715-zoning-board-of-appeals-meeting-october-13th-2026"],["Riverhead Town Board + ZBA","Town Board October 6 · ZBA and work session October 8","https://riverheadminutes.com/"],["Suffolk County Planning Commission","Reviews subdivisions and zoning changes that cross county thresholds","https://www.suffolkcountyny.gov/Departments/Economic-Development-and-Planning/Planning-and-Environment/Regulatory-Review/Suffolk-County-Planning-Commission"],["Orange County Planning Board","Monthly minutes list every subdivision referred","https://www.orangecountyny.gov/AgendaCenter/ViewFile/Minutes/_07072026-2808"],["NYS Guide to Planning and Zoning Laws","The 2026 edition: how subdivision review works, board by board","https://dos.ny.gov/system/files/documents/2026/02/guide-to-planning-and-zoning-laws-in-nys.pdf"]],"memoRe":"land, approvals and buyers","footer":"Sources are the publishers linked on each story. \"Background\" marks a story older than three months that still shapes the market. Pending bills are pending: nothing here assumes they pass.","blog":{"title":"New York land and development: what moved in {month}","intro":"Land, approvals and buyers moved across New York this month. Here is what changed, region by region, with a link to every source.","outro":"Own land, or a house on a big lot, in New York and wondering what it is worth to a builder right now? Team Musso can walk you through it."}};
+// ════════════════════════════════════════════════════════════════════════════
+
+const ITEMS = DESK.items.map(([id, area, date, source, headline, url, summary, why, kind, background]) => ({ id, area, date, source, headline, url, summary, why, kind, background: !!background }));
+const AREA = Object.fromEntries(DESK.areas.map((a) => [a.key, a]));
 const $ = (s) => document.querySelector(s);
 const esc = (s) => String(s == null ? "" : s).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
-// A date is shown only as precisely as the source gave it: a day, a month, or a label.
+// a date is shown only as precisely as the source gave it: a day, a month, or a label
 const day = (d) => /^\d{4}-\d{2}-\d{2}$/.test(d) ? new Date(d + "T12:00:00").toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })
   : /^\d{4}-\d{2}$/.test(d) ? new Date(d + "-15T12:00:00").toLocaleDateString("en-US", { month: "short", year: "numeric" }) : d;
-const SORT = { "Pending": "2026-01-08", "Fall 2026": "2026-09-22", "Filed Mar 2025": "2025-03" };
-const sortKey = (d) => SORT[d] || d;
+const sortKey = (d) => (DESK.sortDates || {})[d] || d;
 const host = (u) => { try { return new URL(u).hostname.replace(/^www\./, ""); } catch (e) { return ""; } };
-function card(n, lead) {
-  const [id, area, date, source, h, url, sum, why, kind, bg] = n;
-  return `<article class="item${lead ? " lead" : ""}" data-area="${area}">
-    <div class="meta"><span class="pill ${area === "li" ? "b" : area === "hv" ? "g" : area === "nyc" ? "w" : ""}">${esc(AREA_LABEL[area])}</span><span class="pill">${esc(kind)}</span>${bg ? `<span class="pill">Background</span>` : ""}<span>${esc(day(date))} · ${esc(source)}</span></div>
-    <h3><a href="${esc(url)}" target="_blank" rel="noopener">${esc(h)}</a></h3>
-    <p>${esc(sum)}</p>
-    <div class="why"><b>Why it matters to you:</b> ${esc(why)}</div>
-    <div class="src">Source: <a href="${esc(url)}" target="_blank" rel="noopener">${esc(host(url))}</a></div>
+const byId = new Map(ITEMS.map((n) => [n.id, n]));
+const TOP = DESK.top.map((id) => byId.get(id)).filter(Boolean);
+const newestFirst = (a, b) => (a.background ? 1 : 0) - (b.background ? 1 : 0) || sortKey(b.date).localeCompare(sortKey(a.date));
+const inArea = (k) => ITEMS.filter((n) => n.area === k && !DESK.top.includes(n.id)).sort(newestFirst);
+const month = new Date(DESK.updated + "T12:00:00").toLocaleDateString("en-US", { month: "long", year: "numeric" });
+const updatedLong = new Date(DESK.updated + "T12:00:00").toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric", year: "numeric" });
+
+// ── chrome ──
+document.title = `${DESK.client} ${DESK.desk}`;
+$("#brand").innerHTML = `${esc(DESK.client)}<span class="sep">·</span>${esc(DESK.desk)}`;
+$("#nav").innerHTML = DESK.nav.map(([l, u]) => `<a href="${esc(u)}">${esc(l)}</a>`).join("") + `<a href="#top" aria-current="page">Intelligence</a>`;
+$("#eyebrow").textContent = DESK.eyebrow;
+$("#h1").textContent = DESK.title;
+$("#intro").textContent = DESK.intro;
+$("#updated").textContent = `Updated ${updatedLong} · every story links to its source`;
+$("#footer").textContent = DESK.footer;
+$("#boards-h").innerHTML = `${esc(DESK.boardsTitle)} <small>${esc(DESK.boardsSub)}</small>`;
+
+// ── the feed ──
+const ICON = {
+  Land: '<path d="M3 19l6-9 4 6 3-4 5 7z"/>',
+  Rates: '<circle cx="7" cy="7" r="2.5"/><circle cx="17" cy="17" r="2.5"/><path d="M19 5L5 19"/>',
+  Market: '<path d="M3 17l5-5 4 3 8-8"/><path d="M15 7h5v5"/>',
+  Development: '<path d="M4 20V9l6-4v15M10 20h10V11l-6-3"/><path d="M14 13h2M14 16h2"/>',
+  Approvals: '<rect x="4" y="4" width="16" height="16" rx="3"/><path d="M8 12l3 3 5-6"/>',
+  Policy: '<path d="M7 3h7l4 4v14H7z"/><path d="M10 11h5M10 15h5"/>',
+  People: '<circle cx="12" cy="8" r="3.5"/><path d="M5 20c1.5-4 4-5 7-5s5.5 1 7 5"/>',
+};
+const icon = (k) => `<svg class="ic" viewBox="0 0 24 24" aria-hidden="true">${ICON[k] || '<circle cx="12" cy="12" r="4"/>'}</svg>`;
+function card(n, lead, i) {
+  const a = AREA[n.area] || { label: n.area, pill: "" };
+  return `<article class="item${lead ? " lead" : ""} edge-${esc(a.pill || "n")}" data-area="${esc(n.area)}">
+    ${lead ? `<div class="num" aria-hidden="true">${i + 1}</div>` : ""}<div class="meta">${icon(n.kind)}<span class="pill ${esc(a.pill || "")}">${esc(a.short || a.label)}</span><span class="pill">${esc(n.kind)}</span>${n.background ? `<span class="pill">Background</span>` : ""}<span>${esc(day(n.date))}</span></div>
+    <h3><a href="${esc(n.url)}" target="_blank" rel="noopener">${esc(n.headline)}</a></h3>
+    <div class="why"><b>Why it matters:</b> ${esc(n.why)}</div>
+    <details class="more"><summary>The details</summary><p>${esc(n.summary)}</p><div class="src">Source: <a href="${esc(n.url)}" target="_blank" rel="noopener">${esc(n.source)} · ${esc(host(n.url))}</a></div></details>
   </article>`;
 }
-const byId = new Map(N.map((n) => [n[0], n]));
-$("#toplist").innerHTML = TOP.map((id) => card(byId.get(id), true)).join("");
-for (const box of document.querySelectorAll(".list[data-area]")) {
-  const a = box.dataset.area;
-  box.innerHTML = N.filter((n) => n[1] === a && !TOP.includes(n[0])).sort((x, y) => (x[9] ? 1 : 0) - (y[9] ? 1 : 0) || sortKey(y[2]).localeCompare(sortKey(x[2]))).map((n) => card(n)).join("");
+$("#toplist").innerHTML = TOP.map((n, i) => card(n, true, i)).join("");
+$("#areas").innerHTML = DESK.areas.filter((a) => inArea(a.key).length).map((a) => `<section id="${esc(a.key)}"><details class="region"><summary class="rh">${esc(a.label)} <small>${inArea(a.key).length} ${inArea(a.key).length === 1 ? "story" : "stories"} · ${esc(a.sub)}</small></summary><div class="list">${inArea(a.key).map((n) => card(n)).join("")}</div></details></section>`).join("");
+$("#boardlist").innerHTML = DESK.boards.map(([h, s, u]) => `<article class="item"><h3><a href="${esc(u)}" target="_blank" rel="noopener">${esc(h)}</a></h3><p>${esc(s)}</p><div class="src">Source: <a href="${esc(u)}" target="_blank" rel="noopener">${esc(host(u))}</a></div></article>`).join("");
+
+// ── the remix: the same stories, four more ways (built from the stories above, nothing invented) ──
+const link = (n) => `<a href="${esc(n.url)}" target="_blank" rel="noopener">${esc(n.source)}</a>`;
+const ORD = ["First", "Second", "Third", "Fourth", "Fifth"];
+const current = DESK.areas.map((a) => [a, inArea(a.key).filter((n) => !n.background)]).filter(([, l]) => l.length);
+const background = ITEMS.filter((n) => n.background && !DESK.top.includes(n.id)).sort(newestFirst);
+
+const FORMATS = {
+  story() {
+    return `<div class="eyebrow">Story mode · ${esc(month)}</div>
+      <h2>${esc(month)}: what moved, and what it means for ${esc(DESK.client)}</h2>
+      <p class="lede">${TOP.length === 3 ? "Three things" : `${TOP.length} things`} will shape the next 90 days. Here they are in order, then the rest of the month, region by region.</p>
+      ${TOP.map((n, i) => `<p><b>${ORD[i] || ""}: ${esc(n.headline)}.</b> ${esc(n.summary)} ${esc(n.why)}</p>`).join("")}
+      ${current.map(([a, list]) => `<h3>${esc(a.label)}</h3>${list.map((n) => `<p>${esc(n.summary)} ${esc(n.why)} <span class="small">(${link(n)}, ${esc(day(n.date))})</span></p>`).join("")}`).join("")}
+      ${background.length ? `<h3>Still shaping the market</h3>${background.map((n) => `<p>${esc(n.summary)} ${esc(n.why)} <span class="small">(${link(n)}, ${esc(day(n.date))})</span></p>`).join("")}` : ""}
+      ${DESK.boards.length ? `<h3>Where the next deal shows up first</h3><p>${DESK.boards.map(([h, s]) => `<b>${esc(h)}</b>: ${esc(s)}.`).join(" ")}</p>` : ""}`;
+  },
+  memo() {
+    return `<div class="eyebrow">Memo</div>
+      <div class="memohead"><b>To</b><span>${esc(DESK.client)}</span><b>From</b><span>${esc(DESK.from)}</span><b>Date</b><span>${esc(updatedLong)}</span><b>Re</b><span>${esc(month)}: ${esc(DESK.memoRe)}</span></div>
+      <h3>Bottom line</h3><ul>${TOP.map((n) => `<li><b>${esc(n.headline)}.</b> ${esc(n.why)}</li>`).join("")}</ul>
+      <h3>What changed</h3>${current.map(([a, list]) => `<h4>${esc(a.label)}</h4><ul>${list.map((n) => `<li>${esc(n.headline)} <span class="small">(${esc(day(n.date))}, ${link(n)})</span></li>`).join("")}</ul>`).join("")}
+      <h3>What it means for your book</h3><ul>${current.flatMap(([, list]) => list).map((n) => `<li>${esc(n.why)}</li>`).join("")}</ul>
+      ${DESK.boards.length ? `<h3>Watch next</h3><ul>${DESK.boards.map(([h, s, u]) => `<li><a href="${esc(u)}" target="_blank" rel="noopener">${esc(h)}</a>: ${esc(s)}</li>`).join("")}</ul>` : ""}
+      ${background.length ? `<h3>Background</h3><ul>${background.map((n) => `<li>${esc(n.headline)} <span class="small">(${esc(day(n.date))}, ${link(n)})</span></li>`).join("")}</ul>` : ""}`;
+  },
+  briefing() {
+    const fresh = ITEMS.filter((n) => !n.background && !DESK.top.includes(n.id)).sort(newestFirst).slice(0, 2);
+    const five = [...TOP, ...fresh];
+    return `<div class="eyebrow">Briefing · read in 60 seconds</div>
+      <h2>Your ${esc(month)} briefing</h2>
+      <p class="small">${esc(updatedLong)} · ${five.length} things to know · ${ITEMS.length} stories on the desk</p>
+      <ol class="brief">${five.map((n) => `<li><span class="pill">${esc(n.kind)}</span><b>${esc(n.headline)}.</b><br>${esc(n.why)} <span class="small">(${link(n)})</span></li>`).join("")}</ol>
+      ${DESK.boards.length ? `<p><b>Watch this week:</b> ${DESK.boards.slice(0, 3).map(([h]) => esc(h)).join(" · ")}.</p>` : ""}`;
+  },
+  blog() {
+    // public-facing: the facts and the sources, never the client's private "why"
+    return `<div class="eyebrow">Blog post · ready to publish</div>
+      <h2>${esc(DESK.blog.title.replace("{month}", month))}</h2>
+      <p class="lede">${esc(DESK.blog.intro)}</p>
+      ${TOP.length ? `<h3>The three stories that matter most</h3>${TOP.map((n) => `<p><b>${esc(n.headline)}.</b> ${esc(n.summary)} <span class="small">(${link(n)})</span></p>`).join("")}` : ""}
+      ${current.map(([a, list]) => `<h3>${esc(a.label)}</h3>${list.map((n) => `<p><b>${esc(n.headline)}.</b> ${esc(n.summary)} <span class="small">(${link(n)})</span></p>`).join("")}`).join("")}
+      ${background.length ? `<h3>Context that still matters</h3>${background.map((n) => `<p><b>${esc(n.headline)}.</b> ${esc(n.summary)} <span class="small">(${link(n)})</span></p>`).join("")}` : ""}
+      <p>${esc(DESK.blog.outro)}</p>`;
+  },
+};
+const MODES = [["feed", "Intelligence feed"], ["story", "Story"], ["memo", "Memo"], ["briefing", "Briefing"], ["blog", "Blog post"]];
+let mode = "feed";
+function setMode(m, push) {
+  mode = FORMATS[m] ? m : "feed";
+  $("#modes").innerHTML = MODES.map(([k, l]) => `<button class="mode" type="button" data-m="${k}" aria-pressed="${k === mode}">${l}</button>`).join(" ");
+  const remix = mode !== "feed";
+  $("#feedview").hidden = remix; $("#remixview").hidden = !remix;
+  if (remix) $("#doc").innerHTML = FORMATS[mode]();
+  $("#copy").textContent = "Copy text"; $("#copy").classList.remove("ok");
+  if (push) history.replaceState(null, "", mode === "feed" ? location.pathname + location.search : "#" + mode);
 }
-$("#boardlist").innerHTML = BOARDS.map(([h, s, u]) => `<article class="item"><h3><a href="${esc(u)}" target="_blank" rel="noopener">${esc(h)}</a></h3><p>${esc(s)}</p><div class="src">Source: <a href="${esc(u)}" target="_blank" rel="noopener">${esc(host(u))}</a></div></article>`).join("");
-const counts = { all: N.length };
-for (const n of N) counts[n[1]] = (counts[n[1]] || 0) + 1;
-let cur = "all";
-try { const saved = localStorage.getItem("tm-news-area"); if (saved && counts[saved]) cur = saved; } catch (e) {}
-function apply() {
-  $("#chips").innerHTML = AREAS.map(([k, l]) => `<button class="chip" type="button" data-k="${k}" aria-pressed="${k === cur}">${esc(l)}<span class="ct">${counts[k] || 0}</span></button>`).join("");
-  for (const s of ["statewide", "li", "hv", "nyc"]) document.getElementById(s).hidden = cur !== "all" && cur !== s;
-  document.querySelectorAll("#toplist .item").forEach((el) => { el.hidden = cur !== "all" && el.dataset.area !== cur; });
-  $("#first").hidden = ![...document.querySelectorAll("#toplist .item")].some((el) => !el.hidden);
-}
-$("#chips").addEventListener("click", (e) => { const b = e.target.closest("[data-k]"); if (!b) return; cur = b.dataset.k; try { localStorage.setItem("tm-news-area", cur); } catch (err) {} apply(); });
-apply();
+$("#modes").addEventListener("click", (e) => { const b = e.target.closest("[data-m]"); if (b) setMode(b.dataset.m, true); });
+$("#back").addEventListener("click", () => setMode("feed", true));
+$("#print").addEventListener("click", () => window.print());
+$("#copy").addEventListener("click", async () => {
+  const text = $("#doc").innerText.trim();
+  let ok = false;
+  try { await navigator.clipboard.writeText(text); ok = true; } catch (e) {
+    try { const t = document.createElement("textarea"); t.value = text; document.body.appendChild(t); t.select(); ok = document.execCommand("copy"); t.remove(); } catch (e2) {}
+  }
+  $("#copy").textContent = ok ? "Copied" : "Select the text to copy"; $("#copy").classList.toggle("ok", ok);
+});
+addEventListener("hashchange", () => setMode(location.hash.slice(1), false));
+setMode(location.hash.slice(1), false);
 })();
 </script>
 </body>
