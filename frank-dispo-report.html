@@ -1,0 +1,500 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<style>body{margin:0}img{max-width:100%}[hidden]{display:none!important}:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}</style>
+<meta name="robots" content="noindex, nofollow">
+<title>Frank's Dispo Report</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Semi+Condensed:wght@600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@500;600&display=swap">
+<style>
+/* Layout: one operator board, read top-down. Summary tiles, then next actions, then the press mix, then every hand-raise, then the Being Worked book. */
+:root {
+  color-scheme: dark;
+  --bg: #06090f;
+  --panel: #0c121c;
+  --panel-2: #111a27;
+  --line: #1e2938;
+  --fg: #f4f7fc;
+  --fg-2: #cdd7e5;
+  --blue: #3b8cff;
+  --blue-2: #74adff;
+  --blue-3: #a9cbff;
+  --green: #12b76a;
+  --rose: #e05a8c;
+  --amber: #f5b83d;
+  --lav: #b197fc;
+  --slate: #8e9ab0;
+  --cyan: #5ec8f2;
+  --display: "Barlow Semi Condensed", "Arial Narrow", "Helvetica Neue", Arial, sans-serif;
+  --body: "IBM Plex Sans", "Segoe UI", system-ui, -apple-system, sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, "Cascadia Mono", Consolas, monospace;
+}
+* { box-sizing: border-box; }
+html { background: var(--bg); }
+body {
+  background: var(--bg);
+  color: var(--fg);
+  font-family: var(--body);
+  font-size: 16px;
+  line-height: 1.5;
+}
+.wrap {
+  max-width: 1120px;
+  margin: 0 auto;
+  padding-block: 32px 56px;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  display: flex;
+  flex-direction: column;
+  gap: 40px;
+}
+h1, h2 { font-family: var(--display); text-wrap: balance; margin: 0; letter-spacing: 0.01em; }
+h1 { font-size: clamp(2.2rem, 6vw, 3.4rem); line-height: 1.02; font-weight: 700; }
+h2 { font-size: 1.6rem; font-weight: 700; }
+p { margin: 0; }
+.eyebrow {
+  font-family: var(--mono);
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--blue);
+}
+.top { display: flex; flex-direction: column; gap: 10px; }
+.sub { color: var(--fg-2); font-size: 17px; max-width: 64ch; }
+.section { display: flex; flex-direction: column; gap: 16px; }
+.section-head { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 8px 16px; }
+.section-head p { color: var(--fg-2); font-size: 15px; }
+
+/* Tiles */
+.tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 12px; }
+.tile {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-top: 3px solid var(--slate);
+  border-radius: 6px;
+  padding: 16px 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+.tile .num { font-family: var(--display); font-size: 3rem; font-weight: 700; line-height: 1; font-variant-numeric: tabular-nums; }
+.tile .lbl { font-weight: 600; font-size: 16px; }
+.tile .meta { color: var(--fg-2); font-size: 15px; }
+.t-blue { border-top-color: var(--blue); } .t-blue .num { color: var(--blue); }
+.t-green { border-top-color: var(--green); } .t-green .num { color: var(--green); }
+.t-amber { border-top-color: var(--amber); } .t-amber .num { color: var(--amber); }
+.t-white .num { color: var(--fg); }
+
+/* Next actions */
+.todo { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 10px; counter-reset: todo; }
+.todo li {
+  counter-increment: todo;
+  display: grid;
+  grid-template-columns: 40px 1fr;
+  gap: 4px 14px;
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-left: 4px solid var(--c, var(--slate));
+  border-radius: 6px;
+  padding: 16px 18px 16px 14px;
+}
+.todo li::before {
+  content: counter(todo);
+  grid-row: span 2;
+  font-family: var(--display);
+  font-weight: 700;
+  font-size: 1.9rem;
+  line-height: 1;
+  color: var(--c, var(--slate));
+}
+.todo .what { font-weight: 600; font-size: 17px; }
+.todo .why { color: var(--fg-2); font-size: 16px; display: flex; flex-direction: column; gap: 10px; min-width: 0; }
+.todo .who { display: flex; flex-wrap: wrap; gap: 8px; }
+.c-rose { --c: var(--rose); } .c-amber { --c: var(--amber); } .c-blue { --c: var(--blue); } .c-slate { --c: var(--slate); }
+
+/* Chips */
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 15px;
+  font-weight: 600;
+  line-height: 1.25;
+  padding: 4px 10px;
+  border-radius: 999px;
+  border: 1.5px solid var(--k, var(--slate));
+  color: var(--k, var(--fg));
+  white-space: nowrap;
+}
+.chip.fill { background: var(--k); color: #04070c; border-color: var(--k); }
+.chip.soft { background: color-mix(in srgb, var(--k) 16%, transparent); color: var(--fg); }
+.k-blue { --k: var(--blue); } .k-green { --k: var(--green); } .k-rose { --k: var(--rose); }
+.k-amber { --k: var(--amber); } .k-lav { --k: var(--lav); } .k-slate { --k: var(--slate); } .k-cyan { --k: var(--cyan); }
+.sig {
+  display: inline-block;
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--fg);
+  background: var(--panel-2);
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  padding: 3px 8px;
+  white-space: nowrap;
+}
+.sig b { color: var(--cyan); font-weight: 600; }
+
+/* Press mix */
+.mix { background: var(--panel); border: 1px solid var(--line); border-radius: 6px; padding: 20px; display: flex; flex-direction: column; gap: 22px; }
+.mix-row { display: grid; grid-template-columns: 120px 1fr; gap: 8px 16px; align-items: center; }
+.mix-name { font-family: var(--display); font-weight: 700; font-size: 1.25rem; }
+.mix-name span { display: block; font-family: var(--mono); font-size: 15px; font-weight: 500; color: var(--fg-2); }
+.track { display: flex; height: 38px; border-radius: 4px; overflow: hidden; background: var(--panel-2); }
+.seg { height: 100%; display: flex; align-items: center; justify-content: center; font-family: var(--mono); font-weight: 600; font-size: 15px; color: #04070c; border-right: 2px solid var(--panel); min-width: 0; overflow: hidden; }
+.seg:last-child { border-right: 0; }
+.mix-detail { grid-column: 2; color: var(--fg-2); font-size: 15px; }
+.legend { display: flex; flex-wrap: wrap; gap: 10px 18px; padding-top: 4px; border-top: 1px solid var(--line); padding-block-start: 16px; }
+.legend span { display: inline-flex; align-items: center; gap: 8px; font-size: 15px; color: var(--fg); }
+.legend i { width: 14px; height: 14px; border-radius: 3px; display: inline-block; background: var(--k); }
+.s-appt { background: var(--green); } .s-hi { background: var(--blue); } .s-sell { background: var(--blue-2); }
+.s-cb { background: var(--blue-3); } .s-sold { background: var(--slate); } .s-wn { background: var(--lav); } .s-ni { background: var(--rose); }
+
+/* Table */
+.scroll { overflow-x: auto; border: 1px solid var(--line); border-radius: 6px; background: var(--panel); }
+table { width: 100%; border-collapse: collapse; min-width: 900px; }
+th, td { text-align: left; vertical-align: top; padding: 14px 14px; border-bottom: 1px solid var(--line); }
+tr:last-child td { border-bottom: 0; }
+th { font-family: var(--mono); font-size: 15px; font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase; color: var(--blue); background: var(--panel-2); white-space: nowrap; }
+td { font-size: 16px; }
+td .nm { font-weight: 600; font-size: 17px; }
+td .ad { color: var(--fg-2); font-size: 15px; }
+td .stack { display: flex; flex-direction: column; gap: 6px; align-items: flex-start; }
+td .when { font-family: var(--mono); font-size: 15px; color: var(--fg-2); }
+tr.row-alert td:first-child { box-shadow: inset 4px 0 0 var(--rose); }
+tr.row-call td:first-child { box-shadow: inset 4px 0 0 var(--amber); }
+tr.row-good td:first-child { box-shadow: inset 4px 0 0 var(--green); }
+.ws { font-family: var(--mono); font-weight: 600; font-size: 15px; }
+.ws-mir { color: var(--blue-2); } .ws-ehoa { color: var(--green); }
+.key { display: flex; flex-wrap: wrap; gap: 10px 20px; font-size: 15px; color: var(--fg-2); }
+.key span { display: inline-flex; align-items: center; gap: 8px; }
+.key i { width: 4px; height: 18px; border-radius: 2px; background: var(--k); display: inline-block; }
+
+/* Being worked */
+.books { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 14px; }
+.book { background: var(--panel); border: 1px solid var(--line); border-radius: 6px; display: flex; flex-direction: column; min-width: 0; }
+.book-head { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; padding: 14px 16px; border-bottom: 1px solid var(--line); }
+.book-head h3 { margin: 0; font-family: var(--display); font-size: 1.3rem; font-weight: 700; }
+.book-head .ct { font-family: var(--display); font-size: 1.6rem; font-weight: 700; color: var(--blue); font-variant-numeric: tabular-nums; }
+.lead { padding: 12px 16px; border-bottom: 1px solid var(--line); display: flex; flex-direction: column; gap: 6px; }
+.lead:last-child { border-bottom: 0; }
+.lead-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; flex-wrap: wrap; }
+.lead .nm { font-weight: 600; font-size: 17px; }
+.lead .ad { color: var(--fg-2); font-size: 15px; }
+.lead .tags { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+.lead .marked { font-family: var(--mono); font-size: 15px; color: var(--fg-2); }
+.note { padding: 12px 16px; color: var(--fg-2); font-size: 15px; border-top: 1px dashed var(--line); }
+
+footer { color: var(--fg-2); font-size: 15px; display: flex; flex-direction: column; gap: 6px; border-top: 1px solid var(--line); padding-top: 18px; max-width: 80ch; }
+footer code { font-family: var(--mono); font-size: 15px; color: var(--fg); }
+
+@media (max-width: 560px) {
+  .mix-row { grid-template-columns: 1fr; }
+  .mix-detail { grid-column: 1; }
+  .books { grid-template-columns: 1fr; }
+  .todo li { grid-template-columns: 30px 1fr; }
+}
+</style>
+</head>
+<body>
+<main class="wrap">
+
+  <header class="top">
+    <p class="eyebrow">Dispo report · Oct 5 – Oct 19, 2026</p>
+    <h1>Frank Mirando Jr</h1>
+    <p class="sub">Every disposition Frank pressed in Mirando Group and EHOA, where each hand-raise stands today, and what to do next.</p>
+  </header>
+
+  <section class="tiles" aria-label="Summary">
+    <div class="tile t-white"><span class="num">70</span><span class="lbl">Dispositions pressed</span><span class="meta">41 Mirando · 29 EHOA</span></div>
+    <div class="tile t-blue"><span class="num">11</span><span class="lbl">Hand-raises</span><span class="meta">9 Mirando · 2 EHOA</span></div>
+    <div class="tile t-green"><span class="num">3</span><span class="lbl">Meetings booked</span><span class="meta">Donald R. · Richard S. · Paul S.</span></div>
+    <div class="tile t-amber"><span class="num">8</span><span class="lbl">Hand-raises not called since</span><span class="meta">Oldest press Oct 7</span></div>
+  </section>
+
+  <section class="section">
+    <div class="section-head"><h2>Do these next</h2><p>In priority order</p></div>
+    <ol class="todo">
+      <li class="c-rose">
+        <span class="what">Close out 3 meetings</span>
+        <div class="why">
+          <span>All three dates have passed and none is marked done. Mark each one completed, or rebook it.</span>
+          <span class="who">
+            <span class="chip soft k-rose">Donald R. · Oct 9, 10:30 AM</span>
+            <span class="chip soft k-rose">Richard S. · Oct 9, 5:00 PM</span>
+            <span class="chip soft k-rose">Paul S. · Oct 10, 10:00 AM</span>
+          </span>
+        </div>
+      </li>
+      <li class="c-amber">
+        <span class="what">Call the 8 hand-raises</span>
+        <div class="why">
+          <span>Each of these raised a hand. No call has gone out since the press. Newest first:</span>
+          <span class="who">
+            <span class="chip soft k-amber">Barbara W. · Oct 16</span>
+            <span class="chip soft k-amber">Ann C. · Oct 16</span>
+            <span class="chip soft k-amber">Ioannis P. · Oct 16</span>
+            <span class="chip soft k-amber">Marlene B. · Oct 12</span>
+            <span class="chip soft k-amber">John S. · Oct 8</span>
+            <span class="chip soft k-amber">Paul S. · Oct 8</span>
+            <span class="chip soft k-amber">Timothy N. · Oct 8</span>
+            <span class="chip soft k-amber">Andrew C. · Oct 7</span>
+            <span class="chip soft k-amber">Michael D. · Oct 7</span>
+          </span>
+          <span>Paul S. also has the Oct 10 meeting above. Andrew C. and Michael D. are EHOA leads; the rest are Mirando.</span>
+        </div>
+      </li>
+      <li class="c-blue">
+        <span class="what">Confirm 2 EHOA OPPTs</span>
+        <div class="why"><span>Andrew C. and Michael D. show OPPT after a Sell press. Sell records intent. Thomas confirms whether they stay OPPT.</span></div>
+      </li>
+      <li class="c-slate">
+        <span class="what">Unmark David L. if he's not in play</span>
+        <div class="why"><span>A Nextier B2B dealership lead in Fairfield, marked Being Worked on Sep 18. The mark locks the lead from every other operator.</span></div>
+      </li>
+    </ol>
+  </section>
+
+  <section class="section">
+    <div class="section-head"><h2>Press mix</h2><p>Bar length is to scale: 41 presses fill the track</p></div>
+    <div class="mix">
+      <div class="mix-row">
+        <div class="mix-name">Mirando<span>41 presses</span></div>
+        <div class="track" role="img" aria-label="Mirando: 1 appointment, 7 high intent, 3 sell, 1 sold, 5 wrong number, 24 not interested">
+          <div class="seg s-appt" style="width:2.44%"></div>
+          <div class="seg s-hi" style="width:17.07%">7</div>
+          <div class="seg s-sell" style="width:7.32%">3</div>
+          <div class="seg s-sold" style="width:2.44%"></div>
+          <div class="seg s-wn" style="width:12.20%">5</div>
+          <div class="seg s-ni" style="width:58.53%">24</div>
+        </div>
+        <div class="mix-detail">1 appt set · 7 high intent · 3 sell · 1 sold · 5 wrong # · 24 not interested</div>
+      </div>
+      <div class="mix-row">
+        <div class="mix-name">EHOA<span>29 presses</span></div>
+        <div class="track" role="img" aria-label="EHOA: 3 sell, 2 callback, 11 wrong number, 13 not interested">
+          <div class="seg s-sell" style="width:7.32%">3</div>
+          <div class="seg s-cb" style="width:4.88%">2</div>
+          <div class="seg s-wn" style="width:26.83%">11</div>
+          <div class="seg s-ni" style="width:31.70%">13</div>
+        </div>
+        <div class="mix-detail">3 sell · 2 callback · 11 wrong # · 13 not interested</div>
+      </div>
+      <div class="legend">
+        <span><i class="s-appt"></i>Appt set</span>
+        <span><i class="s-hi"></i>High intent</span>
+        <span><i class="s-sell"></i>Sell</span>
+        <span><i class="s-cb"></i>Callback</span>
+        <span><i class="s-sold"></i>Sold</span>
+        <span><i class="s-wn"></i>Wrong number</span>
+        <span><i class="s-ni"></i>Not interested</span>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="section-head"><h2>Every hand-raise</h2><p>11 leads, newest press first</p></div>
+    <div class="key">
+      <span><i style="--k: var(--rose)"></i>Meeting date passed, not marked done</span>
+      <span><i style="--k: var(--amber)"></i>No call since the press</span>
+      <span><i style="--k: var(--green)"></i>Called after the press</span>
+    </div>
+    <div class="scroll">
+      <table>
+        <thead>
+          <tr><th>Lead</th><th>Book</th><th>Frank pressed</th><th>Event signal</th><th>Now</th><th>Since the press</th></tr>
+        </thead>
+        <tbody>
+          <tr class="row-call">
+            <td><div class="nm">Barbara W.</div><div class="ad">Saint James</div></td>
+            <td><span class="ws ws-mir">MIRANDO</span></td>
+            <td><div class="stack"><span class="chip k-blue">High intent</span><span class="when">Oct 16, 3:27 PM</span></div></td>
+            <td><span class="sig"><b>Expired</b> · Propstream</span></td>
+            <td><span class="chip fill k-blue">OPPT</span></td>
+            <td><span class="chip fill k-amber">No call yet</span></td>
+          </tr>
+          <tr class="row-call">
+            <td><div class="nm">Ann C.</div><div class="ad">Port Jefferson</div></td>
+            <td><span class="ws ws-mir">MIRANDO</span></td>
+            <td><div class="stack"><span class="chip k-blue">High intent</span><span class="when">Oct 16, 3:23 PM</span></div></td>
+            <td><span class="sig"><b>Expired</b> · Propstream</span></td>
+            <td><span class="chip fill k-blue">OPPT</span></td>
+            <td><span class="chip fill k-amber">No call yet</span></td>
+          </tr>
+          <tr class="row-call">
+            <td><div class="nm">Ioannis P.</div><div class="ad">Ronkonkoma</div></td>
+            <td><span class="ws ws-mir">MIRANDO</span></td>
+            <td><div class="stack"><span class="chip k-blue">High intent</span><span class="when">Oct 16, 3:21 PM</span></div></td>
+            <td><span class="sig"><b>Expired</b> · Propstream</span></td>
+            <td><span class="chip fill k-blue">OPPT</span></td>
+            <td><span class="chip fill k-amber">No call yet</span></td>
+          </tr>
+          <tr class="row-call">
+            <td><div class="nm">Marlene B.</div><div class="ad">Westhampton</div></td>
+            <td><span class="ws ws-mir">MIRANDO</span></td>
+            <td><div class="stack"><span class="chip k-blue">High intent</span><span class="when">Oct 12, 11:04 AM</span></div></td>
+            <td><span class="sig"><b>Expired</b> · Propstream</span></td>
+            <td><span class="chip k-amber">No response</span></td>
+            <td><span class="chip fill k-amber">No call yet</span></td>
+          </tr>
+          <tr class="row-alert">
+            <td><div class="nm">Richard S.</div><div class="ad">Commack</div></td>
+            <td><span class="ws ws-mir">MIRANDO</span></td>
+            <td><div class="stack"><span class="chip k-green">Appt set</span><span class="when">Oct 9, 2:35 PM</span></div></td>
+            <td><span class="sig"><b>Expired</b> · Propstream</span></td>
+            <td><span class="chip fill k-green">Appt booked</span></td>
+            <td><div class="stack"><span class="chip soft k-green">Called 3×</span><span class="chip soft k-rose">Meeting Oct 9, 5:00 PM · not marked done</span></div></td>
+          </tr>
+          <tr class="row-alert">
+            <td><div class="nm">Donald R.</div><div class="ad">East Hampton</div></td>
+            <td><span class="ws ws-mir">MIRANDO</span></td>
+            <td><div class="stack"><span class="chip k-blue">Sell</span><span class="when">Oct 8, 3:25 PM</span><span class="chip k-blue">High intent</span><span class="when">Oct 9, 10:54 AM</span></div></td>
+            <td><span class="sig"><b>Expired</b> · Propstream</span></td>
+            <td><span class="chip fill k-blue">OPPT</span></td>
+            <td><div class="stack"><span class="chip soft k-green">Called 2×</span><span class="chip soft k-rose">Meeting Oct 9, 10:30 AM · not marked done</span></div></td>
+          </tr>
+          <tr class="row-call">
+            <td><div class="nm">John S.</div><div class="ad">Southold</div></td>
+            <td><span class="ws ws-mir">MIRANDO</span></td>
+            <td><div class="stack"><span class="chip k-blue">High intent</span><span class="when">Oct 8, 4:01 PM</span></div></td>
+            <td><span class="sig"><b>Expired</b> · Propstream</span></td>
+            <td><span class="chip fill k-blue">OPPT</span></td>
+            <td><span class="chip fill k-amber">No call yet</span></td>
+          </tr>
+          <tr class="row-alert">
+            <td><div class="nm">Paul S.</div><div class="ad">Rocky Point</div></td>
+            <td><span class="ws ws-mir">MIRANDO</span></td>
+            <td><div class="stack"><span class="chip k-blue">Sell</span><span class="when">Oct 8, 3:20 PM</span></div></td>
+            <td><span class="sig"><b>Expired</b> · Propstream</span></td>
+            <td><span class="chip k-amber">No response</span></td>
+            <td><div class="stack"><span class="chip fill k-amber">No call yet</span><span class="chip soft k-rose">Meeting Oct 10, 10:00 AM · not marked done</span></div></td>
+          </tr>
+          <tr class="row-call">
+            <td><div class="nm">Timothy N.</div><div class="ad">Mount Sinai</div></td>
+            <td><span class="ws ws-mir">MIRANDO</span></td>
+            <td><div class="stack"><span class="chip k-blue">Sell</span><span class="when">Oct 8, 10:45 AM</span></div></td>
+            <td><span class="sig"><b>Probate</b> · LI Profiles · Sep 2026 list</span></td>
+            <td><span class="chip k-blue">Positive</span></td>
+            <td><span class="chip fill k-amber">No call yet</span></td>
+          </tr>
+          <tr class="row-call">
+            <td><div class="nm">Andrew C.</div><div class="ad">Glen Cove</div></td>
+            <td><span class="ws ws-ehoa">EHOA</span></td>
+            <td><div class="stack"><span class="chip k-blue">Callback</span><span class="when">Oct 6, 10:40 AM</span><span class="chip k-blue">Sell</span><span class="when">Oct 7, 11:57 AM</span></div></td>
+            <td><span class="sig"><b>Estate</b> · inherited · Sep 2026</span></td>
+            <td><span class="chip fill k-blue">OPPT</span></td>
+            <td><span class="chip fill k-amber">No call yet</span></td>
+          </tr>
+          <tr class="row-call">
+            <td><div class="nm">Michael D.</div><div class="ad">Town not on record</div></td>
+            <td><span class="ws ws-ehoa">EHOA</span></td>
+            <td><div class="stack"><span class="chip k-blue">Callback</span><span class="when">Oct 6, 10:40 AM</span><span class="chip k-blue">Sell</span><span class="when">Oct 7, 10:37 AM</span></div></td>
+            <td><div class="stack"><span class="sig"><b>Pre-foreclosure</b> · May 2026</span><span class="sig"><b>Lis pendens</b> · Aug 2025</span></div></td>
+            <td><span class="chip fill k-blue">OPPT</span></td>
+            <td><span class="chip fill k-amber">No call yet</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="section-head"><h2>Being Worked</h2><p>13 leads Frank has marked, by book</p></div>
+    <div class="books">
+
+      <div class="book">
+        <div class="book-head"><h3>Mirando · Homeowners</h3><span class="ct">7</span></div>
+        <div class="lead">
+          <div class="lead-top"><div><div class="nm">Maurice S.</div><div class="ad">Mastic Beach</div></div><span class="marked">Oct 8</span></div>
+          <div class="tags"><span class="chip k-cyan">Question</span><span class="sig"><b>Expired</b> · Propstream</span></div>
+        </div>
+        <div class="lead">
+          <div class="lead-top"><div><div class="nm">Florentina R.</div><div class="ad">North Babylon</div></div><span class="marked">Oct 8</span></div>
+          <div class="tags"><span class="chip k-blue">Positive</span><span class="sig"><b>Aged expired</b> · OneKey MLS</span></div>
+        </div>
+        <div class="lead">
+          <div class="lead-top"><div><div class="nm">Matthew P.</div><div class="ad">Lindenhurst</div></div><span class="marked">Oct 8</span></div>
+          <div class="tags"><span class="chip k-blue">Positive</span><span class="sig"><b>Expired</b> · Propstream</span></div>
+        </div>
+        <div class="lead">
+          <div class="lead-top"><div><div class="nm">D. C.</div><div class="ad">Southampton</div></div><span class="marked">Oct 8</span></div>
+          <div class="tags"><span class="chip k-blue">Positive</span><span class="sig"><b>Expired</b> · Propstream</span></div>
+        </div>
+        <div class="lead">
+          <div class="lead-top"><div><div class="nm">Timothy N.</div><div class="ad">Mount Sinai</div></div><span class="marked">Oct 8</span></div>
+          <div class="tags"><span class="chip k-blue">Positive</span><span class="sig"><b>Probate</b> · Sep 2026 list</span></div>
+        </div>
+        <div class="lead">
+          <div class="lead-top"><div><div class="nm">David H.</div><div class="ad">Shoreham</div></div><span class="marked">Oct 8</span></div>
+          <div class="tags"><span class="chip k-amber">No response</span><span class="sig"><b>Expired</b> · Propstream</span></div>
+        </div>
+        <div class="lead">
+          <div class="lead-top"><div><div class="nm">Brian T.</div><div class="ad">Cutchogue</div></div><span class="marked">Oct 8</span></div>
+          <div class="tags"><span class="chip k-amber">No response</span><span class="sig"><b>Expired</b> · Propstream</span></div>
+        </div>
+      </div>
+
+      <div class="book">
+        <div class="book-head"><h3>EHOA</h3><span class="ct">3</span></div>
+        <div class="lead">
+          <div class="lead-top"><div><div class="nm">Michael D.</div><div class="ad">Town not on record</div></div><span class="marked">Oct 7</span></div>
+          <div class="tags"><span class="chip fill k-blue">OPPT</span><span class="sig"><b>Pre-foreclosure</b> · May 2026</span></div>
+        </div>
+        <div class="lead">
+          <div class="lead-top"><div><div class="nm">Andrew C.</div><div class="ad">Glen Cove</div></div><span class="marked">Oct 7</span></div>
+          <div class="tags"><span class="chip fill k-blue">OPPT</span><span class="sig"><b>Estate</b> · Sep 2026</span></div>
+        </div>
+        <div class="lead">
+          <div class="lead-top"><div><div class="nm">Keisha H.</div><div class="ad">Medford</div></div><span class="marked">Oct 6</span></div>
+          <div class="tags"><span class="chip k-amber">No response</span><span class="sig"><b>Reverse mortgage</b> · Notice of foreclosure sale</span></div>
+        </div>
+      </div>
+
+      <div class="book">
+        <div class="book-head"><h3>Mirando · Agents</h3><span class="ct">2</span></div>
+        <div class="lead">
+          <div class="lead-top"><div><div class="nm">Azlm S.</div><div class="ad">Coram</div></div><span class="marked">Oct 19</span></div>
+          <div class="tags"><span class="chip k-blue">Positive</span><span class="sig"><b>Agent</b> book</span></div>
+        </div>
+        <div class="lead">
+          <div class="lead-top"><div><div class="nm">Robert D.</div><div class="ad">Manorville</div></div><span class="marked">Oct 19</span></div>
+          <div class="tags"><span class="chip k-blue">Positive</span><span class="sig"><b>Agent</b> book</span></div>
+        </div>
+        <div class="note">1 more (Vincent C.) opted out after the mark and is off every list.</div>
+      </div>
+
+      <div class="book">
+        <div class="book-head"><h3>Nextier · B2B</h3><span class="ct">1</span></div>
+        <div class="lead">
+          <div class="lead-top"><div><div class="nm">David L.</div><div class="ad">Fairfield</div></div><span class="marked">Sep 18</span></div>
+          <div class="tags"><span class="chip k-slate">Sourced</span><span class="sig"><b>Dealership</b> · USBizData</span></div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <footer>
+    <p>Read live from the Nextier database on Oct 19, 2026. All times are Eastern.</p>
+    <p>Presses are Frank's own disposition presses. Calls are every logged call after the press. Meetings are the booked calendar. Being Worked is the lead's own mark.</p>
+    <p>Names are shortened to first name and last initial for this shared copy.</p>
+    <p>Propstream expired leads carry no expiry month on the record, so none is shown.</p>
+  </footer>
+
+</main>
+</body>
+</html>
