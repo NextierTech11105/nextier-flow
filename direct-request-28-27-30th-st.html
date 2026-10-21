@@ -1,0 +1,396 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="robots" content="noindex,nofollow">
+<title>28-27 30th St Direct Request</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.css">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo+Narrow:wght@600;700&family=Public+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600&display=swap">
+<style>
+/* Direct request sheet: the property on the left, every traced phone pinned top right with its dispo. JEM lead-page palette: true black, blue, green for good news, amber/red for WN/STOP. Single dark theme by choice. */
+:root {
+  --bg: #000000; --panel: #0c0f14; --panel2: #121925; --line: #243042; --fg: #ffffff; --fg2: #d3dbe6;
+  --blue: #3b8cff; --green: #12b76a; --amber: #f2b44a; --red: #ff6363;
+  --display: "Archivo Narrow", "Arial Narrow", "Roboto Condensed", sans-serif;
+  --body: "Public Sans", "Segoe UI", Arial, sans-serif;
+  --mono: "IBM Plex Mono", Consolas, "Courier New", monospace;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; }
+img { max-width: 100%; }
+[hidden] { display: none !important; }
+body { background: var(--bg); color: var(--fg); font: 400 16px/1.55 var(--body); padding-top: env(safe-area-inset-top, 0px); padding-bottom: env(safe-area-inset-bottom, 0px); }
+.page { max-width: 1360px; margin: 0 auto; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); padding-block: 24px 56px;
+  display: grid; grid-template-columns: minmax(0, 1fr) 420px; grid-template-areas: "mast phones" "body phones"; gap: 28px 28px; align-items: start; }
+.mast { grid-area: mast; display: grid; gap: 10px; min-width: 0; }
+.body { grid-area: body; display: grid; gap: 30px; min-width: 0; }
+.phones { grid-area: phones; position: sticky; top: calc(env(safe-area-inset-top, 0px) + 12px); max-height: calc(100vh - 24px); overflow-y: auto; overscroll-behavior: contain;
+  border: 1px solid var(--line); border-radius: 10px; background: var(--panel); display: grid; align-content: start; }
+@media (max-width: 1040px) {
+  .page { grid-template-columns: minmax(0, 1fr); grid-template-areas: "mast" "phones" "body"; }
+  .phones { position: static; max-height: none; overflow: visible; }
+}
+.eyebrow { font: 600 15px/1.3 var(--mono); letter-spacing: .08em; text-transform: uppercase; color: var(--blue); display: flex; flex-wrap: wrap; gap: 4px 16px; }
+h1 { margin: 0; font: 700 clamp(40px, 6.4vw, 66px)/1 var(--display); text-wrap: balance; }
+.sub { margin: 0; font: 500 18px/1.45 var(--body); color: var(--fg2); max-width: 66ch; }
+.ids { display: flex; flex-wrap: wrap; gap: 6px 18px; font: 500 15px/1.4 var(--mono); color: var(--fg2); }
+.req { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); border: 1px solid var(--line); border-radius: 8px; overflow: hidden; margin-top: 8px; }
+.req > div { padding: 12px 16px; background: var(--panel); border-right: 1px solid var(--line); display: grid; gap: 2px; min-width: 0; }
+.req .k { font: 600 15px/1.2 var(--body); letter-spacing: .04em; text-transform: uppercase; color: var(--fg2); }
+.req .v { font: 700 19px/1.25 var(--display); overflow-wrap: anywhere; }
+h2 { margin: 0; font: 700 28px/1.1 var(--display); text-wrap: balance; }
+.lede { margin: 0; max-width: 70ch; color: var(--fg2); }
+.lede b { color: var(--fg); }
+section { display: grid; gap: 14px; }
+.visuals { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 14px; }
+@media (max-width: 760px) { .visuals { grid-template-columns: minmax(0, 1fr); } }
+figure { margin: 0; display: grid; gap: 8px; min-width: 0; }
+figure img { width: 100%; max-width: 100%; height: 320px; object-fit: cover; object-position: 62% 50%; border-radius: 8px; border: 1px solid var(--line); display: block; background: var(--panel); }
+figcaption { font-size: 15px; color: var(--fg2); }
+.mapbox { position: relative; height: 320px; border-radius: 8px; border: 1px solid var(--line); overflow: hidden; background: #05070b; }
+#map { position: absolute; inset: 0; }
+.maplibregl-ctrl-attrib { font-size: 11px; }
+.mapmsg { position: absolute; inset: 0; display: grid; place-items: center; padding: 16px; text-align: center; color: var(--fg2); }
+.legend { position: absolute; left: 10px; bottom: 10px; display: grid; gap: 4px; padding: 8px 10px; border-radius: 6px; background: rgba(0,0,0,.76); font-size: 15px; pointer-events: none; }
+.legend span { display: flex; align-items: center; gap: 8px; }
+.legend i { width: 14px; height: 14px; border-radius: 3px; display: inline-block; }
+.maprow { display: flex; flex-wrap: wrap; gap: 8px 16px; align-items: center; justify-content: space-between; }
+.btn { display: inline-flex; align-items: center; gap: 8px; font: 600 15px/1 var(--body); color: var(--fg); background: transparent; border: 1px solid var(--blue); border-radius: 6px; padding: 10px 14px; text-decoration: none; cursor: pointer; }
+.btn:hover { background: rgba(59,140,255,.16); }
+.band { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); border: 1px solid var(--line); border-radius: 8px; overflow: hidden; }
+@media (max-width: 760px) { .band { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 440px) { .band { grid-template-columns: minmax(0, 1fr); } }
+.cell { padding: 16px 18px; border-right: 1px solid var(--line); border-bottom: 1px solid var(--line); display: grid; gap: 4px; align-content: start; min-width: 0; background: var(--panel); }
+.cell .k { font: 600 15px/1.2 var(--body); letter-spacing: .04em; text-transform: uppercase; color: var(--fg2); }
+.cell .v { font: 700 28px/1.1 var(--display); font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
+.cell .n { font-size: 15px; color: var(--fg2); }
+.cell.good .v { color: var(--green); }
+.cell.est .v { color: var(--blue); }
+.cols { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 16px; }
+@media (max-width: 760px) { .cols { grid-template-columns: minmax(0, 1fr); } }
+dl { margin: 0; display: grid; border-top: 1px solid var(--line); }
+dl div { display: grid; grid-template-columns: 40% 60%; gap: 12px; padding: 11px 0; border-bottom: 1px solid var(--line); }
+dt { color: var(--fg2); font-weight: 600; }
+dd { margin: 0; overflow-wrap: anywhere; }
+.steps { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; counter-reset: s; }
+.steps li { counter-increment: s; display: grid; grid-template-columns: 36px minmax(0, 1fr); gap: 12px; padding: 14px 16px; border: 1px solid var(--line); border-radius: 8px; background: var(--panel); }
+.steps li::before { content: counter(s); font: 700 26px/1 var(--display); color: var(--blue); }
+.steps b { display: block; font-size: 17px; }
+.steps span { color: var(--fg2); }
+.deal { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 12px; }
+.deal > div { border: 1px solid var(--line); border-radius: 8px; padding: 16px 18px; display: grid; gap: 6px; align-content: start; background: var(--panel); }
+.deal .a { font: 700 21px/1.2 var(--display); }
+.deal .p { font: 600 16px/1.3 var(--mono); color: var(--green); }
+.deal .t { color: var(--fg2); }
+.pitch { margin: 0; border: 1px solid var(--blue); border-radius: 8px; padding: 14px 18px; background: var(--panel); max-width: 76ch; }
+.tw { overflow-x: auto; border: 1px solid var(--line); border-radius: 8px; }
+table { border-collapse: collapse; width: 100%; min-width: 640px; font-size: 15px; }
+th, td { text-align: left; padding: 10px 14px; border-bottom: 1px solid var(--line); vertical-align: top; }
+th { font: 600 15px/1.2 var(--body); letter-spacing: .04em; text-transform: uppercase; color: var(--fg2); background: var(--panel); }
+tbody tr:last-child td { border-bottom: 0; }
+td .s { display: block; color: var(--fg2); }
+.tag { display: inline-block; font: 600 15px/1.2 var(--mono); padding: 2px 8px; border-radius: 4px; border: 1px solid var(--line); color: var(--amber); }
+.foot { margin: 0; font-size: 15px; color: var(--fg2); border-top: 1px solid var(--line); padding-top: 14px; max-width: 84ch; }
+.foot a, .lede a { color: var(--blue); }
+
+/* Phones panel */
+.ph-head { padding: 16px 16px 12px; border-bottom: 1px solid var(--line); display: grid; gap: 6px; position: sticky; top: 0; background: var(--panel); z-index: 1; }
+.ph-head h2 { font-size: 26px; }
+.ph-meta { font-size: 15px; color: var(--fg2); }
+.tally { display: flex; flex-wrap: wrap; gap: 6px; font: 600 15px/1 var(--mono); font-variant-numeric: tabular-nums; }
+.tally span { padding: 6px 8px; border-radius: 5px; border: 1px solid var(--line); }
+.tally .t-ok { color: var(--green); } .tally .t-wn { color: var(--amber); } .tally .t-stop { color: var(--red); }
+.note { font-size: 15px; color: var(--amber); }
+.note:empty { display: none; }
+.who { padding: 14px 16px; border-bottom: 1px solid var(--line); display: grid; gap: 8px; }
+.who:last-child { border-bottom: 0; }
+.who-n { font: 700 21px/1.15 var(--display); }
+.who-r { font-size: 15px; color: var(--fg2); }
+.who-ask { font-size: 15px; color: var(--fg); }
+.who-ask.warn { color: var(--amber); }
+.ph { display: grid; gap: 8px; padding: 10px 12px; border: 1px solid var(--line); border-radius: 8px; background: var(--panel2); }
+.ph-top { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 4px 10px; }
+.num { font: 600 19px/1.2 var(--mono); font-variant-numeric: tabular-nums; user-select: all; }
+.lbl { font: 600 15px/1.2 var(--mono); letter-spacing: .04em; text-transform: uppercase; color: var(--blue); }
+.lbl.land { color: var(--fg2); }
+.mask { color: var(--fg2); letter-spacing: .02em; }
+.sheet { justify-self: start; }
+.ph-act { display: flex; flex-wrap: wrap; gap: 6px; }
+.d, .cp, .call { font: 700 15px/1 var(--body); padding: 9px 11px; border-radius: 6px; border: 1px solid var(--line); background: transparent; color: var(--fg); cursor: pointer; text-decoration: none; display: inline-flex; align-items: center; }
+.d:disabled { opacity: .45; cursor: not-allowed; }
+.d-ok { border-color: var(--green); color: var(--green); }
+.d-wn { border-color: var(--amber); color: var(--amber); }
+.d-stop { border-color: var(--red); color: var(--red); }
+.d-ok[aria-pressed="true"] { background: var(--green); color: #000; }
+.d-wn[aria-pressed="true"] { background: var(--amber); color: #000; }
+.d-stop[aria-pressed="true"] { background: var(--red); color: #000; }
+.cp, .call { margin-left: auto; color: var(--fg2); }
+.call { margin-left: 0; }
+.ph-st { font-size: 15px; color: var(--fg2); }
+.ph-st:empty { display: none; }
+.ph.is-confirmed { border-color: var(--green); }
+.ph.is-wn .num, .ph.is-stop .num { text-decoration: line-through; color: var(--fg2); }
+.ph.is-wn { border-color: var(--amber); }
+.ph.is-stop { border-color: var(--red); }
+.ph.busy { opacity: .7; }
+.em { font: 500 15px/1.5 var(--mono); color: var(--fg2); overflow-wrap: anywhere; user-select: all; }
+:focus-visible { outline: 3px solid var(--blue); outline-offset: 2px; }
+@media (prefers-reduced-motion: reduce) { * { scroll-behavior: auto !important; } }
+</style>
+</head>
+<body>
+
+
+<div class="page">
+  <header class="mast">
+    <div class="eyebrow"><span>Direct request</span><span>Neel · developer</span><span>JEM Consultant Grp</span><span>Oct 21, 2026</span></div>
+    <h1>28-27 30th Street</h1>
+    <p class="sub">The Verizon telephone building in Astoria: four stories on a 21,213 sq ft lot zoned C4-4A. Verizon has owned it for decades, carries no loan on it, and has sold parts of its other New York switching buildings to developers.</p>
+    <div class="ids"><span>BBL 4-00595-0010</span><span>Block 595 · Lot 10</span><span>Astoria, Queens, NY 11102</span><span>BIN 4007688</span></div>
+    <div class="req" aria-label="The request">
+      <div><span class="k">Requested by</span><span class="v">Neel (developer)</span></div>
+      <div><span class="k">Through</span><span class="v">Jeremy · JEM Consultant Grp</span></div>
+      <div><span class="k">Owner</span><span class="v">Verizon New York Inc.</span></div>
+      <div><span class="k">The ask</span><span class="v">Unused rights or spare floors</span></div>
+    </div>
+  </header>
+
+  <aside class="phones" aria-label="Traced phones">
+    <div class="ph-head">
+      <h2>Phones to call</h2>
+      <div class="ph-meta">22 phones and 12 emails from a Tracerfy skip trace on JEM's own account, Oct 21, 2026. Middle digits are hidden on this public page. Full numbers and the Confirmed / WN / STOP marks are on the private phone sheet.</div>
+      <a class="btn sheet" href="https://claude.ai/artifact/8xs8iuU54rju15oLy3yEEc" target="_blank" rel="noopener">Open the phone sheet</a>
+    </div>
+    <div id="people">
+    <div class="who">
+      <div class="who-n">Ronald Merhige, PE</div>
+      <div class="who-r">RLM Engineering PLLC. Verizon's engineer on the current job here (filed Apr 27, 2026) for Ethan Kannry.</div>
+      <div class="who-ask">Ask for the Verizon real estate contact and an intro to Ethan Kannry.</div>
+      <div class="ph"><div class="ph-top"><span class="num mask">646-•••-0016</span><span class="lbl">Primary · Mobile</span></div></div>
+      <div class="ph"><div class="ph-top"><span class="num mask">516-•••-6710</span><span class="lbl">Mobile 1</span></div></div>
+      <div class="ph"><div class="ph-top"><span class="num mask">516-•••-9340</span><span class="lbl">Mobile 2</span></div></div>
+      <div class="ph"><div class="ph-top"><span class="num mask">516-•••-9195</span><span class="lbl">Mobile 3</span></div></div>
+      <div class="ph"><div class="ph-top"><span class="num mask">631-•••-6620</span><span class="lbl">Mobile 4</span></div></div>
+      <div class="ph"><div class="ph-top"><span class="num mask">410-•••-0408</span><span class="lbl land">Landline 1</span></div></div>
+      <div class="ph"><div class="ph-top"><span class="num mask">631-•••-9195</span><span class="lbl land">Landline 2</span></div></div>
+      <div class="em">3 emails on the phone sheet</div>
+    </div>
+    <div class="who">
+      <div class="who-n">Steven Saraniero, RA</div>
+      <div class="who-r">WFC Architects. Verizon's architect on two jobs here: Neil Banach's (2021) and Miguel Figueiredo's (2022–25).</div>
+      <div class="who-ask">Ask who replaced Figueiredo and who signs off on a sale.</div>
+      <div class="ph"><div class="ph-top"><span class="num mask">516-•••-2087</span><span class="lbl">Primary · Mobile</span></div></div>
+      <div class="ph"><div class="ph-top"><span class="num mask">318-•••-9236</span><span class="lbl">Mobile 1</span></div></div>
+      <div class="ph"><div class="ph-top"><span class="num mask">516-•••-5807</span><span class="lbl">Mobile 2</span></div></div>
+      <div class="ph"><div class="ph-top"><span class="num mask">716-•••-7767</span><span class="lbl">Mobile 3</span></div></div>
+      <div class="ph"><div class="ph-top"><span class="num mask">631-•••-2995</span><span class="lbl land">Landline 1</span></div></div>
+      <div class="ph"><div class="ph-top"><span class="num mask">631-•••-2799</span><span class="lbl land">Landline 2</span></div></div>
+      <div class="ph"><div class="ph-top"><span class="num mask">631-•••-5052</span><span class="lbl land">Landline 3</span></div></div>
+      <div class="em">3 emails on the phone sheet</div>
+    </div>
+    <div class="who">
+      <div class="who-n">Patrick Conlon, PE</div>
+      <div class="who-r">Conlon Engineering, LLC. Verizon's engineer on Miguel Figueiredo's job here (2022–25).</div>
+      <div class="who-ask">Ask who replaced Figueiredo and who signs off on a sale.</div>
+      <div class="ph"><div class="ph-top"><span class="num mask">914-•••-3519</span><span class="lbl">Primary · Mobile</span></div></div>
+      <div class="ph"><div class="ph-top"><span class="num mask">914-•••-3797</span><span class="lbl">Mobile 1</span></div></div>
+      <div class="ph"><div class="ph-top"><span class="num mask">203-•••-8285</span><span class="lbl land">Landline 1</span></div></div>
+      <div class="ph"><div class="ph-top"><span class="num mask">914-•••-0360</span><span class="lbl land">Landline 2</span></div></div>
+      <div class="ph"><div class="ph-top"><span class="num mask">914-•••-0062</span><span class="lbl land">Landline 3</span></div></div>
+      <div class="em">3 emails on the phone sheet</div>
+    </div>
+    <div class="who">
+      <div class="who-n">Angela Rivera</div>
+      <div class="who-r">Expediter, filed for KM Associates. Filed Verizon's 2021 permit here for Neil Banach.</div>
+      <div class="who-ask warn">Common name. The match rests on her filing address, so confirm it's her first.</div>
+      <div class="ph"><div class="ph-top"><span class="num mask">631-•••-3674</span><span class="lbl">Primary · Mobile</span></div></div>
+      <div class="ph"><div class="ph-top"><span class="num mask">732-•••-1759</span><span class="lbl land">Landline 1</span></div></div>
+      <div class="ph"><div class="ph-top"><span class="num mask">732-•••-9621</span><span class="lbl land">Landline 2</span></div></div>
+      <div class="em">3 emails on the phone sheet</div>
+    </div>
+    </div>
+  </aside>
+
+  <main class="body">
+    <div class="visuals">
+      <figure>
+        <img src="media/lead-28-27-30th-st-street.jpg" alt="Four-story brick building with TELEPHONE BUILDING carved above the entrance at 28-27 30th Street" width="1600" height="712">
+        <figcaption>Street view, March 2026. "Telephone Building" is carved over the door.</figcaption>
+      </figure>
+      <figure>
+        <div class="mapbox">
+          <div id="map" role="img" aria-label="3D model of the blocks around 28-27 30th Street with the Verizon building in white"></div>
+          <div class="legend"><span><i style="background:#ffffff"></i>Verizon building · ~60 ft</span><span><i style="background:#12b76a"></i>Unused rights (est.)</span></div>
+        </div>
+        <div class="maprow">
+          <figcaption>Live 3D map. Drag to turn, scroll to zoom.</figcaption>
+          <a class="btn" href="https://www.google.com/maps/@40.76775,-73.9216,190a,35y,62t/data=!3m1!1e3" target="_blank" rel="noopener">Open in Google 3D</a>
+        </div>
+      </figure>
+    </div>
+
+    <div class="band" aria-label="Key numbers">
+      <div class="cell"><div class="k">Lot</div><div class="v">21,213 sq ft</div><div class="n">198 × 111 ft</div></div>
+      <div class="cell"><div class="k">Zoning</div><div class="v">C4-4A</div><div class="n">FAR 4.0 · ~84,852 sq ft max</div></div>
+      <div class="cell"><div class="k">Building</div><div class="v">4 floors</div><div class="n">~60 ft roof · ~16,500 sq ft footprint</div></div>
+      <div class="cell est"><div class="k">Unused rights</div><div class="v">~19,000 sq ft</div><div class="n">estimate · confirm with a survey</div></div>
+      <div class="cell good"><div class="k">Debt</div><div class="v">None open</div><div class="n">old liens satisfied 2003</div></div>
+      <div class="cell"><div class="k">Last sale</div><div class="v">None recorded</div><div class="n">no deed in city records</div></div>
+    </div>
+
+    <section>
+      <h2>Call order</h2>
+      <ol class="steps">
+        <li><div><b>Ron Merhige · RLM Engineering</b><span>Verizon's engineer on the current job here, filed April 2026 for Ethan Kannry. Ask who in Verizon real estate owns this building and for an intro to Kannry.</span></div></li>
+        <li><div><b>Steven Saraniero · WFC Architects</b><span>Verizon's architect on two jobs here (2021 and 2022–25). Ask who took over from Miguel Figueiredo and who signs off on a sale.</span></div></li>
+        <li><div><b>Patrick Conlon · Conlon Engineering</b><span>Engineer on Figueiredo's 2022–25 job. Same two questions.</span></div></li>
+        <li><div><b>KM Associates of New York · Angela Rivera</b><span>The expediter that files Verizon's permits here, 14 Penn Plaza. Confirm Rivera is the right person before you pitch.</span></div></li>
+        <li><div><b>Mail the LOI certified</b><span>Verizon Communications Inc., Attn Global Real Estate / Ethan Kannry; cc William L. Horton, Jr., Corporate Secretary. Verizon is moving its New York headquarters to Penn 2 in 2026, so confirm the street address before mailing.</span></div></li>
+        <li><div><b>Follow up 7 days after the LOI lands</b><span>Call Kannry's line through whoever made the intro.</span></div></li>
+      </ol>
+    </section>
+
+    <section>
+      <h2>Verizon's people on this building</h2>
+      <p class="lede">Every Verizon owner representative on a city permit for this building since 2019, and the firms that filed the work for them. The owner reps have no phone in public records, and the trace found none of them at Verizon's headquarters address. The firms are the way in.</p>
+      <div class="tw"><table>
+        <thead><tr><th>Years</th><th>Verizon owner rep</th><th>Who filed the work</th></tr></thead>
+        <tbody>
+          <tr><td>2026</td><td><b>Ethan Kannry</b><span class="s">Job Q01378840 · fire pump, permit Jun 2026</span></td><td>RLM Engineering (Ronald Merhige, PE) · New York Plumbing Heating Cooling</td></tr>
+          <tr><td>2022–2025</td><td><b>Miguel Figueiredo</b><span class="s">Job Q00781552 · generator and switchgear</span></td><td>WB Engineers (Desmond Greene, PE) · Conlon Engineering (Patrick Conlon, PE) · WFC Architects (Steven Saraniero, RA) · KM Associates (Keyana Fluitt) · Tishman Interiors</td></tr>
+          <tr><td>2021</td><td><b>Neil Banach</b><span class="s">Job Q00468560</span></td><td>Jacobsen &amp; Horan Engineering (Kenneth Horan, PE) · WFC Architects (Steven Saraniero, RA) · Angela Rivera for KM Associates · Tishman Interiors</td></tr>
+          <tr><td>2020</td><td><b>Ryan Silveira</b><span class="s">Boiler and gas service</span></td><td>Stracar Engineering (Miro Stracar, PE) · Master Tech Plumbing</td></tr>
+          <tr><td>2019</td><td><b>David Riccitelli</b><span class="s">Verizon Communications, Inc.</span></td><td>James Dowiat, PE · J T &amp; T Air Conditioning</td></tr>
+        </tbody>
+      </table></div>
+      <p class="lede"><b>Do not use:</b> Ignazio Artale, a contractor at On-Trac Construction, not Verizon. Skip the Verizon Wireless landlord line and its Bedminster and Basking Ridge addresses; that desk handles cell-tower leases, and this building belongs to Verizon New York, the wireline company. C T Corporation at 28 Liberty St only accepts legal papers.</p>
+    </section>
+
+    <section>
+      <h2>Who decides</h2>
+      <p class="lede">A sale goes through Verizon's corporate real estate group and up to finance. These names come from Verizon's own SEC filings.</p>
+      <div class="tw"><table>
+        <thead><tr><th>Name</th><th>Role</th><th>Why they matter</th></tr></thead>
+        <tbody>
+          <tr><td><b>Anthony Skiadas</b></td><td>EVP and Chief Financial Officer</td><td>The real estate exit charges sit in the results he reports.<span class="s">Source: 2026 proxy statement</span></td></tr>
+          <tr><td><b>Daniel Schulman</b></td><td>Chief Executive Officer since Oct 4, 2025</td><td>Top of the company<span class="s">Source: 2026 proxy statement</span></td></tr>
+          <tr><td><b>Vandana Venkatesh</b></td><td>EVP and Chief Legal Officer</td><td>Legal sign-off on any property sale<span class="s">Source: 2026 proxy statement</span></td></tr>
+          <tr><td><b>William L. Horton, Jr.</b></td><td>SVP, Deputy General Counsel and Corporate Secretary</td><td>Signs Verizon's SEC filings · the formal address for letters<span class="s">Source: 8-K filings, 2026</span></td></tr>
+          <tr><td><b>Global Real Estate group</b></td><td>Buys, sells and leases Verizon buildings</td><td>Its last public head was John Vazquez, SVP (2019). Confirm the current head before sending.</td></tr>
+        </tbody>
+      </table></div>
+    </section>
+
+    <section>
+      <h2>Why now</h2>
+      <div class="deal">
+        <div><div class="a">Verizon is exiting real estate</div><div class="p">$583M in 2025 charges</div><div class="t">Its 2025 annual report (SEC Form 10-K) ties the charges "predominately" to "the decision to cease use of certain real estate assets."</div></div>
+        <div><div class="a">It just bought Frontier</div><div class="p">Closed January 2026</div><div class="t">Two networks merging means more buildings to consolidate. The same 10-K says Verizon owns substantially all its switching centers.</div></div>
+      </div>
+    </section>
+
+    <section>
+      <h2>How Verizon has sold before</h2>
+      <div class="deal">
+        <div><div class="a">140 West St, Manhattan</div><div class="p">$274M · ~40% of the building</div><div class="t">Upper floors sold as a condo interest to Magnum Real Estate. Verizon kept the switching floors.</div></div>
+        <div><div class="a">435 W 50th St, Manhattan</div><div class="p">$20M · 101,000 of 300,000 sq ft</div><div class="t">Sold to JDS Development and Property Markets Group. Verizon kept the rest.</div></div>
+      </div>
+      <p class="pitch"><b>The offer that fits:</b> buy the unused building rights or the floors Verizon doesn't need, and leave the switching equipment in place. That is the shape of both past deals.</p>
+    </section>
+
+    <section>
+      <h2>Owner</h2>
+      <div class="cols">
+        <dl>
+          <div><dt>Owner of record</dt><dd><b>Verizon New York Inc.</b></dd></div>
+          <div><dt>Former name</dt><dd>New York Telephone Co.</dd></div>
+          <div><dt>Incorporated</dt><dd>1896 (New York State)</dd></div>
+          <div><dt>Owner type</dt><dd>Public utility · corporation</dd></div>
+        </dl>
+        <dl>
+          <div><dt>Use</dt><dd>Telephone switching building (utility, class U6)</dd></div>
+          <div><dt>In use</dt><dd>Yes · new 750 kW generator (2025), fire pump permit June 2026</dd></div>
+          <div><dt>Tax class</dt><dd>3 · utility</dd></div>
+        </dl>
+      </div>
+    </section>
+
+    <section>
+      <h2>Recent work on the building</h2>
+      <div class="tw"><table>
+        <thead><tr><th>Date</th><th>Work</th><th>Status</th></tr></thead>
+        <tbody>
+          <tr><td>Jun 2026</td><td>Replace standpipe fire pump in cellar</td><td>Permit issued</td></tr>
+          <tr><td>Apr 2025</td><td>Replace cellar and roof generators and switchgear with one 750 kW diesel generator</td><td>Signed off</td></tr>
+          <tr><td>Apr 2025</td><td>Mechanical and structural changes</td><td>Signed off</td></tr>
+          <tr><td>May 2022</td><td>New duct opening, AC replacement on 3rd floor and roof</td><td>Signed off</td></tr>
+          <tr><td>Dec 2020</td><td>New boiler and gas service</td><td>Signed off</td></tr>
+          <tr><td>Sep 2014</td><td>Fiber switch room preparation</td><td>Signed off</td></tr>
+        </tbody>
+      </table></div>
+    </section>
+
+    <section>
+      <h2>Neighbors on the block</h2>
+      <div class="tw"><table>
+        <thead><tr><th>Address</th><th>Building</th><th>Owner</th></tr></thead>
+        <tbody>
+          <tr><td>30-01 30th Ave</td><td>Retail · 1920</td><td>Individual owner</td></tr>
+          <tr><td>30-05 30th Ave</td><td>Office · 1924</td><td>30-05 Grand Avenue Realty LLC</td></tr>
+          <tr><td>30-09 30th Ave</td><td>8-unit walk-up · 1930</td><td>30 Avenue LLC</td></tr>
+          <tr><td>30-11 30th Ave</td><td>Stores + 3 apartments · 1930</td><td>30-11 Grand Avenue Realty LLC</td></tr>
+        </tbody>
+      </table></div>
+    </section>
+
+    <p class="foot"><span class="tag">Sources</span> NYC Department of Buildings permit filings (DOB NOW and BIS), NYC building outlines, ACRIS, PLUTO, SEC EDGAR, and a Tracerfy normal skip trace run on JEM Consultant Grp's own Tracerfy account (queue 200107). Phone numbers are masked here; the full numbers and call marks live on the private phone sheet. The city does not publish building size for utility lots, so the ~66,000 sq ft built and ~19,000 sq ft unused figures assume four full floors and need a survey. Penn 2 move: <a href="https://www.bloomberg.com/news/articles/2025-07-28/verizon-to-move-nyc-headquarters-to-manhattan-s-penn-2-tower" target="_blank" rel="noopener">Bloomberg, July 2025</a>.</p>
+  </main>
+</div>
+
+<script src="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.js"></script>
+<script>
+(function () {
+  if (!window.maplibregl) return;
+  var reduce = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  var ring = [[-73.921598531398,40.76748611907],[-73.921635912099,40.767439374112],[-73.921697552581,40.767474685167],[-73.921676678532,40.767495748181],[-73.921906099911,40.767627168603],[-73.921684732277,40.7678505505],[-73.921531504895,40.768005171772],[-73.921515634855,40.768021185434],[-73.921515527145,40.768021123226],[-73.92139646031,40.76795291802],[-73.9212790283,40.767885649432],[-73.921396187907,40.767739145352],[-73.921598531398,40.76748611907]];
+  var H = 18.24;          // roof height, 59.84 ft (city building outline)
+  var EXTRA = 4.6;        // ~19,000 sq ft over a ~16,500 sq ft footprint ≈ 1.15 floors (estimate)
+  // Push our outline ~1.5% outward so its white walls sit just outside the base map's copy of the same building.
+  var cx = 0, cy = 0; ring.slice(0, -1).forEach(function (q) { cx += q[0]; cy += q[1]; }); cx /= ring.length - 1; cy /= ring.length - 1;
+  ring = ring.map(function (q) { return [cx + (q[0] - cx) * 1.015, cy + (q[1] - cy) * 1.015]; });
+  var bldg = { type: "Feature", properties: {}, geometry: { type: "Polygon", coordinates: [ring] } };
+  var map = new maplibregl.Map({
+    container: "map", style: "https://tiles.openfreemap.org/styles/dark",
+    center: [-73.92160, 40.76775], zoom: 16.9, pitch: 62, bearing: -28, maxPitch: 75,
+    attributionControl: { compact: true }
+  });
+  map.addControl(new maplibregl.NavigationControl({ visualizePitch: true }), "top-right");
+  map.on("load", function () {
+    map.addLayer({ id: "nx-3d", type: "fill-extrusion", source: "openmaptiles", "source-layer": "building", minzoom: 13,
+      paint: {
+        "fill-extrusion-color": ["interpolate", ["linear"], ["coalesce", ["get", "render_height"], 6], 0, "#1b2a5a", 25, "#2f5fc4", 70, "#4d9bff"],
+        "fill-extrusion-height": ["coalesce", ["get", "render_height"], 6],
+        "fill-extrusion-base": ["coalesce", ["get", "render_min_height"], 0],
+        "fill-extrusion-opacity": 0.85
+      } });
+    map.addSource("vz", { type: "geojson", data: bldg });
+    map.addLayer({ id: "vz-bldg", type: "fill-extrusion", source: "vz",
+      paint: { "fill-extrusion-color": "#ffffff", "fill-extrusion-height": H + 0.2, "fill-extrusion-base": 0, "fill-extrusion-opacity": 0.96 } });
+    map.addLayer({ id: "vz-rights", type: "fill-extrusion", source: "vz",
+      paint: { "fill-extrusion-color": "#12b76a", "fill-extrusion-height": H + 0.2 + EXTRA, "fill-extrusion-base": H + 0.2, "fill-extrusion-opacity": 0.6 } });
+    if (!reduce) {
+      var spinning = true;
+      var spin = function () { if (spinning) map.easeTo({ bearing: map.getBearing() + 30, duration: 14000, easing: function (t) { return t; } }); };
+      map.on("moveend", spin);
+      ["mousedown", "touchstart", "wheel", "dragstart"].forEach(function (ev) { map.on(ev, function () { spinning = false; }); });
+      spin();
+    }
+  });
+})();
+</script>
+</body>
+</html>
