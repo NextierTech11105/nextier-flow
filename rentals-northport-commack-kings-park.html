@@ -1,0 +1,428 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<meta name="description" content="Houses for rent with 3+ bedrooms and 2+ baths in Northport, Commack, Kings Park and Hauppauge, as of October 21, 2026.">
+<title>Northport Area House Rentals</title>
+<style>
+:root { color-scheme: light; padding-top: env(safe-area-inset-top, 0px); padding-bottom: env(safe-area-inset-bottom, 0px); }
+*, *::before, *::after { box-sizing: border-box; }
+body { margin: 0; -webkit-text-size-adjust: 100%; }
+img { max-width: 100%; }
+[hidden] { display: none !important; }
+</style>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=Source+Sans+3:wght@400;600&family=IBM+Plex+Mono:wght@500&display=swap">
+<style>
+/* Layout: one reading column; a town filter, then listing cards grouped by how close they sit to the four target towns. */
+:root {
+  --bg: #f4f7fa;
+  --surface: #ffffff;
+  --ink: #0c1218;
+  --muted: #3f4c59;
+  --line: #d5dde6;
+  --accent: #1c4fd6;
+  --accent-soft: #e4ebfd;
+  --good: #15703a;
+  --good-soft: #e1f3e7;
+  --warn: #9a4a06;
+  --warn-soft: #fbeedd;
+  --display: "Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
+  --body: "Source Sans 3", "Segoe UI", system-ui, sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, "Cascadia Mono", Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0a0e13; --surface: #121921; --ink: #e9eef3; --muted: #aab6c2; --line: #263240;
+    --accent: #7ea4ff; --accent-soft: #18244a; --good: #5fd88a; --good-soft: #10291a;
+    --warn: #f2b660; --warn-soft: #33230d; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0a0e13; --surface: #121921; --ink: #e9eef3; --muted: #aab6c2; --line: #263240;
+  --accent: #7ea4ff; --accent-soft: #18244a; --good: #5fd88a; --good-soft: #10291a;
+  --warn: #f2b660; --warn-soft: #33230d; color-scheme: dark;
+}
+
+body {
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--body);
+  font-size: 16px;
+  line-height: 1.5;
+}
+.wrap {
+  max-width: 1080px;
+  margin: 0 auto;
+  padding-block: 40px 56px;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  display: grid;
+  gap: 40px;
+}
+
+header { display: grid; gap: 14px; }
+.eyebrow {
+  font-family: var(--mono);
+  font-size: 13px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+h1 {
+  font-family: var(--display);
+  font-weight: 700;
+  font-size: clamp(30px, 5vw, 46px);
+  line-height: 1.08;
+  letter-spacing: -0.015em;
+  margin: 0;
+  text-wrap: balance;
+  max-width: 22ch;
+}
+.lede { margin: 0; font-size: 18px; color: var(--muted); max-width: 62ch; }
+.lede strong { color: var(--ink); font-weight: 600; }
+
+.stats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px 36px;
+  padding-top: 18px;
+  border-top: 1px solid var(--line);
+  margin-top: 6px;
+}
+.stat { display: grid; gap: 2px; }
+.stat b {
+  font-family: var(--display);
+  font-weight: 700;
+  font-size: 28px;
+  font-variant-numeric: tabular-nums;
+  line-height: 1.1;
+}
+.stat span { font-size: 15px; color: var(--muted); }
+
+.filters { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.filters .label { font-size: 15px; color: var(--muted); margin-right: 4px; }
+.chip {
+  font: 600 15px/1 var(--body);
+  color: var(--ink);
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  padding: 9px 14px;
+  cursor: pointer;
+}
+.chip:hover { border-color: var(--accent); }
+.chip[aria-pressed="true"] { background: var(--accent); border-color: var(--accent); color: var(--surface); }
+.chip:focus-visible, .card a:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+section { display: grid; gap: 16px; }
+.sec-head { display: grid; gap: 4px; }
+h2 {
+  font-family: var(--display);
+  font-weight: 700;
+  font-size: 23px;
+  margin: 0;
+  text-wrap: balance;
+}
+.sec-head p { margin: 0; color: var(--muted); max-width: 66ch; }
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 300px), 1fr));
+  gap: 14px;
+}
+.card {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 18px 18px 16px;
+  display: grid;
+  grid-template-rows: auto auto auto 1fr auto;
+  gap: 10px;
+  min-width: 0;
+}
+.price-row { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; flex-wrap: wrap; }
+.price {
+  font-family: var(--display);
+  font-weight: 700;
+  font-size: 30px;
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+}
+.price small { font-family: var(--body); font-weight: 400; font-size: 15px; color: var(--muted); margin-left: 2px; }
+.flag {
+  font: 600 13px/1 var(--body);
+  padding: 6px 9px;
+  border-radius: 6px;
+  white-space: nowrap;
+}
+.flag.new { color: var(--good); background: var(--good-soft); }
+.flag.cut { color: var(--accent); background: var(--accent-soft); }
+.flag.check { color: var(--warn); background: var(--warn-soft); }
+.flag.owner { color: var(--good); background: var(--good-soft); }
+.addr { display: grid; gap: 2px; }
+.addr strong { font-size: 18px; font-weight: 600; line-height: 1.3; }
+.addr span { font-family: var(--mono); font-size: 14px; color: var(--muted); }
+.specs { display: flex; flex-wrap: wrap; gap: 6px; }
+.specs span {
+  font-family: var(--mono);
+  font-size: 14px;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  padding: 3px 8px;
+}
+.feat { margin: 0; color: var(--muted); font-size: 15px; }
+.note { margin: 0; font-size: 15px; color: var(--warn); }
+.foot {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  padding-top: 10px;
+  border-top: 1px solid var(--line);
+  font-size: 15px;
+}
+.foot .posted { color: var(--muted); }
+.foot a { color: var(--accent); font-weight: 600; text-decoration: none; }
+.foot a:hover { text-decoration: underline; }
+
+.notes {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 20px 22px;
+  display: grid;
+  gap: 10px;
+}
+.notes h2 { font-size: 19px; }
+.notes ul { margin: 0; padding-left: 20px; display: grid; gap: 8px; }
+.notes li { max-width: 72ch; }
+.src { font-size: 14px; color: var(--muted); margin: 0; }
+.src a { color: var(--accent); }
+.empty { color: var(--muted); margin: 0; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="eyebrow">Prepared for Richard · October 21, 2026</div>
+    <h1>Houses for rent in Northport, Commack, Kings Park &amp; Hauppauge</h1>
+    <p class="lede">Every whole house listed for rent today with <strong>at least 3 bedrooms and 2 bathrooms</strong> in the four towns, plus two owner-listed homes next door in Smithtown. Sorted by monthly rent.</p>
+    <div class="stats">
+      <div class="stat"><b>12</b><span>houses in the four towns</span></div>
+      <div class="stat"><b>6</b><span>at $5,000/mo or less</span></div>
+      <div class="stat"><b>$4,500</b><span>lowest rent, owner-listed in Smithtown</span></div>
+    </div>
+  </header>
+
+  <div class="filters" role="group" aria-label="Filter by town">
+    <span class="label">Show</span>
+    <button class="chip" id="f-all" data-f="all" aria-pressed="true">All towns</button>
+    <button class="chip" id="f-northport" data-f="northport" aria-pressed="false">Northport area</button>
+    <button class="chip" id="f-commack" data-f="commack" aria-pressed="false">Commack</button>
+    <button class="chip" id="f-kingspark" data-f="kingspark" aria-pressed="false">Kings Park</button>
+    <button class="chip" id="f-smithtown" data-f="smithtown" aria-pressed="false">Smithtown</button>
+  </div>
+
+  <section data-sec>
+    <div class="sec-head">
+      <h2>In the four towns</h2>
+      <p>The Northport area includes East Northport and Fort Salonga, which share the 11768 and 11731 ZIP codes.</p>
+    </div>
+    <div class="grid">
+
+      <article class="card" data-town="northport">
+        <div class="price-row"><div class="price">$4,600<small>/mo</small></div></div>
+        <div class="addr"><strong>76 Keane Ln</strong><span>East Northport · 11731</span></div>
+        <div class="specs"><span>3 BD</span><span>2 BA</span><span>House</span></div>
+        <p class="feat">Pool, hardwood floors, dishwasher</p>
+        <div class="foot"><span class="posted">Posted 5+ days ago</span><a href="https://www.zumper.com/address/76-keane-ln-e-northport-ny-11731-usa" target="_blank" rel="noopener">View listing →</a></div>
+      </article>
+
+      <article class="card" data-town="northport">
+        <div class="price-row"><div class="price">$4,750<small>/mo</small></div><span class="flag new">New this week</span></div>
+        <div class="addr"><strong>70 Rinaldo Rd</strong><span>Fort Salonga (Northport) · 11768</span></div>
+        <div class="specs"><span>3 BD</span><span>2 BA</span><span>House</span></div>
+        <p class="feat">In-unit laundry, outdoor space, storage</p>
+        <div class="foot"><span class="posted">Posted 2 days ago</span><a href="https://www.zumper.com/address/70-rinaldo-rd-northport-ny-11768-usa" target="_blank" rel="noopener">View listing →</a></div>
+      </article>
+
+      <article class="card" data-town="northport">
+        <div class="price-row"><div class="price">$4,800<small>/mo</small></div></div>
+        <div class="addr"><strong>25 Ripley Dr</strong><span>East Northport · 11768</span></div>
+        <div class="specs"><span>3 BD</span><span>2 BA</span><span>House</span></div>
+        <p class="feat">In-unit laundry, outdoor space, garage</p>
+        <div class="foot"><span class="posted">Posted 5+ days ago</span><a href="https://www.zumper.com/address/25-ripley-dr-east-northport-ny-11768-usa" target="_blank" rel="noopener">View listing →</a></div>
+      </article>
+
+      <article class="card" data-town="northport">
+        <div class="price-row"><div class="price">$4,900<small>/mo</small></div></div>
+        <div class="addr"><strong>28 Summit Ave</strong><span>Northport · 11768</span></div>
+        <div class="specs"><span>4 BD</span><span>2.5 BA</span><span>House</span></div>
+        <p class="feat">In-unit laundry, outdoor space, storage</p>
+        <div class="foot"><span class="posted">Posted 5+ days ago</span><a href="https://www.zumper.com/address/28-smt-ave-northport-ny-11768-usa" target="_blank" rel="noopener">View listing →</a></div>
+      </article>
+
+      <article class="card" data-town="commack">
+        <div class="price-row"><div class="price">$4,950<small>/mo</small></div><span class="flag cut">Price cut $250</span></div>
+        <div class="addr"><strong>26 Valleywood Rd</strong><span>Commack · 11725</span></div>
+        <div class="specs"><span>4 BD</span><span>2 BA</span><span>House</span></div>
+        <p class="feat">In-unit laundry, outdoor space, garage. Listed under Smithtown, with a Commack ZIP.</p>
+        <div class="foot"><span class="posted">Posted 5+ days ago</span><a href="https://www.zumper.com/address/26-valleywood-rd-smithtown-ny-11725-usa" target="_blank" rel="noopener">View listing →</a></div>
+      </article>
+
+      <article class="card" data-town="kingspark">
+        <div class="price-row"><div class="price">$5,000<small>/mo</small></div><span class="flag new">New this week</span></div>
+        <div class="addr"><strong>125 W Main St</strong><span>Kings Park · 11754</span></div>
+        <div class="specs"><span>4 BD</span><span>3.5 BA</span><span>House</span></div>
+        <p class="feat">In-unit laundry, assigned parking, high ceilings</p>
+        <p class="note">On Main Street. Confirm it is the whole house before touring.</p>
+        <div class="foot"><span class="posted">Posted 1 day ago</span><a href="https://www.zumper.com/address/125-w-main-st-kings-park-ny-11754-usa" target="_blank" rel="noopener">View listing →</a></div>
+      </article>
+
+      <article class="card" data-town="northport">
+        <div class="price-row"><div class="price">$5,100<small>/mo</small></div></div>
+        <div class="addr"><strong>219 Bellerose Ave</strong><span>East Northport · 11731</span></div>
+        <div class="specs"><span>5 BD</span><span>3 BA</span><span>House</span></div>
+        <p class="feat">Garage, outdoor space, dishwasher</p>
+        <div class="foot"><span class="posted">Posted 5+ days ago</span><a href="https://www.zumper.com/address/219-bellerose-ave-east-northport-ny-11731-usa" target="_blank" rel="noopener">View listing →</a></div>
+      </article>
+
+      <article class="card" data-town="kingspark">
+        <div class="price-row"><div class="price">$5,500<small>/mo</small></div></div>
+        <div class="addr"><strong>119 Whittier Dr</strong><span>Kings Park · 11754</span></div>
+        <div class="specs"><span>3 BD</span><span>2.5 BA</span><span>House</span></div>
+        <p class="feat">New construction, in-unit laundry, balcony, walk-in closets</p>
+        <div class="foot"><span class="posted">Posted 5+ days ago</span><a href="https://www.zumper.com/address/119-whittier-dr-kings-park-ny-11754-usa" target="_blank" rel="noopener">View listing →</a></div>
+      </article>
+
+      <article class="card" data-town="northport">
+        <div class="price-row"><div class="price">$5,700<small>/mo</small></div></div>
+        <div class="addr"><strong>15 Garfield St</strong><span>Northport · 11768</span></div>
+        <div class="specs"><span>4 BD</span><span>2 BA</span><span>House</span></div>
+        <p class="feat">In-unit laundry, dishwasher</p>
+        <div class="foot"><span class="posted">Posted 5+ days ago</span><a href="https://www.zumper.com/address/15-garfield-st-northport-ny-11768-usa" target="_blank" rel="noopener">View listing →</a></div>
+      </article>
+
+      <article class="card" data-town="northport">
+        <div class="price-row"><div class="price">$6,000<small>/mo</small></div></div>
+        <div class="addr"><strong>37 Cairo Ave</strong><span>Northport · 11768</span></div>
+        <div class="specs"><span>4 BD</span><span>2 BA</span><span>House</span></div>
+        <p class="feat">In-unit laundry, outdoor space, garage</p>
+        <div class="foot"><span class="posted">Posted 5+ days ago</span><a href="https://www.zumper.com/address/37-cairo-ave-northport-ny-11768-usa" target="_blank" rel="noopener">View listing →</a></div>
+      </article>
+
+      <article class="card" data-town="commack">
+        <div class="price-row"><div class="price">$6,200<small>/mo</small></div><span class="flag new">New this week</span></div>
+        <div class="addr"><strong>40 Pittoni Dr</strong><span>Commack · 11725</span></div>
+        <div class="specs"><span>5 BD</span><span>2.5 BA</span><span>House</span></div>
+        <p class="feat">Laundry on site, outdoor space, garage</p>
+        <div class="foot"><span class="posted">Posted 4 days ago</span><a href="https://www.zumper.com/address/40-pittoni-dr-commack-ny-11725-usa" target="_blank" rel="noopener">View listing →</a></div>
+      </article>
+
+      <article class="card" data-town="commack">
+        <div class="price-row"><div class="price">$8,000<small>/mo</small></div></div>
+        <div class="addr"><strong>28 Annandale Rd</strong><span>Commack · 11725</span></div>
+        <div class="specs"><span>4 BD</span><span>2.5 BA</span><span>House</span></div>
+        <p class="feat">In-unit laundry, outdoor space, garage</p>
+        <div class="foot"><span class="posted">Posted 5+ days ago</span><a href="https://www.zumper.com/address/28-annandale-rd-commack-ny-11725-usa" target="_blank" rel="noopener">View listing →</a></div>
+      </article>
+
+    </div>
+    <p class="empty" hidden>No listings in this section for that town.</p>
+  </section>
+
+  <section data-sec>
+    <div class="sec-head">
+      <h2>Owner-listed, next door in Smithtown</h2>
+      <p>Posted directly by the owners on Craigslist. Smithtown borders Kings Park, Commack and Hauppauge. Reply through the post to reach the owner.</p>
+    </div>
+    <div class="grid">
+
+      <article class="card" data-town="smithtown">
+        <div class="price-row"><div class="price">$4,500<small>/mo</small></div><span class="flag owner">Owner-listed</span></div>
+        <div class="addr"><strong>House for rent, 3 bed 2 bath</strong><span>Smithtown · 1,600 sq ft</span></div>
+        <div class="specs"><span>3 BD</span><span>2 BA</span><span>House</span></div>
+        <p class="feat">Exact address is given in the post.</p>
+        <div class="foot"><span class="posted">Posted Oct 20</span><a href="https://longisland.craigslist.org/apa/d/smithtown-house-for-rent-bdr-bath/uQeetmTkBeoBrffm1yiTv8.html" target="_blank" rel="noopener">View post →</a></div>
+      </article>
+
+      <article class="card" data-town="smithtown">
+        <div class="price-row"><div class="price">$4,800<small>/mo</small></div><span class="flag owner">Owner-listed</span></div>
+        <div class="addr"><strong>4 bedrooms, 2 full baths</strong><span>Smithtown</span></div>
+        <div class="specs"><span>4 BD</span><span>2 BA</span><span>House</span></div>
+        <p class="feat">Advertised with a separate room for a parent.</p>
+        <div class="foot"><span class="posted">Posted Oct 18</span><a href="https://longisland.craigslist.org/apa/d/smithtown-smithtown-bedrooms-full/3fP5kEngzyigf2DDBZ98GG.html" target="_blank" rel="noopener">View post →</a></div>
+      </article>
+
+    </div>
+    <p class="empty" hidden>No listings in this section for that town.</p>
+  </section>
+
+  <section data-sec>
+    <div class="sec-head">
+      <h2>Just outside the area, under $4,500</h2>
+      <p>Two nearby houses for a lower budget, both in the Town of Huntington, west of Northport.</p>
+    </div>
+    <div class="grid">
+
+      <article class="card" data-town="nearby">
+        <div class="price-row"><div class="price">$3,500<small>/mo</small></div></div>
+        <div class="addr"><strong>19 Cotswold Dr</strong><span>Centerport · 11721</span></div>
+        <div class="specs"><span>3 BD</span><span>2 BA</span><span>House</span></div>
+        <p class="feat">Garage, outdoor space</p>
+        <div class="foot"><span class="posted">Posted 5+ days ago</span><a href="https://www.zumper.com/address/19-cotswold-dr-centerport-ny-11721-usa" target="_blank" rel="noopener">View listing →</a></div>
+      </article>
+
+      <article class="card" data-town="nearby">
+        <div class="price-row"><div class="price">$4,000<small>/mo</small></div></div>
+        <div class="addr"><strong>13 Woodland Ln</strong><span>Huntington · 11743</span></div>
+        <div class="specs"><span>3 BD</span><span>2 BA</span><span>House</span></div>
+        <p class="feat">In-unit laundry, dishwasher</p>
+        <div class="foot"><span class="posted">Posted 5+ days ago</span><a href="https://www.zumper.com/address/13-woodland-ln-huntington-ny-11743-usa" target="_blank" rel="noopener">View listing →</a></div>
+      </article>
+
+    </div>
+    <p class="empty" hidden>No listings in this section for that town.</p>
+  </section>
+
+  <aside class="notes">
+    <h2>What to know</h2>
+    <ul>
+      <li><strong>Hauppauge:</strong> no 3-bedroom, 2-bath house is listed for rent inside Hauppauge today. Commack and Smithtown are the closest options.</li>
+      <li><strong>Left off:</strong> 6 Warbler Ln, Commack ($5,500, 4 bed, 2.5 bath) is in an age-restricted community.</li>
+      <li><strong>Moving fast:</strong> North Shore rentals in this range often go within days. Prices and availability are as posted on October 21, 2026.</li>
+    </ul>
+    <p class="src">Sources: <a href="https://www.zumper.com/houses-for-rent/northport-ny" target="_blank" rel="noopener">Zumper</a> house rentals for Northport, East Northport, Commack, Kings Park and Hauppauge, updated October 21, 2026, and <a href="https://longisland.craigslist.org/" target="_blank" rel="noopener">Craigslist Long Island</a> houses for rent.</p>
+  </aside>
+</div>
+
+<script>
+(function () {
+  var chips = document.querySelectorAll(".chip");
+  var sections = document.querySelectorAll("[data-sec]");
+  function apply(f) {
+    chips.forEach(function (c) { c.setAttribute("aria-pressed", String(c.dataset.f === f)); });
+    sections.forEach(function (sec) {
+      var shown = 0;
+      sec.querySelectorAll(".card").forEach(function (card) {
+        var on = f === "all" || card.dataset.town === f;
+        card.hidden = !on;
+        if (on) shown++;
+      });
+      var isNearby = sec.querySelector('[data-town="nearby"]');
+      if (isNearby && f !== "all") { sec.hidden = true; return; }
+      sec.hidden = false;
+      sec.querySelector(".grid").hidden = shown === 0;
+      sec.querySelector(".empty").hidden = shown !== 0;
+    });
+  }
+  chips.forEach(function (c) { c.addEventListener("click", function () { apply(c.dataset.f); }); });
+})();
+</script>
+</body>
+</html>
