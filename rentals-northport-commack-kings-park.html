@@ -139,10 +139,29 @@ h2 {
   border: 1px solid var(--line);
   border-radius: 10px;
   padding: 18px 18px 16px;
-  display: grid;
-  grid-template-rows: auto auto auto 1fr auto;
+  display: flex;
+  flex-direction: column;
   gap: 10px;
   min-width: 0;
+  overflow: hidden;
+}
+.card .foot { margin-top: auto; }
+.photo {
+  display: block;
+  width: calc(100% + 36px);
+  max-width: none;
+  margin: -18px -18px 6px;
+  aspect-ratio: 4 / 3;
+  object-fit: cover;
+  background: var(--line);
+}
+.photo.none {
+  display: grid;
+  place-items: center;
+  color: var(--muted);
+  font-size: 15px;
+  background: var(--bg);
+  border-bottom: 1px solid var(--line);
 }
 .price-row { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; flex-wrap: wrap; }
 .price {
@@ -236,6 +255,7 @@ h2 {
     <div class="grid">
 
       <article class="card" data-town="northport">
+        <img class="photo" src="https://img.zumpercdn.com/931199741/1280x960?auto=format&fit=crop&w=720&h=540&q=60" alt="76 Keane Ln, East Northport" loading="lazy" referrerpolicy="no-referrer" onerror="this.remove()">
         <div class="price-row"><div class="price">$4,600<small>/mo</small></div></div>
         <div class="addr"><strong>76 Keane Ln</strong><span>East Northport · 11731</span></div>
         <div class="specs"><span>3 BD</span><span>2 BA</span><span>House</span></div>
@@ -244,6 +264,7 @@ h2 {
       </article>
 
       <article class="card" data-town="northport">
+        <img class="photo" src="https://img.zumpercdn.com/924710375/1280x960?auto=format&fit=crop&w=720&h=540&q=60" alt="70 Rinaldo Rd, Fort Salonga (Northport)" loading="lazy" referrerpolicy="no-referrer" onerror="this.remove()">
         <div class="price-row"><div class="price">$4,750<small>/mo</small></div><span class="flag new">New this week</span></div>
         <div class="addr"><strong>70 Rinaldo Rd</strong><span>Fort Salonga (Northport) · 11768</span></div>
         <div class="specs"><span>3 BD</span><span>2 BA</span><span>House</span></div>
@@ -252,6 +273,7 @@ h2 {
       </article>
 
       <article class="card" data-town="northport">
+        <img class="photo" src="https://img.zumpercdn.com/926572724/1280x960?auto=format&fit=crop&w=720&h=540&q=60" alt="25 Ripley Dr, East Northport" loading="lazy" referrerpolicy="no-referrer" onerror="this.remove()">
         <div class="price-row"><div class="price">$4,800<small>/mo</small></div></div>
         <div class="addr"><strong>25 Ripley Dr</strong><span>East Northport · 11768</span></div>
         <div class="specs"><span>3 BD</span><span>2 BA</span><span>House</span></div>
@@ -260,6 +282,7 @@ h2 {
       </article>
 
       <article class="card" data-town="northport">
+        <img class="photo" src="https://img.zumpercdn.com/927693745/1280x960?auto=format&fit=crop&w=720&h=540&q=60" alt="28 Summit Ave, Northport" loading="lazy" referrerpolicy="no-referrer" onerror="this.remove()">
         <div class="price-row"><div class="price">$4,900<small>/mo</small></div></div>
         <div class="addr"><strong>28 Summit Ave</strong><span>Northport · 11768</span></div>
         <div class="specs"><span>4 BD</span><span>2.5 BA</span><span>House</span></div>
@@ -268,6 +291,7 @@ h2 {
       </article>
 
       <article class="card" data-town="commack">
+        <img class="photo" src="https://img.zumpercdn.com/916132563/1280x960?auto=format&fit=crop&w=720&h=540&q=60" alt="26 Valleywood Rd, Commack" loading="lazy" referrerpolicy="no-referrer" onerror="this.remove()">
         <div class="price-row"><div class="price">$4,950<small>/mo</small></div><span class="flag cut">Price cut $250</span></div>
         <div class="addr"><strong>26 Valleywood Rd</strong><span>Commack · 11725</span></div>
         <div class="specs"><span>4 BD</span><span>2 BA</span><span>House</span></div>
@@ -276,6 +300,7 @@ h2 {
       </article>
 
       <article class="card" data-town="kingspark">
+        <img class="photo" src="https://img.zumpercdn.com/932266165/1280x960?auto=format&fit=crop&w=720&h=540&q=60" alt="125 W Main St, Kings Park" loading="lazy" referrerpolicy="no-referrer" onerror="this.remove()">
         <div class="price-row"><div class="price">$5,000<small>/mo</small></div><span class="flag new">New this week</span></div>
         <div class="addr"><strong>125 W Main St</strong><span>Kings Park · 11754</span></div>
         <div class="specs"><span>4 BD</span><span>3.5 BA</span><span>House</span></div>
@@ -285,6 +310,7 @@ h2 {
       </article>
 
       <article class="card" data-town="northport">
+        <img class="photo" src="https://img.zumpercdn.com/925020112/1280x960?auto=format&fit=crop&w=720&h=540&q=60" alt="219 Bellerose Ave, East Northport" loading="lazy" referrerpolicy="no-referrer" onerror="this.remove()">
         <div class="price-row"><div class="price">$5,100<small>/mo</small></div></div>
         <div class="addr"><strong>219 Bellerose Ave</strong><span>East Northport · 11731</span></div>
         <div class="specs"><span>5 BD</span><span>3 BA</span><span>House</span></div>
@@ -293,6 +319,7 @@ h2 {
       </article>
 
       <article class="card" data-town="kingspark">
+        <img class="photo" src="https://img.zumpercdn.com/919933864/1280x960?auto=format&fit=crop&w=720&h=540&q=60" alt="119 Whittier Dr, Kings Park" loading="lazy" referrerpolicy="no-referrer" onerror="this.remove()">
         <div class="price-row"><div class="price">$5,500<small>/mo</small></div></div>
         <div class="addr"><strong>119 Whittier Dr</strong><span>Kings Park · 11754</span></div>
         <div class="specs"><span>3 BD</span><span>2.5 BA</span><span>House</span></div>
@@ -301,6 +328,7 @@ h2 {
       </article>
 
       <article class="card" data-town="northport">
+        <img class="photo" src="https://img.zumpercdn.com/920496033/1280x960?auto=format&fit=crop&w=720&h=540&q=60" alt="15 Garfield St, Northport" loading="lazy" referrerpolicy="no-referrer" onerror="this.remove()">
         <div class="price-row"><div class="price">$5,700<small>/mo</small></div></div>
         <div class="addr"><strong>15 Garfield St</strong><span>Northport · 11768</span></div>
         <div class="specs"><span>4 BD</span><span>2 BA</span><span>House</span></div>
@@ -309,6 +337,7 @@ h2 {
       </article>
 
       <article class="card" data-town="northport">
+        <img class="photo" src="https://img.zumpercdn.com/909835974/1280x960?auto=format&fit=crop&w=720&h=540&q=60" alt="37 Cairo Ave, Northport" loading="lazy" referrerpolicy="no-referrer" onerror="this.remove()">
         <div class="price-row"><div class="price">$6,000<small>/mo</small></div></div>
         <div class="addr"><strong>37 Cairo Ave</strong><span>Northport · 11768</span></div>
         <div class="specs"><span>4 BD</span><span>2 BA</span><span>House</span></div>
@@ -317,6 +346,7 @@ h2 {
       </article>
 
       <article class="card" data-town="commack">
+        <img class="photo" src="https://img.zumpercdn.com/931855073/1280x960?auto=format&fit=crop&w=720&h=540&q=60" alt="40 Pittoni Dr, Commack" loading="lazy" referrerpolicy="no-referrer" onerror="this.remove()">
         <div class="price-row"><div class="price">$6,200<small>/mo</small></div><span class="flag new">New this week</span></div>
         <div class="addr"><strong>40 Pittoni Dr</strong><span>Commack · 11725</span></div>
         <div class="specs"><span>5 BD</span><span>2.5 BA</span><span>House</span></div>
@@ -325,6 +355,7 @@ h2 {
       </article>
 
       <article class="card" data-town="commack">
+        <img class="photo" src="https://img.zumpercdn.com/922252224/1280x960?auto=format&fit=crop&w=720&h=540&q=60" alt="28 Annandale Rd, Commack" loading="lazy" referrerpolicy="no-referrer" onerror="this.remove()">
         <div class="price-row"><div class="price">$8,000<small>/mo</small></div></div>
         <div class="addr"><strong>28 Annandale Rd</strong><span>Commack · 11725</span></div>
         <div class="specs"><span>4 BD</span><span>2.5 BA</span><span>House</span></div>
@@ -344,19 +375,22 @@ h2 {
     <div class="grid">
 
       <article class="card" data-town="smithtown">
+        <div class="photo none" role="img" aria-label="No photos posted">No photos posted</div>
         <div class="price-row"><div class="price">$4,500<small>/mo</small></div><span class="flag owner">Owner-listed</span></div>
-        <div class="addr"><strong>House for rent, 3 bed 2 bath</strong><span>Smithtown · 1,600 sq ft</span></div>
+        <div class="addr"><strong>Ranch, 3 bed 2 bath</strong><span>Smithtown · 1,600 sq ft</span></div>
         <div class="specs"><span>3 BD</span><span>2 BA</span><span>House</span></div>
-        <p class="feat">Exact address is given in the post.</p>
-        <div class="foot"><span class="posted">Posted Oct 20</span><a href="https://longisland.craigslist.org/apa/d/smithtown-house-for-rent-bdr-bath/uQeetmTkBeoBrffm1yiTv8.html" target="_blank" rel="noopener">View post →</a></div>
+        <p class="feat">Finished basement with its own outside entrance. The owner gives the address on request.</p>
+        <div class="foot"><span class="posted">Posted Oct 20</span><a href="https://www.craigslist.org/view/d/smithtown-house-for-rent-bdr-bath/uQeetmTkBeoBrffm1yiTv8" target="_blank" rel="noopener">View post →</a></div>
       </article>
 
       <article class="card" data-town="smithtown">
+        <img class="photo" src="https://images.craigslist.org/00I0I_5uIHOC9Ns0Q_0sj0le_600x450.jpg" alt="4 bed + office, 2 full baths, Smithtown" loading="lazy" referrerpolicy="no-referrer" onerror="this.remove()">
         <div class="price-row"><div class="price">$4,800<small>/mo</small></div><span class="flag owner">Owner-listed</span></div>
-        <div class="addr"><strong>4 bedrooms, 2 full baths</strong><span>Smithtown</span></div>
+        <div class="addr"><strong>4 bed + office, 2 full baths</strong><span>Smithtown</span></div>
         <div class="specs"><span>4 BD</span><span>2 BA</span><span>House</span></div>
-        <p class="feat">Advertised with a separate room for a parent.</p>
-        <div class="foot"><span class="posted">Posted Oct 18</span><a href="https://longisland.craigslist.org/apa/d/smithtown-smithtown-bedrooms-full/3fP5kEngzyigf2DDBZ98GG.html" target="_blank" rel="noopener">View post →</a></div>
+        <p class="feat">Den, formal dining, eat-in kitchen, central air, large yard, 2-car garage, new deck</p>
+        <p class="note">Rent is plus oil heat. Income of 3× the rent required.</p>
+        <div class="foot"><span class="posted">Posted Oct 18</span><a href="https://www.craigslist.org/view/d/smithtown-smithtown-bedrooms-full/3fP5kEngzyigf2DDBZ98GG" target="_blank" rel="noopener">View post →</a></div>
       </article>
 
     </div>
@@ -371,6 +405,7 @@ h2 {
     <div class="grid">
 
       <article class="card" data-town="nearby">
+        <img class="photo" src="https://img.zumpercdn.com/930989149/1280x960?auto=format&fit=crop&w=720&h=540&q=60" alt="19 Cotswold Dr, Centerport" loading="lazy" referrerpolicy="no-referrer" onerror="this.remove()">
         <div class="price-row"><div class="price">$3,500<small>/mo</small></div></div>
         <div class="addr"><strong>19 Cotswold Dr</strong><span>Centerport · 11721</span></div>
         <div class="specs"><span>3 BD</span><span>2 BA</span><span>House</span></div>
@@ -379,6 +414,7 @@ h2 {
       </article>
 
       <article class="card" data-town="nearby">
+        <img class="photo" src="https://img.zumpercdn.com/923102166/1280x960?auto=format&fit=crop&w=720&h=540&q=60" alt="13 Woodland Ln, Huntington" loading="lazy" referrerpolicy="no-referrer" onerror="this.remove()">
         <div class="price-row"><div class="price">$4,000<small>/mo</small></div></div>
         <div class="addr"><strong>13 Woodland Ln</strong><span>Huntington · 11743</span></div>
         <div class="specs"><span>3 BD</span><span>2 BA</span><span>House</span></div>
