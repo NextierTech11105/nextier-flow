@@ -1,0 +1,558 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Development Story Mode, with music</title>
+<meta name="description" content="Story Mode for Nextier development sourcing: big lots, subdivision-size parcels, the FAR gap, corridors, expired and estate signals, individual owners first, the Property Book list with autotags, any tool by webhook, co-hosted on DigitalOcean with your own keys, and ready blocks that wait at Initial SMS.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=DM+Sans:wght@400;500;700&display=swap">
+<style>
+/* Layout: a stage (the app's own screens, animated) beside a narration column, a chapter rail underneath; one chapter at a time. Single committed dark look, continuous with Story Mode and the Nextier app. */
+:root{
+  --bg:#000000; --panel:#0D0D0D; --panel-2:#161616; --line:#2A2A2A;
+  --fg:#FFFFFF; --soft:#D5DDF0; --orange:#FF8A3D; --orange-soft:#FFB27A;
+  --blue:#4C8DFF; --blue-soft:#9CC0FF; --green:#2FD39A; --ink:#0A1022;
+  --app:#0B0F14; --app-2:#12181F; --app-line:#232B35; --gold:#E2B54A;
+  --display:'Space Grotesk','Trebuchet MS',Arial,sans-serif;
+  --body:'DM Sans','Segoe UI',Arial,sans-serif;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+html,body{height:100%}
+body{margin:0;background:var(--bg);color:var(--fg);font-family:var(--body);font-size:17px;line-height:1.5}
+.wrap{max-width:1240px;margin:0 auto;padding-inline:20px;padding-block:28px 40px;display:flex;flex-direction:column;gap:24px}
+header{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px}
+.brand{font-family:var(--display);font-weight:700;font-size:22px;letter-spacing:.08em}
+.brand span{color:var(--orange)}
+.tag{font-size:13px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--soft);border:1px solid var(--line);border-radius:999px;padding:6px 12px}
+h1{font-family:var(--display);font-weight:700;font-size:clamp(30px,4.4vw,52px);line-height:1.05;margin:0;text-wrap:balance}
+h1 em{font-style:normal;color:var(--orange)}
+.main{display:grid;grid-template-columns:minmax(0,1.5fr) minmax(0,1fr);gap:24px;align-items:stretch}
+@media (max-width:920px){.main{grid-template-columns:minmax(0,1fr)}}
+.stage{position:relative;background:var(--panel);border:1px solid var(--line);border-radius:24px;min-height:500px;overflow:hidden}
+.narr{display:flex;flex-direction:column;gap:16px;padding:8px 4px;min-width:0}
+.step{font-size:13px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--orange)}
+.narr h2{font-family:var(--display);font-size:clamp(26px,3vw,36px);line-height:1.1;margin:0;text-wrap:balance}
+.narr p{margin:0;font-size:19px;max-width:36ch}
+.controls{display:flex;flex-wrap:wrap;gap:10px;margin-top:auto}
+button{font:inherit;font-weight:700;font-size:15px;color:var(--fg);background:var(--panel-2);border:1px solid var(--line);border-radius:12px;padding:10px 16px;cursor:pointer}
+button:hover{border-color:var(--blue)}
+button:focus-visible{outline:3px solid var(--orange);outline-offset:2px}
+#play{background:var(--orange);border-color:var(--orange);color:var(--ink);min-width:120px}
+.rail{display:grid;grid-template-columns:repeat(10,minmax(0,1fr));gap:6px}
+@media (max-width:1000px){.rail{grid-template-columns:repeat(5,minmax(0,1fr))}}
+@media (max-width:520px){.rail{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.rail button{display:flex;flex-direction:column;align-items:flex-start;gap:8px;padding:10px;border-radius:12px;text-align:left;font-size:13px;color:var(--soft);min-width:0}
+.rail .bar{display:block;width:100%;height:4px;border-radius:2px;background:var(--line);overflow:hidden}
+.rail .bar i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--blue),var(--orange))}
+.rail button[aria-current="step"]{color:var(--fg);border-color:var(--orange)}
+.rail .n{font-variant-numeric:tabular-nums;color:var(--orange)}
+.foot{font-size:14px;color:var(--soft)}
+.foot a{color:var(--fg)}
+
+/* ── the app, recreated ─────────────────────────────────────────────── */
+.scene{position:absolute;inset:0;padding:22px;display:flex;align-items:center;justify-content:center}
+.scene[hidden]{display:none!important}
+.app{width:100%;max-width:640px;background:var(--app);border:1px solid var(--app-line);border-radius:16px;overflow:hidden;box-shadow:0 0 60px #4C8DFF22;font-size:14px}
+.abar{display:flex;align-items:center;gap:10px;padding:10px 14px;border-bottom:1px solid var(--app-line);background:#090C10;flex-wrap:wrap}
+.abar b{font-weight:700}
+.ws{border:1px solid #3A4450;border-radius:8px;padding:4px 10px;font-weight:700}
+.pill{font-size:11px;font-weight:700;letter-spacing:.1em;padding:3px 8px;border-radius:999px;background:#0F2A1E;color:#5BE3A8;border:1px solid #1E5A40}
+.abody{padding:14px;display:flex;flex-direction:column;gap:12px}
+.ah{font-family:var(--display);font-weight:700;font-size:18px}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.ac{padding:6px 10px;border-radius:8px;background:var(--app-2);border:1px solid var(--app-line);font-weight:700;font-size:13px;color:#C9D2DC;white-space:nowrap}
+.ac.on{border-color:var(--blue);background:#13254A;color:#fff}
+.ac small{color:#8FA0B3;font-weight:700;margin-left:4px;font-variant-numeric:tabular-nums}
+.ac.hit{border-color:var(--gold);color:#fff}
+
+/* lead builder map */
+.amap{position:relative;height:220px;border-radius:12px;overflow:hidden;border:1px solid var(--app-line);
+  background:
+   repeating-linear-gradient(28deg,transparent 0 38px,#1A222C 38px 40px),
+   repeating-linear-gradient(118deg,transparent 0 52px,#1A222C 52px 54px),
+   radial-gradient(ellipse 60% 50% at 62% 55%,#162016 0%,#10161C 70%)}
+.amap .water{position:absolute;right:-10%;bottom:-30%;width:70%;height:60%;border-radius:50%;background:#0B1624}
+.amap .road{position:absolute;height:3px;background:#3B4552;transform-origin:left center}
+.amap .ctl{position:absolute;left:10px;top:10px;display:flex;flex-direction:column;gap:6px}
+.amap .ctl span{background:#0C1116;border:1px solid var(--app-line);border-radius:8px;padding:4px 10px;font-size:12px;font-weight:700}
+.amap .cnt{position:absolute;right:10px;top:10px;background:#0C1116;border:1px solid var(--app-line);border-radius:999px;padding:6px 12px;font-weight:700;font-variant-numeric:tabular-nums}
+.pin{position:absolute;width:14px;height:14px;margin:-7px 0 0 -7px;border-radius:50%;background:var(--blue);border:2px solid #fff;box-shadow:0 0 12px #4C8DFF}
+.go .pin{animation:drop .5s cubic-bezier(.2,1.4,.4,1) both var(--d)}
+.rows{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.rows .box{border:1px solid #3A4450;border-radius:8px;padding:6px 14px;font-weight:700;font-size:18px;font-variant-numeric:tabular-nums}
+
+/* monitors */
+.mon{display:flex;justify-content:space-between;align-items:center;gap:12px;border:1px solid var(--app-line);border-radius:12px;padding:12px 14px;background:var(--app-2)}
+.mon b{display:block;font-size:15px}
+.mon span{color:#C9D2DC;font-size:13px}
+.on-btn{background:#16A34A;color:#fff;font-weight:700;border-radius:8px;padding:8px 14px;flex:none}
+.presets{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.preset{border:1px solid var(--app-line);border-radius:10px;padding:10px 12px;background:var(--app-2)}
+.preset b{display:block;font-size:14px}.preset span{font-size:12px;color:#AEB9C6}
+.preset.on{border-color:var(--blue);background:#141414}
+.tick{display:flex;justify-content:space-between;align-items:center;border:1px dashed #3A4450;border-radius:10px;padding:10px 12px;font-weight:700}
+.tick b{font-family:var(--display);font-size:22px;color:var(--green);font-variant-numeric:tabular-nums}
+
+/* signals */
+.sig{display:flex;flex-direction:column;gap:10px;width:min(460px,100%)}
+.sc{display:flex;gap:12px;align-items:center;padding:12px 14px;border-radius:14px;background:var(--panel-2);border:1px solid var(--line)}
+.sc .ic{flex:none;width:40px;height:40px;border-radius:10px;display:grid;place-items:center;font-weight:700;font-family:var(--display)}
+.sc b{display:block}.sc small{color:var(--soft);font-size:14px}
+.sc .new{margin-left:auto;flex:none;font-size:11px;font-weight:700;letter-spacing:.12em;padding:4px 8px;border-radius:999px;background:var(--orange);color:var(--ink)}
+
+/* owner split */
+.split{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:14px;width:min(520px,100%)}
+.lanebox{border-radius:16px;padding:14px;border:1px solid var(--line);background:var(--panel-2);display:flex;flex-direction:column;gap:8px}
+.lanebox h3{margin:0;font-family:var(--display);font-size:17px}
+.lanebox .o{padding:8px 10px;border-radius:10px;background:#0A0A0A;border:1px solid var(--line);font-size:14px}
+.lanebox.go-l{border-color:var(--green)}.lanebox.go-l h3{color:var(--green)}
+.lanebox.rs-l h3{color:var(--blue-soft)}
+
+/* trace */
+.trace{width:min(440px,100%);display:flex;flex-direction:column;gap:10px}
+.tr{display:flex;align-items:center;gap:10px;padding:12px 14px;border-radius:12px;background:var(--panel-2);border:1px solid var(--line)}
+.tr .ok{margin-left:auto;font-size:12px;font-weight:700;letter-spacing:.1em;padding:4px 10px;border-radius:999px;background:#0F2A1E;color:#5BE3A8;border:1px solid #1E5A40}
+.tr .num{font-family:var(--display);font-size:22px;color:var(--green);font-variant-numeric:tabular-nums}
+
+/* property book list */
+.tbl{border:1px solid var(--app-line);border-radius:10px;overflow:auto;max-height:250px}
+table{border-collapse:collapse;width:100%;min-width:460px;font-size:13px;table-layout:fixed}
+td small{display:block;color:#8FA0B3;font-size:12px}
+td.w{white-space:normal}
+th:nth-child(1){width:34%}th:nth-child(2){width:18%}th:nth-child(3){width:18%}
+th{position:sticky;top:0;background:#0E1319;text-align:left;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:#AEB9C6;padding:8px 10px;border-bottom:1px solid var(--app-line)}
+td{padding:8px 10px;border-bottom:1px solid #1A2129;vertical-align:top;white-space:nowrap}
+tr.sel td{background:#161B22}
+.tgs{display:flex;flex-wrap:wrap;gap:4px;white-space:normal}
+.tg{font-size:11px;font-weight:700;padding:2px 7px;border-radius:999px;border:1px solid #3A4450;color:#E5EBF2;background:#161D25}
+.tg.ev{border-color:var(--orange);color:var(--orange-soft)}
+.tg.ok{border-color:#1E5A40;color:#5BE3A8}
+.go .tg{animation:stamp .35s cubic-bezier(.2,1.4,.4,1) both var(--d)}
+.search{border:1px solid var(--app-line);border-radius:8px;padding:8px 10px;color:#8FA0B3;font-size:13px;background:#0E1319}
+.toprow{display:flex;justify-content:space-between;gap:10px;align-items:center;flex-wrap:wrap}
+.enzo{border:1px solid #1E5A40;color:#5BE3A8;border-radius:8px;padding:6px 10px;font-weight:700;font-size:12px}
+
+/* record panel */
+.rec{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.1fr);gap:12px}
+@media (max-width:560px){.rec{grid-template-columns:minmax(0,1fr)}.rec .mini{display:none}}
+.mini{display:flex;flex-direction:column;gap:6px}
+.mini span{padding:7px 9px;border-radius:8px;background:#0E1319;border:1px solid #1A2129;font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.mini span.sel{background:#161B22;border-color:#2E3A48}
+.panel{border:1px solid var(--app-line);border-radius:12px;padding:12px;background:var(--app-2);display:flex;flex-direction:column;gap:10px;min-width:0}
+.panel .addr{font-weight:700;font-size:16px}
+.panel .cty{color:#AEB9C6;font-size:13px}
+.traced{align-self:flex-start;font-size:11px;font-weight:700;letter-spacing:.1em;border:1px solid #3A4450;border-radius:6px;padding:2px 8px}
+.acts{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.acts .ph{font-family:var(--display);font-size:18px;color:#5BE3A8;font-variant-numeric:tabular-nums;margin-right:4px}
+.acts .call{background:#16A34A;color:#fff;border-radius:8px;padding:6px 12px;font-weight:700}
+.acts .bt{border:1px solid #3A4450;border-radius:8px;padding:6px 10px;font-weight:700}
+.clock{border:1px solid #4A3A12;background:#1A160B;border-radius:10px;padding:10px}
+.clock b{font-size:11px;letter-spacing:.14em;color:var(--gold)}
+.clock .g{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px 10px;margin-top:6px;font-size:12px}
+.clock .g small{display:block;color:#AEB9C6;letter-spacing:.08em;text-transform:uppercase;font-size:10px}
+.clock .g span{font-weight:700}
+
+/* webhook */
+.hook{display:grid;grid-template-columns:minmax(0,1.1fr) 70px minmax(0,1fr);gap:8px;align-items:center;width:100%;max-width:640px}
+@media (max-width:560px){.hook{grid-template-columns:minmax(0,1fr)}.hook .wire{display:none}}
+pre{margin:0;padding:12px;border-radius:12px;background:#0A0A0A;border:1px solid var(--line);font-size:12px;line-height:1.45;color:#CFE0FF;overflow:auto;white-space:pre}
+pre .k{color:var(--blue-soft)}pre .s{color:var(--orange-soft)}
+.wire{position:relative;height:120px}
+.wire i{position:absolute;left:0;width:10px;height:10px;border-radius:50%;background:var(--orange-soft);box-shadow:0 0 10px var(--orange);animation:tf 1.8s linear infinite;animation-delay:var(--d)}
+.wire i:nth-child(1){top:10px}.wire i:nth-child(2){top:40px}.wire i:nth-child(3){top:70px}.wire i:nth-child(4){top:100px}
+.dest{display:flex;flex-direction:column;gap:6px}
+.dest span{padding:8px 12px;border-radius:10px;background:var(--panel-2);border:1px solid var(--line);font-weight:700;font-size:14px}
+.go .dest span{animation:lit .5s ease-out both var(--d)}
+
+/* launch */
+.launch{display:flex;flex-direction:column;gap:10px}
+.blk{display:flex;justify-content:space-between;align-items:center;gap:10px;border:1px solid var(--app-line);border-radius:12px;padding:12px 14px;background:var(--app-2);flex-wrap:wrap}
+.blk b{display:block;font-size:15px}
+.blk span{font-size:13px;color:#C9D2DC}
+.ready{font-size:11px;font-weight:700;letter-spacing:.12em;padding:4px 10px;border-radius:999px;background:#0F2A1E;color:#5BE3A8;border:1px solid #1E5A40}
+.send{align-self:center;background:var(--orange);color:var(--ink);font-weight:700;font-size:18px;border-radius:14px;padding:14px 30px;box-shadow:0 0 0 0 #FF8A3D88}
+.go .send{animation:wait 1.8s ease-in-out infinite 1.5s}
+.halt{text-align:center;font-weight:700;color:var(--soft);font-size:14px}
+
+/* entrances: elements rest visible; .go replays them */
+.go .in1{animation:up .5s ease-out both .1s}.go .in2{animation:up .5s ease-out both .8s}
+.go .in3{animation:up .5s ease-out both 1.5s}.go .in4{animation:up .5s ease-out both 2.2s}
+.go .pop{animation:pop .45s cubic-bezier(.2,1.4,.4,1) both 2s}
+@keyframes up{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+@keyframes pop{from{opacity:0;transform:scale(.6)}to{opacity:1;transform:none}}
+@keyframes drop{from{opacity:0;transform:translateY(-22px) scale(.6)}to{opacity:1;transform:none}}
+@keyframes stamp{from{opacity:0;transform:scale(1.8)}to{opacity:1;transform:none}}
+@keyframes tf{0%{left:0;opacity:0}20%{opacity:1}100%{left:60px;opacity:0}}
+@keyframes lit{0%{background:var(--panel-2)}100%{background:#2A1A10;border-color:var(--orange);box-shadow:0 0 14px #FF8A3D55}}
+@keyframes wait{0%,100%{box-shadow:0 0 0 0 #FF8A3D66}50%{box-shadow:0 0 0 14px #FF8A3D00}}
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}}
+</style>
+<style>
+/* development additions: satellite parcels, the split, the FAR bar, corridors */
+.sat{position:relative;height:220px;border-radius:12px;overflow:hidden;border:1px solid var(--app-line);
+  background:
+   radial-gradient(circle at 20% 30%,#2E3B22 0 14%,transparent 15%),
+   radial-gradient(circle at 75% 70%,#2A361F 0 18%,transparent 19%),
+   radial-gradient(circle at 60% 20%,#3A3424 0 10%,transparent 11%),
+   linear-gradient(135deg,#25301C,#1C2417 45%,#2B2A1E)}
+.sat .rd{position:absolute;height:6px;background:#5B5A55;border-top:1px solid #77756E;border-bottom:1px solid #77756E;transform-origin:left center}
+.sat .lot{position:absolute;border:1.5px solid rgba(255,255,255,.35);background:rgba(255,255,255,.04)}
+.sat .lot.big{border:2px solid var(--gold);background:rgba(226,181,74,.14)}
+.go .sat .lot.big{animation:glow 1.6s ease-in-out both var(--d)}
+.sat .ctl{position:absolute;left:10px;top:10px;display:flex;flex-direction:column;gap:6px}
+.sat .ctl span{background:#0C1116;border:1px solid var(--app-line);border-radius:8px;padding:4px 10px;font-size:12px;font-weight:700}
+.sat .ctl span.on{border-color:var(--gold);color:#fff}
+.sat .cnt{position:absolute;right:10px;top:10px;background:#0C1116;border:1px solid var(--app-line);border-radius:999px;padding:6px 12px;font-weight:700;font-variant-numeric:tabular-nums}
+@keyframes glow{0%{box-shadow:none;opacity:.2}60%{box-shadow:0 0 18px var(--gold);opacity:1}100%{box-shadow:0 0 8px #E2B54A88;opacity:1}}
+
+.math{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:16px;width:min(560px,100%);align-items:center}
+@media (max-width:560px){.math{grid-template-columns:minmax(0,1fr)}}
+.parcel{position:relative;aspect-ratio:1/1.15;border:2px solid var(--gold);border-radius:6px;background:linear-gradient(160deg,#2B3A22,#1D2617);overflow:hidden;max-width:100%}
+.parcel .house{position:absolute;left:12%;top:10%;width:30%;height:20%;background:#8A8476;border-radius:3px}
+.parcel .cut{position:absolute;top:0;bottom:0;width:0;border-left:2px dashed #fff}
+.go .parcel .cut{animation:cutin .6s ease-out both var(--d)}
+.parcel .lbl{position:absolute;bottom:8px;font-size:12px;font-weight:700;color:#fff;text-shadow:0 1px 3px #000}
+@keyframes cutin{from{opacity:0;transform:scaleY(0)}to{opacity:1;transform:none}}
+.facts{display:flex;flex-direction:column;gap:8px}
+.fct{display:flex;justify-content:space-between;gap:10px;padding:10px 12px;border-radius:10px;background:var(--panel-2);border:1px solid var(--line)}
+.fct b{font-variant-numeric:tabular-nums}
+.far{padding:10px 12px;border-radius:10px;background:var(--panel-2);border:1px solid var(--line)}
+.far .track{position:relative;height:12px;border-radius:6px;background:#0A0A0A;margin-top:8px;overflow:hidden}
+.far .built{position:absolute;left:0;top:0;bottom:0;width:20%;background:var(--blue)}
+.far .gap{position:absolute;left:20%;top:0;bottom:0;width:0;background:repeating-linear-gradient(45deg,var(--orange) 0 6px,#B4480F 6px 12px)}
+.go .far .gap{animation:grow 1.4s ease-out both 1.4s}
+@keyframes grow{to{width:80%}}
+.far small{display:flex;justify-content:space-between;color:var(--soft);font-size:12px;margin-top:4px}
+
+.terr{position:relative;width:min(560px,100%);height:300px;border-radius:16px;border:1px solid var(--line);overflow:hidden;background:radial-gradient(ellipse 80% 50% at 50% 55%,#161616 0%,#0D0D0D 60%,#0A0A0A 100%)}
+.terr .isl{position:absolute;left:6%;right:4%;top:38%;height:30%;border-radius:40% 60% 50% 50%/60% 50% 50% 40%;background:#1A1A1A;border:1px solid #333333}
+.terr .c110{position:absolute;left:30%;top:28%;width:8px;height:48%;border-radius:4px;background:linear-gradient(var(--orange),#B4480F);box-shadow:0 0 16px var(--orange)}
+.terr .c110 b{position:absolute;left:14px;top:-4px;white-space:nowrap;font-size:13px;color:var(--orange-soft)}
+.terr .band{position:absolute;border:2px dashed var(--gold);border-radius:12px;background:rgba(226,181,74,.08)}
+.terr .band b{position:absolute;left:8px;top:-22px;white-space:nowrap;font-size:13px;color:var(--gold)}
+.terr .bub{position:absolute;width:var(--s);height:var(--s);margin:calc(var(--s)/-2) 0 0 calc(var(--s)/-2);border-radius:50%;background:#4C8DFF33;border:2px solid var(--blue);display:grid;place-items:center;font-size:12px;font-weight:700;font-variant-numeric:tabular-nums}
+.go .terr .bub{animation:pop .45s cubic-bezier(.2,1.4,.4,1) both var(--d)}
+.terr .key{position:absolute;left:10px;bottom:10px;font-size:12px;color:var(--soft)}
+
+.opener{align-self:stretch;padding:12px 14px;border-radius:14px;background:#0A0A0A;border:1px dashed var(--line)}
+.opener small{display:block;font-size:11px;letter-spacing:.12em;color:var(--blue-soft);font-weight:700;margin-bottom:4px}
+.opener span{font-size:15px}
+
+.host{width:min(560px,100%);display:flex;flex-direction:column;gap:10px}
+.host .prj{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;padding:12px 14px;border-radius:14px;background:#0A0A0A;border:1px solid var(--blue)}
+.host .prj b{font-family:var(--display);font-size:18px}
+.host .prj span{font-size:12px;font-weight:700;letter-spacing:.12em;color:var(--blue-soft)}
+.host .res{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+@media (max-width:560px){.host .res{grid-template-columns:minmax(0,1fr)}}
+.host .r{padding:10px 12px;border-radius:12px;background:var(--panel-2);border:1px solid var(--line)}
+.host .r small{display:block;font-size:11px;letter-spacing:.12em;color:var(--soft);font-weight:700}
+.host .r b{display:block;font-size:15px}
+.host .key{display:flex;justify-content:space-between;gap:10px;padding:9px 12px;border-radius:10px;background:var(--panel-2);border:1px solid var(--line);font-size:14px}
+.host .key em{font-style:normal;font-size:11px;font-weight:700;letter-spacing:.1em;padding:3px 8px;border-radius:999px;background:#0F2A1E;color:#5BE3A8;border:1px solid #1E5A40}
+.host .acc{display:flex;gap:8px;flex-wrap:wrap}
+.host .acc span{padding:6px 12px;border-radius:999px;border:1px solid var(--line);background:var(--panel-2);font-size:13px;font-weight:700}
+.host .acc span.you{border-color:var(--green);color:#5BE3A8}
+.rail{grid-template-columns:repeat(11,minmax(0,1fr))}
+@media (max-width:1100px){.rail{grid-template-columns:repeat(6,minmax(0,1fr))}}
+@media (max-width:520px){.rail{grid-template-columns:repeat(2,minmax(0,1fr))}}
+</style>
+</head><body>
+<div class="wrap">
+  <header>
+    <div class="brand">NEXT<span>IER</span> · DEVELOPMENT</div>
+    <div class="tag">Story mode · with music · Illustrative example</div>
+  </header>
+  <h1>Find the land <em>before it's a listing.</em></h1>
+
+  <div class="main">
+    <div class="stage" id="stage" aria-live="polite">
+
+      <!-- 1 · BUY BOX: LEAD BUILDER, SATELLITE -->
+      <div class="scene">
+        <div class="app">
+          <div class="abar"><b>Workspace</b><span class="ws">Your Market · Development</span><span class="pill">REAL ESTATE</span><span style="margin-left:auto;color:#AEB9C6">Lead Builder</span></div>
+          <div class="abody">
+            <div class="chips in1" id="segs">
+              <span class="ac">Vacant Land</span><span class="ac">Big Lot 0.90+ ac</span><span class="ac">Older Home ≤1975</span><span class="ac">Expired MLS</span><span class="ac">Inherited</span><span class="ac">Long-Term Owner</span><span class="ac">Commercial held 5+</span><span class="ac">Parking Lot</span><span class="ac">Individually Owned</span>
+            </div>
+            <div class="sat in2" id="sat">
+              <div class="ctl"><span>Satellite</span><span class="on">Lot size</span><span>FAR Gap (NYC)</span></div>
+              <div class="cnt"><span id="pcount">0</span> parcels</div>
+            </div>
+            <div class="rows in3"><b>Rows to build</b><span class="box">1,200</span><span style="color:#C9D2DC">big lots, individually owned, not listed</span></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 2 · THE PARCEL MATH -->
+      <div class="scene" hidden>
+        <div class="math">
+          <div class="parcel in1">
+            <span class="house"></span>
+            <span class="cut" style="left:33%;--d:1.2s"></span><span class="cut" style="left:66%;--d:1.6s"></span>
+            <span class="lbl" style="left:8%">Lot A</span><span class="lbl" style="left:41%">Lot B</span><span class="lbl" style="left:74%">Lot C</span>
+          </div>
+          <div class="facts">
+            <div class="fct in1"><span>Lot</span><b>1.4 acres</b></div>
+            <div class="fct in2"><span>Home built</span><b>1962</b></div>
+            <div class="fct in2"><span>Owner since</span><b>1987</b></div>
+            <div class="fct in3" style="border-color:var(--gold)"><span>Room for</span><b style="color:var(--gold)">3 lots</b></div>
+            <div class="far in4"><b style="font-size:14px">FAR gap (NYC)</b>
+              <div class="track"><i class="built"></i><i class="gap"></i></div>
+              <small><span>Built 0.4</span><span>Allowed 2.0</span></small>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 3 · TERRITORY -->
+      <div class="scene" hidden>
+        <div class="terr">
+          <div class="isl"></div>
+          <div class="c110"><b>Route 110 · north to south</b></div>
+          <div class="band" style="left:66%;top:40%;width:17%;height:22%"><b>Riverhead · out east</b></div>
+          <div class="band" style="left:48%;top:56%;width:15%;height:16%"><b>Mastic–Moriches</b></div>
+          <span class="bub" style="left:31%;top:46%;--s:56px;--d:.8s">1,240</span>
+          <span class="bub" style="left:74%;top:51%;--s:50px;--d:1.2s">840</span>
+          <span class="bub" style="left:55%;top:64%;--s:42px;--d:1.6s">370</span>
+          <span class="bub" style="left:16%;top:47%;--s:34px;--d:2s">210</span>
+          <span class="key">Bubbles = matching parcels by area · example counts</span>
+        </div>
+      </div>
+
+      <!-- 4 · SIGNALS -->
+      <div class="scene" hidden>
+        <div class="sig">
+          <div class="sc in1"><span class="ic" style="background:#2A1A10;color:var(--orange)">EX</span><div><b>Expired, never relisted · big lot</b><small>The owner already tried to sell, and the lot can be split</small></div><span class="new">NEW</span></div>
+          <div class="sc in2"><span class="ic" style="background:#161616;color:var(--blue-soft)">ES</span><div><b>Estate · oversized lot</b><small>Heirs deciding what to do with land</small></div><span class="new">NEW</span></div>
+          <div class="sc in3"><span class="ic" style="background:#26201A;color:var(--gold)">PF</span><div><b>Pre-foreclosure · big lot</b><small>A deadline on a developable parcel</small></div><span class="new">NEW</span></div>
+          <div class="sc in4"><span class="ic" style="background:#13261D;color:var(--green)">30</span><div><b>Owned 30+ years · older home</b><small>Long hold, low basis, big yard</small></div></div>
+        </div>
+      </div>
+
+      <!-- 5 · OWNER -->
+      <div class="scene" hidden>
+        <div class="split">
+          <div class="lanebox go-l in1"><h3>Individually owned → first</h3><span class="o">R. Castellano · 1.4 ac</span><span class="o">Estate of H. Lindqvist · 2.1 ac</span><span class="o">T. Nguyen · 0.95 ac</span><span class="o">A. Romano · 1.1 ac</span></div>
+          <div class="lanebox rs-l in2"><h3>Companies → research</h3><span class="o">Oak Hollow Realty LLC</span><span class="o">Main St Parking Corp</span><span class="o" style="color:var(--soft)">Find the person who decides</span></div>
+        </div>
+      </div>
+
+      <!-- 6 · TRACE -->
+      <div class="scene" hidden>
+        <div class="trace">
+          <div class="tr in1"><b>R. Castellano · 14 Old Country Rd</b></div>
+          <div class="tr in2">Mobile found<span class="num" style="margin-left:auto">(631) 555-0158</span></div>
+          <div class="tr in3">Line type: mobile<span class="ok">CHECKED</span></div>
+          <div class="tr in3">Do-not-call and opt-outs<span class="ok">CLEAR</span></div>
+          <div class="tr in4">Traced only when the record had no number<span class="ok">NO WASTE</span></div>
+        </div>
+      </div>
+
+      <!-- 7 · PROPERTY BOOK LIST -->
+      <div class="scene" hidden>
+        <div class="app">
+          <div class="abar"><b>Workspace</b><span class="ws">Your Market · Development</span><span class="pill">REAL ESTATE</span><span style="margin-left:auto;color:#AEB9C6">Property Book</span></div>
+          <div class="abody">
+            <div class="toprow in1"><span class="ah">Property Book <span style="font-weight:500;color:#C9D2DC;font-size:15px">1,200 ready</span></span><span class="enzo">Export to your dialer · CSV</span></div>
+            <div class="chips in1">
+              <span class="ac hit">Subdivision-size<small>312</small></span><span class="ac hit">Expired, not relisted<small>94</small></span><span class="ac">Oversized lot<small>1,200</small></span><span class="ac">Older home ≤1975<small>688</small></span><span class="ac">Estate<small>141</small></span><span class="ac">Vacant land<small>203</small></span><span class="ac">FAR gap<small>57</small></span><span class="ac">Owned 30+ yrs<small>420</small></span>
+            </div>
+            <div class="tbl in2">
+              <table>
+                <thead><tr><th>Property</th><th>Lot</th><th>Mobile</th><th>Autotags</th></tr></thead>
+                <tbody id="book"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 8 · ONE RECORD -->
+      <div class="scene" hidden>
+        <div class="app">
+          <div class="abar"><b>Workspace</b><span class="ws">Your Market · Development</span><span class="pill">REAL ESTATE</span><span style="margin-left:auto;color:#AEB9C6">Property Book</span></div>
+          <div class="abody">
+            <div class="rec">
+              <div class="mini in1"><span class="sel">14 Old Country Rd, Riverhead, NY</span><span>8 Pine Hollow Ln, Center Moriches, NY</span><span>220 Broadhollow Rd, Melville, NY</span><span>31 Fox Run, Calverton, NY</span><span>5 Bayview Ave, Mastic, NY</span><span>119-40 Liberty Ave, Queens, NY</span></div>
+              <div class="panel in2">
+                <div><div class="addr">14 Old Country Rd, Riverhead, NY</div><div class="cty">Suffolk, NY · R. Castellano · 1.4 ac</div></div>
+                <span class="traced">TRACED</span>
+                <div class="acts"><span class="ph">(631) 555-0158</span><span class="call">CALL</span><span class="bt">Text</span><span class="bt">Mark worked</span></div>
+                <div class="tgs"><span class="tg ev">Expired, not relisted</span><span class="tg">Subdivision-size</span><span class="tg">Older home 1962</span><span class="tg">Owned 30+ yrs</span><span class="tg ok">Mobile verified</span></div>
+                <div class="clock in3"><b>THE CLOCK</b>
+                  <div class="g"><div><small>Listing expired</small><span>41 days ago</span></div><div><small>Relisted since</small><span>No</span></div><div><small>Room for</small><span>3 lots</span></div><div><small>Last sale</small><span>1987</span></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 9 · ANY TOOL -->
+      <div class="scene" hidden>
+        <div class="hook">
+          <pre class="in1"><span class="k">POST</span> your-webhook-url
+{
+  <span class="k">"event"</span>: <span class="s">"lead.ready"</span>,
+  <span class="k">"block"</span>: <span class="s">"Riverhead · Subdivision-size"</span>,
+  <span class="k">"owner"</span>: <span class="s">"R. Castellano"</span>,
+  <span class="k">"mobile"</span>: <span class="s">"+16315550158"</span>,
+  <span class="k">"lot_acres"</span>: 1.4,
+  <span class="k">"room_for_lots"</span>: 3,
+  <span class="k">"tags"</span>: [<span class="s">"expired_not_relisted"</span>,
+           <span class="s">"subdivision_size"</span>,
+           <span class="s">"older_home"</span>],
+  <span class="k">"score"</span>: 91
+}</pre>
+          <div class="wire" aria-hidden="true"><i style="--d:0s"></i><i style="--d:.45s"></i><i style="--d:.9s"></i><i style="--d:1.35s"></i></div>
+          <div class="dest">
+            <span style="--d:.6s">Your CRM</span><span style="--d:1s">Your dialer</span><span style="--d:1.4s">Your acquisitions team</span><span style="--d:1.8s">Initial SMS</span><span style="--d:2.2s">Any webhook · Zapier · Make</span><span style="--d:2.6s">CSV · API · MCP</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- 10 · YOURS, CO-HOSTED -->
+      <div class="scene" hidden>
+        <div class="host">
+          <div class="prj in1"><b>Your company · production</b><span>HOSTED ON DIGITALOCEAN</span></div>
+          <div class="res in2">
+            <div class="r"><small>DATABASE</small><b>Your Postgres cluster</b></div>
+            <div class="r"><small>ENGINE</small><b>Nextier, installed</b></div>
+            <div class="r"><small>BACKUPS</small><b>Daily, in your account</b></div>
+          </div>
+          <div class="key in3"><span>Property data key</span><em>YOURS</em></div>
+          <div class="key in3"><span>Skip trace key</span><em>YOURS</em></div>
+          <div class="key in3"><span>Texting lines and number</span><em>YOURS</em></div>
+          <div class="acc in4"><span class="you">You · owner, full infra access</span><span>Nextier · manages it for you</span></div>
+        </div>
+      </div>
+
+      <!-- 10 · PREPPED, STOPPED -->
+      <div class="scene" hidden>
+        <div class="app">
+          <div class="abar"><b>Workspace</b><span class="ws">Your Market · Development</span><span class="pill">REAL ESTATE</span><span style="margin-left:auto;color:#AEB9C6">Initial SMS</span></div>
+          <div class="abody launch">
+            <div class="blk in1"><div><b>Riverhead · Subdivision-size lots</b><span>840 owners · traced · tagged · checked</span></div><span class="ready">READY</span></div>
+            <div class="blk in2"><div><b>Route 110 · Commercial held 5+ yrs</b><span>1,240 owners · traced · tagged · checked</span></div><span class="ready">READY</span></div>
+            <div class="opener in3"><small>OPENER, READY TO REVIEW</small><span>Hi Rosa, we're seeing builder interest in larger lots near Old Country Rd. Would it help if I showed you what we're seeing?</span></div>
+            <span class="send in4">Send</span>
+            <div class="halt in4">0 sent. Nothing goes out until a person presses Send.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="narr">
+      <div class="step" id="step">Chapter 1 of 11</div>
+      <h2 id="ttl"></h2>
+      <p id="txt"></p>
+      <div class="controls">
+        <button id="prev" type="button">Back</button>
+        <button id="play" type="button">Play story</button>
+        <button id="snd" type="button" aria-pressed="true">Sound on</button>
+        <button id="next" type="button">Next</button>
+      </div>
+    </div>
+  </div>
+
+  <nav class="rail" id="rail" aria-label="Chapters"></nav>
+  <div class="foot">Illustrative story. Names, addresses, phone numbers (555), lot facts and counts are examples, shown on the Nextier app's own screens. Use the arrow keys or the chapter buttons to move through it. · <a href="engine-story.html">Data Engine Story Mode</a> · <a href="dataengine.html">The Data Engine</a></div>
+</div>
+
+<script>
+const CH=[
+ {k:'Buy box',t:'Start with the land you build on',x:'Big lots, vacant land, older homes on oversized parcels, commercial held for years. The Lead Builder lights up every parcel in your market that fits, on the satellite view.'},
+ {k:'The math',t:'See the deal in the dirt',x:'Lot size, the age of the house, how long they’ve owned it, and how many lots it could become. In New York City, the FAR gap shows how much more the zoning allows than what is built.'},
+ {k:'Territory',t:'Hunt where it pays',x:'Pick your corridors. Route 110 north to south for commercial, Riverhead and Mastic–Moriches out east for subdivision-size land. Every area gets its own count.'},
+ {k:'Signals',t:'The reason to sell now',x:'An expired listing that never came back, an estate on an oversized lot, a pre-foreclosure on land you can split. Each lands as a signal that says why now.'},
+ {k:'Owner',t:'Individual owners first',x:'People who own the land themselves go first. LLCs and corporations go to research, to find the person who actually decides.'},
+ {k:'Trace',t:'A number you can reach',x:'The owner’s mobile is traced only when the record doesn’t already have one, then checked for line type, do-not-call and opt-outs.'},
+ {k:'Autotags',t:'Every lot, tagged',x:'Subdivision-size, oversized lot, older home, estate, expired and not relisted, FAR gap. The Property Book shows the whole list, filterable by every tag.'},
+ {k:'Record',t:'The whole parcel on one record',x:'Open any row: the verified mobile, one-click Call and Text, Mark worked, every tag, and The Clock: how long since the listing expired, and whether it came back.'},
+ {k:'Any tool',t:'Into your tool of choice',x:'Each ready lot can fire a webhook into the tool you already use: your CRM, your dialer, your acquisitions team, Zapier or Make. Or pull it by CSV, API or MCP.'},
+ {k:'Yours',t:'Co-hosted. Yours.',x:'It runs in your own DigitalOcean account: your database, your API keys, your texting lines, and full access to the infrastructure. Nextier installs it and manages it for you. If you ever leave, everything stays with you.'},
+ {k:'Prepped',t:'Then it stops',x:'Ready blocks wait at Initial SMS with the opener drafted for review. Zero texts go out until a person presses Send.'}
+];
+const DUR=7000;
+
+/* scene 1: satellite parcels */
+const sat=document.getElementById('sat');
+[[0,58,100,-4],[22,0,120,72],[60,0,110,98]].forEach(([l,t,w,a])=>{const r=document.createElement('i');r.className='rd';r.style.left=l+'%';r.style.top=t+'%';r.style.width=w+'%';r.style.transform='rotate('+a+'deg)';sat.appendChild(r)});
+const LOTS=[[30,18,9,14,0],[40,20,7,10,0],[48,16,12,18,1],[62,24,8,11,0],[71,22,14,20,1],[34,66,10,13,0],[45,70,16,20,1],[63,68,8,12,0],[73,64,7,10,0],[12,30,11,16,1],[14,70,9,12,0],[84,40,10,15,1]];
+LOTS.forEach(([x,y,w,h,big],i)=>{const l=document.createElement('i');l.className='lot'+(big?' big':'');l.style.left=x+'%';l.style.top=y+'%';l.style.width=w+'%';l.style.height=h+'%';if(big)l.style.setProperty('--d',(1+i*.15)+'s');sat.appendChild(l)});
+const segs=[...document.querySelectorAll('#segs .ac')];
+
+/* scene 7: the list */
+const ROWS=[
+ ['14 Old Country Rd, Riverhead, NY','Suffolk','1.4 ac · room for 3','(631) 555-0158',[['Expired, not relisted','ev'],['Subdivision-size',''],['Older home','']]],
+ ['8 Pine Hollow Ln, Center Moriches, NY','Suffolk','2.1 ac · room for 4','(631) 555-0136',[['Estate','ev'],['Subdivision-size',''],['Owned 30+ yrs','']]],
+ ['220 Broadhollow Rd, Melville, NY','Suffolk','1.9 ac · commercial','(631) 555-0191',[['Commercial held 5+',''],['Route 110','']]],
+ ['31 Fox Run, Calverton, NY','Suffolk','3.2 ac · vacant','(631) 555-0104',[['Vacant land',''],['Oversized lot','']]],
+ ['5 Bayview Ave, Mastic, NY','Suffolk','0.95 ac · room for 2','(631) 555-0122',[['Pre-foreclosure','ev'],['Older home','']]],
+ ['119-40 Liberty Ave, Queens, NY','Queens','4,800 sq ft','(718) 555-0147',[['FAR gap','ev'],['Owned 30+ yrs','']]],
+ ['Oak Hollow Realty LLC · Riverhead','Suffolk','2.6 ac','—',[['Entity · research','']]]
+];
+const book=document.getElementById('book');
+ROWS.forEach((r,i)=>{const tr=document.createElement('tr');if(i===0)tr.className='sel';
+ tr.innerHTML='<td class="w">'+r[0]+'<small>'+r[1]+'</small></td><td class="w">'+r[2]+'</td><td>'+r[3]+'</td><td><div class="tgs"></div></td>';
+ const box=tr.querySelector('.tgs');r[4].forEach(([t,c],j)=>{const s=document.createElement('span');s.className='tg'+(c?' '+c:'');s.textContent=t;s.style.setProperty('--d',(1.2+i*.25+j*.12)+'s');box.appendChild(s)});
+ if(r[3]!=='—'){const s=document.createElement('span');s.className='tg ok';s.textContent='Mobile verified';s.style.setProperty('--d',(1.5+i*.25)+'s');box.appendChild(s)}
+ book.appendChild(tr)});
+
+/* counters */
+let timers=[];
+function countUp(el,to,prefix,ms){const t0=performance.now();const f=now=>{const p=Math.min(1,(now-t0)/ms);el.textContent=prefix+Math.round(to*p).toLocaleString('en-US');if(p<1)timers.push(requestAnimationFrame(f))};timers.push(requestAnimationFrame(f))}
+
+/* player */
+const scenes=[...document.querySelectorAll('.scene')];
+const rail=document.getElementById('rail');
+const stepEl=document.getElementById('step'),ttl=document.getElementById('ttl'),txt=document.getElementById('txt'),playBtn=document.getElementById('play');
+CH.forEach((c,i)=>{const b=document.createElement('button');b.type='button';b.innerHTML='<span class="bar"><i></i></span><span><span class="n">'+String(i+1).padStart(2,'0')+'</span> '+c.k+'</span>';b.addEventListener('click',()=>go(i));rail.appendChild(b)});
+const railBtns=[...rail.children];
+let cur=0,playing=false,t0=0,raf=0,segT=0;
+function go(i){
+  cur=(i+CH.length)%CH.length;
+  scenes.forEach((s,j)=>{s.hidden=j!==cur;s.classList.remove('go')});
+  const s=scenes[cur];void s.offsetWidth;s.classList.add('go');
+  stepEl.textContent='Chapter '+(cur+1)+' of '+CH.length;ttl.textContent=CH[cur].t;txt.textContent=CH[cur].x;
+  railBtns.forEach((b,j)=>{b.querySelector('.bar i').style.width=j<cur?'100%':'0';if(j===cur)b.setAttribute('aria-current','step');else b.removeAttribute('aria-current')});
+  timers.forEach(cancelAnimationFrame);timers=[];clearInterval(segT);
+  if(cur===0){segs.forEach(e=>e.classList.remove('on'));let k=0;const pick=[1,2,0,3,8];segT=setInterval(()=>{if(k<pick.length){segs[pick[k]].classList.add('on');k++}},450);countUp(document.getElementById('pcount'),1200,'',3200)}
+  t0=performance.now();
+}
+function tick(now){
+  if(!playing)return;
+  const p=Math.min(1,(now-t0)/DUR);
+  railBtns[cur].querySelector('.bar i').style.width=(p*100)+'%';
+  if(p>=1){if(cur===CH.length-1){setPlay(false);return}go(cur+1)}
+  raf=requestAnimationFrame(tick);
+}
+function setPlay(on){playing=on;playBtn.textContent=on?'Pause':(cur===CH.length-1?'Replay':'Play story');cancelAnimationFrame(raf);if(on){if(cur===CH.length-1)go(0);t0=performance.now();raf=requestAnimationFrame(tick)}}
+playBtn.addEventListener('click',()=>setPlay(!playing));
+document.getElementById('next').addEventListener('click',()=>{go(cur+1);if(playing)t0=performance.now()});
+document.getElementById('prev').addEventListener('click',()=>{go(cur-1);if(playing)t0=performance.now()});
+document.addEventListener('keydown',e=>{if(e.key==='ArrowRight')go(cur+1);else if(e.key==='ArrowLeft')go(cur-1);else if(e.key===' '&&e.target===document.body){e.preventDefault();setPlay(!playing)}});
+// Deep link: development-story.html#ch7 opens on chapter 7.
+const m=/^#ch(\d+)$/.exec(location.hash||'');
+go(m?Math.min(Math.max(+m[1],1),CH.length)-1:0);
+</script>
+<audio id="song" src="media/story-song2-77s.m4a" preload="auto"></audio>
+<script>
+// Music follows the story clock: chapter i starts at i x DUR of the song. It fades in on Play,
+// fades out on Pause, Sound off and the story's end, and dips under a chapter jump. The file is
+// cut to this story's length with the fade-out baked in, for browsers that ignore volume.
+const song=document.getElementById('song'),snd=document.getElementById('snd'),SEC=DUR/1000;
+const canFade=(()=>{try{const a=document.createElement('audio');a.volume=.5;return Math.abs(a.volume-.5)<.01}catch(e){return false}})();
+let soundOn=true,fadeIv=0;
+function fadeTo(v,ms,done){clearInterval(fadeIv);fadeIv=0;if(!canFade||ms<=0){if(canFade)song.volume=v;if(done)done();return}const a=Math.sqrt(song.volume),b=Math.sqrt(v),s=performance.now();fadeIv=setInterval(()=>{const k=Math.min(1,(performance.now()-s)/ms),x=a+(b-a)*k;song.volume=Math.max(0,Math.min(1,x*x));if(k>=1){clearInterval(fadeIv);fadeIv=0;if(done)done()}},30)}
+function songAt(){return Math.min(cur*SEC+(performance.now()-t0)/1000,song.duration||1e9)}
+function syncSong(){
+  if(!soundOn||!playing){if(!song.paused)fadeTo(0,soundOn?900:400,()=>song.pause());return}
+  if(song.paused){try{song.currentTime=songAt()}catch(e){}if(canFade)song.volume=0;const p=song.play();if(p&&p.then)p.then(()=>fadeTo(1,500)).catch(()=>{});else fadeTo(1,500);return}
+  if(Math.abs(song.currentTime-songAt())>.6){fadeTo(0,150,()=>{try{song.currentTime=songAt()}catch(e){}fadeTo(1,400)});return}
+  fadeTo(1,300);
+}
+const _go=go;go=function(i){_go(i);syncSong()};
+const _setPlay=setPlay;setPlay=function(on){_setPlay(on);syncSong()};
+snd.addEventListener('click',()=>{soundOn=!soundOn;snd.setAttribute('aria-pressed',String(soundOn));snd.textContent=soundOn?'Sound on':'Sound off';syncSong()});
+</script>
+</body></html>
