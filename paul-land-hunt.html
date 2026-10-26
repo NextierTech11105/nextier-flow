@@ -1730,7 +1730,7 @@ function syncSplit() {
 function ensureSat() {
   if (!map || !map.getLayer("cols") || map.getSource("satx")) return;
   map.addSource("satx", { type: "raster", ...SATX });
-  map.addLayer({ id: "satx", type: "raster", source: "satx", minzoom: 10, paint: { "raster-opacity": ["interpolate", ["linear"], ["zoom"], 10, 0, 12.5, 1] } }, "cols");
+  map.addLayer({ id: "satx", type: "raster", source: "satx", paint: { "raster-opacity": 1 } }, "cols"); // satellite at every zoom
   // Close up, the satellite stays clean: the lot blocks fade out (they read as a grid over the photo), thin lines remain.
   map.setPaintProperty("lots", "fill-extrusion-opacity", ["interpolate", ["linear"], ["zoom"], 11.5, 0.85, 13, 0.3, 14, 0]);
   map.addLayer({ id: "lots-line", type: "line", source: "lots", minzoom: 13, paint: { "line-color": "#ffffff", "line-opacity": 0.5, "line-width": 1.2 } });
