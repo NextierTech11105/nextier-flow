@@ -1476,7 +1476,7 @@ document.addEventListener("keydown", (e) => { if ($("#story").hidden) return; if
 let satMap = null;
 // Satellite tiles: the client's own Mapbox account when the page has the token (opened once as ?mapbox=pk..., kept in
 // that browser, never in this file), Esri imagery until then.
-const MB_TOKEN = (() => { try { const q = new URLSearchParams(location.search).get("mapbox"); if (q && /^pk\./.test(q)) { localStorage.setItem("nx-mapbox", q); return q; } return localStorage.getItem("nx-mapbox") || ""; } catch (e) { return ""; } })();
+const MB_TOKEN = (() => { try { const q = new URLSearchParams(location.search).get("mapbox"); if (q && /^pk\./.test(q)) { localStorage.setItem("nx-mapbox", q); try { history.replaceState(null, "", location.pathname + location.hash); } catch (e) {} return q; } return localStorage.getItem("nx-mapbox") || ""; } catch (e) { return ""; } })();
 const SATX = MB_TOKEN
   ? { tiles: [`https://api.mapbox.com/v4/mapbox.satellite/{z}/{x}/{y}@2x.jpg90?access_token=${MB_TOKEN}`], tileSize: 256, maxzoom: 22, attribution: "© Mapbox © Maxar" }
   : { tiles: ["https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}"], tileSize: 256, maxzoom: 19, attribution: "Imagery © Esri, Maxar, Earthstar Geographics" };
