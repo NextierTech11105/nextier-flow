@@ -310,6 +310,18 @@ pre .k{color:var(--blue-soft)}pre .s{color:var(--orange-soft)}
 @keyframes ntk-move{to{transform:translateX(-50%)}}
 @media (prefers-reduced-motion:reduce){.ntk-track{flex-wrap:wrap;justify-content:center;width:auto;row-gap:10px}.ntk-t[aria-hidden="true"]{display:none}}
 
+/* fit: open and that's it, no scrolling on desktop */
+body.fit{height:100vh;overflow:hidden}
+body.fit .ntk{padding:6px 0}
+body.fit .ntk-l{display:none}
+body.fit .ntk-t{height:34px;padding:0 12px;border-radius:9px;margin-right:9px}
+body.fit .ntk .lg{width:calc(var(--w) * .6);height:calc(var(--h) * .6)}
+body.fit .wrap{transform-origin:top center;padding-block:14px 10px;gap:14px}
+body.fit h1{font-size:clamp(26px,2.6vw,42px)}
+body.fit .rail{gap:5px}
+body.fit .rail button{padding:6px 9px;font-size:13px}
+body.fit .foot{font-size:12px;line-height:1.45}
+
 /* 3D layer: one live map moves into each screen that needs it. Until it loads (or if it can't),
    the flat drawings above stay exactly as they were. */
 #map3d{position:absolute;inset:0}
@@ -960,6 +972,20 @@ document.getElementById('finReplay').addEventListener('click',()=>{hide();go(0);
 <script>
 /* the Play button always tells the truth: Pause while playing, Play story or Replay when stopped */
 (function(){const b=document.getElementById('play');if(!b)return;const goBefore=go;go=function(i){goBefore(i);if(!playing)b.textContent=cur===CH.length-1?'Replay':'Play story'};})();
+</script>
+<script>
+/* fit: scale the story to the window so it opens fully, with nothing to scroll */
+(function(){
+const wrap=document.querySelector('.wrap'),bar=document.querySelector('.ntk');if(!wrap)return;
+function fit(){
+  if(innerWidth<921){document.body.classList.remove('fit');wrap.style.transform='';return}
+  document.body.classList.add('fit');wrap.style.transform='';
+  const avail=innerHeight-(bar?bar.offsetHeight:0),s=Math.min(1,avail/wrap.offsetHeight);
+  if(s<1)wrap.style.transform='scale('+s.toFixed(4)+')';
+}
+addEventListener('resize',fit);fit();
+if(document.fonts&&document.fonts.ready)document.fonts.ready.then(fit);
+})();
 </script>
 <script src="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.js"></script>
 <script>
