@@ -103,6 +103,13 @@ body.mapmode #scanmap { position: absolute; inset: 0; height: auto; }
 }
 #rows tr.on { background: #0d1d33; box-shadow: inset 4px 0 0 #ffd23f; }
 #rows .eyecell { white-space: nowrap; }
+#book .search { position: relative; }
+#book .search::before { content: "🔍"; position: absolute; left: 14px; top: 50%; transform: translateY(-50%); font-size: 18px; pointer-events: none; }
+#book .search input { width: 100%; box-sizing: border-box; background: #0b1730; border: 2px solid var(--blue); color: #fff; font: 600 17px var(--body); padding: 13px 14px 13px 46px; border-radius: 12px; }
+#book .search input::placeholder { color: #e6ecf7; opacity: 1; }
+#book .search input:focus { outline: 3px solid #ffd23f; outline-offset: 1px; }
+#rows a.own.lock { display: block; text-decoration: underline; cursor: pointer; }
+#opanel .rbtn.push { border-color: #a78bfa; background: #1a1033; font-size: 14px; } #opanel .rbtn.push:hover { background: #a78bfa; color: #000; }
 #book .frow.fold { align-items: flex-start; }
 #book .frow.fold .flab { cursor: pointer; user-select: none; padding-top: 5px; }
 #book .frow.fold .flab::before { content: "▸ "; color: #f3c04e; }
@@ -113,6 +120,11 @@ body.mapmode #scanmap { position: absolute; inset: 0; height: auto; }
 #scan .opanel { position: absolute; left: 12px; right: 12px; bottom: 30px; z-index: 6; max-height: 60%; overflow: auto; display: grid; gap: 10px; background: rgba(5,7,11,.94); border: 2px solid #ffd23f; border-radius: 14px; padding: 12px 14px; color: #fff; font-size: 15px; }
 #scan .opanel[hidden], body.mapmode #scan .opanel { display: none !important; }
 body:not(.mapmode) #scan.locked .legend { display: none; }
+/* side by side: the owner profile below the map, not on top of it */
+@media (min-width: 760px) {
+  body.split:not(.mapmode) #scan.locked #scanmap { bottom: 44%; }
+  body.split:not(.mapmode) #scan .opanel { top: 56%; bottom: 0; left: 0; right: 0; max-height: none; border-radius: 0; border-width: 2px 0 0; align-content: start; }
+}
 .opanel .op-h { display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; }
 .opanel .op-a { font: 800 18px var(--display); }
 .opanel .op-p { color: #d5ddf0; font-size: 14px; }
@@ -579,9 +591,6 @@ footer .fl { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; 
 
   <section id="book">
     <div class="wrap">
-      <div class="eyebrow">Property Book · list view</div>
-      <h2>Every lot, ranked. Search it, filter it, open it.</h2>
-      <p class="intro">Individual owners first, then trusts and estates, then companies. Split candidates ahead of single lots. Open any row for the full detail view.</p>
       <div class="tools">
         <div class="search"><input id="q" type="search" placeholder="Search address, hamlet, town or county" aria-label="Search lots"></div>
         <div class="frow"><span class="flab">Event signal</span><div class="chips" id="listev"></div></div>
@@ -1662,7 +1671,7 @@ function ownerNameOf(r) { try { const t = traced(r), o = t && t.owner; return o 
 function ownerCellOf(r) {
   const nm = ownerNameOf(r);
   let sealed = false; try { sealed = !nm && sealedHas(r); } catch (e) {}
-  return (nm ? `<div class="own">👤 <b>${esc(nm)}</b></div>` : sealed ? `<div class="own lock">👤 Owner traced · open with your key link</div>` : "") + `<div class="sub">${esc(r.k)} · ${esc(r.rch)}</div>`;
+  return (nm ? `<div class="own">👤 <b>${esc(nm)}</b></div>` : sealed ? `<a href="#" class="own lock" data-askkey>👤 Owner traced · tap to show the name</a>` : "") + `<div class="sub">${esc(r.k)} · ${esc(r.rch)}</div>`;
 }
 /** The list's reach cell: one-press call on the best non-DNC mobile, email, notes, and the call / text / email counts. */
 function reachCellOf(r) {
@@ -1710,7 +1719,7 @@ function focusLot(k, tr) {
   if (tourOn) stopTour();
   const xs = ring[0].map((q) => q[0]), ys = ring[0].map((q) => q[1]);
   clearTimeout(flyT);
-  flyT = setTimeout(() => map.fitBounds([[Math.min(...xs), Math.min(...ys)], [Math.max(...xs), Math.max(...ys)]], { padding: { top: 70, bottom: 200, left: 70, right: 70 }, maxZoom: 18, pitch: 45, bearing: 0, duration: reduce ? 0 : 1300, essential: true }), 140);
+  flyT = setTimeout(() => map.fitBounds([[Math.min(...xs), Math.min(...ys)], [Math.max(...xs), Math.max(...ys)]], { padding: 60, maxZoom: 18, pitch: 45, bearing: 0, duration: reduce ? 0 : 1300, essential: true }), 140);
 }
 function pickRow() {
   if (!splitOn() || performance.now() < holdUntil) return;
@@ -1773,10 +1782,12 @@ function ckOpen(r, num) {
       <div class="cklab">Outcome</div>
       <div class="ckpad">${CK_OUTCOMES.map(([o, c]) => `<button class="ckb ${c}" type="button" data-ckout="${o}">${o}</button>`).join("")}</div>
       <div class="ckpad"><button class="ckb w" type="button" data-ckworked>👁 MARK WORKED</button><input type="datetime-local" data-ckfu aria-label="Follow-up date"><button class="ckb" type="button" data-ckfuset>Set follow-up</button></div>
+      <div class="cklab">Push</div>
+      <div class="ckpad"><button class="ckb w" type="button" data-ckpush="Initial SMS">➜ INITIAL SMS</button><button class="ckb w" type="button" data-ckpush="Pipeline Nurture">➜ PIPELINE NURTURE</button><button class="ckb w" type="button" data-ckpush="Follow Up Boss">➜ FOLLOW UP BOSS</button></div>
       <textarea data-ckbox aria-label="Notes" placeholder="What did the owner say?"></textarea>
       <div class="pushbar"><button class="btn nsave" type="button" data-cksave>Save note</button><span class="nhint">Rides along in the Follow Up Boss push.</span></div>
       <ul class="nlist"></ul>
-      <div class="nhint">On this page it saves to this device. In your workspace the call, the outcome and the notes save on the lead.</div>
+      <div class="nhint">On this page it saves to this device. In your workspace the call, the outcome and the notes save on the lead; Initial SMS stages the lead in a block and nothing sends until you press Send.</div>
     </div>`;
   ck.hidden = false; ck.classList.remove("flash"); void ck.offsetWidth; ck.classList.add("flash");
   const nt = $("#ntab"), nw = $("#nwin"); if (nt) nt.hidden = true; if (nw) nw.hidden = true;
@@ -1791,6 +1802,7 @@ ck.addEventListener("click", (e) => {
     ckLog(r, `Call result · ${b.dataset.ckres}${ck.dataset.num ? " · " + ck.dataset.num : ""}`, "outcome"); return;
   }
   if (b.dataset.ckout) { ckLog(r, `Outcome · ${b.dataset.ckout}`, "outcome"); return; }
+  if (b.dataset.ckpush) { ckLog(r, pushLine(b.dataset.ckpush), "push"); return; }
   if (b.hasAttribute("data-ckworked")) { ckLog(r, "Marked worked · being worked", "worked"); return; }
   if (b.hasAttribute("data-ckfuset")) { const f = ck.querySelector("[data-ckfu]"); if (!f.value) { f.focus(); return; } ckLog(r, `Follow-up set · ${when(f.value)}`, "followup"); return; }
   if (b.hasAttribute("data-cksave")) { const box = ck.querySelector("[data-ckbox]"), t = box.value.trim(); if (!t) { box.focus(); return; } box.value = ""; ckLog(r, t, "note"); }
@@ -1807,6 +1819,13 @@ document.addEventListener("click", (e) => {
   if (a.dataset.notesk) ckOpen(r, "");
 });
 document.addEventListener("keydown", (e) => { if (e.key === "Escape" && !ck.hidden) ckClose(); });
+const pushLine = (to) => to === "Initial SMS" ? "Pushed to Initial SMS · staged in a block, nothing sends until Send is pressed" : `Pushed to ${to}`;
+document.addEventListener("click", async (e) => {
+  const kk = e.target.closest("[data-askkey]");
+  if (kk) { e.preventDefault(); e.stopPropagation(); const c = prompt("Owner code"); if (c && await unsealTraced(c)) { renderList(); drawOwnerPanel(byRank.get(activeK)); } else if (c) alert("That code didn't open it."); return; }
+  const pb = e.target.closest("[data-pushk]");
+  if (pb) { const r = byRank.get(Number(pb.dataset.pushk)); if (!r) return; ckOpen(r, ""); ckLog(r, pushLine(pb.dataset.to), "push"); }
+}, true);
 addEventListener("hashchange", () => { const m = location.hash.match(/^#lot-(\d+)$/); if (ckLot && m && Number(m[1]) !== ckLot.rank) ckClose(); });
 
 
@@ -1815,7 +1834,7 @@ const opanel = document.createElement("div");
 opanel.className = "opanel"; opanel.id = "opanel"; opanel.hidden = true;
 $("#scan").appendChild(opanel);
 function drawOwnerPanel(r) {
-  if (!r) { opanel.hidden = true; $("#scan").classList.remove("locked"); return; }
+  if (!r) { opanel.hidden = true; $("#scan").classList.remove("locked"); if (map) setTimeout(() => map.resize(), 20); return; }
   let t = null, sealed = false; try { t = traced(r); sealed = !t && sealedHas(r); } catch (e) {}
   const nm = ownerNameOf(r), o = (t && t.owner) || {};
   const place = [r.h, r.t && r.t !== r.h ? r.t : "", r.co].filter(Boolean).join(" · ");
@@ -1831,13 +1850,15 @@ function drawOwnerPanel(r) {
     : `<div class="op-ph"><a class="rbtn call" href="tel:${esc(telOf(p.n))}" data-callk="${r.rank}" data-num="${esc(fmtPh(p.n))}">☎ ${esc(fmtPh(p.n))}</a> ${ltTag(p)}</div>`).join("");
   const emails = em.slice(0, 2).map((m) => `<a class="rbtn mail" href="mailto:${esc(m.e)}" data-mailk="${r.rank}">✉ ${esc(m.e)}</a>`).join("");
   const L = ledgerOf(r);
-  const who = nm ? `<b>${esc(nm)}</b>` : sealed ? `<a href="#" class="op-key" data-askkey>Owner traced · enter your code to show the name and phones</a>` : `<span class="op-none">Owner of record · not traced yet</span>`;
+  const who = nm ? `<b>${esc(nm)}</b>` : sealed ? `<a href="#" class="op-key" data-askkey>Owner traced · tap to show the name and phones</a>` : `<span class="op-none">Owner of record · not traced yet</span>`;
   opanel.innerHTML = `<div class="op-h"><span class="op-a">#${r.rank} · ${esc(r.a)}</span><span class="op-p">${esc(place)}</span><button type="button" data-opclose aria-label="Unlock this parcel">×</button></div>
     <div class="op-own">👤 ${who}</div>
     <div class="op-facts">${facts.map((f) => `<span>${f}</span>`).join("")}</div>
     ${phones || emails ? `<div class="op-reach">${phones}${emails}</div>` : ""}
-    <div class="op-b"><button class="rbtn notes" type="button" data-notesk="${r.rank}">📝 Notes <b>${n0(L.notes)}</b></button><a class="rbtn eye2" href="#lot-${r.rank}">👁 Detail view</a><span class="led">Calls <b>${L.call}</b> · Texts <b>${L.text}</b> · Emails <b>${L.email}</b></span></div>`;
+    <div class="op-b"><button class="rbtn notes" type="button" data-notesk="${r.rank}">📝 Notes <b>${n0(L.notes)}</b></button><a class="rbtn eye2" href="#lot-${r.rank}">👁 Detail view</a><button class="rbtn push" type="button" data-pushk="${r.rank}" data-to="Initial SMS">➜ Initial SMS</button><button class="rbtn push" type="button" data-pushk="${r.rank}" data-to="Pipeline Nurture">➜ Pipeline Nurture</button><span class="led">Calls <b>${L.call}</b> · Texts <b>${L.text}</b> · Emails <b>${L.email}</b></span></div>`;
+  const was = $("#scan").classList.contains("locked");
   opanel.hidden = false; $("#scan").classList.add("locked");
+  if (!was && map) setTimeout(() => map.resize(), 20); // owner profile below the map: the map gets shorter
 }
 opanel.addEventListener("click", async (e) => {
   if (e.target.closest("[data-opclose]")) {
@@ -1845,7 +1866,6 @@ opanel.addEventListener("click", async (e) => {
     const hs = map && map.getSource("hi"); if (hs) hs.setData({ type: "FeatureCollection", features: [] });
     drawOwnerPanel(null); return;
   }
-  if (e.target.closest("[data-askkey]")) { e.preventDefault(); const c = prompt("Owner code"); if (c && await unsealTraced(c)) { renderList(); drawOwnerPanel(byRank.get(activeK)); } }
 });
 
 
