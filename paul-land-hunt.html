@@ -1971,7 +1971,7 @@ const mq = document.createElement("div");
 mq.className = "mapsearch";
 mq.innerHTML = `<input id="mapq" type="search" placeholder="Search address, hamlet, town or county · Enter jumps to it" aria-label="Search lots on the map"><span id="mapqct"></span>`;
 $("#scan").appendChild(mq);
-try { .textContent = n0(filtered().length) + " lots"; } catch (e) {}
+try { $("#mapqct").textContent = n0(filtered().length) + " lots"; } catch (e) {}
 $("#mapq").addEventListener("input", (e) => { st.q = e.target.value; st.shown = 60; const lq = $("#q"); if (lq) lq.value = st.q; renderList(); });
 $("#mapq").addEventListener("keydown", (e) => {
   if (e.key !== "Enter") return;
