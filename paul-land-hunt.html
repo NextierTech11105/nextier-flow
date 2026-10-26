@@ -104,6 +104,17 @@ body.mapmode #scanmap { position: absolute; inset: 0; height: auto; }
 #rows tr.on { background: #0d1d33; box-shadow: inset 4px 0 0 #ffd23f; }
 #rows .eyecell { white-space: nowrap; }
 /* bright list text */
+#rows td { font-size: 17px; }
+#rows .addr { font-size: 20px; font-weight: 800; color: #fff; line-height: 1.25; }
+#rows .addr2 { font-size: 17px; font-weight: 700; color: #fff; margin-top: 2px; }
+#rows .pidl { font-size: 15px; color: #ffd23f; font-weight: 800; margin-top: 4px; }
+#rows .own { font-size: 18px; }
+#rows .acx { font-size: 18px; }
+#rows .pill { font-size: 16px; }
+#rows .rk { font-size: 17px; }
+#rows .rbtn { font-size: 16px; }
+#rows .led { font-size: 15px; }
+.opanel .op-pid { color: #ffd23f; font-weight: 800; font-size: 15px; }
 #rows .sub { color: #eef2f8; font-size: 15px; }
 #rows .reachcell .sub { color: #fff; font-weight: 800; font-size: 15px; margin-top: 6px; }
 .opanel .op-p, .opanel .op-cr { color: #fff; }
@@ -812,7 +823,7 @@ function renderList() {
   const rows = f.slice(0, st.shown);
   $("#rows").innerHTML = rows.map((r) => `<tr data-k="${r.rank}">
     <td class="r eyecell"><a class="eye" href="#lot-${r.rank}" title="Detail view" aria-label="Detail view for ${esc(r.a)}"><svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path d="M1.5 12S5.5 4.8 12 4.8 22.5 12 22.5 12 18.5 19.2 12 19.2 1.5 12 1.5 12Z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><circle cx="12" cy="12" r="3.6" fill="currentColor"/></svg></a><div class="rk">${r.rank}</div></td>
-    <td><div class="addr">${esc(r.a)}</div><div class="sub">${esc([r.h, r.t && r.t !== r.h ? r.t : "", r.co].filter(Boolean).join(" · "))}</div>${ownerCellOf(r)}</td>
+    <td>${addrLines(r)}${pidLineOf(r)}${ownerCellOf(r)}</td>
     <td><div class="acx">${acf(r.ac)} ac</div>${splitCell(r)}</td>
     <td>${r.win ? `<span class="pill ${r.win === "fresh" ? "b" : "g"}">${WINS[r.win]}</span>` : r.use ? nearPills(r) : ""}<div class="sub">${r.dom ? n0(r.dom) + " days on market" : ""}${r.x > 1 ? ` · listed ${r.x}×` : ""}</div><div class="sub ask">${r.use ? `Tax roll ${money(r.val)}` : r.p ? `Last asking ${money(r.p)}` : ""}</div></td>
     <td class="reachcell">${reachCellOf(r)}</td>
@@ -1662,6 +1673,21 @@ window.addEventListener("hashchange", route);
 // ---------- List view: the list on the left, the live satellite map on the right (Thomas 2026-10-26) ----------
 const SPLIT_MIN = 0; // always list + map together: side by side from 760px, map on top below that
 let activeK = null, flyT = null, scrollRaf = 0;
+// ---------- addresses read like addresses: "179 Bennett Road / Napanoch, NY 12458", then town · county; parcel ID under it ----------
+const streetOf = (r) => String(r.a || "").replace(/\s+/g, " ").trim();
+const cityLineOf = (r) => { const city = r.h || r.t || ""; return `${city}${city ? ", " : ""}NY${r.z ? " " + r.z : ""}`; };
+function addrLines(r) {
+  const line3 = [r.t && r.t !== r.h ? `Town of ${r.t}` : "", r.co ? `${r.co} County` : ""].filter(Boolean).join(" · ");
+  return `<div class="addr">${esc(streetOf(r))}</div><div class="addr2">${esc(cityLineOf(r))}</div>${line3 ? `<div class="sub">${esc(line3)}</div>` : ""}`;
+}
+function parcelIdOf(r) {
+  try { if (PARCEL[r.rank]) return `Section ${PARCEL[r.rank][0]} · Block ${PARCEL[r.rank][1]} · Lot ${PARCEL[r.rank][2]}`; } catch (e) {}
+  const raw = r.pk || r.pid || ""; if (!raw) return "";
+  const m = String(raw).match(/^(\d{6})\s+(.+)$/), pk = m ? m[2] : String(raw);
+  const p = pk.split("-"), c = (s) => String(s || "").replace(/\.$/, "");
+  return p.length >= 3 ? `Section ${c(p[0])} · Block ${c(p[1])} · Lot ${c(p.slice(2).join("-"))}` : pk;
+}
+const pidLineOf = (r) => { const s = parcelIdOf(r); return s ? `<div class="pidl">Parcel ID · ${esc(s)}</div>` : ""; };
 function ledgerOf(r) {
   try {
     const list = readNotes(r);
@@ -1861,7 +1887,8 @@ function drawOwnerPanel(r) {
   const emails = em.slice().sort((a, b) => other(a) - other(b)).map((m) => `<div class="op-ph"><a class="rbtn mail" href="mailto:${esc(m.e)}" data-mailk="${r.rank}">✉ ${esc(m.e)}</a>${whoTag(m)}</div>`).join("");
   const L = ledgerOf(r);
   const who = nm ? `<b>${esc(nm)}</b>` : sealed ? `<a href="#" class="op-key" data-askkey>Owner traced · tap to show the name and phones</a>` : `<span class="op-none">Owner of record · not traced yet</span>`;
-  opanel.innerHTML = `<div class="op-h"><span class="op-a">#${r.rank} · ${esc(r.a)}</span><span class="op-p">${esc(place)}</span><button type="button" data-opclose aria-label="Unlock this parcel">×</button></div>
+  opanel.innerHTML = `<div class="op-h"><span class="op-a">#${r.rank} · ${esc(streetOf(r))}, ${esc(cityLineOf(r))}</span><span class="op-p">${esc(place)}</span><button type="button" data-opclose aria-label="Unlock this parcel">×</button></div>
+    ${parcelIdOf(r) ? `<div class="op-pid">Parcel ID · ${esc(parcelIdOf(r))}</div>` : ""}
     <div class="op-own">👤 ${who}</div>
     <div class="op-facts">${facts.map((f) => `<span>${f}</span>`).join("")}</div>
     ${ph.length ? `<div class="op-lab">Phones · ${n0(ph.length)}</div><div class="op-reach">${phones}</div>` : ""}${em.length ? `<div class="op-lab">Emails · ${n0(em.length)}</div><div class="op-reach">${emails}</div>` : ""}
