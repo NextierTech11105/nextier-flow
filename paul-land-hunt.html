@@ -109,6 +109,7 @@ body.mapmode #scanmap { position: absolute; inset: 0; height: auto; }
 #book .flab { font-size: 16px; color: #fff; }
 #book .frow.fold .fsum { font-size: 17px; font-weight: 800; padding: 6px 14px; }
 /* bright list text */
+#lotinner .dname { font-size: 20px; color: #fff; } #lotinner .dkey { color: var(--green); font-weight: 800; font-size: 17px; }
 #rows .orec { color: #d5ddf0; font-size: 13px; font-weight: 600; }
 #rows td { font-size: 17px; }
 #rows .addr { font-size: 20px; font-weight: 800; color: #fff; line-height: 1.25; }
@@ -1281,9 +1282,7 @@ function traceBoxTraced(r, t) {
 function traceBox(r) {
   const t = traced(r); if (t) return traceBoxTraced(r, t);
   return `<div class="tracebox" id="tbox"><div class="th"><span class="lg lg-tracerfy" style="width:96px;height:24px" role="img" aria-label="Skip trace"></span><b>Skip trace + verification</b><span>Fills on your key · validated before the first call</span></div>
-    <div class="tfields">${TRACE_FIELDS.map(([f, k, lt, v]) => `<div class="tf${k === "c" ? " contact" : ""}" data-lt="${lt}" data-lit="${esc(v)}"><span class="l">${f}</span><span class="v">— lands here</span></div>`).join("")}</div>
-    <div class="pushbar"><button class="btn go" type="button" data-trace>Run skip trace · light up this lead</button></div>
-    <div class="note" id="tracenote" hidden>Preview. On your key the owner's real phones and emails land in the Call + email card, each phone with its line type and the Do Not Call check. The best mobile is called first, from your own SignalHouse.io line. Emails go from your own address.</div></div>`;
+    <div class="note">Not traced yet. A skip trace on your key puts every phone and email in the Call + email card, with line type, carrier and Do Not Call.</div></div>`;
 }
 /** Light the trace boxes, one by one. Preview only: masks, never invented numbers. */
 function lightUp(box) {
@@ -1594,7 +1593,7 @@ function openLot(rank) {
           <dt>Owner type</dt><dd>${esc(r.k)}</dd>
           <dt>Reach</dt><dd>${esc(r.rch || "—")}</dd>
           <dt>Mailing</dt><dd>${r.oos ? "Out of state" : (r.sig || []).includes("absentee") ? "Different address in New York" : r.rch === "Lives there" ? "Lives on the property" : "—"}</dd>
-          <dt>Name on file</dt><dd>${traced(r) ? `<b>${esc(traced(r).owner.full || "")}</b> · from the owner lookup` : "In your workspace. Never on a page."}</dd></dl>
+          ${ownerDetailRows(r)}</dl>
           ${traceBox(r)}</div>
           <div class="src">Source: ${esc(r.src || "")} · owner of record</div></section>
         <section class="card" id="d-reach"><h2>Call + email · click to call</h2><div class="pad">${reachCard(r)}</div>
@@ -1742,6 +1741,19 @@ function parcelIdOf(r) {
   return p.length >= 3 ? `Section ${c(p[0])} · Block ${c(p[1])} · Lot ${c(p.slice(2).join("-"))}` : pk;
 }
 const pidLineOf = (r) => { const s = parcelIdOf(r); return s ? `<div class="pidl">Parcel ID · ${esc(s)}</div>` : ""; };
+/** The detail view's owner rows: the name (traced, else owner of record), the mailing address, anyone else on the deed. */
+function ownerDetailRows(r) {
+  const nm = ownerNameOf(r);
+  let tag = "", locked = false;
+  try { tag = traced(r) ? "from the owner trace" : "owner of record · NYS tax roll"; } catch (e) {}
+  try { locked = !nm && (sealedHas(r) || (!!OWNERS_SEALED && !OWNERS)); } catch (e) {}
+  const name = nm ? `<b class="dname">${esc(nm)}</b> · ${tag}` : locked ? `<a href="#" class="dkey" data-askkey>Tap to show the owner's name</a>` : "No tax-roll match for this lot yet";
+  const rec = recordOf(r);
+  const mail = rec && rec[2] ? `<dt>Mails to</dt><dd>${esc(titleCase(rec[2]))}, ${esc(titleCase(rec[3]))} ${esc(rec[4])} ${esc(rec[5])}</dd>` : "";
+  const also = rec && rec[1] ? `<dt>Also on the deed</dt><dd>${esc(personName(rec[1]))}</dd>` : "";
+  const pid = parcelIdOf(r) ? `<dt>Parcel ID</dt><dd>${esc(parcelIdOf(r))}</dd>` : "";
+  return `<dt>Owner</dt><dd>${name}</dd>${also}${mail}${pid}`;
+}
 function ledgerOf(r) {
   try {
     const list = readNotes(r);
@@ -1913,7 +1925,7 @@ document.addEventListener("keydown", (e) => { if (e.key === "Escape" && !ck.hidd
 const pushLine = (to) => to === "Initial SMS" ? "Pushed to Initial SMS · staged in a block, nothing sends until Send is pressed" : `Pushed to ${to}`;
 document.addEventListener("click", async (e) => {
   const kk = e.target.closest("[data-askkey]");
-  if (kk) { e.preventDefault(); e.stopPropagation(); const c = prompt("Owner code"); if (c && await unsealTraced(c)) { renderList(); drawOwnerPanel(byRank.get(activeK)); } else if (c) alert("That code didn't open it."); return; }
+  if (kk) { e.preventDefault(); e.stopPropagation(); const c = prompt("Owner code"); if (c && await unsealTraced(c)) { renderList(); drawOwnerPanel(byRank.get(activeK)); const m = location.hash.match(/^#lot-(\d+)$/); if (m && !$("#lotview").hidden) openLot(Number(m[1])); } else if (c) alert("That code didn't open it."); return; }
   const pb = e.target.closest("[data-pushk]");
   if (pb) { const r = byRank.get(Number(pb.dataset.pushk)); if (!r) return; ckOpen(r, ""); ckLog(r, pushLine(pb.dataset.to), "push"); }
 }, true);
