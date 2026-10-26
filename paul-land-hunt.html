@@ -90,6 +90,16 @@ body:not(.mapmode) #scan { display: none !important; }
 body.mapmode #book { display: none !important; }
 body.mapmode .hero { height: calc(100dvh - 64px); min-height: 420px; }
 body.mapmode #scanmap { position: absolute; inset: 0; height: auto; }
+/* List view = the list on the left, the live satellite map on the right. Scrolling the list flies the map to each parcel. */
+@media (min-width: 1100px) {
+  body.split:not(.mapmode) #mainview:not([hidden]) { display: grid; grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr); align-items: start; }
+  body.split:not(.mapmode) #scan { display: block !important; grid-column: 2; grid-row: 1; position: sticky; top: 64px; height: calc(100dvh - 64px); min-height: 420px; border-left: 1px solid var(--rule); border-bottom: 0; }
+  body.split:not(.mapmode) #mainview > main { grid-column: 1; grid-row: 1; min-width: 0; }
+  body.split:not(.mapmode) #book .wrap { max-width: none; padding-inline: 20px; }
+}
+#rows tr.on { background: #0d1d33; box-shadow: inset 4px 0 0 #ffd23f; }
+#rows .ph { color: var(--green); font-weight: 800; white-space: nowrap; font-variant-numeric: tabular-nums; }
+.trace.on { border-style: solid; border-color: var(--green); color: #fff; background: #03130b; }
 .bar nav a.on { background: var(--blue); color: #000; border-color: var(--blue); }
 .legend .mb { color: #fff; font-weight: 700; }
 .hero { position: relative; height: min(88vh, 900px); min-height: 640px; border-bottom: 1px solid var(--rule); overflow: hidden; }
@@ -732,8 +742,8 @@ function renderList() {
     <td>${r.win ? `<span class="pill ${r.win === "fresh" ? "b" : "g"}">${WINS[r.win]}</span>` : r.use ? nearPills(r) : ""}<div class="sub">${r.dom ? n0(r.dom) + " days on market" : ""}${r.x > 1 ? ` · listed ${r.x}×` : ""}</div></td>
     <td class="r">${r.use ? `${money(r.val)}<div class="sub">tax roll value</div>` : money(r.p)}</td>
     <td>${esc(r.k)}<div class="sub">${esc(r.rch)}</div></td>
-    <td><span class="trace">skip trace</span></td>
-    <td><span class="trace">skip trace</span></td>
+    <td>${reachCellOf(r, "m")}</td>
+    <td>${reachCellOf(r, "e")}</td>
     <td><a href="#lot-${r.rank}" aria-label="Open ${esc(r.a)}">Open</a></td></tr>`).join("") || `<tr><td colspan="10" style="color:#fff">${st.ev === "arm" ? "Adjustable-rate loans come from RealEstateAPI on your key. None loaded yet." : "No lots match. Clear a filter or the search."}</td></tr>`;
   $("#count").textContent = `${n0(f.length)} of ${n0(R.length)} lots`;
   const left = f.length - rows.length;
@@ -1000,9 +1010,7 @@ function mathCard(r) {
 }
 // [label, kind, line type label when lit, masked value when lit]. Contact fields glow; phones carry their line type.
 const TRACE_FIELDS = [
-  ["Mobile 1", "c", "Mobile", "(•••) •••-••••"], ["Mobile 2", "c", "Mobile", "(•••) •••-••••"], ["Mobile 3", "c", "Mobile", "(•••) •••-••••"], ["Landline", "c", "Landline", "(•••) •••-••••"],
-  ["Email 1", "c", "Email", "•••••@•••••.com"], ["Email 2", "c", "Email", "•••••@•••••.com"], ["Email 3", "c", "Email", "•••••@•••••.com"], ["Best mobile", "m", "", "Mobile 1 · called first"],
-  ["Carrier", "m", "", "Carrier on file"], ["Do Not Call", "m", "", "Checked"], ["TCPA", "m", "", "Checked"], ["Verified", "m", "", "Date of the check"],
+  ["Best mobile", "m", "", "Mobile 1 · called first"], ["Carrier", "m", "", "Carrier on file"], ["Do Not Call", "m", "", "Checked"], ["TCPA", "m", "", "Checked"], ["Verified", "m", "", "Date of the check"],
 ];
 // ---------- reach: click to call on your own SignalHouse.io line, email from your own address ----------
 // Real traced owners, keyed by lot rank. EMPTY on the public page (everything stays masked); filled only
@@ -1070,10 +1078,7 @@ function reachCard(r) {
   const t = traced(r); if (t) return reachCardTraced(r, t);
   if (sealedHas(r)) return reachCardLocked(r);
   return `<div class="reachbox">${REACH_HEAD}
-    <div class="rrows">${REACH_PHONES.map(([f, lt], i) => `<div class="rrow"><span class="l">${f}</span><span class="v">(•••) •••-•••• <span class="lt ${lt === "Landline" ? "ll" : "mo"}">${lt}</span></span><button class="btn go" type="button" data-call="${i}">☎ Call</button></div>`).join("")}
-    ${REACH_EMAILS.map((f, i) => `<div class="rrow"><span class="l">${f}</span><span class="v">•••••@•••••.com <span class="lt em">Email</span></span><button class="btn" type="button" data-email="${i}">✉ Email</button></div>`).join("")}</div>
-    <div class="callpanel" id="cpanel" hidden></div>
-    <div class="note">Preview. Phones and emails are masked on this page. In your workspace they are the owner's real traced numbers, and one press rings the owner from your own SignalHouse.io line. Every call and email logs on the lead. No texting campaign needed.</div></div>`;
+    <div class="lockbox"><b>Not traced yet</b><span>Next: ${esc(nextMoveOf(r))}. The owner's phones and emails land here, each phone with its line type, the Do Not Call check and a Call button.</span></div></div>`;
 }
 let callTimer = null, ringTimer = null;
 function stopCall() { clearInterval(callTimer); clearTimeout(ringTimer); callTimer = ringTimer = null; }
@@ -1128,8 +1133,7 @@ function traceBoxTraced(r, t) {
   const P = (p) => p ? `${esc(fmtPh(p.n))} ${ltTag(p)}` : "None found";
   const E = (m) => m ? `${esc(m.e)} <span class="lt em">Email</span>` : "None found";
   const rows = [
-    ["Mobile 1", P(mob[0]), 1], ["Mobile 2", P(mob[1]), 1], ["Mobile 3", P(mob[2]), 1], ["Landline", P(land[0]), 1],
-    ["Email 1", E(em[0]), 1], ["Email 2", E(em[1]), 1], ["Email 3", E(em[2]), 1], ["Best mobile", best ? `${esc(fmtPh(best.n))} · called first` : "—", 0],
+    ["Best mobile", best ? `${esc(fmtPh(best.n))} · called first` : "—", 0],
     ["Carrier", esc((best && best.c) || "—"), 0], ["Do Not Call", best ? (best.dnc ? `<span class="lt dnc">On DNC</span>` : `<span class="lt ok">Clear</span>`) : "—", 0],
     ["TCPA", best ? (best.tcpa ? `<span class="lt tcpa">Flagged</span>` : `<span class="lt ok">Clear</span>`) : "—", 0], ["Verified", esc(t.on || "—"), 0],
   ];
@@ -1142,7 +1146,7 @@ function traceBox(r) {
   return `<div class="tracebox" id="tbox"><div class="th"><span class="lg lg-tracerfy" style="width:96px;height:24px" role="img" aria-label="Skip trace"></span><b>Skip trace + verification</b><span>Fills on your key · validated before the first call</span></div>
     <div class="tfields">${TRACE_FIELDS.map(([f, k, lt, v]) => `<div class="tf${k === "c" ? " contact" : ""}" data-lt="${lt}" data-lit="${esc(v)}"><span class="l">${f}</span><span class="v">— lands here</span></div>`).join("")}</div>
     <div class="pushbar"><button class="btn go" type="button" data-trace>Run skip trace · light up this lead</button></div>
-    <div class="note" id="tracenote" hidden>Preview. On your key the real phones and emails land in these boxes, each phone labeled with its line type, with the carrier and the Do Not Call check. The best mobile is called first, from your own SignalHouse.io line. Emails go from your own address.</div></div>`;
+    <div class="note" id="tracenote" hidden>Preview. On your key the owner's real phones and emails land in the Call + email card, each phone with its line type and the Do Not Call check. The best mobile is called first, from your own SignalHouse.io line. Emails go from your own address.</div></div>`;
 }
 /** Light the trace boxes, one by one. Preview only: masks, never invented numbers. */
 function lightUp(box) {
@@ -1387,7 +1391,13 @@ $("#story").addEventListener("click", (e) => { if (e.target.id === "story") clos
 document.addEventListener("keydown", (e) => { if ($("#story").hidden) return; if (e.key === "Escape") closeStory(); else if (e.key === "ArrowRight") { storyAt++; drawStory(); } else if (e.key === "ArrowLeft") { storyAt--; drawStory(); } });
 
 let satMap = null;
-const SAT_STYLE = { version: 8, sources: { sat: { type: "raster", tiles: ["https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}"], tileSize: 256, maxzoom: 19, attribution: "Imagery © Esri, Maxar, Earthstar Geographics" } }, layers: [{ id: "sat", type: "raster", source: "sat" }] };
+// Satellite tiles: the client's own Mapbox account when the page has the token (opened once as ?mapbox=pk..., kept in
+// that browser, never in this file), Esri imagery until then.
+const MB_TOKEN = (() => { try { const q = new URLSearchParams(location.search).get("mapbox"); if (q && /^pk\./.test(q)) { localStorage.setItem("nx-mapbox", q); return q; } return localStorage.getItem("nx-mapbox") || ""; } catch (e) { return ""; } })();
+const SATX = MB_TOKEN
+  ? { tiles: [`https://api.mapbox.com/v4/mapbox.satellite/{z}/{x}/{y}@2x.jpg90?access_token=${MB_TOKEN}`], tileSize: 256, maxzoom: 22, attribution: "© Mapbox © Maxar" }
+  : { tiles: ["https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}"], tileSize: 256, maxzoom: 19, attribution: "Imagery © Esri, Maxar, Earthstar Geographics" };
+const SAT_STYLE = { version: 8, sources: { sat: { type: "raster", ...SATX } }, layers: [{ id: "sat", type: "raster", source: "sat" }] };
 function openLot(rank) {
   const r = byRank.get(rank); if (!r) { location.hash = "book"; return; }
   stopTour(); closeStory();
@@ -1505,7 +1515,7 @@ function openLot(rank) {
   const tb = $("#lotinner [data-trace]"); if (tb) tb.addEventListener("click", () => lightUp($("#tbox")));
   const ub = $("#lotinner [data-unlock]"), uc = $("#lotinner [data-code]");
   if (ub && uc) {
-    const go = async () => { ub.disabled = true; const ok = await unsealTraced(uc.value); ub.disabled = false; if (ok) openLot(r.rank); else { const m = $("#lotinner [data-lockmsg]"); if (m) m.hidden = false; } };
+    const go = async () => { ub.disabled = true; const ok = await unsealTraced(uc.value); ub.disabled = false; if (ok) { renderList(); openLot(r.rank); } else { const m = $("#lotinner [data-lockmsg]"); if (m) m.hidden = false; } };
     ub.addEventListener("click", go); uc.addEventListener("keydown", (e) => { if (e.key === "Enter") go(); });
   }
   stopCall();
@@ -1571,8 +1581,64 @@ window.addEventListener("hashchange", route);
 // A code entered earlier in this tab opens the sealed owners again on reload.
 (async () => {
   let c = null; try { c = sessionStorage.getItem("hunt-owner-code"); } catch {}
-  if (c && await unsealTraced(c)) { const m = location.hash.match(/^#lot-(\d+)/); if (m) openLot(Number(m[1])); }
+  if (c && await unsealTraced(c)) { renderList(); const m = location.hash.match(/^#lot-(\d+)/); if (m) openLot(Number(m[1])); }
 })();
+// ---------- List view: the list on the left, the live satellite map on the right (Thomas 2026-10-26) ----------
+const SPLIT_MIN = 1100;
+let activeK = null, flyT = null, scrollRaf = 0;
+function reachCellOf(r, kind) {
+  try {
+    const t = traced(r);
+    if (t) {
+      if (kind === "m") { const ph = t.phones || []; const b = ph.find((x) => isMobile(x.t) && !x.dnc) || ph.find((x) => !x.dnc) || ph[0]; return b ? `<span class="ph">${esc(fmtPh(b.n))}</span><div class="sub">${n0(ph.length)} phones</div>` : `<span class="sub">None found</span>`; }
+      const em = t.emails || []; return em.length ? `${esc(em[0].e)}<div class="sub">${n0(em.length)} emails</div>` : `<span class="sub">None found</span>`;
+    }
+    if (sealedHas(r)) return `<span class="trace on">Traced · code</span>`;
+  } catch (e) {}
+  return `<span class="trace">skip trace</span>`;
+}
+const splitOn = () => innerWidth >= SPLIT_MIN && !document.body.classList.contains("mapmode") && $("#lotview").hidden;
+function syncSplit() { document.body.classList.toggle("split", innerWidth >= SPLIT_MIN); if (map) setTimeout(() => map.resize(), 40); }
+function ensureSat() {
+  if (!map || !map.getLayer("cols") || map.getSource("satx")) return;
+  map.addSource("satx", { type: "raster", ...SATX });
+  map.addLayer({ id: "satx", type: "raster", source: "satx", minzoom: 10, paint: { "raster-opacity": ["interpolate", ["linear"], ["zoom"], 10, 0, 12.5, 1] } }, "cols");
+  map.setPaintProperty("lots", "fill-extrusion-opacity", ["interpolate", ["linear"], ["zoom"], 11.5, 0.85, 15, 0.22]);
+  map.addSource("hi", { type: "geojson", data: { type: "FeatureCollection", features: [] } });
+  map.addLayer({ id: "hi-fill", type: "fill", source: "hi", paint: { "fill-color": "#ffd23f", "fill-opacity": 0.12 } });
+  map.addLayer({ id: "hi-line", type: "line", source: "hi", paint: { "line-color": "#ffd23f", "line-width": 4 } });
+}
+function focusLot(k, tr) {
+  if (k === activeK) return;
+  activeK = k;
+  document.querySelectorAll("#rows tr.on").forEach((x) => x.classList.remove("on"));
+  if (tr) tr.classList.add("on");
+  const r = byRank.get(k);
+  if (!map || !r || !r.c) return;
+  ensureSat();
+  const ring = r.rings || square(r.c, Math.max(40, Math.sqrt((r.ac || 0.3) * 4047)));
+  const hs = map.getSource("hi"); if (hs) hs.setData({ type: "FeatureCollection", features: [{ type: "Feature", properties: {}, geometry: { type: "Polygon", coordinates: ring } }] });
+  if (tourOn) stopTour();
+  const xs = ring[0].map((q) => q[0]), ys = ring[0].map((q) => q[1]);
+  clearTimeout(flyT);
+  flyT = setTimeout(() => map.fitBounds([[Math.min(...xs), Math.min(...ys)], [Math.max(...xs), Math.max(...ys)]], { padding: 90, maxZoom: 18, pitch: 45, bearing: 0, duration: reduce ? 0 : 1300, essential: true }), 140);
+}
+function pickRow() {
+  if (!splitOn()) return;
+  const line = innerHeight * 0.4;
+  let best = null;
+  for (const tr of $("#rows").querySelectorAll("tr[data-k]")) { const b = tr.getBoundingClientRect(); if (b.bottom < 70) continue; if (b.top > line && best) break; best = tr; if (b.top > line) break; }
+  if (best) focusLot(Number(best.dataset.k), best);
+}
+let lastScroll = 0;
+addEventListener("scroll", () => { lastScroll = performance.now(); if (!scrollRaf) scrollRaf = requestAnimationFrame(() => { scrollRaf = 0; pickRow(); }); }, { passive: true });
+$("#rows").addEventListener("mouseover", (e) => { if (performance.now() - lastScroll < 600) return; const tr = e.target.closest("tr[data-k]"); if (tr && splitOn()) focusLot(Number(tr.dataset.k), tr); });
+new MutationObserver(() => { activeK = null; requestAnimationFrame(pickRow); }).observe($("#rows"), { childList: true });
+addEventListener("resize", () => { syncSplit(); pickRow(); });
+addEventListener("hashchange", () => setTimeout(() => { syncSplit(); activeK = null; pickRow(); }, 60));
+syncSplit();
+if (map) map.on("idle", function first() { if (!map.getLayer("cols")) return; map.off("idle", first); ensureSat(); activeK = null; pickRow(); });
+
 renderList();
 route();
 })();
