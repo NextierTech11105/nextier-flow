@@ -79,6 +79,18 @@ h1, h2, h3 { font-family: var(--display); font-stretch: 112%; margin: 0; text-wr
 .bar nav a:hover { border-color: var(--blue); }
 
 /* hero scan */
+/* List view + Map view + Detail view only. No dashboard. */
+.frow { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+.flab { font: 800 13px var(--mono); letter-spacing: .08em; text-transform: uppercase; color: #fff; min-width: 128px; }
+.srcline { color: #f2f4f7; font-size: 15px; }
+.srcline b { color: #fff; }
+#segments, #stream, #market, #where, #lake, #yes, .hero .hud-left, .hero .hud-right { display: none !important; }
+body:not(.mapmode) #scan { display: none !important; }
+body.mapmode #book { display: none !important; }
+body.mapmode .hero { height: calc(100dvh - 64px); min-height: 420px; }
+body.mapmode #scanmap { position: absolute; inset: 0; height: auto; }
+.bar nav a.on { background: var(--blue); color: #000; border-color: var(--blue); }
+.legend .mb { color: #fff; font-weight: 700; }
 .hero { position: relative; height: min(88vh, 900px); min-height: 640px; border-bottom: 1px solid var(--rule); overflow: hidden; }
 #scanmap { position: absolute; inset: 0; background: radial-gradient(120% 90% at 70% 40%, #0a1424 0%, #000 70%); }
 .loading { position: absolute; inset: 0; display: grid; place-items: center; color: var(--soft); font-family: var(--mono); font-size: 15px; pointer-events: none; }
@@ -403,14 +415,14 @@ footer .fl { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; 
   <div class="wrap">
     <div class="brand"><span class="lg lg-nx-mark" style="width:26px;height:26px" role="img" aria-label="Nextier"></span><span>Team Musso</span><span class="sep">·</span><span>Nextier Data Engine</span></div>
     <nav aria-label="Sections">
-      <a href="#scan">Scan</a><a href="#segments">Segments</a><a href="#stream">Stream</a><a href="#market">Market</a><a href="#where">Where</a><a href="#book">Property Book</a><a href="#lake">Data lake</a><a href="#yes">On yes</a><a href="paul-news.html">News</a>
+      <a href="#book" data-view="list">List view</a><a href="#map" data-view="map">Map view</a>
     </nav>
   </div>
 </header>
 
 <div id="mainview">
 <div class="hero" id="scan">
-  <div id="scanmap" aria-label="3D scan of New York State expired land"><div class="loading" id="maploading">Loading the scan…</div></div>
+  <div id="scanmap" aria-label="3D scan of New York State expired land"><div class="loading" id="maploading">Loading the map…</div></div>
   <div class="hud-left">
     <div class="eyebrow">Team Musso · Nextier Data Engine · New York State</div>
     <h1>Every expired lot. Every owner. One hunt.</h1>
@@ -438,10 +450,11 @@ footer .fl { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; 
     <button class="btn ghost" id="scanBtn" type="button">Pause scan</button>
   </div>
   <div class="legend" aria-hidden="true">
-    <span><i style="background:var(--green)"></i>Verified by right</span>
-    <span><i style="background:var(--blue)"></i>Split candidate</span>
-    <span><i style="background:var(--blue-soft)"></i>NYC site</span>
-    <span><i style="background:var(--lot)"></i>Single-lot land</span>
+    <span><i style="background:var(--green)"></i>Zoning allows a split</span>
+    <span><i style="background:var(--blue)"></i>Big enough to split</span>
+    <span><i style="background:var(--blue-soft)"></i>NYC building site</span>
+    <span><i style="background:var(--lot)"></i>One buildable lot</span>
+    <span class="mb">Click any lot to open it · runs on your own Mapbox account at install</span>
   </div>
 </div>
 
@@ -499,16 +512,17 @@ footer .fl { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; 
       <p class="intro">Individual owners first, then trusts and estates, then companies. Split candidates ahead of single lots. Open any row for the full detail view.</p>
       <div class="tools">
         <div class="search"><input id="q" type="search" placeholder="Search address, hamlet, town or county" aria-label="Search lots"></div>
+        <div class="frow"><span class="flab">Event signal</span><div class="chips" id="listev"></div></div>
+        <div class="frow"><span class="flab">MLS expired</span><div class="chips" id="listwin"></div></div>
+        <div class="frow"><span class="flab">Development</span><div class="chips" id="listseg"></div></div>
+        <div class="frow"><span class="flab">Lot size</span><div class="chips" id="listsize"></div></div>
         <div class="rowx">
-          <div class="chips" id="listseg"></div>
-        </div>
-        <div class="rowx">
-          <div class="chips" id="listwin"></div>
-          <select id="kind" aria-label="Owner type"><option value="">Every owner type</option><option>Individual</option><option>Trust / estate</option><option>Company</option><option>Owner of record</option><option>Matched at install</option></select>
-          <select id="region" aria-label="Region"><option value="">Statewide</option></select>
-          <select id="sort" aria-label="Sort"><option value="rank">Rank</option><option value="ac">Acres, largest</option><option value="dom">Days on market, longest</option><option value="p">Last asking, highest</option></select>
+          <select id="kind" aria-label="Owner type"><option value="">Any owner</option><option>Individual</option><option>Trust / estate</option><option>Company</option><option>Owner of record</option><option>Matched at install</option></select>
+          <select id="region" aria-label="Region"><option value="">All of New York</option></select>
+          <select id="sort" aria-label="Sort"><option value="rank">Rank</option><option value="ac">Lot size, largest first</option><option value="dom">Days on market, longest</option><option value="p">Last asking, highest</option></select>
           <span class="count" id="count"></span>
         </div>
+        <div class="srcline">Sources: <b>NY gov open data</b> (parcels, owners, estates) · <b>OneKey MLS</b> (expired listings) · <b>Apify</b> (re-check: still off the market) · <b>RealEstateAPI</b> (loans, adjustable rates) · <b>Tracerfy</b> (phones, emails)</div>
       </div>
       <div class="tablewrap">
         <table>
@@ -663,11 +677,11 @@ const REG = {
 const regionOf = (co) => { for (const [k, v] of Object.entries(REG)) if (v.includes(co)) return k; return co ? "Upstate" : ""; };
 const seg = (r) => r.basis === "by right" && r.sub ? "verified" : r.basis === "zoning FAR" && r.sub ? "nyc" : r.sub ? "cand" : r.c ? "single" : "listing";
 const SEGS = [
-  ["verified", "Verified by right · Suffolk", "#12b76a"],
-  ["cand", "Split candidates", "#3b8cff"],
-  ["nyc", "NYC development sites", "#8cbcff"],
-  ["single", "Single-lot land", "#2a3550"],
-  ["listing", "Listing only · parcel at install", "#1b2433"],
+  ["verified", "Zoning allows a split", "#12b76a"],
+  ["cand", "Big enough to split", "#3b8cff"],
+  ["nyc", "NYC building site", "#8cbcff"],
+  ["single", "One buildable lot", "#2a3550"],
+  ["listing", "Address only · no parcel yet", "#1b2433"],
 ];
 R.forEach((r) => { r.sg = seg(r); r.rg = regionOf(r.co); r.hay = `${r.a} ${r.h} ${r.t} ${r.co} ${r.rg}`.toLowerCase(); });
 const isTarget = (r) => r.sg === "verified" || r.sg === "cand" || r.sg === "nyc";
@@ -680,10 +694,16 @@ countUp($("#cAged"), T.filter((r) => r.win === "aged" || r.win === "deep").lengt
 countUp($("#cInd"), T.filter((r) => r.k === "Individual").length);
 
 // ---------- list state ----------
-const st = { q: "", segs: new Set(["verified", "cand", "nyc"]), win: "", kind: "", region: "", sort: "rank", shown: 60 };
+const st = { q: "", segs: new Set(["verified", "cand", "nyc"]), win: "", ev: "", size: "", kind: "", region: "", sort: "rank", shown: 60 };
+// Event signals on this book. Every lot is an MLS expired listing; Estate = estate or trust owner on the record;
+// Adjustable rate = loan data from RealEstateAPI on the client's key (none loaded yet, so it reads 0 honestly).
+const EVENTS = [["mls", "MLS expired", () => true], ["estate", "Estate", (r) => r.k === "Trust / estate" || (r.sig || []).some((s) => s === "estate" || s === "trust")], ["arm", "Adjustable rate · resets within 12 months", (r) => !!r.arm12]];
+const evHas = (r) => !st.ev || EVENTS.find((e) => e[0] === st.ev)[2](r);
+const SIZES = [["10", "10+ acres", (a) => a >= 10], ["5", "5–10 acres", (a) => a >= 5 && a < 10], ["2", "2–5 acres", (a) => a >= 2 && a < 5], ["1", "1–2 acres", (a) => a >= 1 && a < 2], ["0", "Under 1 acre", (a) => a < 1]];
+const sizeHas = (r) => !st.size || (r.ac != null && SIZES.find((s) => s[0] === st.size)[2](r.ac));
 function filtered() {
   const q = st.q.trim().toLowerCase();
-  let out = R.filter((r) => st.segs.has(r.sg) && (!st.win || r.win === st.win) && (!st.kind || r.k === st.kind) && (!st.region || r.rg === st.region || r.co === st.region) && (!q || q.split(/\s+/).every((w) => r.hay.includes(w))));
+  let out = R.filter((r) => evHas(r) && sizeHas(r) && st.segs.has(r.sg) && (!st.win || r.win === st.win) && (!st.kind || r.k === st.kind) && (!st.region || r.rg === st.region || r.co === st.region) && (!q || q.split(/\s+/).every((w) => r.hay.includes(w))));
   const by = { rank: (a, b) => a.rank - b.rank, ac: (a, b) => (b.ac || 0) - (a.ac || 0), dom: (a, b) => (b.dom || 0) - (a.dom || 0), p: (a, b) => (b.p || 0) - (a.p || 0) }[st.sort];
   return out.sort(by);
 }
@@ -707,7 +727,7 @@ function renderList() {
     <td>${esc(r.k)}<div class="sub">${esc(r.rch)}</div></td>
     <td><span class="trace">skip trace</span></td>
     <td><span class="trace">skip trace</span></td>
-    <td><a href="#lot-${r.rank}" aria-label="Open ${esc(r.a)}">Open</a></td></tr>`).join("") || `<tr><td colspan="10" style="color:var(--soft)">No lots match. Clear a filter or the search.</td></tr>`;
+    <td><a href="#lot-${r.rank}" aria-label="Open ${esc(r.a)}">Open</a></td></tr>`).join("") || `<tr><td colspan="10" style="color:#fff">${st.ev === "arm" ? "Adjustable-rate loans come from RealEstateAPI on your key. None loaded yet." : "No lots match. Clear a filter or the search."}</td></tr>`;
   $("#count").textContent = `${n0(f.length)} of ${n0(R.length)} lots`;
   const left = f.length - rows.length;
   $("#moreBtn").hidden = left <= 0;
@@ -720,7 +740,7 @@ $("#kind").addEventListener("change", (e) => { st.kind = e.target.value; st.show
 $("#sort").addEventListener("change", (e) => { st.sort = e.target.value; renderList(); });
 const regSel = $("#region");
 const counties = [...new Set(R.map((r) => r.co).filter(Boolean))].sort();
-regSel.innerHTML = `<option value="">Statewide</option>` + Object.keys(REG).map((k) => `<option>${k}</option>`).join("") + `<option value="Upstate">Upstate</option><option disabled>──────────</option>` + counties.map((c) => `<option>${c}</option>`).join("");
+regSel.innerHTML = `<option value="">All of New York</option>` + Object.keys(REG).map((k) => `<option>${k}</option>`).join("") + `<option value="Upstate">Upstate</option><option disabled>──────────</option>` + counties.map((c) => `<option>${c}</option>`).join("");
 regSel.addEventListener("change", (e) => { st.region = e.target.value; st.shown = 60; renderList(); });
 
 const segCount = (k) => R.filter((r) => r.sg === k).length;
@@ -731,7 +751,13 @@ function chipsSeg(el, withScroll) {
 function syncChips() { document.querySelectorAll("[data-seg]").forEach((b) => b.setAttribute("aria-pressed", String(st.segs.has(b.dataset.seg)))); document.querySelectorAll("[data-win]").forEach((b) => b.setAttribute("aria-pressed", String(st.win === b.dataset.win))); }
 chipsSeg($("#segchips")); chipsSeg($("#listseg"));
 const winEl = $("#listwin");
-winEl.innerHTML = [["", "Every window"], ["fresh", "Fresh · 0–90 days"], ["aged", "Aged · 91–365 days"], ["deep", "Aged · 1–2 years"]].map(([k, l]) => `<button class="chip" type="button" data-win="${k}" aria-pressed="${st.win === k}">${l}${k ? ` <span class="ct">${n0(R.filter((r) => r.win === k && st.segs.has(r.sg)).length)}</span>` : ""}</button>`).join("");
+winEl.innerHTML = [["", "Any time"], ["fresh", "0–3 months"], ["aged", "Aged · 3–12 months"], ["deep", "Aged · 1–2 years"]].map(([k, l]) => `<button class="chip" type="button" data-win="${k}" aria-pressed="${st.win === k}">${l}${k ? ` <span class="ct">${n0(R.filter((r) => r.win === k && st.segs.has(r.sg)).length)}</span>` : ""}</button>`).join("");
+const evEl = $("#listev");
+evEl.innerHTML = EVENTS.map(([k, l, f]) => `<button class="chip" type="button" data-ev="${k}" aria-pressed="false">${l} <span class="ct">${n0(R.filter(f).length)}</span></button>`).join("");
+evEl.addEventListener("click", (e) => { const b = e.target.closest("[data-ev]"); if (!b) return; st.ev = st.ev === b.dataset.ev ? "" : b.dataset.ev; evEl.querySelectorAll("[data-ev]").forEach((x) => x.setAttribute("aria-pressed", String(x.dataset.ev === st.ev))); st.shown = 60; renderList(); });
+const sizeEl = $("#listsize");
+sizeEl.innerHTML = SIZES.map(([k, l, f]) => `<button class="chip" type="button" data-size="${k}" aria-pressed="false">${l} <span class="ct">${n0(R.filter((r) => r.ac != null && f(r.ac)).length)}</span></button>`).join("");
+sizeEl.addEventListener("click", (e) => { const b = e.target.closest("[data-size]"); if (!b) return; st.size = st.size === b.dataset.size ? "" : b.dataset.size; sizeEl.querySelectorAll("[data-size]").forEach((x) => x.setAttribute("aria-pressed", String(x.dataset.size === st.size))); st.shown = 60; renderList(); });
 winEl.addEventListener("click", (e) => { const b = e.target.closest("[data-win]"); if (!b) return; st.win = b.dataset.win; syncChips(); st.shown = 60; renderList(); });
 
 // focus chips (hero): fly + filter
@@ -749,7 +775,7 @@ $("#heroGo").addEventListener("click", goSearch);
 $("#heroq").addEventListener("keydown", (e) => { if (e.key === "Enter") goSearch(); });
 
 // ---------- segment grid: midstream to bottom stream ----------
-const SEG_ROWS = [["verified", "Verified by right · Suffolk"], ["cand", "Split candidates"], ["nyc", "NYC development sites"], ["single", "Single-lot land"], ["listing", "Listing only · parcel at install"]];
+const SEG_ROWS = [["verified", "Development · zoning allows a split"], ["cand", "Development · big enough to split"], ["nyc", "Development · NYC building site"], ["single", "One buildable lot"], ["listing", "Address only · no parcel yet"]];
 const WIN_COLS = [["fresh", "Fresh · 0–90 days", false], ["aged", "Aged · 91–365 days", true], ["deep", "Aged · 1–2 years", true]];
 const cnt = (f) => R.filter(f).length;
 const cell = (n, attrs, ag) => `<button class="cellbtn${ag ? " ag" : ""}${n ? "" : " z"}" type="button" ${attrs}>${n0(n)}</button>`;
@@ -811,7 +837,7 @@ $("#lane").innerHTML = laneHtml + laneHtml;
 $("#footsrc").innerHTML = `Pulled ${esc(S.pulled)}. Sources: MLS land class (expired, live and sold, two years) · New York State assessment rolls 2025 (data.ny.gov) · NYS tax parcel map · NYC lot file (MapPLUTO) · Suffolk County GIS and town zoning maps · Suffolk County Sanitary Code Article 6. Owner names never appear on this page; they live in your workspace.`;
 
 // ---------- the scan map ----------
-let map = null, tourOn = !reduce, tourTimer = null, tourIdx = 0;
+let map = null, tourOn = false, tourTimer = null, tourIdx = 0;
 const square = (c, side) => { const [x, y] = c; const dy = side / 2 / 111320, dx = side / 2 / (111320 * Math.cos((y * Math.PI) / 180)); return [[[x - dx, y - dy], [x + dx, y - dy], [x + dx, y + dy], [x - dx, y + dy], [x - dx, y - dy]]]; };
 const COLOR = { verified: "#12b76a", cand: "#3b8cff", nyc: "#8cbcff", single: "#2a3550" };
 function geo() {
@@ -878,7 +904,6 @@ function initMap() {
   try {
     map = new maplibregl.Map({ container: "scanmap", style: "https://tiles.openfreemap.org/styles/dark", ...VIEWS.Statewide, attributionControl: { compact: false }, cooperativeGestures: false, antialias: true });
   } catch (e) { $("#maploading").textContent = "3D needs WebGL. The Property Book below has every lot."; return; }
-  map.scrollZoom.disable();
   map.on("load", () => { $("#maploading").remove(); addLayers(); if (tourOn) startTour(); });
   ["dragstart", "wheel", "touchstart"].forEach((ev) => map.on(ev, () => { if (tourOn) stopTour(); }));
 }
@@ -1358,7 +1383,7 @@ function openLot(rank) {
       <h1>${esc(r.a)}</h1>
       <ul class="sbul">${factBullets(r)}</ul>
       <div class="chips">${chips}</div>
-      <div class="pushbar"><button class="btn go" type="button" data-goreach>☎ Click to call</button><button class="btn" type="button" data-goreach>✉ Email</button><button class="btn nbtn" type="button" data-opennotes>📝 Notes <b class="ncount">0</b></button><button class="btn" type="button" data-similar>◎ Find similar</button><button class="btn" type="button" data-story="0">▶ Story mode</button><button class="btn go" type="button" data-story="last"><span class="lg lg-fub" style="width:22px;height:22px" aria-hidden="true"></span>Push to Follow Up Boss</button></div>
+      <div class="pushbar"><button class="btn go" type="button" data-goreach>☎ Click to call</button><button class="btn" type="button" data-goreach>✉ Email</button><button class="btn nbtn" type="button" data-opennotes>📝 Notes <b class="ncount">0</b></button><button class="btn" type="button" data-similar>◎ Find similar</button><button class="btn" type="button" data-story="0">▶ Story mode</button>${r.c ? `<a class="btn" href="https://www.google.com/maps/@?api=1&map_action=pano&viewpoint=${r.c[1]},${r.c[0]}" target="_blank" rel="noopener">📷 Front of house</a>` : ""}<button class="btn go" type="button" data-story="last"><span class="lg lg-fub" style="width:22px;height:22px" aria-hidden="true"></span>Push to Follow Up Boss</button></div>
     </div>
     <div class="facts">${facts.map(([l, v, n, c]) => `<div class="fact"><div class="l">${l}</div><div class="v ${c || ""}">${esc(v)}</div>${n ? `<div class="n">${esc(n)}</div>` : ""}</div>`).join("")}</div>
     <div class="dbody">
@@ -1481,6 +1506,10 @@ function openLot(rank) {
 }
 function route() {
   const h = (location.hash || "").replace("#", "");
+  const mapView = h === "map";
+  document.body.classList.toggle("mapmode", mapView);
+  document.querySelectorAll(".bar nav a[data-view]").forEach((a) => a.classList.toggle("on", (a.dataset.view === "map") === mapView));
+  if (mapView && map) setTimeout(() => map.resize(), 30);
   const m = h.match(/^lot-(\d+)$/);
   if (m) { openLot(Number(m[1])); return; }
   closeStory();
