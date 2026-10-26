@@ -102,6 +102,10 @@ body.mapmode #scanmap { position: absolute; inset: 0; height: auto; }
   body.split:not(.mapmode) #scan { display: block !important; position: sticky; top: var(--barh, 64px); z-index: 5; height: 40vh; min-height: 240px; }
 }
 #rows tr.on { background: #0d1d33; box-shadow: inset 4px 0 0 #ffd23f; }
+#rows .eyecell { white-space: nowrap; }
+#rows .eye { display: inline-grid; place-items: center; width: 42px; height: 42px; border-radius: 10px; border: 2px solid var(--blue); background: #0a1a33; color: #fff; }
+#rows .eye:hover, #rows .eye:focus-visible { background: var(--blue); color: #000; }
+#rows .rk { margin-top: 4px; text-align: center; color: #fff; font-weight: 700; }
 #rows .ph { color: var(--green); font-weight: 800; white-space: nowrap; font-variant-numeric: tabular-nums; }
 .trace.on { border-style: solid; border-color: var(--green); color: #fff; background: #03130b; }
 .bar nav a.on { background: var(--blue); color: #000; border-color: var(--blue); }
@@ -543,7 +547,7 @@ footer .fl { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; 
       </div>
       <div class="tablewrap">
         <table>
-          <thead><tr><th>#</th><th>Property</th><th>Acres</th><th>Split</th><th>Expired</th><th>Last asking</th><th>Owner</th><th>Mobile</th><th>Email</th><th></th></tr></thead>
+          <thead><tr><th>#</th><th>Property</th><th>Acres</th><th>Split</th><th>Expired</th><th>Last asking</th><th>Owner</th><th>Mobile</th><th>Email</th></tr></thead>
           <tbody id="rows"></tbody>
         </table>
       </div>
@@ -739,7 +743,7 @@ function renderList() {
   const f = filtered();
   const rows = f.slice(0, st.shown);
   $("#rows").innerHTML = rows.map((r) => `<tr data-k="${r.rank}">
-    <td class="r">${r.rank}</td>
+    <td class="r eyecell"><a class="eye" href="#lot-${r.rank}" title="Detail view" aria-label="Detail view for ${esc(r.a)}"><svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path d="M1.5 12S5.5 4.8 12 4.8 22.5 12 22.5 12 18.5 19.2 12 19.2 1.5 12 1.5 12Z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><circle cx="12" cy="12" r="3.6" fill="currentColor"/></svg></a><div class="rk">${r.rank}</div></td>
     <td><div class="addr">${esc(r.a)}</div><div class="sub">${esc([r.h, r.t && r.t !== r.h ? r.t : "", r.co].filter(Boolean).join(" · "))}</div></td>
     <td class="r">${acf(r.ac)}</td>
     <td>${splitCell(r)}</td>
@@ -748,7 +752,7 @@ function renderList() {
     <td>${esc(r.k)}<div class="sub">${esc(r.rch)}</div></td>
     <td>${reachCellOf(r, "m")}</td>
     <td>${reachCellOf(r, "e")}</td>
-    <td><a href="#lot-${r.rank}" aria-label="Open ${esc(r.a)}">Open</a></td></tr>`).join("") || `<tr><td colspan="10" style="color:#fff">${st.ev === "arm" ? "Adjustable-rate loans come from RealEstateAPI on your key. None loaded yet." : "No lots match. Clear a filter or the search."}</td></tr>`;
+    </tr>`).join("") || `<tr><td colspan="9" style="color:#fff">${st.ev === "arm" ? "Adjustable-rate loans come from RealEstateAPI on your key. None loaded yet." : "No lots match. Clear a filter or the search."}</td></tr>`;
   $("#count").textContent = `${n0(f.length)} of ${n0(R.length)} lots`;
   const left = f.length - rows.length;
   $("#moreBtn").hidden = left <= 0;
