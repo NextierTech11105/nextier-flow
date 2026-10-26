@@ -91,11 +91,15 @@ body.mapmode #book { display: none !important; }
 body.mapmode .hero { height: calc(100dvh - 64px); min-height: 420px; }
 body.mapmode #scanmap { position: absolute; inset: 0; height: auto; }
 /* List view = the list on the left, the live satellite map on the right. Scrolling the list flies the map to each parcel. */
-@media (min-width: 1100px) {
+@media (min-width: 760px) {
   body.split:not(.mapmode) #mainview:not([hidden]) { display: grid; grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr); align-items: start; }
-  body.split:not(.mapmode) #scan { display: block !important; grid-column: 2; grid-row: 1; position: sticky; top: 64px; height: calc(100dvh - 64px); min-height: 420px; border-left: 1px solid var(--rule); border-bottom: 0; }
+  body.split:not(.mapmode) #scan { display: block !important; grid-column: 2; grid-row: 1; position: sticky; top: var(--barh, 64px); height: calc(100dvh - var(--barh, 64px)); min-height: 360px; border-left: 1px solid var(--rule); border-bottom: 0; }
   body.split:not(.mapmode) #mainview > main { grid-column: 1; grid-row: 1; min-width: 0; }
-  body.split:not(.mapmode) #book .wrap { max-width: none; padding-inline: 20px; }
+  body.split:not(.mapmode) #book .wrap { max-width: none; padding-inline: 16px; }
+}
+/* Narrow screens and phones: the map on top, sticky, the list scrolling under it */
+@media (max-width: 759px) {
+  body.split:not(.mapmode) #scan { display: block !important; position: sticky; top: var(--barh, 64px); z-index: 5; height: 40vh; min-height: 240px; }
 }
 #rows tr.on { background: #0d1d33; box-shadow: inset 4px 0 0 #ffd23f; }
 #rows .ph { color: var(--green); font-weight: 800; white-space: nowrap; font-variant-numeric: tabular-nums; }
@@ -750,7 +754,7 @@ function renderList() {
   $("#moreBtn").hidden = left <= 0;
   $("#moreCt").textContent = left > 0 ? `${n0(left)} more in this view` : "";
 }
-$("#rows").addEventListener("click", (e) => { const tr = e.target.closest("tr[data-k]"); if (tr && !e.target.closest("a")) location.hash = "lot-" + tr.dataset.k; });
+$("#rows").addEventListener("click", (e) => { const tr = e.target.closest("tr[data-k]"); if (tr && !e.target.closest("a")) selectLot(Number(tr.dataset.k), false); });
 $("#moreBtn").addEventListener("click", () => { st.shown += 60; renderList(); });
 $("#q").addEventListener("input", (e) => { st.q = e.target.value; st.shown = 60; renderList(); });
 $("#kind").addEventListener("change", (e) => { st.kind = e.target.value; st.shown = 60; renderList(); });
@@ -923,7 +927,7 @@ function addLayers() {
   map.addLayer({ id: "lots", type: "fill-extrusion", source: "lots", minzoom: 11.5, paint: { "fill-extrusion-color": col, "fill-extrusion-height": 28, "fill-extrusion-opacity": 0.85 } });
   applyMapFilter();
   for (const id of ["cols", "lots"]) {
-    map.on("click", id, (e) => { const f = e.features && e.features[0]; if (f) location.hash = "lot-" + f.properties.k; });
+    map.on("click", id, (e) => { const f = e.features && e.features[0]; if (f) selectLot(Number(f.properties.k), true); });
     map.on("mouseenter", id, () => (map.getCanvas().style.cursor = "pointer"));
     map.on("mouseleave", id, () => (map.getCanvas().style.cursor = ""));
   }
@@ -1038,7 +1042,7 @@ async function unsealTraced(code) {
     const key = await crypto.subtle.deriveKey({ name: "PBKDF2", salt: unb64(TRACED_SEALED.salt), iterations: TRACED_SEALED.it, hash: "SHA-256" }, base, { name: "AES-GCM", length: 256 }, false, ["decrypt"]);
     const pt = await crypto.subtle.decrypt({ name: "AES-GCM", iv: unb64(TRACED_SEALED.iv) }, key, unb64(TRACED_SEALED.ct));
     Object.assign(TRACED, JSON.parse(new TextDecoder().decode(pt)));
-    try { sessionStorage.setItem("hunt-owner-code", code.trim().toLowerCase()); } catch {}
+    try { sessionStorage.setItem("hunt-owner-code", code.trim().toLowerCase()); localStorage.setItem("hunt-owner-code", code.trim().toLowerCase()); } catch {}
     return true;
   } catch { return false; }
 }
@@ -1580,11 +1584,15 @@ function route() {
 window.addEventListener("hashchange", route);
 // A code entered earlier in this tab opens the sealed owners again on reload.
 (async () => {
-  let c = null; try { c = sessionStorage.getItem("hunt-owner-code"); } catch {}
+  let c = null;
+  // The key can ride in the link (#key=… or ?key=…): the phones open with no box and no typing.
+  const fromLink = (location.hash.match(/(?:^#|&)key=([^&]+)/) || location.search.match(/[?&]key=([^&]+)/) || [])[1];
+  if (fromLink) { c = decodeURIComponent(fromLink); try { history.replaceState(null, "", location.pathname + "#book"); } catch {} }
+  if (!c) { try { c = localStorage.getItem("hunt-owner-code") || sessionStorage.getItem("hunt-owner-code"); } catch {} }
   if (c && await unsealTraced(c)) { renderList(); const m = location.hash.match(/^#lot-(\d+)/); if (m) openLot(Number(m[1])); }
 })();
 // ---------- List view: the list on the left, the live satellite map on the right (Thomas 2026-10-26) ----------
-const SPLIT_MIN = 1100;
+const SPLIT_MIN = 0; // always list + map together: side by side from 760px, map on top below that
 let activeK = null, flyT = null, scrollRaf = 0;
 function reachCellOf(r, kind) {
   try {
@@ -1598,7 +1606,11 @@ function reachCellOf(r, kind) {
   return `<span class="trace">skip trace</span>`;
 }
 const splitOn = () => innerWidth >= SPLIT_MIN && !document.body.classList.contains("mapmode") && $("#lotview").hidden;
-function syncSplit() { document.body.classList.toggle("split", innerWidth >= SPLIT_MIN); if (map) setTimeout(() => map.resize(), 40); }
+function syncSplit() {
+  document.body.classList.toggle("split", innerWidth >= SPLIT_MIN);
+  const bar = document.querySelector(".bar"); document.documentElement.style.setProperty("--barh", (bar ? bar.offsetHeight : 64) + "px");
+  if (map) setTimeout(() => map.resize(), 40);
+}
 function ensureSat() {
   if (!map || !map.getLayer("cols") || map.getSource("satx")) return;
   map.addSource("satx", { type: "raster", ...SATX });
@@ -1624,13 +1636,22 @@ function focusLot(k, tr) {
   flyT = setTimeout(() => map.fitBounds([[Math.min(...xs), Math.min(...ys)], [Math.max(...xs), Math.max(...ys)]], { padding: 90, maxZoom: 18, pitch: 45, bearing: 0, duration: reduce ? 0 : 1300, essential: true }), 140);
 }
 function pickRow() {
-  if (!splitOn()) return;
-  const line = innerHeight * 0.4;
+  if (!splitOn() || performance.now() < holdUntil) return;
+  const stacked = innerWidth < 760, top = stacked ? $("#scan").getBoundingClientRect().bottom : (document.querySelector(".bar") || { offsetHeight: 64 }).offsetHeight;
+  const line = top + (innerHeight - top) * 0.3;
   let best = null;
-  for (const tr of $("#rows").querySelectorAll("tr[data-k]")) { const b = tr.getBoundingClientRect(); if (b.bottom < 70) continue; if (b.top > line && best) break; best = tr; if (b.top > line) break; }
+  for (const tr of $("#rows").querySelectorAll("tr[data-k]")) { const b = tr.getBoundingClientRect(); if (b.bottom < top + 6) continue; if (b.top > line && best) break; best = tr; if (b.top > line) break; }
   if (best) focusLot(Number(best.dataset.k), best);
 }
-let lastScroll = 0;
+let lastScroll = 0, holdUntil = 0;
+/** A click on a row or a parcel: in list + map it selects (map flies there, row lights up, page stays put). */
+function selectLot(k, fromMap) {
+  if (!splitOn()) { location.hash = "lot-" + k; return; }
+  const tr = $(`#rows tr[data-k="${k}"]`);
+  holdUntil = performance.now() + 1500;
+  activeK = null; focusLot(k, tr);
+  if (fromMap && tr) tr.scrollIntoView({ behavior: reduce ? "auto" : "smooth", block: "center" });
+}
 addEventListener("scroll", () => { lastScroll = performance.now(); if (!scrollRaf) scrollRaf = requestAnimationFrame(() => { scrollRaf = 0; pickRow(); }); }, { passive: true });
 $("#rows").addEventListener("mouseover", (e) => { if (performance.now() - lastScroll < 600) return; const tr = e.target.closest("tr[data-k]"); if (tr && splitOn()) focusLot(Number(tr.dataset.k), tr); });
 new MutationObserver(() => { activeK = null; requestAnimationFrame(pickRow); }).observe($("#rows"), { childList: true });
