@@ -103,6 +103,11 @@ body.mapmode #scanmap { position: absolute; inset: 0; height: auto; }
 }
 #rows tr.on { background: #0d1d33; box-shadow: inset 4px 0 0 #ffd23f; }
 #rows .eyecell { white-space: nowrap; }
+/* bold filter chips */
+#book .chip { font-weight: 800; font-size: 17px; padding: 10px 15px; color: #fff; }
+#book .chip .ct { font-size: 15px; font-weight: 800; }
+#book .flab { font-size: 16px; color: #fff; }
+#book .frow.fold .fsum { font-size: 17px; font-weight: 800; padding: 6px 14px; }
 /* bright list text */
 #rows td { font-size: 17px; }
 #rows .addr { font-size: 20px; font-weight: 800; color: #fff; line-height: 1.25; }
@@ -158,6 +163,15 @@ body:not(.mapmode) #scan.locked .legend { display: none; }
 .opanel .op-key { color: var(--green); font-size: 15px; font-weight: 700; } .opanel .op-none { color: #d5ddf0; font-size: 15px; }
 .opanel .op-facts { display: flex; flex-wrap: wrap; gap: 6px; }
 .opanel .op-facts span { border: 1px solid #3b4250; background: #10141b; border-radius: 999px; padding: 4px 10px; font-size: 14px; font-weight: 700; }
+.opanel .op-deal ul { margin: 4px 0 0; padding-left: 20px; display: grid; gap: 4px; font-size: 15px; color: #fff; }
+.opanel .op-deal li .g { color: var(--green); font-weight: 800; }
+.opanel .op-deal li.next { color: #ffd23f; font-weight: 800; list-style: none; margin-left: -20px; }
+.opanel details.op-fold > summary { cursor: pointer; list-style: none; font: 800 16px var(--body); color: #fff; padding: 9px 14px; border: 2px solid var(--green); border-radius: 10px; background: #03130b; width: fit-content; }
+.opanel details.op-fold > summary::-webkit-details-marker { display: none; }
+.opanel details.op-fold > summary::before { content: "▸ "; color: #ffd23f; }
+.opanel details.op-fold[open] > summary::before { content: "▾ "; }
+.opanel details.op-fold > summary span { color: var(--green); font-size: 14px; margin-left: 6px; }
+.opanel details.op-fold[open] > .op-reach { margin-top: 8px; }
 .opanel .op-reach { display: grid; gap: 6px 14px; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); }
 .opanel .op-lab { font: 800 13px var(--mono); letter-spacing: .1em; text-transform: uppercase; color: #ffd23f; }
 .opanel .op-who { color: #ffd23f; font-weight: 700; font-size: 14px; }
@@ -1873,6 +1887,20 @@ document.addEventListener("click", async (e) => {
 addEventListener("hashchange", () => { const m = location.hash.match(/^#lot-(\d+)$/); if (ckLot && m && Number(m[1]) !== ckLot.rank) ckClose(); });
 
 
+// ---------- Deal potential on the owner panel (Thomas 2026-10-26: "collapse the phones under the map and put a deal potential summary") ----------
+const opOpen = { ph: false, em: false };
+function dealPotentialOf(r) {
+  let b = ""; try { b = factBullets(r); } catch (e) {}
+  const extra = [];
+  if (r.dv && r.dv.length) extra.push(`<li>${n0(r.dv.length)} developers building here · most active: <b>${esc(r.dv[0][0])}</b> (${n0(r.dv[0][1])} new parcels since 2021)</li>`);
+  if (r.pm && r.pm.y) {
+    const ys = Object.entries(r.pm.y).sort((a, c) => a[0].localeCompare(c[0])), last = ys[ys.length - 1], prev = ys[ys.length - 2];
+    if (last) extra.push(`<li>${esc(r.pm.pl || "Town")}: ${n0(last[1].units)} new homes permitted in ${last[0]}${prev ? (last[1].units > prev[1].units * 1.1 ? " · rising" : last[1].units < prev[1].units * 0.9 ? " · falling" : " · steady") : ""}</li>`);
+  }
+  if (r.prec && r.prec.s) extra.push(`<li>${n0(r.prec.s)} subdivisions in town since 2021 · ${n0(r.prec.l)} lots created</li>`);
+  try { extra.push(`<li class="next">Next → ${esc(nextMoveOf(r))}</li>`); } catch (e) {}
+  return `<div class="op-deal"><div class="op-lab">Deal potential</div><ul>${b}${extra.join("")}</ul></div>`;
+}
 // ---------- Owner panel on the map: who owns the locked parcel, in the box where the legend was (Thomas 2026-10-26) ----------
 const opanel = document.createElement("div");
 opanel.className = "opanel"; opanel.id = "opanel"; opanel.hidden = true;
@@ -1902,12 +1930,13 @@ function drawOwnerPanel(r) {
     ${parcelIdOf(r) ? `<div class="op-pid">Parcel ID · ${esc(parcelIdOf(r))}</div>` : ""}
     <div class="op-own">👤 ${who}</div>
     <div class="op-facts">${facts.map((f) => `<span>${f}</span>`).join("")}</div>
-    ${ph.length ? `<div class="op-lab">Phones · ${n0(ph.length)}</div><div class="op-reach">${phones}</div>` : ""}${em.length ? `<div class="op-lab">Emails · ${n0(em.length)}</div><div class="op-reach">${emails}</div>` : ""}
+    ${dealPotentialOf(r)}${ph.length ? `<details class="op-fold" data-f="ph"${opOpen.ph ? " open" : ""}><summary>☎ Phones · ${n0(ph.length)} <span>${n0(ph.filter((x) => !x.dnc).length)} callable</span></summary><div class="op-reach">${phones}</div></details>` : ""}${em.length ? `<details class="op-fold" data-f="em"${opOpen.em ? " open" : ""}><summary>✉ Emails · ${n0(em.length)}</summary><div class="op-reach">${emails}</div></details>` : ""}
     <div class="op-b"><button class="rbtn notes" type="button" data-notesk="${r.rank}">📝 Notes <b>${n0(L.notes)}</b></button><a class="rbtn eye2" href="#lot-${r.rank}">👁 Detail view</a><button class="rbtn push" type="button" data-pushk="${r.rank}" data-to="Initial SMS">➜ Initial SMS</button><button class="rbtn push" type="button" data-pushk="${r.rank}" data-to="Pipeline Nurture">➜ Pipeline Nurture</button><span class="led">Calls <b>${L.call}</b> · Texts <b>${L.text}</b> · Emails <b>${L.email}</b></span></div>`;
   const was = $("#scan").classList.contains("locked");
   opanel.hidden = false; $("#scan").classList.add("locked");
   if (!was && map) setTimeout(() => map.resize(), 20); // owner profile below the map: the map gets shorter
 }
+opanel.addEventListener("toggle", (e) => { const d = e.target; if (d && d.dataset && d.dataset.f) opOpen[d.dataset.f] = d.open; }, true);
 opanel.addEventListener("click", async (e) => {
   if (e.target.closest("[data-opclose]")) {
     activeK = null; document.querySelectorAll("#rows tr.on").forEach((x) => x.classList.remove("on"));
