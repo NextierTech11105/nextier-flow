@@ -103,6 +103,15 @@ body.mapmode #scanmap { position: absolute; inset: 0; height: auto; }
 }
 #rows tr.on { background: #0d1d33; box-shadow: inset 4px 0 0 #ffd23f; }
 #rows .eyecell { white-space: nowrap; }
+/* no mono */
+:root { --mono: var(--body); }
+#book { padding-top: 14px !important; }
+#book .flab { font: 800 17px var(--body) !important; letter-spacing: .01em !important; text-transform: none !important; color: #fff !important; }
+#book th { font: 800 15px var(--body) !important; letter-spacing: .01em !important; text-transform: none !important; color: #fff !important; }
+#count, #moreCt { font: 800 17px var(--body) !important; color: #fff !important; letter-spacing: 0 !important; }
+.trace { font: 800 14px var(--body) !important; }
+.opanel .op-lab, .ck .cklab, .ck .nwin-h .tt { font-family: var(--body) !important; letter-spacing: .02em !important; font-size: 15px !important; }
+#scan .legend { font: 700 15px var(--body) !important; }
 /* bold filter chips */
 #book .chip { font-weight: 800; font-size: 17px; padding: 10px 15px; color: #fff; }
 #book .chip .ct { font-size: 15px; font-weight: 800; }
