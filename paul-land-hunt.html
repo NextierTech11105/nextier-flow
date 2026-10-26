@@ -133,7 +133,17 @@ body.mapmode #scanmap { position: absolute; inset: 0; height: auto; }
 #book .frow.fold .fsum { cursor: pointer; color: #fff; font-size: 15px; font-weight: 700; padding: 4px 12px; border: 1px solid #3b4250; border-radius: 999px; background: #10141b; }
 #book .frow.fold.open .fsum { display: none; }
 #scan .opanel { position: absolute; left: 12px; right: 12px; bottom: 30px; z-index: 6; max-height: 60%; overflow: auto; display: grid; gap: 10px; background: rgba(5,7,11,.94); border: 2px solid #ffd23f; border-radius: 14px; padding: 12px 14px; color: #fff; font-size: 15px; }
-#scan .opanel[hidden], body.mapmode #scan .opanel { display: none !important; }
+#scan .opanel[hidden] { display: none !important; }
+body.mapmode #scan .opanel { top: 84px; right: 16px; left: auto; bottom: 16px; width: min(480px, 44vw); max-height: none; z-index: 7; }
+body.mapmode #scan.locked .legend { display: none; }
+#scan .mapsearch { display: none; }
+body.mapmode #scan .mapsearch { display: flex; position: absolute; z-index: 7; top: 16px; left: 16px; right: 16px; gap: 12px; align-items: center; }
+#scan .mapsearch input { flex: 1; max-width: 720px; background: #0b1730; border: 2px solid var(--blue); color: #fff; font: 600 17px var(--body); padding: 12px 14px; border-radius: 12px; }
+#scan .mapsearch input::placeholder { color: #e6ecf7; opacity: 1; }
+#scan .mapsearch span { background: rgba(5,7,11,.9); border: 1px solid #2a2a2a; border-radius: 999px; padding: 8px 14px; color: #fff; font: 800 15px var(--body); }
+.lottip .maplibregl-popup-content { background: #05070b; color: #fff; border: 2px solid #ffd23f; border-radius: 10px; padding: 8px 12px; font: 600 15px/1.35 var(--body); }
+.lottip .maplibregl-popup-content span { color: #d5ddf0; font-size: 13px; }
+.lottip .maplibregl-popup-tip { display: none; }
 body:not(.mapmode) #scan.locked .legend { display: none; }
 /* side by side: the owner profile below the map, not on top of it */
 @media (min-width: 760px) {
@@ -1737,6 +1747,7 @@ function ensureSat() {
   map.addSource("hi", { type: "geojson", data: { type: "FeatureCollection", features: [] } });
   map.addLayer({ id: "hi-fill", type: "fill", source: "hi", paint: { "fill-color": "#ffd23f", "fill-opacity": 0.12 } });
   map.addLayer({ id: "hi-line", type: "line", source: "hi", paint: { "line-color": "#ffd23f", "line-width": 4 } });
+  addDots();
 }
 function focusLot(k, tr) {
   if (k === activeK) return;
@@ -1765,14 +1776,14 @@ function pickRow() {
 let lastScroll = 0, holdUntil = 0;
 /** A click on a row or a parcel: in list + map it selects (map flies there, row lights up, page stays put). */
 function selectLot(k, fromMap) {
-  if (!splitOn()) { location.hash = "lot-" + k; return; }
+  if (!splitOn() && !inMapView()) { location.hash = "lot-" + k; return; }
   const tr = $(`#rows tr[data-k="${k}"]`);
   holdUntil = performance.now() + 1500;
   activeK = null; focusLot(k, tr);
   if (fromMap && tr) tr.scrollIntoView({ behavior: reduce ? "auto" : "smooth", block: "center" });
 }
 // The map moves only on a click (Thomas: "I should have to click it first, then it locks on"). A re-render keeps the lock.
-new MutationObserver(() => { const tr = activeK != null && $(`#rows tr[data-k="${activeK}"]`); if (tr) tr.classList.add("on"); }).observe($("#rows"), { childList: true });
+new MutationObserver(() => { const tr = activeK != null && $(`#rows tr[data-k="${activeK}"]`); if (tr) tr.classList.add("on"); syncDots(); }).observe($("#rows"), { childList: true });
 addEventListener("resize", syncSplit);
 addEventListener("hashchange", () => setTimeout(syncSplit, 60));
 syncSplit();
@@ -1925,6 +1936,48 @@ function foldSums() {
 }
 $("#book .tools").addEventListener("click", () => setTimeout(foldSums, 0));
 foldSums();
+
+
+// ---------- Map view that works (Thomas 2026-10-26: "map view should be more functioning than this") ----------
+// Every lot in the current filter is a dot; click locks + owner panel (no jump to the detail); hover shows the address;
+// a search box on the map. The same dots show on the list view's map.
+const inMapView = () => document.body.classList.contains("mapmode") && $("#lotview").hidden;
+function syncDots() {
+  const s = map && map.getSource("lotpts"); if (!s) return;
+  let f = []; try { f = filtered(); } catch (e) { f = R; }
+  s.setData({ type: "FeatureCollection", features: f.filter((r) => r.c).map((r) => ({ type: "Feature", properties: { k: r.rank, sg: r.sg }, geometry: { type: "Point", coordinates: r.c } })) });
+  const c = $("#mapqct"); if (c) c.textContent = `${n0(f.length)} lots`;
+}
+function addDots() {
+  if (!map || map.getSource("lotpts")) return;
+  map.addSource("lotpts", { type: "geojson", data: { type: "FeatureCollection", features: [] } });
+  map.addLayer({ id: "lot-dots", type: "circle", source: "lotpts", paint: {
+    "circle-color": ["match", ["get", "sg"], "verified", COLOR.verified, "cand", COLOR.cand, "nyc", COLOR.nyc, "comm", "#f2f4f7", "#9aa4b2"],
+    "circle-radius": ["interpolate", ["linear"], ["zoom"], 6, 2.2, 10, 4.5, 14, 8, 17, 11],
+    "circle-stroke-color": "#000", "circle-stroke-width": 1.2, "circle-opacity": 0.95 } });
+  const tip = new maplibregl.Popup({ closeButton: false, closeOnClick: false, offset: 12, className: "lottip" });
+  map.on("mousemove", "lot-dots", (e) => {
+    const f = e.features && e.features[0]; if (!f) return;
+    map.getCanvas().style.cursor = "pointer";
+    const r = byRank.get(Number(f.properties.k)); if (!r) return;
+    tip.setLngLat(f.geometry.coordinates).setHTML(`<b>${esc(streetOf(r))}</b><br>${esc(cityLineOf(r))}<br><span>${esc(r.k)} · ${acf(r.ac)} ac</span>`).addTo(map);
+  });
+  map.on("mouseleave", "lot-dots", () => { map.getCanvas().style.cursor = ""; tip.remove(); });
+  map.on("click", "lot-dots", (e) => { const f = e.features && e.features[0]; if (f) { tip.remove(); selectLot(Number(f.properties.k), true); } });
+  syncDots();
+}
+// the search box on the map (map view)
+const mq = document.createElement("div");
+mq.className = "mapsearch";
+mq.innerHTML = `<input id="mapq" type="search" placeholder="Search address, hamlet, town or county · Enter jumps to it" aria-label="Search lots on the map"><span id="mapqct"></span>`;
+$("#scan").appendChild(mq);
+try { .textContent = n0(filtered().length) + " lots"; } catch (e) {}
+$("#mapq").addEventListener("input", (e) => { st.q = e.target.value; st.shown = 60; const lq = $("#q"); if (lq) lq.value = st.q; renderList(); });
+$("#mapq").addEventListener("keydown", (e) => {
+  if (e.key !== "Enter") return;
+  let f = []; try { f = filtered(); } catch (x) {}
+  const r = f.find((x) => x.c); if (r) selectLot(r.rank, true);
+});
 
 renderList();
 route();
