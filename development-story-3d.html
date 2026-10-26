@@ -255,6 +255,21 @@ pre .k{color:var(--blue-soft)}pre .s{color:var(--orange-soft)}
 @media (max-width:1100px){.rail{grid-template-columns:repeat(6,minmax(0,1fr))}}
 @media (max-width:520px){.rail{grid-template-columns:repeat(2,minmax(0,1fr))}}
 
+/* finale: the story closes on the loop and the offer */
+.fin{position:absolute;inset:0;z-index:10;display:flex;align-items:center;justify-content:center;padding:28px;background:radial-gradient(ellipse 70% 60% at 50% 45%,#0B1530 0%,#000 72%);animation:fin-in .6s ease both}
+.fin[hidden]{display:none}
+@keyframes fin-in{from{opacity:0}}
+.fin-in{display:flex;flex-direction:column;align-items:center;gap:16px;text-align:center;max-width:620px}
+.loop{display:flex;flex-wrap:wrap;justify-content:center;align-items:center;gap:6px}
+.loop span{font-size:14px;font-weight:700;padding:6px 12px;border-radius:999px;border:1px solid #2A3550;background:#0B1020;color:#fff;animation:up .4s ease-out both calc(var(--n) * .14s + .2s)}
+.loop i{font-style:normal;font-weight:700;color:var(--orange)}
+.loop .dl{background:var(--orange);border-color:var(--orange);color:var(--ink)}
+.fin .back{font-size:15px;font-weight:600;color:var(--soft)}
+.fin h2{margin:4px 0 0;font-family:var(--display);font-size:clamp(30px,4vw,46px);line-height:1.05;text-wrap:balance}
+.fin h2 em{font-style:normal;color:var(--orange)}
+.fin-b{display:flex;flex-wrap:wrap;justify-content:center;gap:10px}
+.fin-b a{font-weight:700;font-size:16px;padding:12px 22px;border-radius:12px;background:var(--orange);color:var(--ink);text-decoration:none}
+
 /* 3D layer: one live map moves into each screen that needs it. Until it loads (or if it can't),
    the flat drawings above stay exactly as they were. */
 #map3d{position:absolute;inset:0}
@@ -448,6 +463,14 @@ pre .k{color:var(--blue-soft)}pre .s{color:var(--orange-soft)}
 
   <div class="main">
     <div class="stage" id="stage" aria-live="polite">
+      <div class="fin" id="fin" hidden>
+        <div class="fin-in">
+          <div class="loop"><span style="--n:0">Database</span><i>→</i><span style="--n:1">Signal</span><i>→</i><span style="--n:2">Owner</span><i>→</i><span style="--n:3">First text</span><i>→</i><span style="--n:4">Reply</span><i>→</i><span style="--n:5">Your CRM</span><i>→</i><span class="dl" style="--n:6">Deal</span></div>
+          <div class="back">↺ Every reply goes back into the database.</div>
+          <h2>We built it. <em>Now we build yours.</em></h2>
+          <div class="fin-b"><a href="https://www.nxtier.ai/book/nextier" target="_blank" rel="noopener">Book 15 minutes</a><button type="button" id="finReplay">Replay</button></div>
+        </div>
+      </div>
 
       <!-- 1 · BUY BOX: LEAD BUILDER, SATELLITE -->
       <div class="scene">
@@ -826,6 +849,16 @@ document.addEventListener('keydown',e=>{if(e.key==='ArrowRight')go(cur+1);else i
 // Deep link: development-story.html#ch7 opens on chapter 7.
 const m=/^#ch(\d+)$/.exec(location.hash||'');
 go(m?Math.min(Math.max(+m[1],1),CH.length)-1:0);
+</script>
+<script>
+/* finale: shown only when the story plays to its end; any navigation or Play hides it */
+(function(){
+const fin=document.getElementById('fin');if(!fin)return;
+const hide=()=>{fin.hidden=true};
+const goPrev=go;go=function(i){hide();goPrev(i)};
+const playPrev=setPlay;setPlay=function(on){if(on)hide();const ended=!on&&playing&&cur===CH.length-1&&performance.now()-t0>=DUR-80;playPrev(on);if(ended)fin.hidden=false};
+document.getElementById('finReplay').addEventListener('click',()=>{hide();go(0);setPlay(true)});
+})();
 </script>
 <script src="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.js"></script>
 <script>
