@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="robots" content="noindex, nofollow">
-<title>Team Musso · Hunt Engine</title>
+<title>Team Musso · Nextier Data Engine</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..800&family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
@@ -170,10 +170,10 @@ thead th { font-family: var(--mono); font-size: 12px; letter-spacing: .1em; text
 tbody tr { cursor: pointer; } tbody tr:hover { background: #0a1220; }
 td.r { text-align: right; font-family: var(--mono); font-variant-numeric: tabular-nums; }
 td .addr { font-weight: 600; } td .sub { color: var(--soft); font-size: 14px; }
-.pill { display: inline-block; border-radius: 999px; padding: 2px 9px; font-size: 13px; font-family: var(--mono); border: 1px solid var(--rule); white-space: nowrap; }
-.pill.g { border-color: var(--green); color: #6fe3a8; }
-.pill.b { border-color: var(--blue); color: var(--blue-soft); }
-.pill.w { border-color: #3a4a66; color: var(--soft); }
+.pill { display: inline-block; border-radius: 999px; padding: 4px 12px; font-size: 15px; font-weight: 800; font-family: var(--body); border: 2px solid #e9eef7; background: #e9eef7; color: #05070c; white-space: nowrap; }
+.pill.g { background: var(--green); border-color: var(--green); color: #00150b; }
+.pill.b { background: var(--blue); border-color: var(--blue); color: #00122b; }
+.pill.w { background: #e9eef7; border-color: #e9eef7; color: #05070c; }
 .trace { display: inline-block; border: 1px dashed var(--blue); color: var(--blue-soft); background: rgba(59,140,255,.08); border-radius: 6px; padding: 2px 8px; font-size: 13px; font-family: var(--mono); white-space: nowrap; }
 .more { margin-top: 12px; display: flex; gap: 10px; align-items: center; }
 
@@ -201,6 +201,9 @@ td .addr { font-weight: 600; } td .sub { color: var(--soft); font-size: 14px; }
 .dhead h1 { font-size: clamp(34px, 5vw, 56px); font-weight: 800; line-height: 1; }
 .dhead .sentence { font-size: 18px; max-width: 72ch; color: var(--text); }
 .dhead .sentence .g { color: var(--green); font-weight: 600; }
+.dhead .sbul { margin: 0; padding-left: 1.3em; display: grid; gap: 5px; font-size: 19px; max-width: 72ch; color: var(--text); }
+.dhead .sbul li::marker { color: var(--green); }
+.dhead .sbul .g { color: var(--green); font-weight: 700; }
 .facts { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); border: 1px solid var(--rule); border-radius: 12px; overflow: hidden; margin-bottom: 18px; }
 .fact { padding: 14px 16px; border-right: 1px solid var(--rule); display: grid; gap: 2px; min-width: 0; background: var(--panel); }
 .fact:last-child { border-right: 0; }
@@ -219,7 +222,7 @@ td .addr { font-weight: 600; } td .sub { color: var(--soft); font-size: 14px; }
 .card .src { padding: 10px 18px; border-top: 1px solid var(--rule); font-family: var(--mono); font-size: 13px; color: var(--soft); }
 #lotmap { height: 440px; position: relative; background: #05070c; }
 dl.kv { display: grid; grid-template-columns: max-content 1fr; gap: 8px 18px; margin: 0; font-size: 16px; }
-dl.kv dt { color: var(--soft); } dl.kv dd { margin: 0; }
+dl.kv dt { color: #fff; } dl.kv dd { margin: 0; color: #fff; font-weight: 700; }
 table.math { min-width: 0; font-size: 15px; }
 table.math td, table.math th { padding: 10px 14px; }
 table.math tr.res td { color: var(--green); font-weight: 600; }
@@ -228,6 +231,9 @@ table.math tr.res td { color: var(--green); font-weight: 600; }
 .checks li { display: grid; grid-template-columns: 22px 1fr; gap: 8px; font-size: 16px; }
 .checks li .ok { color: var(--green); font-weight: 700; } .checks li .at { color: var(--blue-soft); font-weight: 700; }
 .reachbox { border: 1px solid #1f6b47; border-radius: 12px; background: rgba(18,183,106,.05); padding: 14px; display: grid; gap: 12px; }
+.lockbox { display: grid; gap: 8px; padding: 14px; border: 2px solid var(--green); border-radius: 10px; background: #03130b; }
+.lockbox b { font-size: 19px; } .lockbox span { color: var(--soft); font-size: 16px; }
+.lockbox input { font: 700 18px var(--body); padding: 10px 12px; border-radius: 8px; border: 2px solid var(--rule); background: #060c18; color: var(--text); min-width: 0; flex: 1 1 180px; letter-spacing: .08em; }
 .reachbox .th { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
 .reachbox .th b { font-family: var(--display); font-stretch: 100%; font-size: 19px; }
 .reachbox .th .s { color: var(--soft); font-size: 15px; }
@@ -235,6 +241,13 @@ table.math tr.res td { color: var(--green); font-weight: 600; }
 .rrow { display: grid; grid-template-columns: 100px minmax(0, 1fr) auto; gap: 10px; align-items: center; border: 1px solid var(--rule); border-radius: 8px; padding: 8px 10px; background: #060c18; }
 .rrow .l { font-family: var(--mono); font-size: 13px; letter-spacing: .08em; text-transform: uppercase; color: #6fe3a8; }
 .rrow .v { font-family: var(--mono); font-size: 15px; display: flex; flex-wrap: wrap; gap: 6px; align-items: center; min-width: 0; }
+.rrow .v .cr { font-family: var(--body); font-size: 13px; color: var(--soft); }
+.rrow .v .who { font-family: var(--body); font-size: 13px; color: var(--blue-soft); }
+.ownerid { display: grid; gap: 6px; padding: 12px 14px; border: 1px solid var(--green); border-radius: 10px; background: #03130b; }
+.ownerid .nm { font-family: var(--display); font-stretch: 100%; font-weight: 800; font-size: 26px; line-height: 1.1; }
+.ownerid .fl { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 18px; color: var(--soft); font-size: 16px; }
+.ownerid .fl b { color: var(--text); }
+.ownerid .hh { color: var(--soft); font-size: 15px; }
 .callpanel { border: 1px solid var(--green); border-radius: 12px; padding: 14px; display: grid; gap: 10px; background: #03130b; }
 .callpanel .cs { font-family: var(--display); font-stretch: 100%; font-size: 22px; display: flex; align-items: center; gap: 10px; }
 .callpanel .dot { width: 11px; height: 11px; border-radius: 50%; background: var(--green); animation: cpulse 1s infinite; }
@@ -343,10 +356,13 @@ table.math tr.res td { color: var(--green); font-weight: 600; }
 .tf.lit { border-style: solid; border-color: #1f6b47; background: rgba(18,183,106,.05); }
 .tf.lit.contact { border-color: var(--green); background: rgba(18,183,106,.09); box-shadow: 0 0 0 1px rgba(18,183,106,.4), 0 0 14px rgba(18,183,106,.32); }
 .tf.lit .l { color: #6fe3a8; } .tf.lit .v { color: var(--text); display: flex; flex-wrap: wrap; align-items: center; gap: 6px; }
-.lt { font-family: var(--mono); font-size: 11px; letter-spacing: .08em; text-transform: uppercase; padding: 1px 7px; border-radius: 999px; font-weight: 600; }
-.lt.mo { background: var(--green); color: #000; }
-.lt.ll { border: 1px solid #f6f9ff; color: #f6f9ff; }
-.lt.em { background: var(--blue); color: #000; }
+.lt { font-family: var(--body); font-size: 15px; letter-spacing: .05em; text-transform: uppercase; padding: 4px 11px; border-radius: 999px; font-weight: 900; line-height: 1.2; border: 2px solid transparent; white-space: nowrap; }
+.lt.mo { background: var(--green); border-color: var(--green); color: #00150b; }
+.lt.ll { background: #f6f9ff; border-color: #f6f9ff; color: #05070c; }
+.lt.em { background: var(--blue); border-color: var(--blue); color: #00122b; }
+.lt.dnc { background: #ef4444; border-color: #ef4444; color: #fff; }
+.lt.tcpa { background: #f59e0b; border-color: #f59e0b; color: #1f1300; }
+.lt.ok { background: transparent; border-color: var(--green); color: #6fe3a8; }
 .bulkbar { position: sticky; bottom: 0; z-index: 4; display: flex; gap: 10px; align-items: center; flex-wrap: wrap; padding: 12px 14px; border: 1px solid var(--rule); border-radius: 10px; background: rgba(7,9,14,.96); }
 .bulkbar b { font-family: var(--mono); }
 @media (prefers-reduced-motion: reduce) { .tf, .reach i { transition: none; } }
@@ -385,7 +401,7 @@ footer .fl { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; 
 <body>
 <header class="bar">
   <div class="wrap">
-    <div class="brand"><span class="lg lg-nx-mark" style="width:26px;height:26px" role="img" aria-label="Nextier"></span><span>Team Musso</span><span class="sep">·</span><span>Hunt Engine</span></div>
+    <div class="brand"><span class="lg lg-nx-mark" style="width:26px;height:26px" role="img" aria-label="Nextier"></span><span>Team Musso</span><span class="sep">·</span><span>Nextier Data Engine</span></div>
     <nav aria-label="Sections">
       <a href="#scan">Scan</a><a href="#segments">Segments</a><a href="#stream">Stream</a><a href="#market">Market</a><a href="#where">Where</a><a href="#book">Property Book</a><a href="#lake">Data lake</a><a href="#yes">On yes</a><a href="paul-news.html">News</a>
     </nav>
@@ -396,7 +412,7 @@ footer .fl { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; 
 <div class="hero" id="scan">
   <div id="scanmap" aria-label="3D scan of New York State expired land"><div class="loading" id="maploading">Loading the scan…</div></div>
   <div class="hud-left">
-    <div class="eyebrow">Team Musso · Hunt Engine · New York State</div>
+    <div class="eyebrow">Team Musso · Nextier Data Engine · New York State</div>
     <h1>Every expired lot. Every owner. One hunt.</h1>
     <p class="lede">Land across New York that came off the MLS without selling in the last two years. Never relisted. Matched to the parcel on government records, screened for a split, ranked for the first call.</p>
     <div class="counters">
@@ -881,6 +897,18 @@ function sentence(r) {
   else if (r.basis === "by right" && r.note) s += `Zoning check: ${esc(r.note)}.`;
   return s;
 }
+/** The same facts as sentence(r), one per bullet, for the lot's header (Thomas 2026-10-26: bullets, never a paragraph). */
+function factBullets(r) {
+  const where = [r.h, r.t && r.t !== r.h ? r.t : ""].filter(Boolean).join(", ");
+  const place = `${esc(where || r.co || "")}${r.co && !where.includes(r.co) ? `, ${esc(r.co)} County` : ""}`;
+  const b = [r.ac ? `${acf(r.ac)} acres · ${place}` : `Lot in ${place}`, "Listed, expired without a sale, never relisted"];
+  if (r.p) b.push(`Last asking ${money(r.p)}`);
+  if (r.sg === "verified") b.push(`<span class="g">${r.lots} lots by right</span> under town zoning and the county septic rule`);
+  else if (r.sg === "nyc") b.push(`Zoned ${esc(r.nyc.zone || "")}: <span class="g">${n0(r.nyc.build)} sq ft buildable</span>`);
+  else if (r.sg === "cand") { b.push(`Sized to split${r.prec && r.prec.s ? ` · ${r.prec.s} subdivisions in town since 2021` : ""}`); b.push("Zoning check at install"); }
+  else if (r.basis === "by right" && r.note) b.push(`Zoning check: ${esc(r.note)}`);
+  return b.map((x) => `<li>${x}</li>`).join("");
+}
 function mathCard(r) {
   if (r.m && r.basis === "by right") {
     const m = r.m; const sf = (v) => v == null ? "—" : n0(v) + " sq ft";
@@ -923,11 +951,64 @@ const TRACE_FIELDS = [
   ["Carrier", "m", "", "Carrier on file"], ["Do Not Call", "m", "", "Checked"], ["TCPA", "m", "", "Checked"], ["Verified", "m", "", "Date of the check"],
 ];
 // ---------- reach: click to call on your own SignalHouse.io line, email from your own address ----------
+// Real traced owners, keyed by lot rank. EMPTY on the public page (everything stays masked); filled only
+// in the private build. Every phone is click-to-call, every email click-to-email, each phone with its
+// line type and the Do Not Call / TCPA check. Thomas, 2026-10-26: "this is how everyone's data engine should be."
+const TRACED = {};
+const PARCEL = {"1":["106","8","50.4","106.-8-50.4","473889"],"2":["66","2","58.1","66.-2-58.1","472889"],"3":["449.00","03","036.001","449.00-03-036.001","472289"],"4":["418","3","30","418.-3-30","472889"],"6":["10.02","3","55","10.02-3-55","392800"]};
+const traced = (r) => TRACED[r.rank] || null;
+// Traced owners ship SEALED on the public page: AES-GCM ciphertext, opened with a code the operator
+// shares (PBKDF2 → AES key, in the browser). Without the code, nothing about the owner is readable.
+const TRACED_SEALED = {"ranks":[1,2,3,4,6],"salt":"MdCaoXU+OSoaMPxEW8Dlng==","iv":"pIvWBnqbbLLczBYg","it":200000,"ct":"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"};
+const sealedHas = (r) => !!(TRACED_SEALED && TRACED_SEALED.ranks.includes(r.rank) && !traced(r));
+const unb64 = (s) => Uint8Array.from(atob(s), (c) => c.charCodeAt(0));
+async function unsealTraced(code) {
+  if (!TRACED_SEALED || !code || !(window.crypto && crypto.subtle)) return false;
+  try {
+    const base = await crypto.subtle.importKey("raw", new TextEncoder().encode(code.trim().toLowerCase()), "PBKDF2", false, ["deriveKey"]);
+    const key = await crypto.subtle.deriveKey({ name: "PBKDF2", salt: unb64(TRACED_SEALED.salt), iterations: TRACED_SEALED.it, hash: "SHA-256" }, base, { name: "AES-GCM", length: 256 }, false, ["decrypt"]);
+    const pt = await crypto.subtle.decrypt({ name: "AES-GCM", iv: unb64(TRACED_SEALED.iv) }, key, unb64(TRACED_SEALED.ct));
+    Object.assign(TRACED, JSON.parse(new TextDecoder().decode(pt)));
+    try { sessionStorage.setItem("hunt-owner-code", code.trim().toLowerCase()); } catch {}
+    return true;
+  } catch { return false; }
+}
+function reachCardLocked(r) {
+  return `<div class="reachbox">${REACH_HEAD}
+    <div class="lockbox"><b>🔒 Owner traced: name, phones and emails</b><span>Enter the code to show them.</span>
+      <div class="pushbar"><input type="password" data-code aria-label="Owner code" placeholder="Code" autocomplete="off"><button class="btn go" type="button" data-unlock>Unlock</button></div>
+      <div class="note" data-lockmsg hidden>That code didn't open it. Check it and try again.</div></div></div>`;
+}
+const digits10 = (n) => String(n || "").replace(/\D/g, "").replace(/^1(?=\d{10}$)/, "");
+const fmtPh = (n) => { const d = digits10(n); return d.length === 10 ? `(${d.slice(0, 3)}) ${d.slice(3, 6)}-${d.slice(6)}` : String(n || ""); };
+const telOf = (n) => { const d = digits10(n); return d.length === 10 ? `+1${d}` : d; };
+const isMobile = (t) => /mobile|wireless/i.test(t || "");
+const ltTag = (p) => `<span class="lt ${isMobile(p.t) ? "mo" : "ll"}">${esc(p.t || "Phone")}</span>${p.dnc ? ` <span class="lt dnc">DNC</span>` : ""}${p.tcpa ? ` <span class="lt tcpa">TCPA</span>` : ""}`;
+const REACH_HEAD = `<div class="th"><span class="lg lg-signalhouse" style="width:76px;height:42px" role="img" aria-label="SignalHouse.io"></span><b>Click to call · your own line</b><span class="s">Calls ring from your SignalHouse.io number. Email goes from your own address.</span></div>`;
+function reachCardTraced(r, t) {
+  const o = t.owner || {};
+  const others = (t.people || []).filter((p) => !p.owner && p.full).map((p) => esc(p.full));
+  const seen = {};
+  const phoneRows = (t.phones || []).map((p) => {
+    const k = isMobile(p.t) ? "Mobile" : /landline/i.test(p.t || "") ? "Landline" : "Phone";
+    seen[k] = (seen[k] || 0) + 1;
+    return `<div class="rrow"><span class="l">${k} ${seen[k]}</span><span class="v">${esc(fmtPh(p.n))} ${ltTag(p)}${p.c ? ` <span class="cr">${esc(p.c)}</span>` : ""}${p.who && p.who !== o.full ? ` <span class="who">${esc(p.who)}</span>` : ""}</span><a class="btn go" href="tel:${esc(telOf(p.n))}">☎ Call</a></div>`;
+  }).join("");
+  const emailRows = (t.emails || []).map((m, i) => `<div class="rrow"><span class="l">Email ${i + 1}</span><span class="v">${esc(m.e)} <span class="lt em">Email</span>${m.who && m.who !== o.full ? ` <span class="who">${esc(m.who)}</span>` : ""}</span><a class="btn" href="mailto:${esc(m.e)}">✉ Email</a></div>`).join("");
+  return `<div class="reachbox">${REACH_HEAD}
+    <div class="ownerid"><div class="nm">${esc(o.full || [o.first, o.last].filter(Boolean).join(" ") || "Owner")}</div>
+      <div class="fl"><span>First name <b>${esc(o.first || "—")}</b></span><span>Last name <b>${esc(o.last || "—")}</b></span>${o.age ? `<span>Age <b>${esc(o.age)}</b></span>` : ""}<span class="lt ok">Owner</span></div>
+      ${others.length ? `<div class="hh">Also at this address: ${others.join(" · ")}</div>` : ""}</div>
+    <div class="rrows">${phoneRows || `<div class="note">No phone came back for this owner.</div>`}${emailRows}</div>
+    <div class="note">Traced ${esc(t.on || "")}: ${n0((t.phones || []).length)} phones, ${n0((t.emails || []).length)} emails, mobiles first. A red DNC tag means the number is on the Do Not Call list.</div></div>`;
+}
 const REACH_PHONES = [["Mobile 1", "Mobile"], ["Mobile 2", "Mobile"], ["Mobile 3", "Mobile"], ["Landline", "Landline"]];
 const REACH_EMAILS = ["Email 1", "Email 2", "Email 3"];
 const OUTCOMES = ["Talked to the owner", "Left a voicemail", "No answer", "Wrong number", "Asked not to be called"];
 function reachCard(r) {
-  return `<div class="reachbox"><div class="th"><span class="lg lg-signalhouse" style="width:76px;height:42px" role="img" aria-label="SignalHouse.io"></span><b>Click to call · your own line</b><span class="s">Calls ring from your SignalHouse.io number. Email goes from your own address.</span></div>
+  const t = traced(r); if (t) return reachCardTraced(r, t);
+  if (sealedHas(r)) return reachCardLocked(r);
+  return `<div class="reachbox">${REACH_HEAD}
     <div class="rrows">${REACH_PHONES.map(([f, lt], i) => `<div class="rrow"><span class="l">${f}</span><span class="v">(•••) •••-•••• <span class="lt ${lt === "Landline" ? "ll" : "mo"}">${lt}</span></span><button class="btn go" type="button" data-call="${i}">☎ Call</button></div>`).join("")}
     ${REACH_EMAILS.map((f, i) => `<div class="rrow"><span class="l">${f}</span><span class="v">•••••@•••••.com <span class="lt em">Email</span></span><button class="btn" type="button" data-email="${i}">✉ Email</button></div>`).join("")}</div>
     <div class="callpanel" id="cpanel" hidden></div>
@@ -979,7 +1060,24 @@ function startEmail(r, i) {
   });
   p.scrollIntoView({ behavior: reduce ? "auto" : "smooth", block: "nearest" });
 }
+function traceBoxTraced(r, t) {
+  const ph = t.phones || [], em = t.emails || [];
+  const mob = ph.filter((p) => isMobile(p.t)), land = ph.filter((p) => !isMobile(p.t));
+  const best = mob.find((p) => !p.dnc) || mob[0] || ph[0];
+  const P = (p) => p ? `${esc(fmtPh(p.n))} ${ltTag(p)}` : "None found";
+  const E = (m) => m ? `${esc(m.e)} <span class="lt em">Email</span>` : "None found";
+  const rows = [
+    ["Mobile 1", P(mob[0]), 1], ["Mobile 2", P(mob[1]), 1], ["Mobile 3", P(mob[2]), 1], ["Landline", P(land[0]), 1],
+    ["Email 1", E(em[0]), 1], ["Email 2", E(em[1]), 1], ["Email 3", E(em[2]), 1], ["Best mobile", best ? `${esc(fmtPh(best.n))} · called first` : "—", 0],
+    ["Carrier", esc((best && best.c) || "—"), 0], ["Do Not Call", best ? (best.dnc ? `<span class="lt dnc">On DNC</span>` : `<span class="lt ok">Clear</span>`) : "—", 0],
+    ["TCPA", best ? (best.tcpa ? `<span class="lt tcpa">Flagged</span>` : `<span class="lt ok">Clear</span>`) : "—", 0], ["Verified", esc(t.on || "—"), 0],
+  ];
+  return `<div class="tracebox" id="tbox"><div class="th"><span class="lg lg-tracerfy" style="width:96px;height:24px" role="img" aria-label="Skip trace"></span><b>Skip trace + verification</b><span>Traced ${esc(t.on || "")} · owner lookup</span></div>
+    <div class="tfields">${rows.map(([f, v, c]) => `<div class="tf lit${c ? " contact" : ""}"><span class="l">${f}</span><span class="v">${v}</span></div>`).join("")}</div>
+    <div class="note">Every number is in the Call + email card, one press to call.</div></div>`;
+}
 function traceBox(r) {
+  const t = traced(r); if (t) return traceBoxTraced(r, t);
   return `<div class="tracebox" id="tbox"><div class="th"><span class="lg lg-tracerfy" style="width:96px;height:24px" role="img" aria-label="Skip trace"></span><b>Skip trace + verification</b><span>Fills on your key · validated before the first call</span></div>
     <div class="tfields">${TRACE_FIELDS.map(([f, k, lt, v]) => `<div class="tf${k === "c" ? " contact" : ""}" data-lt="${lt}" data-lit="${esc(v)}"><span class="l">${f}</span><span class="v">— lands here</span></div>`).join("")}</div>
     <div class="pushbar"><button class="btn go" type="button" data-trace>Run skip trace · light up this lead</button></div>
@@ -1176,7 +1274,7 @@ function pushCard(r) {
       <dt>Last asking</dt><dd>${money(r.p)}</dd>
       <dt>Story</dt><dd>${esc(storyLine(r))}</dd>
       <dt>Notes</dt><dd id="pnotes">${notes.length ? `${notes.length} note${notes.length === 1 ? "" : "s"} · newest: ${esc(notes[notes.length - 1].t)}` : "Your notes ride along"}</dd>
-      <dt>Lead source</dt><dd>Team Musso Hunt Engine</dd>
+      <dt>Lead source</dt><dd>Team Musso · Nextier Data Engine</dd>
     </dl></div>`;
 }
 function chapters(r) {
@@ -1250,7 +1348,7 @@ function openLot(rank) {
     ["Listed", r.x ? `${r.x}×` : "—", r.x > 1 ? "expired more than once" : "one listing"],
     ["Owner", r.k, r.rch],
   ];
-  const secs = [["reach", "Call + email"], ["map", "Live 3D lot"], ["sat", "Live satellite"], ["similar", "Find similar"], ["push", "Story · push"], ["notes", "📝 Notes"], ["portfolio", "Portfolio linkage"], ["devs", "Developers on deals"], ["permits", "Permit activity"], ["math", "Subdivision math"], ["event", "Listing history · the event"], ["lost", "Deals lost nearby · learn"], ["owner", "Owner & how to reach them"], ["record", "Parcel record"]];
+  const secs = [["record", "Parcel record"], ["owner", "Owner & how to reach them"], ["reach", "Call + email"], ["map", "Live 3D lot"], ["sat", "Live satellite"], ["similar", "Find similar"], ["push", "Story · push"], ["notes", "📝 Notes"], ["portfolio", "Portfolio linkage"], ["devs", "Developers on deals"], ["permits", "Permit activity"], ["math", "Subdivision math"], ["event", "Listing history · the event"], ["lost", "Deals lost nearby · learn"]];
   const m = r.m || {};
   const prev = R[R.indexOf(r) - 1], next = R[R.indexOf(r) + 1];
   $("#lotinner").innerHTML = `
@@ -1258,7 +1356,7 @@ function openLot(rank) {
     <div class="dhead">
       <div class="crumb">${esc([r.co ? r.co + " County" : "", r.t, r.h].filter(Boolean).join(" › "))}</div>
       <h1>${esc(r.a)}</h1>
-      <div class="sentence">${sentence(r)}</div>
+      <ul class="sbul">${factBullets(r)}</ul>
       <div class="chips">${chips}</div>
       <div class="pushbar"><button class="btn go" type="button" data-goreach>☎ Click to call</button><button class="btn" type="button" data-goreach>✉ Email</button><button class="btn nbtn" type="button" data-opennotes>📝 Notes <b class="ncount">0</b></button><button class="btn" type="button" data-similar>◎ Find similar</button><button class="btn" type="button" data-story="0">▶ Story mode</button><button class="btn go" type="button" data-story="last"><span class="lg lg-fub" style="width:22px;height:22px" aria-hidden="true"></span>Push to Follow Up Boss</button></div>
     </div>
@@ -1266,6 +1364,19 @@ function openLot(rank) {
     <div class="dbody">
       <nav class="dindex" aria-label="Detail sections">${secs.map(([id, h]) => `<a href="#lot-${r.rank}" data-jump="d-${id}">${h}</a>`).join("")}</nav>
       <div class="dcards">
+        <section class="card" id="d-record"><h2>Parcel record</h2><div class="pad"><dl class="kv">
+          ${PARCEL[r.rank] ? `<dt>Parcel ID</dt><dd>Section ${PARCEL[r.rank][0]} · Block ${PARCEL[r.rank][1]} · Lot ${PARCEL[r.rank][2]}</dd><dt>Print key · SWIS</dt><dd>${PARCEL[r.rank][3]} · ${PARCEL[r.rank][4]}</dd>` : `<dt>Parcel ID</dt><dd>Section · Block · Lot at install</dd>`}<dt>Record</dt><dd>${esc(r.src || "MLS listing")}</dd>
+          <dt>Class</dt><dd>${esc(r.cls || "—")}</dd>
+          ${r.m ? `<dt>Groundwater zone</dt><dd>${esc(m.gw || "—")}</dd><dt>Sewer district</dt><dd>${esc(m.sewer || "None")}</dd><dt>Flood zone</dt><dd>${esc((m.flood || []).join(", ") || "None mapped")}</dd><dt>Pine Barrens</dt><dd>${esc((m.pine || []).join(", ") || "Outside")}</dd><dt>New homes nearby</dt><dd>${m.newHomes && m.newHomes.n ? `${m.newHomes.n} built 2021–25 within 1.5 mi${m.newHomes.medFmv ? `, median ${money(m.newHomes.medFmv)}` : ""}` : "—"}</dd><dt>Splits nearby</dt><dd>${m.splitsNear || 0} since 2021</dd>` : ""}
+          ${r.prec ? `<dt>Town subdivisions</dt><dd>${r.prec.s} since 2021 · ${n0(r.prec.l)} lots created</dd>` : ""}
+          </dl></div><div class="src">Source: ${esc(r.src || "")}${r.m ? " · Suffolk County GIS" : ""}</div></section>
+        <section class="card" id="d-owner"><h2>Owner &amp; how to reach them</h2><div class="pad"><dl class="kv">
+          <dt>Owner type</dt><dd>${esc(r.k)}</dd>
+          <dt>Reach</dt><dd>${esc(r.rch || "—")}</dd>
+          <dt>Mailing</dt><dd>${r.oos ? "Out of state" : (r.sig || []).includes("absentee") ? "Different address in New York" : r.rch === "Lives there" ? "Lives on the property" : "—"}</dd>
+          <dt>Name on file</dt><dd>${traced(r) ? `<b>${esc(traced(r).owner.full || "")}</b> · from the owner lookup` : "In your workspace. Never on a page."}</dd></dl>
+          ${traceBox(r)}</div>
+          <div class="src">Source: ${esc(r.src || "")} · owner of record</div></section>
         <section class="card" id="d-reach"><h2>Call + email · click to call</h2><div class="pad">${reachCard(r)}</div>
           <div class="src">Calls on your own SignalHouse.io line · email from your own address · phones and emails from the skip trace on your own key</div></section>
         <section class="card" id="d-map"><h2>Live 3D lot</h2><div id="lotmap">${r.c ? "" : `<div class="loading">Parcel outline lands at install. The listing is real: MLS land class, expired, never relisted.</div>`}</div>
@@ -1299,19 +1410,6 @@ function openLot(rank) {
           <div class="src">Source: MLS land class · expired, live and sold · pulled ${esc(S.pulled)}</div></section>
         <section class="card" id="d-lost"><h2>Deals lost nearby · learn from them</h2><div class="pad">${dealsLostCard(r)}</div>
           <div class="src">Source: MLS listing history, 2 years (expired, live and sold, $50K and up) · another brokerage = a different listing office · pulled Oct 17, 2026</div></section>
-        <section class="card" id="d-owner"><h2>Owner &amp; how to reach them</h2><div class="pad"><dl class="kv">
-          <dt>Owner type</dt><dd>${esc(r.k)}</dd>
-          <dt>Reach</dt><dd>${esc(r.rch || "—")}</dd>
-          <dt>Mailing</dt><dd>${r.oos ? "Out of state" : (r.sig || []).includes("absentee") ? "Different address in New York" : r.rch === "Lives there" ? "Lives on the property" : "—"}</dd>
-          <dt>Name on file</dt><dd>In your workspace. Never on a page.</dd></dl>
-          ${traceBox(r)}</div>
-          <div class="src">Source: ${esc(r.src || "")} · owner of record</div></section>
-        <section class="card" id="d-record"><h2>Parcel record</h2><div class="pad"><dl class="kv">
-          <dt>Record</dt><dd>${esc(r.src || "MLS listing")}</dd>
-          <dt>Class</dt><dd>${esc(r.cls || "—")}</dd>
-          ${r.m ? `<dt>Groundwater zone</dt><dd>${esc(m.gw || "—")}</dd><dt>Sewer district</dt><dd>${esc(m.sewer || "None")}</dd><dt>Flood zone</dt><dd>${esc((m.flood || []).join(", ") || "None mapped")}</dd><dt>Pine Barrens</dt><dd>${esc((m.pine || []).join(", ") || "Outside")}</dd><dt>New homes nearby</dt><dd>${m.newHomes && m.newHomes.n ? `${m.newHomes.n} built 2021–25 within 1.5 mi${m.newHomes.medFmv ? `, median ${money(m.newHomes.medFmv)}` : ""}` : "—"}</dd><dt>Splits nearby</dt><dd>${m.splitsNear || 0} since 2021</dd>` : ""}
-          ${r.prec ? `<dt>Town subdivisions</dt><dd>${r.prec.s} since 2021 · ${n0(r.prec.l)} lots created</dd>` : ""}
-          </dl></div><div class="src">Source: ${esc(r.src || "")}${r.m ? " · Suffolk County GIS" : ""}</div></section>
       </div>
     </div>
     <button class="ntab" id="ntab" type="button" data-opennotes aria-label="Open notes on this lead">📝 NOTES <b class="ncount">0</b></button>
@@ -1331,6 +1429,11 @@ function openLot(rank) {
   $("#lotinner").querySelectorAll("[data-story]").forEach((b) => b.addEventListener("click", () => openStory(r, b.dataset.story)));
   $("#lotinner").querySelectorAll("[data-similar]").forEach((b) => b.addEventListener("click", () => { renderSimilar(r); document.getElementById("d-similar").scrollIntoView({ behavior: reduce ? "auto" : "smooth" }); }));
   const tb = $("#lotinner [data-trace]"); if (tb) tb.addEventListener("click", () => lightUp($("#tbox")));
+  const ub = $("#lotinner [data-unlock]"), uc = $("#lotinner [data-code]");
+  if (ub && uc) {
+    const go = async () => { ub.disabled = true; const ok = await unsealTraced(uc.value); ub.disabled = false; if (ok) openLot(r.rank); else { const m = $("#lotinner [data-lockmsg]"); if (m) m.hidden = false; } };
+    ub.addEventListener("click", go); uc.addEventListener("keydown", (e) => { if (e.key === "Enter") go(); });
+  }
   stopCall();
   $("#lotinner").querySelectorAll("[data-goreach]").forEach((b) => b.addEventListener("click", () => document.getElementById("d-reach").scrollIntoView({ behavior: reduce ? "auto" : "smooth" })));
   $("#lotinner").querySelectorAll("[data-call]").forEach((b) => b.addEventListener("click", () => startCall(r, Number(b.dataset.call))));
@@ -1387,9 +1490,15 @@ function route() {
   if ($("#mainview").hidden) { $("#lotview").hidden = true; $("#mainview").hidden = false; if (map) map.resize(); if (h) { const el = document.getElementById(h); if (el) setTimeout(() => el.scrollIntoView(), 30); } }
 }
 window.addEventListener("hashchange", route);
+// A code entered earlier in this tab opens the sealed owners again on reload.
+(async () => {
+  let c = null; try { c = sessionStorage.getItem("hunt-owner-code"); } catch {}
+  if (c && await unsealTraced(c)) { const m = location.hash.match(/^#lot-(\d+)/); if (m) openLot(Number(m[1])); }
+})();
 renderList();
 route();
 })();
 </script>
+<script>if(!location.hash||location.hash==="#"){location.hash="#book";}</script>
 </body>
 </html>
