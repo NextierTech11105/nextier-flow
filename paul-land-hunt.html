@@ -259,6 +259,36 @@ table.math tr.res td { color: var(--green); font-weight: 600; }
 .btn.go:hover { background: var(--green); color: #000; }
 .notes textarea { width: 100%; min-height: 96px; resize: vertical; background: #05070c; border: 1px solid var(--rule); border-radius: 8px; padding: 10px 12px; font: 16px/1.5 var(--body); color: var(--text); }
 .notes textarea::placeholder { color: #9fb0c8; }
+.btn.nbtn { border: 2px solid #f3c04e; background: rgba(243,192,78,.16); color: #fff; }
+.btn.nbtn:hover { background: #f3c04e; color: #000; }
+.btn.nbtn b, .ntab b { background: #f3c04e; color: #000; border-radius: 999px; padding: 1px 9px; font: 700 14px var(--mono); }
+.btn.nbtn:hover b { background: #000; color: #f3c04e; }
+.ntab { position: fixed; right: 20px; bottom: 20px; z-index: 45; display: inline-flex; align-items: center; gap: 10px; border: 2px solid #f3c04e; background: #000; color: #fff; border-radius: 999px; padding: 12px 18px; font: 800 16px/1 var(--display); letter-spacing: .06em; cursor: pointer; box-shadow: 0 0 0 1px rgba(243,192,78,.35), 0 10px 30px rgba(0,0,0,.75), 0 0 24px rgba(243,192,78,.3); }
+.ntab:hover { background: #f3c04e; color: #000; }
+.ntab:hover b { background: #000; color: #f3c04e; }
+.nwin { position: fixed; right: 20px; bottom: 20px; z-index: 50; width: min(420px, calc(100vw - 32px)); max-height: min(78vh, 640px); display: flex; flex-direction: column; background: #0b0c0f; border: 2px solid #f3c04e; border-radius: 14px; overflow: hidden; box-shadow: 0 0 0 1px rgba(243,192,78,.4), 0 22px 60px rgba(0,0,0,.8), 0 0 36px rgba(243,192,78,.28); animation: npop .22s ease-out; }
+.nwin[hidden], .ntab[hidden] { display: none; }
+@keyframes npop { from { transform: translateY(14px) scale(.96); opacity: 0; } }
+.nwin-h { display: flex; align-items: center; gap: 10px; background: #f3c04e; color: #000; padding: 11px 12px 11px 16px; }
+.nwin-h .tt { font: 800 18px/1.1 var(--display); letter-spacing: .06em; }
+.nwin-h .who { font: 600 15px/1.2 var(--body); min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.nwin-h b { background: #000; color: #f3c04e; border-radius: 999px; padding: 2px 9px; font: 700 14px var(--mono); }
+.nwin-h button { margin-left: auto; flex: none; width: 34px; height: 34px; border-radius: 8px; border: 2px solid #000; background: transparent; color: #000; font: 800 20px/1 var(--body); cursor: pointer; }
+.nwin-h button:hover { background: #000; color: #f3c04e; }
+.nwin-b { padding: 14px; display: grid; gap: 10px; overflow: auto; }
+.nwin textarea { width: 100%; box-sizing: border-box; min-height: 96px; resize: vertical; background: #000; border: 1px solid rgba(243,192,78,.6); border-radius: 8px; padding: 10px 12px; font: 16px/1.5 var(--body); color: #fff; }
+.nwin textarea::placeholder { color: #c9cfd8; }
+.nwin textarea:focus { outline: 2px solid #f3c04e; outline-offset: 1px; }
+.btn.nsave { border: 2px solid #f3c04e; background: rgba(243,192,78,.16); color: #fff; }
+.btn.nsave:hover { background: #f3c04e; color: #000; }
+.nwin .nhint { color: #f2f4f7; font-size: 15px; }
+.nwin .nlist li { background: #14161b; border: 1px solid #2a2d35; border-left: 4px solid #f3c04e; }
+.nwin .nlist .t { color: #f3c04e; }
+.nwin .nlist .b { color: #fff; }
+.nwin.flash { animation: npop .22s ease-out, nflash 1s ease .25s 2; }
+@keyframes nflash { 50% { box-shadow: 0 0 0 5px #f3c04e, 0 0 48px rgba(243,192,78,.65); } }
+@media (max-width: 700px) { .nwin { right: 8px; left: 8px; bottom: 8px; width: auto; max-height: 72vh; } .ntab { right: 12px; bottom: 12px; } }
+@media (prefers-reduced-motion: reduce) { .nwin, .nwin.flash { animation: none; } }
 .nlist { display: grid; gap: 8px; margin: 0; padding: 0; list-style: none; }
 .nlist li { background: var(--panel-2); border: 1px solid var(--rule); border-radius: 8px; padding: 10px 12px; display: grid; gap: 2px; }
 .nlist .t { font-family: var(--mono); font-size: 13px; color: var(--soft); }
@@ -906,7 +936,7 @@ function reachCard(r) {
 let callTimer = null, ringTimer = null;
 function stopCall() { clearInterval(callTimer); clearTimeout(ringTimer); callTimer = ringTimer = null; }
 const clock = (s) => `${Math.floor(s / 60)}:${String(s % 60).padStart(2, "0")}`;
-function logOnLead(r, t) { const list = readNotes(r); list.push({ t, at: new Date().toISOString() }); writeNotes(r, list); drawNotes(r); }
+function logOnLead(r, t) { const list = readNotes(r); list.push({ t, at: new Date().toISOString() }); writeNotes(r, list); drawNotes(r); openNotes(true); }
 /** Preview call: ringing, connected with a live clock, hang up, one-press outcome saved to the lot's notes. */
 function startCall(r, i) {
   const p = $("#cpanel"); if (!p) return;
@@ -928,7 +958,7 @@ function startCall(r, i) {
       <div class="pushbar">${OUTCOMES.map((o) => `<button class="btn" type="button" data-out="${esc(o)}">${esc(o)}</button>`).join("")}</div>`;
     p.querySelectorAll("[data-out]").forEach((b) => b.addEventListener("click", () => {
       logOnLead(r, `Called ${f} · ${b.dataset.out} · ${clock(secs)}`);
-      p.innerHTML = `<div class="cs">Saved · ${esc(b.dataset.out)}</div><div class="m">It's in your notes below. In your workspace the call, its length and the outcome save on the lead.</div>`;
+      p.innerHTML = `<div class="cs">Saved · ${esc(b.dataset.out)}</div><div class="m">It's in your notes. In your workspace the call, its length and the outcome save on the lead.</div>`;
     }));
   });
   p.scrollIntoView({ behavior: reduce ? "auto" : "smooth", block: "nearest" });
@@ -945,7 +975,7 @@ function startEmail(r, i) {
   p.querySelector("[data-esend]").addEventListener("click", (e) => {
     logOnLead(r, `Emailed ${REACH_EMAILS[i]}`);
     e.currentTarget.disabled = true; e.currentTarget.textContent = "Ready to send";
-    p.insertAdjacentHTML("beforeend", `<div class="m">Ready. In your workspace this goes from your own address and logs on the lead. It's in your notes below.</div>`);
+    p.insertAdjacentHTML("beforeend", `<div class="m">Ready. In your workspace this goes from your own address and logs on the lead. It's in your notes.</div>`);
   });
   p.scrollIntoView({ behavior: reduce ? "auto" : "smooth", block: "nearest" });
 }
@@ -1113,8 +1143,19 @@ const when = (iso) => { try { return new Date(iso).toLocaleString("en-US", { mon
 function drawNotes(r) {
   const el = $("#nlist"); if (!el) return;
   const list = readNotes(r);
+  document.querySelectorAll("#lotinner .ncount").forEach((c) => { c.textContent = list.length; });
   el.innerHTML = list.length ? list.slice().reverse().map((n) => `<li><span class="t">${esc(when(n.at))}</span><span class="b">${esc(n.t)}</span></li>`).join("") : `<li><span class="b" style="color:var(--soft)">No notes yet.</span></li>`;
 }
+
+function openNotes(flash) {
+  const w = $("#nwin"); if (!w) return;
+  w.hidden = false; $("#ntab").hidden = true;
+  if (flash) { w.classList.remove("flash"); void w.offsetWidth; w.classList.add("flash"); }
+  else $("#nbox").focus({ preventScroll: true });
+  const top = $("#nlist li"); if (flash && top) top.scrollIntoView({ block: "nearest" });
+}
+function closeNotes() { const w = $("#nwin"); if (!w) return; w.hidden = true; $("#ntab").hidden = false; }
+document.addEventListener("keydown", (e) => { if (e.key === "Escape" && $("#nwin") && !$("#nwin").hidden && $("#story").hidden) closeNotes(); });
 
 // ---------- the push: what lands in Follow Up Boss, and the story that rides with it ----------
 const fubTags = (r) => ["expired_land", r.win ? `expired_${r.win}` : ""].filter(Boolean);
@@ -1209,7 +1250,7 @@ function openLot(rank) {
     ["Listed", r.x ? `${r.x}×` : "—", r.x > 1 ? "expired more than once" : "one listing"],
     ["Owner", r.k, r.rch],
   ];
-  const secs = [["reach", "Call + email"], ["map", "Live 3D lot"], ["sat", "Live satellite"], ["similar", "Find similar"], ["push", "Story · push"], ["notes", "Notes"], ["portfolio", "Portfolio linkage"], ["devs", "Developers on deals"], ["permits", "Permit activity"], ["math", "Subdivision math"], ["event", "Listing history · the event"], ["lost", "Deals lost nearby · learn"], ["owner", "Owner & how to reach them"], ["record", "Parcel record"]];
+  const secs = [["reach", "Call + email"], ["map", "Live 3D lot"], ["sat", "Live satellite"], ["similar", "Find similar"], ["push", "Story · push"], ["notes", "📝 Notes"], ["portfolio", "Portfolio linkage"], ["devs", "Developers on deals"], ["permits", "Permit activity"], ["math", "Subdivision math"], ["event", "Listing history · the event"], ["lost", "Deals lost nearby · learn"], ["owner", "Owner & how to reach them"], ["record", "Parcel record"]];
   const m = r.m || {};
   const prev = R[R.indexOf(r) - 1], next = R[R.indexOf(r) + 1];
   $("#lotinner").innerHTML = `
@@ -1219,7 +1260,7 @@ function openLot(rank) {
       <h1>${esc(r.a)}</h1>
       <div class="sentence">${sentence(r)}</div>
       <div class="chips">${chips}</div>
-      <div class="pushbar"><button class="btn go" type="button" data-goreach>☎ Click to call</button><button class="btn" type="button" data-goreach>✉ Email</button><button class="btn" type="button" data-similar>◎ Find similar</button><button class="btn" type="button" data-story="0">▶ Story mode</button><button class="btn go" type="button" data-story="last"><span class="lg lg-fub" style="width:22px;height:22px" aria-hidden="true"></span>Push to Follow Up Boss</button></div>
+      <div class="pushbar"><button class="btn go" type="button" data-goreach>☎ Click to call</button><button class="btn" type="button" data-goreach>✉ Email</button><button class="btn nbtn" type="button" data-opennotes>📝 Notes <b class="ncount">0</b></button><button class="btn" type="button" data-similar>◎ Find similar</button><button class="btn" type="button" data-story="0">▶ Story mode</button><button class="btn go" type="button" data-story="last"><span class="lg lg-fub" style="width:22px;height:22px" aria-hidden="true"></span>Push to Follow Up Boss</button></div>
     </div>
     <div class="facts">${facts.map(([l, v, n, c]) => `<div class="fact"><div class="l">${l}</div><div class="v ${c || ""}">${esc(v)}</div>${n ? `<div class="n">${esc(n)}</div>` : ""}</div>`).join("")}</div>
     <div class="dbody">
@@ -1240,12 +1281,6 @@ function openLot(rank) {
         <section class="card" id="d-push"><h2>Story · push to Follow Up Boss</h2><div class="pad">${pushCard(r)}
           <div class="pushbar"><button class="btn" type="button" data-story="0">▶ Play the story</button><button class="btn go" type="button" data-story="last">Push to Follow Up Boss</button></div></div>
           <div class="src">One push per lead. Anyone who opted out never goes. Sends on your own Follow Up Boss key.</div></section>
-        <section class="card notes" id="d-notes"><h2>Notes</h2><div class="pad">
-          <label for="nbox" style="font-size:15px;color:var(--soft)">Add a note on this lot</label>
-          <textarea id="nbox" placeholder="Called the owner, left a message. Ask about splitting the back acre."></textarea>
-          <div class="pushbar"><button class="btn" type="button" id="nadd">Save note</button></div>
-          <ul class="nlist" id="nlist"></ul>
-          <div class="note">In your workspace every note saves to the lead and rides along in the Follow Up Boss push. On this page notes stay on this device.</div></div></section>
         <section class="card" id="d-portfolio"><h2>Portfolio linkage · what else this owner holds</h2><div class="pad">${portfolioCard(r)}</div>
           <div class="src">Source: NYS assessment rolls 2025 · linked by owner of record and tax-bill mailing address</div></section>
         <section class="card" id="d-devs"><h2>Developers on deals here · the buyer side</h2><div class="pad">${devCard(r)}</div>
@@ -1279,8 +1314,20 @@ function openLot(rank) {
           </dl></div><div class="src">Source: ${esc(r.src || "")}${r.m ? " · Suffolk County GIS" : ""}</div></section>
       </div>
     </div>
+    <button class="ntab" id="ntab" type="button" data-opennotes aria-label="Open notes on this lead">📝 NOTES <b class="ncount">0</b></button>
+    <aside class="nwin" id="nwin" aria-label="Notes on this lead" hidden>
+      <div class="nwin-h"><span class="tt">📝 NOTES</span><b class="ncount">0</b><span class="who">${esc(r.a)}</span><button type="button" data-closenotes aria-label="Close notes">×</button></div>
+      <div class="nwin-b">
+        <textarea id="nbox" aria-label="Add a note on this lead" placeholder="Called the owner, left a message. Ask about splitting the back acre."></textarea>
+        <div class="pushbar"><button class="btn nsave" type="button" id="nadd">Save note</button><span class="nhint">Rides along in the Follow Up Boss push.</span></div>
+        <ul class="nlist" id="nlist"></ul>
+        <div class="nhint">On this page notes stay on this device. In your workspace every note saves to the lead.</div>
+      </div>
+    </aside>
     <div class="dnav">${prev ? `<a class="btn ghost" href="#lot-${prev.rank}">← #${prev.rank} ${esc(prev.a)}</a>` : "<span></span>"}${next ? `<a class="btn ghost" href="#lot-${next.rank}">#${next.rank} ${esc(next.a)} →</a>` : ""}</div>`;
-  $("#lotinner").querySelectorAll("[data-jump]").forEach((a) => a.addEventListener("click", (e) => { e.preventDefault(); document.getElementById(a.dataset.jump).scrollIntoView({ behavior: reduce ? "auto" : "smooth" }); }));
+  $("#lotinner").querySelectorAll("[data-jump]").forEach((a) => a.addEventListener("click", (e) => { e.preventDefault(); if (a.dataset.jump === "d-notes") { openNotes(); return; } document.getElementById(a.dataset.jump).scrollIntoView({ behavior: reduce ? "auto" : "smooth" }); }));
+  $("#lotinner").querySelectorAll("[data-opennotes]").forEach((b) => b.addEventListener("click", () => openNotes()));
+  $("#lotinner [data-closenotes]").addEventListener("click", closeNotes);
   $("#lotinner").querySelectorAll("[data-story]").forEach((b) => b.addEventListener("click", () => openStory(r, b.dataset.story)));
   $("#lotinner").querySelectorAll("[data-similar]").forEach((b) => b.addEventListener("click", () => { renderSimilar(r); document.getElementById("d-similar").scrollIntoView({ behavior: reduce ? "auto" : "smooth" }); }));
   const tb = $("#lotinner [data-trace]"); if (tb) tb.addEventListener("click", () => lightUp($("#tbox")));
