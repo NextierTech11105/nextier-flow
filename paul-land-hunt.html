@@ -1160,7 +1160,7 @@ const OWNER_ENTITY = /\b(LLC|L L C|INC|CORP|CORPORATION|CO|COMPANY|TRUST|TRUSTEE
 const titleCase = (s) => String(s).toLowerCase().replace(/\b([a-z])/g, (m) => m.toUpperCase()).replace(/\bLlc\b/g, "LLC").replace(/\bInc\b/g, "Inc").replace(/\bMc([a-z])/g, (m, c) => "Mc" + c.toUpperCase());
 /** NYS rolls write people LAST FIRST MIDDLE ("RICE SEAN C") → "Sean C Rice". Companies and trusts stay as written. */
 function personName(raw) {
-  const s = String(raw || "").replace(/\s+/g, " ").trim(); if (!s) return "";
+  const s = String(raw || "").replace(/\s+/g, " ").replace(/[,;]+\s*$/, "").trim(); if (!s) return "";
   if (OWNER_ENTITY.test(s)) return titleCase(s);
   const one = s.split(/\s*&\s*|\s+AND\s+/i)[0].trim().split(" ");
   return one.length < 2 ? titleCase(s) : titleCase(one.slice(1).join(" ") + " " + one[0]);
@@ -1591,8 +1591,7 @@ function openLot(rank) {
           </dl></div><div class="src">Source: ${esc(r.src || "")}${r.m ? " · Suffolk County GIS" : ""}</div></section>
         <section class="card" id="d-owner"><h2>Owner &amp; how to reach them</h2><div class="pad"><dl class="kv">
           <dt>Owner type</dt><dd>${esc(r.k)}</dd>
-          <dt>Reach</dt><dd>${esc(r.rch || "—")}</dd>
-          <dt>Mailing</dt><dd>${r.oos ? "Out of state" : (r.sig || []).includes("absentee") ? "Different address in New York" : r.rch === "Lives there" ? "Lives on the property" : "—"}</dd>
+          <dt>Where the owner is</dt><dd>${esc(whereOf(r) || "—")}</dd>
           ${ownerDetailRows(r)}</dl>
           ${traceBox(r)}</div>
           <div class="src">Source: ${esc(r.src || "")} · owner of record</div></section>
@@ -1749,10 +1748,20 @@ function ownerDetailRows(r) {
   try { locked = !nm && (sealedHas(r) || (!!OWNERS_SEALED && !OWNERS)); } catch (e) {}
   const name = nm ? `<b class="dname">${esc(nm)}</b> · ${tag}` : locked ? `<a href="#" class="dkey" data-askkey>Tap to show the owner's name</a>` : "No tax-roll match for this lot yet";
   const rec = recordOf(r);
-  const mail = rec && rec[2] ? `<dt>Mails to</dt><dd>${esc(titleCase(rec[2]))}, ${esc(titleCase(rec[3]))} ${esc(rec[4])} ${esc(rec[5])}</dd>` : "";
+  const mail = ""; // the mailing address now lives in "Where the owner is"
   const also = rec && rec[1] ? `<dt>Also on the deed</dt><dd>${esc(personName(rec[1]))}</dd>` : "";
   const pid = parcelIdOf(r) ? `<dt>Parcel ID</dt><dd>${esc(parcelIdOf(r))}</dd>` : "";
   return `<dt>Owner</dt><dd>${name}</dd>${also}${mail}${pid}`;
+}
+/** Where the owner is, in one line (never "mail reaches the owner" next to "mail goes elsewhere"). */
+function whereOf(r) {
+  const sig = r.sig || [], rec = recordOf(r);
+  const mailTo = rec && rec[2] ? `${titleCase(rec[2])}, ${titleCase(rec[3])} ${rec[4]} ${rec[5]}`.trim() : "";
+  if (r.rch === "Lives there") return "Lives at the property";
+  if (r.oos) return mailTo ? `Lives out of state · mails to ${mailTo}` : "Lives out of state";
+  if (sig.includes("absentee")) return mailTo ? `Absentee owner · mails to ${mailTo}` : "Absentee owner · mail goes to another address";
+  if (mailTo) return `Mails to ${mailTo}`;
+  return r.rch === "Mail reaches the owner" ? "Mail reaches the owner" : (r.rch || "");
 }
 function ledgerOf(r) {
   try {
@@ -1956,13 +1965,11 @@ function drawOwnerPanel(r) {
   const nm = ownerNameOf(r), o = (t && t.owner) || {};
   const place = [r.h, r.t && r.t !== r.h ? r.t : "", r.co].filter(Boolean).join(" · ");
   const sig = r.sig || [];
-  const facts = [esc(r.k), esc(r.rch),
-    r.oos ? "Lives out of state" : sig.includes("absentee") ? "Mail goes to a different address" : "",
+  const facts = [esc(r.k), esc(whereOf(r)),
     r.pf && r.pf.n ? `Owns ${n0(r.pf.n)} other parcel${r.pf.n > 1 ? "s" : ""}` : "",
     sig.includes("estate") || sig.includes("trust") ? "Estate or trust" : "",
     o.age ? `Age ${esc(o.age)}` : ""].filter(Boolean);
   const rec = recordOf(r);
-  if (rec && rec[2]) facts.push(`Mails to ${esc(titleCase(rec[2]))}, ${esc(titleCase(rec[3]))} ${esc(rec[4])} ${esc(rec[5])}`);
   if (rec && rec[1]) facts.push(`Also on the deed: ${esc(personName(rec[1]))}`);
   const ph = (t && t.phones) || [], em = (t && t.emails) || [];
   // Every phone and email from the trace: the owner's own first, then the household (named). DNC numbers carry no Call button.
