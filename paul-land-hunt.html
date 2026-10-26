@@ -103,6 +103,10 @@ body.mapmode #scanmap { position: absolute; inset: 0; height: auto; }
 }
 #rows tr.on { background: #0d1d33; box-shadow: inset 4px 0 0 #ffd23f; }
 #rows .eyecell { white-space: nowrap; }
+/* bright list text */
+#rows .sub { color: #eef2f8; font-size: 15px; }
+#rows .reachcell .sub { color: #fff; font-weight: 800; font-size: 15px; margin-top: 6px; }
+.opanel .op-p, .opanel .op-cr { color: #fff; }
 #book .search { position: relative; }
 #book .search::before { content: "🔍"; position: absolute; left: 14px; top: 50%; transform: translateY(-50%); font-size: 18px; pointer-events: none; }
 #book .search input { width: 100%; box-sizing: border-box; background: #0b1730; border: 2px solid var(--blue); color: #fff; font: 600 17px var(--body); padding: 13px 14px 13px 46px; border-radius: 12px; }
@@ -133,7 +137,10 @@ body:not(.mapmode) #scan.locked .legend { display: none; }
 .opanel .op-key { color: var(--green); font-size: 15px; font-weight: 700; } .opanel .op-none { color: #d5ddf0; font-size: 15px; }
 .opanel .op-facts { display: flex; flex-wrap: wrap; gap: 6px; }
 .opanel .op-facts span { border: 1px solid #3b4250; background: #10141b; border-radius: 999px; padding: 4px 10px; font-size: 14px; font-weight: 700; }
-.opanel .op-reach { display: grid; gap: 6px; }
+.opanel .op-reach { display: grid; gap: 6px 14px; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); }
+.opanel .op-lab { font: 800 13px var(--mono); letter-spacing: .1em; text-transform: uppercase; color: #ffd23f; }
+.opanel .op-who { color: #ffd23f; font-weight: 700; font-size: 14px; }
+.opanel .op-cr { color: #d5ddf0; font-size: 13px; }
 .opanel .op-ph { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; } .opanel .op-ph .num { font-weight: 800; color: #d5ddf0; }
 .opanel .op-b { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; } .opanel .led { margin: 0; color: #fff; font-size: 14px; } .opanel .led b { color: var(--green); }
 #opanel .rbtn { display: inline-flex; align-items: center; gap: 6px; padding: 7px 11px; border-radius: 9px; border: 2px solid var(--green); color: #fff; background: #03130b; font: 800 15px var(--body); text-decoration: none; white-space: nowrap; cursor: pointer; width: fit-content; }
@@ -1845,16 +1852,19 @@ function drawOwnerPanel(r) {
     sig.includes("estate") || sig.includes("trust") ? "Estate or trust" : "",
     o.age ? `Age ${esc(o.age)}` : ""].filter(Boolean);
   const ph = (t && t.phones) || [], em = (t && t.emails) || [];
-  const phones = ph.slice().sort((a, b) => (a.dnc - b.dnc) || (isMobile(b.t) - isMobile(a.t))).slice(0, 4).map((p) => p.dnc
-    ? `<div class="op-ph"><span class="num">${esc(fmtPh(p.n))}</span> ${ltTag(p)}</div>`
-    : `<div class="op-ph"><a class="rbtn call" href="tel:${esc(telOf(p.n))}" data-callk="${r.rank}" data-num="${esc(fmtPh(p.n))}">☎ ${esc(fmtPh(p.n))}</a> ${ltTag(p)}</div>`).join("");
-  const emails = em.slice(0, 2).map((m) => `<a class="rbtn mail" href="mailto:${esc(m.e)}" data-mailk="${r.rank}">✉ ${esc(m.e)}</a>`).join("");
+  // Every phone and email from the trace: the owner's own first, then the household (named). DNC numbers carry no Call button.
+  const other = (x) => (x.who && x.who !== o.full ? 1 : 0);
+  const whoTag = (x) => (other(x) ? ` <span class="op-who">${esc(x.who)}</span>` : "");
+  const phones = ph.slice().sort((a, b) => other(a) - other(b) || (a.dnc - b.dnc) || (isMobile(b.t) - isMobile(a.t))).map((x) => x.dnc
+    ? `<div class="op-ph"><span class="num">${esc(fmtPh(x.n))}</span> ${ltTag(x)}${whoTag(x)}</div>`
+    : `<div class="op-ph"><a class="rbtn call" href="tel:${esc(telOf(x.n))}" data-callk="${r.rank}" data-num="${esc(fmtPh(x.n))}">☎ ${esc(fmtPh(x.n))}</a> ${ltTag(x)}${x.c ? ` <span class="op-cr">${esc(x.c)}</span>` : ""}${whoTag(x)}</div>`).join("");
+  const emails = em.slice().sort((a, b) => other(a) - other(b)).map((m) => `<div class="op-ph"><a class="rbtn mail" href="mailto:${esc(m.e)}" data-mailk="${r.rank}">✉ ${esc(m.e)}</a>${whoTag(m)}</div>`).join("");
   const L = ledgerOf(r);
   const who = nm ? `<b>${esc(nm)}</b>` : sealed ? `<a href="#" class="op-key" data-askkey>Owner traced · tap to show the name and phones</a>` : `<span class="op-none">Owner of record · not traced yet</span>`;
   opanel.innerHTML = `<div class="op-h"><span class="op-a">#${r.rank} · ${esc(r.a)}</span><span class="op-p">${esc(place)}</span><button type="button" data-opclose aria-label="Unlock this parcel">×</button></div>
     <div class="op-own">👤 ${who}</div>
     <div class="op-facts">${facts.map((f) => `<span>${f}</span>`).join("")}</div>
-    ${phones || emails ? `<div class="op-reach">${phones}${emails}</div>` : ""}
+    ${ph.length ? `<div class="op-lab">Phones · ${n0(ph.length)}</div><div class="op-reach">${phones}</div>` : ""}${em.length ? `<div class="op-lab">Emails · ${n0(em.length)}</div><div class="op-reach">${emails}</div>` : ""}
     <div class="op-b"><button class="rbtn notes" type="button" data-notesk="${r.rank}">📝 Notes <b>${n0(L.notes)}</b></button><a class="rbtn eye2" href="#lot-${r.rank}">👁 Detail view</a><button class="rbtn push" type="button" data-pushk="${r.rank}" data-to="Initial SMS">➜ Initial SMS</button><button class="rbtn push" type="button" data-pushk="${r.rank}" data-to="Pipeline Nurture">➜ Pipeline Nurture</button><span class="led">Calls <b>${L.call}</b> · Texts <b>${L.text}</b> · Emails <b>${L.email}</b></span></div>`;
   const was = $("#scan").classList.contains("locked");
   opanel.hidden = false; $("#scan").classList.add("locked");
