@@ -1,0 +1,909 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Development Story Mode · 3D</title>
+<meta name="description" content="Story Mode for Nextier development sourcing: big lots, subdivision-size parcels, the FAR gap, corridors, expired and estate signals, individual owners first, the Property Book list with autotags, any tool by webhook, co-hosted on DigitalOcean with your own keys, and ready blocks that wait at Initial SMS.">
+<link rel="stylesheet" href="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=DM+Sans:wght@400;500;700&display=swap">
+<style>
+/* Layout: a stage (the app's own screens, animated) beside a narration column, a chapter rail underneath; one chapter at a time. Single committed dark look, continuous with Story Mode and the Nextier app. */
+:root{
+  --bg:#000000; --panel:#0D0D0D; --panel-2:#161616; --line:#2A2A2A;
+  --fg:#FFFFFF; --soft:#D5DDF0; --orange:#FF8A3D; --orange-soft:#FFB27A;
+  --blue:#4C8DFF; --blue-soft:#9CC0FF; --green:#2FD39A; --ink:#0A1022;
+  --app:#0B0F14; --app-2:#12181F; --app-line:#232B35; --gold:#E2B54A;
+  --display:'Space Grotesk','Trebuchet MS',Arial,sans-serif;
+  --body:'DM Sans','Segoe UI',Arial,sans-serif;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+html,body{height:100%}
+body{margin:0;background:var(--bg);color:var(--fg);font-family:var(--body);font-size:17px;line-height:1.5}
+.wrap{max-width:1240px;margin:0 auto;padding-inline:20px;padding-block:28px 40px;display:flex;flex-direction:column;gap:24px}
+header{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px}
+.brand{font-family:var(--display);font-weight:700;font-size:22px;letter-spacing:.08em}
+.brand span{color:var(--orange)}
+.tag{font-size:13px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--soft);border:1px solid var(--line);border-radius:999px;padding:6px 12px}
+h1{font-family:var(--display);font-weight:700;font-size:clamp(30px,4.4vw,52px);line-height:1.05;margin:0;text-wrap:balance}
+h1 em{font-style:normal;color:var(--orange)}
+.main{display:grid;grid-template-columns:minmax(0,1.5fr) minmax(0,1fr);gap:24px;align-items:stretch}
+@media (max-width:920px){.main{grid-template-columns:minmax(0,1fr)}}
+.stage{position:relative;background:var(--panel);border:1px solid var(--line);border-radius:24px;min-height:500px;overflow:hidden}
+.narr{display:flex;flex-direction:column;gap:16px;padding:8px 4px;min-width:0}
+.step{font-size:13px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--orange)}
+.narr h2{font-family:var(--display);font-size:clamp(26px,3vw,36px);line-height:1.1;margin:0;text-wrap:balance}
+.narr p{margin:0;font-size:19px;max-width:36ch}
+.controls{display:flex;flex-wrap:wrap;gap:10px;margin-top:auto}
+button{font:inherit;font-weight:700;font-size:15px;color:var(--fg);background:var(--panel-2);border:1px solid var(--line);border-radius:12px;padding:10px 16px;cursor:pointer}
+button:hover{border-color:var(--blue)}
+button:focus-visible{outline:3px solid var(--orange);outline-offset:2px}
+#play{background:var(--orange);border-color:var(--orange);color:var(--ink);min-width:120px}
+.rail{display:grid;grid-template-columns:repeat(10,minmax(0,1fr));gap:6px}
+@media (max-width:1000px){.rail{grid-template-columns:repeat(5,minmax(0,1fr))}}
+@media (max-width:520px){.rail{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.rail button{display:flex;flex-direction:column;align-items:flex-start;gap:8px;padding:10px;border-radius:12px;text-align:left;font-size:13px;color:var(--soft);min-width:0}
+.rail .bar{display:block;width:100%;height:4px;border-radius:2px;background:var(--line);overflow:hidden}
+.rail .bar i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--blue),var(--orange))}
+.rail button[aria-current="step"]{color:var(--fg);border-color:var(--orange)}
+.rail .n{font-variant-numeric:tabular-nums;color:var(--orange)}
+.foot{font-size:14px;color:var(--soft)}
+.foot a{color:var(--fg)}
+
+/* ── the app, recreated ─────────────────────────────────────────────── */
+.scene{position:absolute;inset:0;padding:22px;display:flex;align-items:center;justify-content:center}
+.scene[hidden]{display:none!important}
+.app{width:100%;max-width:640px;background:var(--app);border:1px solid var(--app-line);border-radius:16px;overflow:hidden;box-shadow:0 0 60px #4C8DFF22;font-size:14px}
+.abar{display:flex;align-items:center;gap:10px;padding:10px 14px;border-bottom:1px solid var(--app-line);background:#090C10;flex-wrap:wrap}
+.abar b{font-weight:700}
+.ws{border:1px solid #3A4450;border-radius:8px;padding:4px 10px;font-weight:700}
+.pill{font-size:11px;font-weight:700;letter-spacing:.1em;padding:3px 8px;border-radius:999px;background:#0F2A1E;color:#5BE3A8;border:1px solid #1E5A40}
+.abody{padding:14px;display:flex;flex-direction:column;gap:12px}
+.ah{font-family:var(--display);font-weight:700;font-size:18px}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.ac{padding:6px 10px;border-radius:8px;background:var(--app-2);border:1px solid var(--app-line);font-weight:700;font-size:13px;color:#C9D2DC;white-space:nowrap}
+.ac.on{border-color:var(--blue);background:#13254A;color:#fff}
+.ac small{color:#8FA0B3;font-weight:700;margin-left:4px;font-variant-numeric:tabular-nums}
+.ac.hit{border-color:var(--gold);color:#fff}
+
+/* lead builder map */
+.amap{position:relative;height:220px;border-radius:12px;overflow:hidden;border:1px solid var(--app-line);
+  background:
+   repeating-linear-gradient(28deg,transparent 0 38px,#1A222C 38px 40px),
+   repeating-linear-gradient(118deg,transparent 0 52px,#1A222C 52px 54px),
+   radial-gradient(ellipse 60% 50% at 62% 55%,#162016 0%,#10161C 70%)}
+.amap .water{position:absolute;right:-10%;bottom:-30%;width:70%;height:60%;border-radius:50%;background:#0B1624}
+.amap .road{position:absolute;height:3px;background:#3B4552;transform-origin:left center}
+.amap .ctl{position:absolute;left:10px;top:10px;display:flex;flex-direction:column;gap:6px}
+.amap .ctl span{background:#0C1116;border:1px solid var(--app-line);border-radius:8px;padding:4px 10px;font-size:12px;font-weight:700}
+.amap .cnt{position:absolute;right:10px;top:10px;background:#0C1116;border:1px solid var(--app-line);border-radius:999px;padding:6px 12px;font-weight:700;font-variant-numeric:tabular-nums}
+.pin{position:absolute;width:14px;height:14px;margin:-7px 0 0 -7px;border-radius:50%;background:var(--blue);border:2px solid #fff;box-shadow:0 0 12px #4C8DFF}
+.go .pin{animation:drop .5s cubic-bezier(.2,1.4,.4,1) both var(--d)}
+.rows{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.rows .box{border:1px solid #3A4450;border-radius:8px;padding:6px 14px;font-weight:700;font-size:18px;font-variant-numeric:tabular-nums}
+
+/* monitors */
+.mon{display:flex;justify-content:space-between;align-items:center;gap:12px;border:1px solid var(--app-line);border-radius:12px;padding:12px 14px;background:var(--app-2)}
+.mon b{display:block;font-size:15px}
+.mon span{color:#C9D2DC;font-size:13px}
+.on-btn{background:#16A34A;color:#fff;font-weight:700;border-radius:8px;padding:8px 14px;flex:none}
+.presets{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.preset{border:1px solid var(--app-line);border-radius:10px;padding:10px 12px;background:var(--app-2)}
+.preset b{display:block;font-size:14px}.preset span{font-size:12px;color:#AEB9C6}
+.preset.on{border-color:var(--blue);background:#141414}
+.tick{display:flex;justify-content:space-between;align-items:center;border:1px dashed #3A4450;border-radius:10px;padding:10px 12px;font-weight:700}
+.tick b{font-family:var(--display);font-size:22px;color:var(--green);font-variant-numeric:tabular-nums}
+
+/* signals */
+.sig{display:flex;flex-direction:column;gap:10px;width:min(460px,100%)}
+.sc{display:flex;gap:12px;align-items:center;padding:12px 14px;border-radius:14px;background:var(--panel-2);border:1px solid var(--line)}
+.sc .ic{flex:none;width:40px;height:40px;border-radius:10px;display:grid;place-items:center;font-weight:700;font-family:var(--display)}
+.sc b{display:block}.sc small{color:var(--soft);font-size:14px}
+.sc .new{margin-left:auto;flex:none;font-size:11px;font-weight:700;letter-spacing:.12em;padding:4px 8px;border-radius:999px;background:var(--orange);color:var(--ink)}
+
+/* owner split */
+.split{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:14px;width:min(520px,100%)}
+.lanebox{border-radius:16px;padding:14px;border:1px solid var(--line);background:var(--panel-2);display:flex;flex-direction:column;gap:8px}
+.lanebox h3{margin:0;font-family:var(--display);font-size:17px}
+.lanebox .o{padding:8px 10px;border-radius:10px;background:#0A0A0A;border:1px solid var(--line);font-size:14px}
+.lanebox.go-l{border-color:var(--green)}.lanebox.go-l h3{color:var(--green)}
+.lanebox.rs-l h3{color:var(--blue-soft)}
+
+/* trace */
+.trace{width:min(440px,100%);display:flex;flex-direction:column;gap:10px}
+.tr{display:flex;align-items:center;gap:10px;padding:12px 14px;border-radius:12px;background:var(--panel-2);border:1px solid var(--line)}
+.tr .ok{margin-left:auto;font-size:12px;font-weight:700;letter-spacing:.1em;padding:4px 10px;border-radius:999px;background:#0F2A1E;color:#5BE3A8;border:1px solid #1E5A40}
+.tr .num{font-family:var(--display);font-size:22px;color:var(--green);font-variant-numeric:tabular-nums}
+
+/* property book list */
+.tbl{border:1px solid var(--app-line);border-radius:10px;overflow:auto;max-height:250px}
+table{border-collapse:collapse;width:100%;min-width:460px;font-size:13px;table-layout:fixed}
+td small{display:block;color:#8FA0B3;font-size:12px}
+td.w{white-space:normal}
+th:nth-child(1){width:34%}th:nth-child(2){width:18%}th:nth-child(3){width:18%}
+th{position:sticky;top:0;background:#0E1319;text-align:left;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:#AEB9C6;padding:8px 10px;border-bottom:1px solid var(--app-line)}
+td{padding:8px 10px;border-bottom:1px solid #1A2129;vertical-align:top;white-space:nowrap}
+tr.sel td{background:#161B22}
+.tgs{display:flex;flex-wrap:wrap;gap:4px;white-space:normal}
+.tg{font-size:11px;font-weight:700;padding:2px 7px;border-radius:999px;border:1px solid #3A4450;color:#E5EBF2;background:#161D25}
+.tg.ev{border-color:var(--orange);color:var(--orange-soft)}
+.tg.ok{border-color:#1E5A40;color:#5BE3A8}
+.go .tg{animation:stamp .35s cubic-bezier(.2,1.4,.4,1) both var(--d)}
+.search{border:1px solid var(--app-line);border-radius:8px;padding:8px 10px;color:#8FA0B3;font-size:13px;background:#0E1319}
+.toprow{display:flex;justify-content:space-between;gap:10px;align-items:center;flex-wrap:wrap}
+.enzo{border:1px solid #1E5A40;color:#5BE3A8;border-radius:8px;padding:6px 10px;font-weight:700;font-size:12px}
+
+/* record panel */
+.rec{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.1fr);gap:12px}
+@media (max-width:560px){.rec{grid-template-columns:minmax(0,1fr)}.rec .mini{display:none}}
+.mini{display:flex;flex-direction:column;gap:6px}
+.mini span{padding:7px 9px;border-radius:8px;background:#0E1319;border:1px solid #1A2129;font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.mini span.sel{background:#161B22;border-color:#2E3A48}
+.panel{border:1px solid var(--app-line);border-radius:12px;padding:12px;background:var(--app-2);display:flex;flex-direction:column;gap:10px;min-width:0}
+.panel .addr{font-weight:700;font-size:16px}
+.panel .cty{color:#AEB9C6;font-size:13px}
+.traced{align-self:flex-start;font-size:11px;font-weight:700;letter-spacing:.1em;border:1px solid #3A4450;border-radius:6px;padding:2px 8px}
+.acts{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.acts .ph{font-family:var(--display);font-size:18px;color:#5BE3A8;font-variant-numeric:tabular-nums;margin-right:4px}
+.acts .call{background:#16A34A;color:#fff;border-radius:8px;padding:6px 12px;font-weight:700}
+.acts .bt{border:1px solid #3A4450;border-radius:8px;padding:6px 10px;font-weight:700}
+.clock{border:1px solid #4A3A12;background:#1A160B;border-radius:10px;padding:10px}
+.clock b{font-size:11px;letter-spacing:.14em;color:var(--gold)}
+.clock .g{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px 10px;margin-top:6px;font-size:12px}
+.clock .g small{display:block;color:#AEB9C6;letter-spacing:.08em;text-transform:uppercase;font-size:10px}
+.clock .g span{font-weight:700}
+
+/* webhook */
+.hook{display:grid;grid-template-columns:minmax(0,1.1fr) 70px minmax(0,1fr);gap:8px;align-items:center;width:100%;max-width:640px}
+@media (max-width:560px){.hook{grid-template-columns:minmax(0,1fr)}.hook .wire{display:none}}
+pre{margin:0;padding:12px;border-radius:12px;background:#0A0A0A;border:1px solid var(--line);font-size:12px;line-height:1.45;color:#CFE0FF;overflow:auto;white-space:pre}
+pre .k{color:var(--blue-soft)}pre .s{color:var(--orange-soft)}
+.wire{position:relative;height:120px}
+.wire i{position:absolute;left:0;width:10px;height:10px;border-radius:50%;background:var(--orange-soft);box-shadow:0 0 10px var(--orange);animation:tf 1.8s linear infinite;animation-delay:var(--d)}
+.wire i:nth-child(1){top:10px}.wire i:nth-child(2){top:40px}.wire i:nth-child(3){top:70px}.wire i:nth-child(4){top:100px}
+.dest{display:flex;flex-direction:column;gap:6px}
+.dest span{padding:8px 12px;border-radius:10px;background:var(--panel-2);border:1px solid var(--line);font-weight:700;font-size:14px}
+.go .dest span{animation:lit .5s ease-out both var(--d)}
+
+/* launch */
+.launch{display:flex;flex-direction:column;gap:10px}
+.blk{display:flex;justify-content:space-between;align-items:center;gap:10px;border:1px solid var(--app-line);border-radius:12px;padding:12px 14px;background:var(--app-2);flex-wrap:wrap}
+.blk b{display:block;font-size:15px}
+.blk span{font-size:13px;color:#C9D2DC}
+.ready{font-size:11px;font-weight:700;letter-spacing:.12em;padding:4px 10px;border-radius:999px;background:#0F2A1E;color:#5BE3A8;border:1px solid #1E5A40}
+.send{align-self:center;background:var(--orange);color:var(--ink);font-weight:700;font-size:18px;border-radius:14px;padding:14px 30px;box-shadow:0 0 0 0 #FF8A3D88}
+.go .send{animation:wait 1.8s ease-in-out infinite 1.5s}
+.halt{text-align:center;font-weight:700;color:var(--soft);font-size:14px}
+
+/* entrances: elements rest visible; .go replays them */
+.go .in1{animation:up .5s ease-out both .1s}.go .in2{animation:up .5s ease-out both .8s}
+.go .in3{animation:up .5s ease-out both 1.5s}.go .in4{animation:up .5s ease-out both 2.2s}
+.go .pop{animation:pop .45s cubic-bezier(.2,1.4,.4,1) both 2s}
+@keyframes up{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+@keyframes pop{from{opacity:0;transform:scale(.6)}to{opacity:1;transform:none}}
+@keyframes drop{from{opacity:0;transform:translateY(-22px) scale(.6)}to{opacity:1;transform:none}}
+@keyframes stamp{from{opacity:0;transform:scale(1.8)}to{opacity:1;transform:none}}
+@keyframes tf{0%{left:0;opacity:0}20%{opacity:1}100%{left:60px;opacity:0}}
+@keyframes lit{0%{background:var(--panel-2)}100%{background:#2A1A10;border-color:var(--orange);box-shadow:0 0 14px #FF8A3D55}}
+@keyframes wait{0%,100%{box-shadow:0 0 0 0 #FF8A3D66}50%{box-shadow:0 0 0 14px #FF8A3D00}}
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}}
+</style>
+<style>
+/* development additions: satellite parcels, the split, the FAR bar, corridors */
+.sat{position:relative;height:220px;border-radius:12px;overflow:hidden;border:1px solid var(--app-line);
+  background:
+   radial-gradient(circle at 20% 30%,#2E3B22 0 14%,transparent 15%),
+   radial-gradient(circle at 75% 70%,#2A361F 0 18%,transparent 19%),
+   radial-gradient(circle at 60% 20%,#3A3424 0 10%,transparent 11%),
+   linear-gradient(135deg,#25301C,#1C2417 45%,#2B2A1E)}
+.sat .rd{position:absolute;height:6px;background:#5B5A55;border-top:1px solid #77756E;border-bottom:1px solid #77756E;transform-origin:left center}
+.sat .lot{position:absolute;border:1.5px solid rgba(255,255,255,.35);background:rgba(255,255,255,.04)}
+.sat .lot.big{border:2px solid var(--gold);background:rgba(226,181,74,.14)}
+.go .sat .lot.big{animation:glow 1.6s ease-in-out both var(--d)}
+.sat .ctl{position:absolute;left:10px;top:10px;display:flex;flex-direction:column;gap:6px}
+.sat .ctl span{background:#0C1116;border:1px solid var(--app-line);border-radius:8px;padding:4px 10px;font-size:12px;font-weight:700}
+.sat .ctl span.on{border-color:var(--gold);color:#fff}
+.sat .cnt{position:absolute;right:10px;top:10px;background:#0C1116;border:1px solid var(--app-line);border-radius:999px;padding:6px 12px;font-weight:700;font-variant-numeric:tabular-nums}
+@keyframes glow{0%{box-shadow:none;opacity:.2}60%{box-shadow:0 0 18px var(--gold);opacity:1}100%{box-shadow:0 0 8px #E2B54A88;opacity:1}}
+
+.math{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:16px;width:min(560px,100%);align-items:center}
+@media (max-width:560px){.math{grid-template-columns:minmax(0,1fr)}}
+.parcel{position:relative;aspect-ratio:1/1.15;border:2px solid var(--gold);border-radius:6px;background:linear-gradient(160deg,#2B3A22,#1D2617);overflow:hidden;max-width:100%}
+.parcel .house{position:absolute;left:12%;top:10%;width:30%;height:20%;background:#8A8476;border-radius:3px}
+.parcel .cut{position:absolute;top:0;bottom:0;width:0;border-left:2px dashed #fff}
+.go .parcel .cut{animation:cutin .6s ease-out both var(--d)}
+.parcel .lbl{position:absolute;bottom:8px;font-size:12px;font-weight:700;color:#fff;text-shadow:0 1px 3px #000}
+@keyframes cutin{from{opacity:0;transform:scaleY(0)}to{opacity:1;transform:none}}
+.facts{display:flex;flex-direction:column;gap:8px}
+.fct{display:flex;justify-content:space-between;gap:10px;padding:10px 12px;border-radius:10px;background:var(--panel-2);border:1px solid var(--line)}
+.fct b{font-variant-numeric:tabular-nums}
+.far{padding:10px 12px;border-radius:10px;background:var(--panel-2);border:1px solid var(--line)}
+.far .track{position:relative;height:12px;border-radius:6px;background:#0A0A0A;margin-top:8px;overflow:hidden}
+.far .built{position:absolute;left:0;top:0;bottom:0;width:20%;background:var(--blue)}
+.far .gap{position:absolute;left:20%;top:0;bottom:0;width:0;background:repeating-linear-gradient(45deg,var(--orange) 0 6px,#B4480F 6px 12px)}
+.go .far .gap{animation:grow 1.4s ease-out both 1.4s}
+@keyframes grow{to{width:80%}}
+.far small{display:flex;justify-content:space-between;color:var(--soft);font-size:12px;margin-top:4px}
+
+.terr{position:relative;width:min(560px,100%);height:300px;border-radius:16px;border:1px solid var(--line);overflow:hidden;background:radial-gradient(ellipse 80% 50% at 50% 55%,#161616 0%,#0D0D0D 60%,#0A0A0A 100%)}
+.terr .isl{position:absolute;left:6%;right:4%;top:38%;height:30%;border-radius:40% 60% 50% 50%/60% 50% 50% 40%;background:#1A1A1A;border:1px solid #333333}
+.terr .c110{position:absolute;left:30%;top:28%;width:8px;height:48%;border-radius:4px;background:linear-gradient(var(--orange),#B4480F);box-shadow:0 0 16px var(--orange)}
+.terr .c110 b{position:absolute;left:14px;top:-4px;white-space:nowrap;font-size:13px;color:var(--orange-soft)}
+.terr .band{position:absolute;border:2px dashed var(--gold);border-radius:12px;background:rgba(226,181,74,.08)}
+.terr .band b{position:absolute;left:8px;top:-22px;white-space:nowrap;font-size:13px;color:var(--gold)}
+.terr .bub{position:absolute;width:var(--s);height:var(--s);margin:calc(var(--s)/-2) 0 0 calc(var(--s)/-2);border-radius:50%;background:#4C8DFF33;border:2px solid var(--blue);display:grid;place-items:center;font-size:12px;font-weight:700;font-variant-numeric:tabular-nums}
+.go .terr .bub{animation:pop .45s cubic-bezier(.2,1.4,.4,1) both var(--d)}
+.terr .key{position:absolute;left:10px;bottom:10px;font-size:12px;color:var(--soft)}
+
+.opener{align-self:stretch;padding:12px 14px;border-radius:14px;background:#0A0A0A;border:1px dashed var(--line)}
+.opener small{display:block;font-size:11px;letter-spacing:.12em;color:var(--blue-soft);font-weight:700;margin-bottom:4px}
+.opener span{font-size:15px}
+
+.host{width:min(560px,100%);display:flex;flex-direction:column;gap:10px}
+.host .prj{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;padding:12px 14px;border-radius:14px;background:#0A0A0A;border:1px solid var(--blue)}
+.host .prj b{font-family:var(--display);font-size:18px}
+.host .prj span{font-size:12px;font-weight:700;letter-spacing:.12em;color:var(--blue-soft)}
+.host .res{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+@media (max-width:560px){.host .res{grid-template-columns:minmax(0,1fr)}}
+.host .r{padding:10px 12px;border-radius:12px;background:var(--panel-2);border:1px solid var(--line)}
+.host .r small{display:block;font-size:11px;letter-spacing:.12em;color:var(--soft);font-weight:700}
+.host .r b{display:block;font-size:15px}
+.host .key{display:flex;justify-content:space-between;gap:10px;padding:9px 12px;border-radius:10px;background:var(--panel-2);border:1px solid var(--line);font-size:14px}
+.host .key em{font-style:normal;font-size:11px;font-weight:700;letter-spacing:.1em;padding:3px 8px;border-radius:999px;background:#0F2A1E;color:#5BE3A8;border:1px solid #1E5A40}
+.host .acc{display:flex;gap:8px;flex-wrap:wrap}
+.host .acc span{padding:6px 12px;border-radius:999px;border:1px solid var(--line);background:var(--panel-2);font-size:13px;font-weight:700}
+.host .acc span.you{border-color:var(--green);color:#5BE3A8}
+.rail{grid-template-columns:repeat(11,minmax(0,1fr))}
+@media (max-width:1100px){.rail{grid-template-columns:repeat(6,minmax(0,1fr))}}
+@media (max-width:520px){.rail{grid-template-columns:repeat(2,minmax(0,1fr))}}
+
+/* 3D layer: one live map moves into each screen that needs it. Until it loads (or if it can't),
+   the flat drawings above stay exactly as they were. */
+#map3d{position:absolute;inset:0}
+.mslot{position:relative;overflow:hidden}
+.mslot .maplibregl-ctrl-attrib{font-size:10px}
+.mslot .maplibregl-ctrl-bottom-right{z-index:3}
+.has-map .go .sat.in2{animation-delay:0s}
+.has-map .sat{background:#05070a}
+.has-map .sat .rd,.has-map .sat .lot{display:none}
+.sat .ctl,.sat .cnt{z-index:3}
+.has-map .math{width:min(680px,100%);grid-template-columns:minmax(0,1.45fr) minmax(0,1fr)}
+.has-map .parcel{aspect-ratio:auto;height:420px;background:#05070a}
+.has-map .parcel>span{display:none}
+@media (max-width:560px){.has-map .math{grid-template-columns:minmax(0,1fr)}.has-map .parcel{height:220px}}
+.has-map .go .far.in4{animation-delay:3.7s}
+.has-map .go .far .gap{animation-delay:4.1s}
+.has-map .terr{width:min(620px,100%);height:330px;background:#05070a}
+.has-map .terr .isl,.has-map .terr .c110,.has-map .terr .band,.has-map .terr .bub{display:none}
+.terr .key{z-index:3}
+.mslot.full{display:none;position:absolute;inset:0;z-index:0}
+.has-map .mslot.full{display:block}
+.mslot.full::after{content:'';position:absolute;inset:0;z-index:2;pointer-events:none;background:linear-gradient(90deg,rgba(0,0,0,.8),rgba(0,0,0,.25) 48%,rgba(0,0,0,0) 72%)}
+.mslot.full.r::after{background:linear-gradient(270deg,rgba(0,0,0,.8),rgba(0,0,0,.25) 48%,rgba(0,0,0,0) 72%)}
+.mslot.full.b::after{background:linear-gradient(0deg,rgba(0,0,0,.82),rgba(0,0,0,.25) 42%,rgba(0,0,0,0) 66%)}
+.has-map .sig,.has-map .split,.has-map .trace{position:relative;z-index:3}
+.has-map .sig{margin-right:auto;width:min(340px,100%)}
+.has-map .split{align-self:flex-end}
+.has-map .trace{margin-left:auto;width:min(380px,100%)}
+.has-map .sc,.has-map .lanebox,.has-map .tr{background:rgba(10,10,10,.86);-webkit-backdrop-filter:blur(3px);backdrop-filter:blur(3px)}
+.recmap{display:none;height:120px;border-radius:8px;border:1px solid #1A2129}
+.has-map .recmap{display:block}
+
+/* on-map callouts, legends, region chips, the scan beam */
+.co{pointer-events:none;display:flex;flex-direction:column;align-items:center;opacity:0;transform:translateY(8px) scale(.94);transition:opacity .35s,transform .35s}
+.co.up{transform:translateY(-8px) scale(.94)}
+.co.on{opacity:1;transform:none}
+.co .cb{font:700 12px/1.25 var(--body);color:#fff;background:rgba(5,7,11,.9);border:1.5px solid var(--c);border-radius:10px;padding:6px 10px;box-shadow:0 0 14px var(--c);white-space:nowrap;text-align:center}
+.co .cb b{display:block;font-family:var(--display);font-size:13px;letter-spacing:.04em}
+.co .cb small{display:block;font-weight:500;color:#D5DDF0;font-size:11px}
+.co.caps .cb b{text-transform:uppercase}
+.co>i{width:2px;height:22px;background:var(--c);box-shadow:0 0 8px var(--c)}
+.tg3{pointer-events:none;font:700 12px/1 var(--body);color:#0A1022;background:var(--c);border-radius:999px;padding:4px 9px;opacity:0;transition:opacity .3s}
+.tg3.on{opacity:1}
+.lg3{position:absolute;left:10px;bottom:10px;z-index:3;display:flex;flex-wrap:wrap;gap:5px 12px;max-width:calc(100% - 56px);background:rgba(5,7,11,.84);border:1px solid #2A2A2A;border-radius:10px;padding:7px 10px;font-size:12px;font-weight:700;color:#fff;pointer-events:none}
+.lg3 span{display:inline-flex;align-items:center;gap:6px;white-space:nowrap}
+.lg3 i{width:10px;height:10px;border-radius:3px;display:inline-block;flex:none}
+.mslot.full .lg3{left:14px;top:14px;bottom:auto;flex-direction:column;align-items:flex-start}
+.rch{position:absolute;left:10px;top:10px;z-index:3;display:flex;gap:6px;flex-wrap:wrap;pointer-events:none}
+.rch span{background:rgba(5,7,11,.86);border:1px solid #2A2A2A;border-radius:999px;padding:5px 11px;font-size:12px;font-weight:700;color:#C9D2DC;transition:border-color .3s,color .3s}
+.rch span.on{border-color:var(--gold);color:#fff}
+.beam{position:absolute;top:-10%;bottom:-10%;left:-35%;width:30%;z-index:2;pointer-events:none;background:linear-gradient(90deg,transparent,rgba(76,141,255,.16) 35%,rgba(156,192,255,.42) 50%,rgba(76,141,255,.16) 65%,transparent);transform:skewX(-14deg);mix-blend-mode:screen;animation:sweep var(--ms,2400ms) ease-in-out forwards}
+@keyframes sweep{to{left:110%}}
+.flash{position:absolute;inset:0;z-index:4;background:#000;pointer-events:none;animation:flash .55s ease-in-out forwards}
+@keyframes flash{0%{opacity:0}45%{opacity:1}100%{opacity:0}}
+
+/* chapter 12: real replies, masked */
+.rps{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;width:100%;max-width:700px;align-items:start}
+@media (max-width:640px){.rps{grid-template-columns:minmax(0,1fr)}.rp.in3{display:none}}
+.rpt{grid-column:1/-1;font-size:12px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--green)}
+.rp{display:flex;flex-direction:column;gap:8px;padding:12px;border-radius:14px;background:#0B0F14;border:1px solid #232B35}
+.rp .rh{display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 8px}
+.rp .rh b{font-family:var(--display);font-size:18px}
+.rp .rh span{font-size:12px;color:#C9D2DC}
+.rp .rh em{margin-left:auto;font-style:normal;font-size:10px;font-weight:700;letter-spacing:.1em;padding:3px 8px;border-radius:999px;background:#0F2A1E;color:#5BE3A8;border:1px solid #1E5A40}
+.rp .ws{font-size:13px;color:#D5DDF0;background:#12181F;border:1px solid #232B35;border-radius:10px;padding:8px 10px}
+.rp .ts{font-size:12px;background:#0B1F17;border:1px solid #1E5A40;border-radius:10px;padding:8px 10px}
+.rp .ts q{display:block;margin-top:3px;font-size:16px;font-weight:700;line-height:1.3;color:#fff}
+.rp small{display:block;font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:#AEB9C6;margin-bottom:3px}
+.rp .ts small{color:#5BE3A8}
+.rp .rf{display:flex;align-items:center;gap:8px}
+.rp .fast{font-size:12px;font-weight:700;color:var(--orange-soft)}
+.rp .call{margin-left:auto;font-weight:700;font-size:14px;padding:7px 14px;border-radius:10px;background:#16A34A;color:#fff}
+.go .rp .call{animation:wait 1.8s ease-in-out infinite 2.6s}
+@media (max-width:640px){
+  .stage{min-height:580px}
+  .mslot.full .lg3,.parcel .lg3{display:none}
+  .rp.in2 .ws{display:none}
+}
+</style>
+</head><body>
+<div class="wrap">
+  <header>
+    <div class="brand">NEXT<span>IER</span> · DEVELOPMENT</div>
+    <div class="tag">Story mode · 3D · Illustrative example</div>
+  </header>
+  <h1>Find the land <em>before it's a listing.</em></h1>
+
+  <div class="main">
+    <div class="stage" id="stage" aria-live="polite">
+
+      <!-- 1 · BUY BOX: LEAD BUILDER, SATELLITE -->
+      <div class="scene">
+        <div class="app">
+          <div class="abar"><b>Workspace</b><span class="ws">Your Market · Development</span><span class="pill">REAL ESTATE</span><span style="margin-left:auto;color:#AEB9C6">Lead Builder</span></div>
+          <div class="abody">
+            <div class="chips in1" id="segs">
+              <span class="ac">Vacant Land</span><span class="ac">Big Lot 0.90+ ac</span><span class="ac">Older Home ≤1975</span><span class="ac">Expired MLS</span><span class="ac">Inherited</span><span class="ac">Long-Term Owner</span><span class="ac">Commercial held 5+</span><span class="ac">Parking Lot</span><span class="ac">Individually Owned</span>
+            </div>
+            <div class="sat in2" id="sat" data-mslot="0">
+              <div class="ctl"><span>Satellite</span><span class="on">Lot size</span><span>FAR Gap (NYC)</span></div>
+              <div class="cnt"><span id="pcount">0</span> parcels</div>
+            </div>
+            <div class="rows in3"><b>Rows to build</b><span class="box">1,200</span><span style="color:#C9D2DC">big lots, individually owned, not listed</span></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 2 · THE PARCEL MATH -->
+      <div class="scene" hidden>
+        <div class="math">
+          <div class="parcel in1" data-mslot="1">
+            <span class="house"></span>
+            <span class="cut" style="left:33%;--d:1.2s"></span><span class="cut" style="left:66%;--d:1.6s"></span>
+            <span class="lbl" style="left:8%">Lot A</span><span class="lbl" style="left:41%">Lot B</span><span class="lbl" style="left:74%">Lot C</span>
+          </div>
+          <div class="facts">
+            <div class="fct in1"><span>Lot</span><b>1.4 acres</b></div>
+            <div class="fct in2"><span>Home built</span><b>1962</b></div>
+            <div class="fct in2"><span>Owner since</span><b>1987</b></div>
+            <div class="fct in3" style="border-color:var(--gold)"><span>Room for</span><b style="color:var(--gold)">3 lots</b></div>
+            <div class="far in4"><b style="font-size:14px">FAR gap (NYC)</b>
+              <div class="track"><i class="built"></i><i class="gap"></i></div>
+              <small><span>Built 0.4</span><span>Allowed 2.0</span></small>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 3 · TERRITORY -->
+      <div class="scene" hidden>
+        <div class="terr" data-mslot="2">
+          <div class="isl"></div>
+          <div class="c110"><b>Route 110 · north to south</b></div>
+          <div class="band" style="left:66%;top:40%;width:17%;height:22%"><b>Riverhead · out east</b></div>
+          <div class="band" style="left:48%;top:56%;width:15%;height:16%"><b>Mastic–Moriches</b></div>
+          <span class="bub" style="left:31%;top:46%;--s:56px;--d:.8s">1,240</span>
+          <span class="bub" style="left:74%;top:51%;--s:50px;--d:1.2s">840</span>
+          <span class="bub" style="left:55%;top:64%;--s:42px;--d:1.6s">370</span>
+          <span class="bub" style="left:16%;top:47%;--s:34px;--d:2s">210</span>
+          <span class="key">Bubbles = matching parcels by area · example counts</span>
+        </div>
+      </div>
+
+      <!-- 4 · SIGNALS -->
+      <div class="scene" hidden>
+        <div class="mslot full" data-mslot="3"></div>
+        <div class="sig">
+          <div class="sc in1"><span class="ic" style="background:#2A1A10;color:var(--orange)">EX</span><div><b>Expired, never relisted · big lot</b><small>The owner already tried to sell, and the lot can be split</small></div><span class="new">NEW</span></div>
+          <div class="sc in2"><span class="ic" style="background:#161616;color:var(--blue-soft)">ES</span><div><b>Estate · oversized lot</b><small>Heirs deciding what to do with land</small></div><span class="new">NEW</span></div>
+          <div class="sc in3"><span class="ic" style="background:#26201A;color:var(--gold)">PF</span><div><b>Pre-foreclosure · big lot</b><small>A deadline on a developable parcel</small></div><span class="new">NEW</span></div>
+          <div class="sc in4"><span class="ic" style="background:#13261D;color:var(--green)">30</span><div><b>Owned 30+ years · older home</b><small>Long hold, low basis, big yard</small></div></div>
+        </div>
+      </div>
+
+      <!-- 5 · OWNER -->
+      <div class="scene" hidden>
+        <div class="mslot full b" data-mslot="4"></div>
+        <div class="split">
+          <div class="lanebox go-l in1"><h3>Individually owned → first</h3><span class="o">R. Castellano · 1.4 ac</span><span class="o">Estate of H. Lindqvist · 2.1 ac</span><span class="o">T. Nguyen · 0.95 ac</span><span class="o">A. Romano · 1.1 ac</span></div>
+          <div class="lanebox rs-l in2"><h3>Companies → research</h3><span class="o">Oak Hollow Realty LLC</span><span class="o">Main St Parking Corp</span><span class="o" style="color:var(--soft)">Find the person who decides</span></div>
+        </div>
+      </div>
+
+      <!-- 6 · TRACE -->
+      <div class="scene" hidden>
+        <div class="mslot full r" data-mslot="5"></div>
+        <div class="trace">
+          <div class="tr in1"><b>R. Castellano · 14 Old Country Rd</b></div>
+          <div class="tr in2">Mobile found<span class="num" style="margin-left:auto">(631) 555-0158</span></div>
+          <div class="tr in3">Line type: mobile<span class="ok">CHECKED</span></div>
+          <div class="tr in3">Do-not-call and opt-outs<span class="ok">CLEAR</span></div>
+          <div class="tr in4">Traced only when the record had no number<span class="ok">NO WASTE</span></div>
+        </div>
+      </div>
+
+      <!-- 7 · PROPERTY BOOK LIST -->
+      <div class="scene" hidden>
+        <div class="app">
+          <div class="abar"><b>Workspace</b><span class="ws">Your Market · Development</span><span class="pill">REAL ESTATE</span><span style="margin-left:auto;color:#AEB9C6">Property Book</span></div>
+          <div class="abody">
+            <div class="toprow in1"><span class="ah">Property Book <span style="font-weight:500;color:#C9D2DC;font-size:15px">1,200 ready</span></span><span class="enzo">Export to your dialer · CSV</span></div>
+            <div class="chips in1">
+              <span class="ac hit">Subdivision-size<small>312</small></span><span class="ac hit">Expired, not relisted<small>94</small></span><span class="ac">Oversized lot<small>1,200</small></span><span class="ac">Older home ≤1975<small>688</small></span><span class="ac">Estate<small>141</small></span><span class="ac">Vacant land<small>203</small></span><span class="ac">FAR gap<small>57</small></span><span class="ac">Owned 30+ yrs<small>420</small></span>
+            </div>
+            <div class="tbl in2">
+              <table>
+                <thead><tr><th>Property</th><th>Lot</th><th>Mobile</th><th>Autotags</th></tr></thead>
+                <tbody id="book"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 8 · ONE RECORD -->
+      <div class="scene" hidden>
+        <div class="app">
+          <div class="abar"><b>Workspace</b><span class="ws">Your Market · Development</span><span class="pill">REAL ESTATE</span><span style="margin-left:auto;color:#AEB9C6">Property Book</span></div>
+          <div class="abody">
+            <div class="rec">
+              <div class="mini in1"><span class="sel">14 Old Country Rd, Riverhead, NY</span><span>8 Pine Hollow Ln, Center Moriches, NY</span><span>220 Broadhollow Rd, Melville, NY</span><span>31 Fox Run, Calverton, NY</span><span>5 Bayview Ave, Mastic, NY</span><span>119-40 Liberty Ave, Queens, NY</span><div class="mslot recmap" data-mslot="7"></div></div>
+              <div class="panel in2">
+                <div><div class="addr">14 Old Country Rd, Riverhead, NY</div><div class="cty">Suffolk, NY · R. Castellano · 1.4 ac</div></div>
+                <span class="traced">TRACED</span>
+                <div class="acts"><span class="ph">(631) 555-0158</span><span class="call">CALL</span><span class="bt">Text</span><span class="bt">Mark worked</span></div>
+                <div class="tgs"><span class="tg ev">Expired, not relisted</span><span class="tg">Subdivision-size</span><span class="tg">Older home 1962</span><span class="tg">Owned 30+ yrs</span><span class="tg ok">Mobile verified</span></div>
+                <div class="clock in3"><b>THE CLOCK</b>
+                  <div class="g"><div><small>Listing expired</small><span>41 days ago</span></div><div><small>Relisted since</small><span>No</span></div><div><small>Room for</small><span>3 lots</span></div><div><small>Last sale</small><span>1987</span></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 9 · ANY TOOL -->
+      <div class="scene" hidden>
+        <div class="hook">
+          <pre class="in1"><span class="k">POST</span> your-webhook-url
+{
+  <span class="k">"event"</span>: <span class="s">"lead.ready"</span>,
+  <span class="k">"block"</span>: <span class="s">"Riverhead · Subdivision-size"</span>,
+  <span class="k">"owner"</span>: <span class="s">"R. Castellano"</span>,
+  <span class="k">"mobile"</span>: <span class="s">"+16315550158"</span>,
+  <span class="k">"lot_acres"</span>: 1.4,
+  <span class="k">"room_for_lots"</span>: 3,
+  <span class="k">"tags"</span>: [<span class="s">"expired_not_relisted"</span>,
+           <span class="s">"subdivision_size"</span>,
+           <span class="s">"older_home"</span>],
+  <span class="k">"score"</span>: 91
+}</pre>
+          <div class="wire" aria-hidden="true"><i style="--d:0s"></i><i style="--d:.45s"></i><i style="--d:.9s"></i><i style="--d:1.35s"></i></div>
+          <div class="dest">
+            <span style="--d:.6s">Your CRM</span><span style="--d:1s">Your dialer</span><span style="--d:1.4s">Your acquisitions team</span><span style="--d:1.8s">Initial SMS</span><span style="--d:2.2s">Any webhook · Zapier · Make</span><span style="--d:2.6s">CSV · API · MCP</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- 10 · YOURS, CO-HOSTED -->
+      <div class="scene" hidden>
+        <div class="host">
+          <div class="prj in1"><b>Your company · production</b><span>HOSTED ON DIGITALOCEAN</span></div>
+          <div class="res in2">
+            <div class="r"><small>DATABASE</small><b>Your Postgres cluster</b></div>
+            <div class="r"><small>ENGINE</small><b>Nextier, installed</b></div>
+            <div class="r"><small>BACKUPS</small><b>Daily, in your account</b></div>
+          </div>
+          <div class="key in3"><span>Property data key</span><em>YOURS</em></div>
+          <div class="key in3"><span>Skip trace key</span><em>YOURS</em></div>
+          <div class="key in3"><span>Texting lines and number</span><em>YOURS</em></div>
+          <div class="acc in4"><span class="you">You · owner, full infra access</span><span>Nextier · manages it for you</span></div>
+        </div>
+      </div>
+
+      <!-- 10 · PREPPED, STOPPED -->
+      <div class="scene" hidden>
+        <div class="app">
+          <div class="abar"><b>Workspace</b><span class="ws">Your Market · Development</span><span class="pill">REAL ESTATE</span><span style="margin-left:auto;color:#AEB9C6">Initial SMS</span></div>
+          <div class="abody launch">
+            <div class="blk in1"><div><b>Riverhead · Subdivision-size lots</b><span>840 owners · traced · tagged · checked</span></div><span class="ready">READY</span></div>
+            <div class="blk in2"><div><b>Route 110 · Commercial held 5+ yrs</b><span>1,240 owners · traced · tagged · checked</span></div><span class="ready">READY</span></div>
+            <div class="opener in3"><small>OPENER, READY TO REVIEW</small><span>Hi Rosa, we're seeing builder interest in larger lots near Old Country Rd. Would it help if I showed you what we're seeing?</span></div>
+            <span class="send in4">Send</span>
+            <div class="halt in4">0 sent. Nothing goes out until a person presses Send.</div>
+          </div>
+        </div>
+      </div>
+      <!-- 12 · REAL REPLIES, MASKED -->
+      <div class="scene" hidden>
+        <div class="rps">
+          <div class="rpt in1">Real replies · October 2026 · names and numbers masked</div>
+          <div class="rp in1">
+            <div class="rh"><b>K. M.</b><span>Brooklyn · Wed 10/21</span><em>POSITIVE</em></div>
+            <div class="ws"><small>We sent · 6:52 PM</small>Hi K., … Have you ever considered selling?</div>
+            <div class="ts"><small>They said · 6:56 PM</small><q>Yes, soon</q></div>
+            <div class="rf"><span class="fast">4 minutes later</span><span class="call">CALL</span></div>
+          </div>
+          <div class="rp in2">
+            <div class="rh"><b>S. G.</b><span>Brooklyn · Wed 10/21</span><em>POSITIVE</em></div>
+            <div class="ws"><small>We sent · 6:38 PM</small>Hi S., … Have you ever considered selling?</div>
+            <div class="ts"><small>They said · 7:42 PM</small><q>Call me 917 ··· ····</q></div>
+            <div class="ts"><small>They said · 7:50 PM</small><q>I want to. Sell it</q></div>
+            <div class="rf"><span class="fast">Asked for a call</span><span class="call">CALL</span></div>
+          </div>
+          <div class="rp in3">
+            <div class="rh"><b>Owner</b><span>Bronx · Mon 10/19</span><em>WANTS CALL</em></div>
+            <div class="ws"><small>We replied · 3:32 PM</small>What time works for a quick call?</div>
+            <div class="ts"><small>They said · 3:44 PM</small><q>I can talk now but only if it’s a quick call</q></div>
+            <div class="ts"><small>They said · 3:46 PM</small><q>If not then after 5</q></div>
+            <div class="rf"><span class="fast">Same afternoon</span><span class="call">CALL</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="narr">
+      <div class="step" id="step">Chapter 1 of 11</div>
+      <h2 id="ttl"></h2>
+      <p id="txt"></p>
+      <div class="controls">
+        <button id="prev" type="button">Back</button>
+        <button id="play" type="button">Play story</button>
+        <button id="next" type="button">Next</button>
+      </div>
+    </div>
+  </div>
+
+  <nav class="rail" id="rail" aria-label="Chapters"></nav>
+  <div class="foot">Illustrative story, except chapter 12: those are real replies from October 2026, names and numbers masked. The 3D lots, dots, columns and city blocks are examples, not real parcels. Names, addresses, phone numbers (555), lot facts and counts are examples, shown on the Nextier app's own screens. Use the arrow keys or the chapter buttons to move through it. · <a href="engine-story.html">Data Engine Story Mode</a> · <a href="dataengine.html">The Data Engine</a></div>
+</div>
+
+<script>
+const CH=[
+ {k:'Buy box',t:'Start with the land you build on',x:'Big lots, vacant land, older homes on oversized parcels, commercial held for years. The Lead Builder lights up every parcel in your market that fits, on the satellite view.'},
+ {k:'The math',t:'See the deal in the dirt',x:'Lot size, the age of the house, how long they’ve owned it, and how many lots it could become. In New York City, the FAR gap shows how much more the zoning allows than what is built.'},
+ {k:'Territory',t:'Hunt where it pays',x:'Pick your corridors. Route 110 north to south for commercial, Riverhead and Mastic–Moriches out east for subdivision-size land. Every area gets its own count.'},
+ {k:'Signals',t:'The reason to sell now',x:'An expired listing that never came back, an estate on an oversized lot, a pre-foreclosure on land you can split. Each lands as a signal that says why now.'},
+ {k:'Owner',t:'Individual owners first',x:'People who own the land themselves go first. LLCs and corporations go to research, to find the person who actually decides.'},
+ {k:'Trace',t:'A number you can reach',x:'The owner’s mobile is traced only when the record doesn’t already have one, then checked for line type, do-not-call and opt-outs.'},
+ {k:'Autotags',t:'Every lot, tagged',x:'Subdivision-size, oversized lot, older home, estate, expired and not relisted, FAR gap. The Property Book shows the whole list, filterable by every tag.'},
+ {k:'Record',t:'The whole parcel on one record',x:'Open any row: the verified mobile, one-click Call and Text, Mark worked, every tag, and The Clock: how long since the listing expired, and whether it came back.'},
+ {k:'Any tool',t:'Into your tool of choice',x:'Each ready lot can fire a webhook into the tool you already use: your CRM, your dialer, your acquisitions team, Zapier or Make. Or pull it by CSV, API or MCP.'},
+ {k:'Yours',t:'Co-hosted. Yours.',x:'It runs in your own DigitalOcean account: your database, your API keys, your texting lines, and full access to the infrastructure. Nextier installs it and manages it for you. If you ever leave, everything stays with you.'},
+ {k:'Prepped',t:'Then it stops',x:'Ready blocks wait at Initial SMS with the opener drafted for review. Zero texts go out until a person presses Send.'},
+ {k:'Replies',t:'Then real owners answer',x:'Press Send and the replies come back on your calendar, each with a CALL button. These are real replies from October. Names and numbers are masked.'}
+];
+const DUR=7000;
+
+/* scene 1: satellite parcels */
+const sat=document.getElementById('sat');
+[[0,58,100,-4],[22,0,120,72],[60,0,110,98]].forEach(([l,t,w,a])=>{const r=document.createElement('i');r.className='rd';r.style.left=l+'%';r.style.top=t+'%';r.style.width=w+'%';r.style.transform='rotate('+a+'deg)';sat.appendChild(r)});
+const LOTS=[[30,18,9,14,0],[40,20,7,10,0],[48,16,12,18,1],[62,24,8,11,0],[71,22,14,20,1],[34,66,10,13,0],[45,70,16,20,1],[63,68,8,12,0],[73,64,7,10,0],[12,30,11,16,1],[14,70,9,12,0],[84,40,10,15,1]];
+LOTS.forEach(([x,y,w,h,big],i)=>{const l=document.createElement('i');l.className='lot'+(big?' big':'');l.style.left=x+'%';l.style.top=y+'%';l.style.width=w+'%';l.style.height=h+'%';if(big)l.style.setProperty('--d',(1+i*.15)+'s');sat.appendChild(l)});
+const segs=[...document.querySelectorAll('#segs .ac')];
+
+/* scene 7: the list */
+const ROWS=[
+ ['14 Old Country Rd, Riverhead, NY','Suffolk','1.4 ac · room for 3','(631) 555-0158',[['Expired, not relisted','ev'],['Subdivision-size',''],['Older home','']]],
+ ['8 Pine Hollow Ln, Center Moriches, NY','Suffolk','2.1 ac · room for 4','(631) 555-0136',[['Estate','ev'],['Subdivision-size',''],['Owned 30+ yrs','']]],
+ ['220 Broadhollow Rd, Melville, NY','Suffolk','1.9 ac · commercial','(631) 555-0191',[['Commercial held 5+',''],['Route 110','']]],
+ ['31 Fox Run, Calverton, NY','Suffolk','3.2 ac · vacant','(631) 555-0104',[['Vacant land',''],['Oversized lot','']]],
+ ['5 Bayview Ave, Mastic, NY','Suffolk','0.95 ac · room for 2','(631) 555-0122',[['Pre-foreclosure','ev'],['Older home','']]],
+ ['119-40 Liberty Ave, Queens, NY','Queens','4,800 sq ft','(718) 555-0147',[['FAR gap','ev'],['Owned 30+ yrs','']]],
+ ['Oak Hollow Realty LLC · Riverhead','Suffolk','2.6 ac','—',[['Entity · research','']]]
+];
+const book=document.getElementById('book');
+ROWS.forEach((r,i)=>{const tr=document.createElement('tr');if(i===0)tr.className='sel';
+ tr.innerHTML='<td class="w">'+r[0]+'<small>'+r[1]+'</small></td><td class="w">'+r[2]+'</td><td>'+r[3]+'</td><td><div class="tgs"></div></td>';
+ const box=tr.querySelector('.tgs');r[4].forEach(([t,c],j)=>{const s=document.createElement('span');s.className='tg'+(c?' '+c:'');s.textContent=t;s.style.setProperty('--d',(1.2+i*.25+j*.12)+'s');box.appendChild(s)});
+ if(r[3]!=='—'){const s=document.createElement('span');s.className='tg ok';s.textContent='Mobile verified';s.style.setProperty('--d',(1.5+i*.25)+'s');box.appendChild(s)}
+ book.appendChild(tr)});
+
+/* counters */
+let timers=[];
+function countUp(el,to,prefix,ms){const t0=performance.now();const f=now=>{const p=Math.min(1,(now-t0)/ms);el.textContent=prefix+Math.round(to*p).toLocaleString('en-US');if(p<1)timers.push(requestAnimationFrame(f))};timers.push(requestAnimationFrame(f))}
+
+/* player */
+const scenes=[...document.querySelectorAll('.scene')];
+const rail=document.getElementById('rail');
+const stepEl=document.getElementById('step'),ttl=document.getElementById('ttl'),txt=document.getElementById('txt'),playBtn=document.getElementById('play');
+CH.forEach((c,i)=>{const b=document.createElement('button');b.type='button';b.innerHTML='<span class="bar"><i></i></span><span><span class="n">'+String(i+1).padStart(2,'0')+'</span> '+c.k+'</span>';b.addEventListener('click',()=>go(i));rail.appendChild(b)});
+const railBtns=[...rail.children];
+let cur=0,playing=false,t0=0,raf=0,segT=0;
+function go(i){
+  cur=(i+CH.length)%CH.length;
+  scenes.forEach((s,j)=>{s.hidden=j!==cur;s.classList.remove('go')});
+  const s=scenes[cur];void s.offsetWidth;s.classList.add('go');
+  stepEl.textContent='Chapter '+(cur+1)+' of '+CH.length;ttl.textContent=CH[cur].t;txt.textContent=CH[cur].x;
+  railBtns.forEach((b,j)=>{b.querySelector('.bar i').style.width=j<cur?'100%':'0';if(j===cur)b.setAttribute('aria-current','step');else b.removeAttribute('aria-current')});
+  timers.forEach(cancelAnimationFrame);timers=[];clearInterval(segT);
+  if(cur===0){segs.forEach(e=>e.classList.remove('on'));let k=0;const pick=[1,2,0,3,8];segT=setInterval(()=>{if(k<pick.length){segs[pick[k]].classList.add('on');k++}},450);countUp(document.getElementById('pcount'),1200,'',3200)}
+  t0=performance.now();
+}
+function tick(now){
+  if(!playing)return;
+  const p=Math.min(1,(now-t0)/DUR);
+  railBtns[cur].querySelector('.bar i').style.width=(p*100)+'%';
+  if(p>=1){if(cur===CH.length-1){setPlay(false);return}go(cur+1)}
+  raf=requestAnimationFrame(tick);
+}
+function setPlay(on){playing=on;playBtn.textContent=on?'Pause':(cur===CH.length-1?'Replay':'Play story');cancelAnimationFrame(raf);if(on){if(cur===CH.length-1)go(0);t0=performance.now();raf=requestAnimationFrame(tick)}}
+playBtn.addEventListener('click',()=>setPlay(!playing));
+document.getElementById('next').addEventListener('click',()=>{go(cur+1);if(playing)t0=performance.now()});
+document.getElementById('prev').addEventListener('click',()=>{go(cur-1);if(playing)t0=performance.now()});
+document.addEventListener('keydown',e=>{if(e.key==='ArrowRight')go(cur+1);else if(e.key==='ArrowLeft')go(cur-1);else if(e.key===' '&&e.target===document.body){e.preventDefault();setPlay(!playing)}});
+// Deep link: development-story.html#ch7 opens on chapter 7.
+const m=/^#ch(\d+)$/.exec(location.hash||'');
+go(m?Math.min(Math.max(+m[1],1),CH.length)-1:0);
+</script>
+<script src="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.js"></script>
+<script>
+/* The 3D layer for Development Story Mode. One live map (MapLibre + OpenFreeMap, Esri imagery for
+   the satellite views) moves into whichever screen needs it; the flat drawings stay underneath and
+   show if the map can't load. Every dot, lot, column and building on the map is an example, not a
+   real parcel. */
+(function(){
+"use strict";
+const mb=window.maplibregl;if(!mb)return;
+const stage=document.getElementById('stage');
+const reduce=!!(window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches);
+const errs=window.__mapErrs=[];
+const clamp=x=>Math.max(0,Math.min(1,x));
+const fc=f=>({type:'FeatureCollection',features:f});
+
+/* seeded, so every visit draws the same example picture */
+let sd=20261026;
+function rnd(){sd=sd+0x6D2B79F5|0;let t=Math.imul(sd^sd>>>15,1|sd);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}
+function gauss(){let u=0,v=0;while(!u)u=rnd();while(!v)v=rnd();return Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*v)}
+
+/* 1,200 example parcels around Long Island place centers: [lon, lat, spread km, commercial corridor] */
+const PL=[[-73.1519,40.8468,1.4],[-73.0652,40.9259,1],[-73.0822,40.868,1.4],[-73.0936,40.9209,.8],[-72.9859,40.822,1.6],[-72.7875,40.8623,1.8],[-72.9818,40.77,.7],[-72.9933,40.9431,.7],[-73.0202,40.9417,.7],[-72.9364,40.9398,.7],[-72.7965,40.7993,.7],[-73.0467,40.8715,1.2],[-73.0058,40.8812,1.4],[-72.9512,40.8926,1.5],[-72.8859,40.9038,1.6],[-73.1169,40.8578,1],[-73.0701,40.7944,1.2],[-73.2107,40.8223,1.3,1],[-73.2167,40.8575,1.2],[-73.1521,40.8764,1],[-72.6761,40.935,1.5],[-73.4731,40.7818,1],[-73.502,40.8157,1],[-73.4855,40.7495,1],[-73.5248,40.7641,1,1],[-73.4716,40.6783,.6],[-73.4235,40.8734,.8,1],[-73.3623,40.8143,1.1,1],[-73.4093,40.7838,1,1],[-73.4328,40.7327,1,1],[-73.4143,40.6925,.6,1],[-72.8256,40.9451,.8],[-72.7656,40.9322,1.8],[-72.6222,40.9326,.9],[-72.5819,40.943,.8],[-72.8781,40.8116,.9],[-72.8472,40.8111,.8],[-72.8368,40.7757,.5],[-72.8238,40.8135,.8]];
+const CAT={exp:'#FF4D6D',big:'#FFD23F',com:'#FF8A3D',vac:'#2FD39A'};
+const SIG={ex:'#FF8A3D',es:'#9CC0FF',pf:'#E2B54A',lt:'#2FD39A'};
+const catColor=['match',['get','cat'],'exp',CAT.exp,'big',CAT.big,'com',CAT.com,CAT.vac];
+const sigColor=['match',['get','s'],'ex',SIG.ex,'es',SIG.es,'pf',SIG.pf,'lt',SIG.lt,'#46505E'];
+const dots=[];
+for(let n=0;n<1200;n++){
+  const p=PL[n%PL.length],kx=p[2]/(111.32*Math.cos(p[1]*Math.PI/180)),ky=p[2]/110.57;
+  const u=rnd(),cat=p[3]?(u<.45?'com':u<.75?'big':u<.9?'exp':'vac'):(u<.52?'big':u<.7?'vac':u<.87?'exp':'com');
+  const v=rnd(),s=cat==='exp'&&v<.7?'ex':v<.08?'es':v<.12?'pf':v<.24?'lt':'';
+  dots.push({ll:[+(p[0]+gauss()*kx).toFixed(5),+(p[1]+gauss()*ky).toFixed(5)],cat,s});
+}
+const ord=dots.map((_,i)=>i);
+for(let i=ord.length-1;i>0;i--){const j=Math.floor(rnd()*(i+1)),t=ord[i];ord[i]=ord[j];ord[j]=t}
+ord.forEach((d,n)=>{dots[d].i=n});
+const DOTS=fc(dots.map((d,n)=>({type:'Feature',id:n,properties:{i:d.i,cat:d.cat,s:d.s},geometry:{type:'Point',coordinates:d.ll}})));
+function nearest(s,ll){let b=0,bd=1e9;dots.forEach((d,n)=>{if(d.s!==s)return;const dx=(d.ll[0]-ll[0])*.76,dy=d.ll[1]-ll[1],q=dx*dx+dy*dy;if(q<bd){bd=q;b=n}});return dots[b].ll}
+const CALLS=[['ex','<b>Expired · 182 days</b><small>never relisted</small>',[-72.68,40.94]],['es','<b>Estate</b><small>oversized lot</small>',[-72.98,40.91]],['pf','<b>Pre-foreclosure</b><small>big lot</small>',[-72.95,40.8]],['lt','<b>Owned 30+ years</b><small>older home</small>',[-72.79,40.82]]].map(([s,t,ll])=>({s,t,ll:nearest(s,ll),c:SIG[s]}));
+
+/* corridors: example counts, one column each */
+const COLS=[
+ {t:'<b>Route 110 · 1,240</b><small>commercial · north to south</small>',ll:[-73.415,40.79],n:1240,c:'#FF8A3D'},
+ {t:'<b>Riverhead · 840</b><small>subdivision-size · out east</small>',ll:[-72.665,40.925],n:840,c:'#FFD23F'},
+ {t:'<b>Mastic–Moriches · 370</b><small>subdivision-size</small>',ll:[-72.83,40.805],n:370,c:'#FFD23F'},
+ {t:'<b>210</b>',ll:[-73.49,40.8],n:210,c:'#9CC0FF'}];
+function sq(ll,km){const dx=km/(111.32*Math.cos(ll[1]*Math.PI/180)),dy=km/110.57;return[[ll[0]-dx,ll[1]-dy],[ll[0]+dx,ll[1]-dy],[ll[0]+dx,ll[1]+dy],[ll[0]-dx,ll[1]+dy],[ll[0]-dx,ll[1]-dy]]}
+const COLSGJ=fc(COLS.map((c,n)=>({type:'Feature',id:n,properties:{h:c.n*14},geometry:{type:'Polygon',coordinates:[sq(c.ll,1.1)]}})));
+const R110=fc([{type:'Feature',properties:{},geometry:{type:'LineString',coordinates:[[-73.4257,40.87],[-73.412,40.83],[-73.4151,40.7934],[-73.417,40.755],[-73.418,40.718],[-73.416,40.6787]]}}]);
+const grad=p=>['step',['line-progress'],'#FF8A3D',Math.max(.0001,Math.min(1,p)),'rgba(255,138,61,0)'];
+
+/* the example lot: 1.4 acres on open farmland, turned to follow the field; split into three */
+const LOT=[-72.58563,40.96753],LMX=1/(111320*Math.cos(LOT[1]*Math.PI/180)),LMY=1/110540,ROT=19*Math.PI/180;
+const LP=(x,y)=>[LOT[0]+(x*Math.cos(ROT)-y*Math.sin(ROT))*LMX,LOT[1]+(x*Math.sin(ROT)+y*Math.cos(ROT))*LMY];
+const lring=(x0,y0,x1,y1)=>[LP(x0,y0),LP(x1,y0),LP(x1,y1),LP(x0,y1),LP(x0,y0)];
+const poly=(r,p,id)=>({type:'Feature',id,properties:p,geometry:{type:'Polygon',coordinates:[r]}});
+const line=(pts,p)=>({type:'Feature',properties:p,geometry:{type:'LineString',coordinates:pts}});
+const LOTS3=fc([poly(lring(-45,-31.5,45,31.5),{k:'all'}),poly(lring(-45,-31.5,-15,31.5),{k:'A'}),poly(lring(-15,-31.5,15,31.5),{k:'B'}),poly(lring(15,-31.5,45,31.5),{k:'C'})]);
+const NB=[[-118,-31.5,-47,31.5],[47,-31.5,112,31.5],[-118,33.5,-22,92],[-20,33.5,44,92],[46,33.5,112,92],[-118,-80,-34,-33.5],[-32,-80,50,-33.5],[52,-80,112,-33.5]];
+const LOTLINE=fc([line(lring(-45,-31.5,45,31.5),{k:'lot'})].concat(NB.map(b=>line(lring(b[0],b[1],b[2],b[3]),{k:'n'})),[line([LP(-15,-31.5),LP(-15,31.5)],{k:'cut'}),line([LP(15,-31.5),LP(15,31.5)],{k:'cut'})]));
+const HOUSE=fc([poly(lring(-39,-6,-25,6),{})]);
+const NEWH=fc([poly(lring(-6,-6,6,5),{h:8},0),poly(lring(24,-6,36,5),{h:8},1)]);
+
+/* an example city grid, drawn on open water so no real building is implied */
+const CITY=[-38.5,33],CX=1/(111320*Math.cos(CITY[1]*Math.PI/180)),CY=1/110540;
+const cp=(x,y)=>[CITY[0]+x*CX,CITY[1]+y*CY];
+const crect=(x0,y0,x1,y1)=>[cp(x0,y0),cp(x1,y0),cp(x1,y1),cp(x0,y1),cp(x0,y0)];
+const city=[],air=[];let hero=null,hd=1e9;
+const BW=120,BH=72,ST=16,NBX=9,NBY=7;
+for(let by=0;by<NBY;by++)for(let bx=0;bx<NBX;bx++){
+  const x0=(bx-NBX/2)*(BW+ST)+ST/2,y0=(by-NBY/2)*(BH+ST)+ST/2;
+  for(let half=0;half<2;half++){
+    const ya=y0+half*BH/2,yb=ya+BH/2;let x=x0;
+    while(x<x0+BW-8){
+      const w=Math.min(x0+BW-x,10+rnd()*16),u=rnd(),c=u<.3?'t':u<.39?'r':u<.55?'k':'o',tall=rnd()<.05;
+      const h=+(tall?32+rnd()*45:5+rnd()*15).toFixed(1);
+      const f={type:'Feature',properties:{c,h},geometry:{type:'Polygon',coordinates:[crect(x+1.2,ya+1.2,x+w-1.2,yb-1.2)]}};
+      city.push(f);
+      const mx=x+w/2,my=(ya+yb)/2,d=mx*mx+my*my;
+      if(!tall&&d<hd){hd=d;hero=f}
+      if((c==='t'||c==='r')&&!tall&&rnd()<.16)air.push({type:'Feature',properties:{b:h,e:+(10+rnd()*18).toFixed(1),hero:0},geometry:f.geometry});
+      x+=w;
+    }
+  }
+}
+hero.properties.c='hero';hero.properties.h=5;
+for(let k=air.length-1;k>=0;k--)if(air[k].geometry===hero.geometry)air.splice(k,1);
+air.push({type:'Feature',properties:{b:5,e:22,hero:1},geometry:hero.geometry});
+const hr=hero.geometry.coordinates[0],HERO=[(hr[0][0]+hr[2][0])/2,(hr[0][1]+hr[2][1])/2];
+const C0='#262D38',CT='#3B82F6',CR='#22C55E',CK='#64748B';
+const CC1=['match',['get','c'],['t','hero'],CT,C0];
+const CC2=['match',['get','c'],['t','hero'],CT,'r',CR,C0];
+const CC3=['match',['get','c'],['t','hero'],CT,'r',CR,'k',CK,C0];
+const CFAR=['match',['get','c'],'hero','#F4F4F4','#2F5FC4'];
+
+/* the map */
+const mapEl=document.createElement('div');mapEl.id='map3d';
+let curSlot=document.querySelector('[data-mslot="0"]');if(!curSlot)return;curSlot.appendChild(mapEl);
+let map=null,ready=false,SYM=[],mk=[],tm=[],rafA=0,chStart=0,upd=null;
+try{map=new mb.Map({container:mapEl,style:'https://tiles.openfreemap.org/styles/dark',center:[-73,40.83],zoom:8.15,pitch:20,bearing:-10,maxPitch:75,interactive:false,attributionControl:{compact:true},fadeDuration:0})}catch(e){errs.push('init '+e);return}
+window.__map=map;
+map.on('error',e=>{if(errs.length<40)errs.push(String((e&&e.error&&e.error.message)||e))});
+
+const GRP={sat:['esri'],b3d:['nx-3d'],lot:['lot-fill','neigh','lot-line','cuts','house','newh'],city:['city','air'],cols:['cols','r110'],dots:['dots-glow','dots','pulse']};
+function vis(id,on){if(map.getLayer(id))map.setLayoutProperty(id,'visibility',on?'visible':'none')}
+function labels(on){SYM.forEach(id=>vis(id,on))}
+function show(list,lab){Object.keys(GRP).forEach(g=>GRP[g].forEach(id=>vis(id,list.indexOf(g)>=0)));labels(!!lab)}
+function paint(id,p,v){map.setPaintProperty(id,p,v)}
+function at(ms,fn){tm.push(setTimeout(()=>{try{fn()}catch(e){errs.push('at '+e)}},reduce?0:ms))}
+function fly(o,ms){if(reduce)map.jumpTo(o);else map.flyTo(Object.assign({duration:ms,essential:true,curve:1.3},o))}
+function ease(o,ms){if(reduce)map.jumpTo(o);else map.easeTo(Object.assign({duration:ms,easing:t=>t,essential:true},o))}
+function pad(side,f){const p={top:0,bottom:0,left:0,right:0},w=curSlot.clientWidth,h=curSlot.clientHeight;if((side==='left'||side==='right')&&w>620)p[side]=Math.round(w*f);if(side==='bottom'&&h>380)p.bottom=Math.round(h*f);return p}
+function clearMarks(){mk.forEach(m=>m.remove());mk=[]}
+function mark(ll,html,o){
+  o=o||{};const el=document.createElement('div');const up=o.anchor==='top';
+  el.className=(o.cls||'co')+(up?' up':'');el.style.setProperty('--c',o.c||'#4C8DFF');
+  el.innerHTML=o.cls==='tg3'?html:(up?'<i></i><div class="cb">'+html+'</div>':'<div class="cb">'+html+'</div><i></i>');
+  mk.push(new mb.Marker({element:el,anchor:o.anchor||'bottom'}).setLngLat(ll).addTo(map));return el}
+function legend(items){const old=curSlot.querySelector(':scope>.lg3');if(old)old.remove();const el=document.createElement('div');el.className='lg3';el.innerHTML=items.map(([c,t])=>'<span><i style="background:'+c+'"></i>'+t+'</span>').join('');curSlot.appendChild(el)}
+function fx(cls,ms){const el=document.createElement('i');el.className=cls;if(ms)el.style.setProperty('--ms',ms+'ms');curSlot.appendChild(el);setTimeout(()=>el.remove(),(ms||600)+150)}
+function dotsOp(core,glow){paint('dots','circle-opacity',core);paint('dots','circle-stroke-opacity',core);paint('dots-glow','circle-opacity',glow)}
+function dotsColor(c){paint('dots','circle-color',c);paint('dots-glow','circle-color',c)}
+function noPulse(){map.setFilter('pulse',['==',['get','s'],'__'])}
+function lotStage(s,op){paint('lot-fill','fill-opacity',s?['match',['get','k'],'all',0,'A',.34,.46]:['match',['get','k'],'all',op==null?.3:op,0]);paint('cuts','line-opacity',s?1:0);vis('newh',s>0);[0,1].forEach(n=>map.setFeatureState({source:'newh',id:n},{k:s>1?1:0}))}
+
+function addLayers(){
+  const L=map.getStyle().layers,firstSym=(L.find(l=>l.type==='symbol')||{}).id;
+  SYM=L.filter(l=>l.type==='symbol').map(l=>l.id);
+  map.addSource('esri',{type:'raster',tiles:['https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}'],tileSize:256,maxzoom:19,attribution:'Imagery © Esri, Maxar, Earthstar Geographics'});
+  map.addLayer({id:'esri',type:'raster',source:'esri',layout:{visibility:'none'},paint:{'raster-opacity':1,'raster-opacity-transition':{duration:0},'raster-fade-duration':0}},firstSym);
+  map.addLayer({id:'nx-3d',type:'fill-extrusion',source:'openmaptiles','source-layer':'building',minzoom:13,layout:{visibility:'none'},paint:{'fill-extrusion-color':['interpolate',['linear'],['coalesce',['get','render_height'],6],0,'#1b2a5a',25,'#2f5fc4',70,'#4d9bff'],'fill-extrusion-height':['coalesce',['get','render_height'],6],'fill-extrusion-base':['coalesce',['get','render_min_height'],0],'fill-extrusion-opacity':.9}},firstSym);
+  map.addSource('lots',{type:'geojson',data:LOTS3});
+  map.addLayer({id:'lot-fill',type:'fill',source:'lots',layout:{visibility:'none'},paint:{'fill-color':['match',['get','k'],'B','#FFD23F','C','#FFD23F','#2FD39A'],'fill-opacity':0}});
+  map.addSource('lotline',{type:'geojson',data:LOTLINE});
+  map.addLayer({id:'neigh',type:'line',source:'lotline',filter:['==',['get','k'],'n'],layout:{visibility:'none'},paint:{'line-color':'#4C8DFF','line-width':1.6,'line-opacity':.9}});
+  map.addLayer({id:'lot-line',type:'line',source:'lotline',filter:['==',['get','k'],'lot'],layout:{visibility:'none'},paint:{'line-color':'#2FD39A','line-width':3}});
+  map.addLayer({id:'cuts',type:'line',source:'lotline',filter:['==',['get','k'],'cut'],layout:{visibility:'none'},paint:{'line-color':'#FFFFFF','line-width':2.2,'line-dasharray':[2,1.4],'line-opacity':0,'line-opacity-transition':{duration:0}}});
+  map.addSource('house',{type:'geojson',data:HOUSE});
+  map.addLayer({id:'house',type:'fill-extrusion',source:'house',layout:{visibility:'none'},paint:{'fill-extrusion-color':'#F2F2F2','fill-extrusion-height':7,'fill-extrusion-base':0,'fill-extrusion-opacity':.96}});
+  map.addSource('newh',{type:'geojson',data:NEWH});
+  map.addLayer({id:'newh',type:'fill-extrusion',source:'newh',layout:{visibility:'none'},paint:{'fill-extrusion-color':'#4C8DFF','fill-extrusion-height':['*',['get','h'],['coalesce',['feature-state','k'],0]],'fill-extrusion-base':0,'fill-extrusion-opacity':.94}});
+  map.addSource('city',{type:'geojson',data:fc(city)});
+  map.addLayer({id:'city',type:'fill-extrusion',source:'city',layout:{visibility:'none'},paint:{'fill-extrusion-color':C0,'fill-extrusion-height':['get','h'],'fill-extrusion-base':0,'fill-extrusion-opacity':.96,'fill-extrusion-height-transition':{duration:0}}});
+  map.addSource('air',{type:'geojson',data:fc(air)});
+  map.addLayer({id:'air',type:'fill-extrusion',source:'air',layout:{visibility:'none'},paint:{'fill-extrusion-color':'#2FD39A','fill-extrusion-base':['get','b'],'fill-extrusion-height':['+',['get','b'],['get','e']],'fill-extrusion-opacity':.55,'fill-extrusion-height-transition':{duration:0}}});
+  map.addSource('cols',{type:'geojson',data:COLSGJ});
+  map.addLayer({id:'cols',type:'fill-extrusion',source:'cols',layout:{visibility:'none'},paint:{'fill-extrusion-color':['case',['==',['feature-state','lit'],1],'#FF8A3D','#4C8DFF'],'fill-extrusion-height':['*',['get','h'],['coalesce',['feature-state','k'],0]],'fill-extrusion-base':0,'fill-extrusion-opacity':.9}});
+  map.addSource('r110',{type:'geojson',lineMetrics:true,data:R110});
+  map.addLayer({id:'r110',type:'line',source:'r110',layout:{visibility:'none','line-cap':'round','line-join':'round'},paint:{'line-width':5,'line-blur':.6,'line-gradient':grad(0)}});
+  map.addSource('dots',{type:'geojson',data:DOTS});
+  map.addLayer({id:'dots-glow',type:'circle',source:'dots',layout:{visibility:'none'},paint:{'circle-radius':['interpolate',['linear'],['zoom'],8,5,11,10],'circle-color':catColor,'circle-blur':1,'circle-opacity':0,'circle-opacity-transition':{duration:0}}});
+  map.addLayer({id:'dots',type:'circle',source:'dots',layout:{visibility:'none'},paint:{'circle-radius':['interpolate',['linear'],['zoom'],8,2.2,11,4.4],'circle-color':catColor,'circle-stroke-color':'rgba(255,255,255,.7)','circle-stroke-width':.6,'circle-opacity':0,'circle-stroke-opacity':0,'circle-opacity-transition':{duration:0},'circle-stroke-opacity-transition':{duration:0}}});
+  map.addLayer({id:'pulse',type:'circle',source:'dots',filter:['==',['get','s'],'__'],layout:{visibility:'none'},paint:{'circle-radius':6,'circle-color':sigColor,'circle-blur':.5,'circle-opacity':0,'circle-radius-transition':{duration:0},'circle-opacity-transition':{duration:0}}});
+}
+
+/* one function per chapter that uses the map (0-based, matching CH) */
+const CHS={
+ 0(){ // Buy box: live satellite, then Night 3D as the parcels that fit light up
+  show(['sat','dots'],false);noPulse();
+  const ctl=[...curSlot.querySelectorAll('.ctl span')],chip=n=>ctl.forEach((e,j)=>e.classList.toggle('on',j===n));chip(0);
+  paint('esri','raster-opacity',1);dotsColor(catColor);dotsOp(0,0);
+  map.jumpTo({center:[-73,40.83],zoom:8.15,pitch:20,bearing:-10,padding:pad()});
+  at(1100,()=>{chip(1);labels(true);fx('beam',2400);fly({center:[-72.98,40.85],zoom:8.95,pitch:56,bearing:8},3000);
+    legend([[CAT.exp,'Expired land'],[CAT.big,'Small house, big lot'],[CAT.com,'Commercial'],[CAT.vac,'Vacant land']])});
+  at(4300,()=>ease({bearing:26,zoom:9.05},2700));
+  const N=DOTS.features.length;
+  upd=t=>{const f=clamp((t-1100)/600);paint('esri','raster-opacity',1-f);if(f>=1)vis('esri',false);
+    const n=Math.round(N*clamp((t-1000)/2200));dotsOp(['case',['<',['get','i'],n],1,0],['case',['<',['get','i'],n],.32,0]);
+    if(t>3400)upd=null};
+ },
+ 1(){ // The math: the lot on live satellite, split into three, new homes rise; then the FAR gap
+  show(['sat','lot'],false);paint('esri','raster-opacity',1);lotStage(0);
+  legend([['#2FD39A','The lot · 1.4 ac'],['#F2F2F2','Home on it'],['#4C8DFF','Room for 2 more']]);
+  map.jumpTo({center:LOT,zoom:17.1,pitch:48,bearing:-30,padding:pad()});
+  ease({zoom:17.6,pitch:58,bearing:4},3700);
+  ['Lot A','Lot B','Lot C'].forEach((t,n)=>{const el=mark(LP(-30+n*30,-40),t,{cls:'tg3',c:n?'#FFD23F':'#2FD39A',anchor:'top'});at(1000+n*200,()=>el.classList.add('on'))});
+  at(1300,()=>lotStage(1));
+  at(3650,()=>fx('flash',550));
+  at(3900,()=>{
+    clearMarks();show(['city'],false);map.setFilter('air',['==',['get','hero'],1]);
+    paint('city','fill-extrusion-color',CFAR);paint('city','fill-extrusion-height',['get','h']);paint('air','fill-extrusion-height',['get','b']);
+    legend([['#F4F4F4','Built · FAR 0.4'],['#2FD39A','Unused rights (est.) · allowed 2.0']]);
+    map.jumpTo({center:HERO,zoom:17.3,pitch:62,bearing:-40,padding:pad()});
+    ease({bearing:0,zoom:17.5},3100);
+    const el=mark(HERO,'<b>FAR gap</b><small>built 0.4 · allowed 2.0</small>',{c:'#2FD39A',anchor:'top'});at(4700,()=>el.classList.add('on'));
+  });
+  upd=t=>{if(t<3900){paint('cuts','line-opacity',clamp((t-1000)/400));const k=clamp((t-1800)/1100);[0,1].forEach(n=>map.setFeatureState({source:'newh',id:n},{k}))}
+    else paint('air','fill-extrusion-height',['+',['get','b'],['*',['get','e'],clamp((t-4300)/1300)]]);
+    if(t>5700)upd=null};
+ },
+ 2(){ // Territory: fly each corridor, its count rises as a column
+  show(['cols','dots'],true);noPulse();dotsColor(catColor);dotsOp(.28,.08);
+  COLS.forEach((c,n)=>map.setFeatureState({source:'cols',id:n},{k:0,lit:0}));paint('r110','line-gradient',grad(0));
+  map.jumpTo({center:[-73.05,40.83],zoom:8.3,pitch:45,bearing:-10,padding:pad()});
+  const rc=document.createElement('div');rc.className='rch';rc.innerHTML='<span>Route 110</span><span>Riverhead</span><span>Mastic–Moriches</span>';curSlot.appendChild(rc);
+  const chips=[...rc.children],els=COLS.map(c=>mark(c.ll,c.t,{c:c.c,anchor:'top'}));
+  const plan=[[300,[-73.415,40.775],10,-6,1500],[2300,[-72.665,40.91],10,16,1500],[4150,[-72.83,40.795],10.1,26,1200],[5600,[-73.06,40.83],8.7,8,1300]];
+  plan.forEach(([s,c,z,b,ms],n)=>at(s,()=>{fly({center:c,zoom:z,pitch:n===3?55:62,bearing:b},ms);chips.forEach((e,j)=>e.classList.toggle('on',n===3||j===n))}));
+  upd=t=>{paint('r110','line-gradient',grad(clamp((t-500)/1500)));
+    plan.forEach(([s],n)=>{const k=clamp((t-s-500)/900);map.setFeatureState({source:'cols',id:n},{k,lit:k>0&&k<1?1:0});if(k>.15)els[n].classList.add('on')});
+    if(t>7000)upd=null};
+ },
+ 3(){ // Signals: the reason to sell now, in its own color, pulsing
+  show(['dots'],true);dotsColor(sigColor);dotsOp(['case',['==',['get','s'],''],.22,1],['case',['==',['get','s'],''],0,.4]);noPulse();
+  map.jumpTo({center:[-72.84,40.87],zoom:9.75,pitch:58,bearing:-18,padding:pad('left',.46)});
+  ease({bearing:14,zoom:9.95},7000);
+  at(300,()=>fx('beam',2600));
+  const on=[];
+  CALLS.forEach((c,n)=>{const el=mark(c.ll,c.t,{c:c.c,cls:'co caps'});at(150+n*700,()=>{on.push(c.s);map.setFilter('pulse',['in',['get','s'],['literal',on.slice()]]);el.classList.add('on')})});
+  upd=t=>{const ph=(t%1300)/1300;paint('pulse','circle-radius',4+ph*16);paint('pulse','circle-opacity',.75*(1-ph))};
+ },
+ 4(){ // Owners: every lot, every owner; people first, companies to research
+  show(['city'],false);map.setFilter('air',['!=',['get','hero'],1]);vis('air',false);
+  paint('city','fill-extrusion-color',C0);paint('city','fill-extrusion-height',['*',['get','h'],0]);paint('air','fill-extrusion-height',['get','b']);
+  legend([[CT,'Individually owned · first'],[CR,'Reason to sell now'],['#2FD39A','Unused rights (est.)'],[CK,'Company · research'],[C0,'Every other lot']]);
+  map.jumpTo({center:CITY,zoom:15.9,pitch:60,bearing:-28,padding:pad('bottom',.42)});
+  ease({bearing:18,zoom:16.15},7000);
+  at(500,()=>paint('city','fill-extrusion-color',CC1));
+  at(1100,()=>paint('city','fill-extrusion-color',CC2));
+  at(1500,()=>vis('air',true));
+  at(1800,()=>paint('city','fill-extrusion-color',CC3));
+  upd=t=>{paint('city','fill-extrusion-height',['*',['get','h'],clamp(t/900)]);if(t>1500)paint('air','fill-extrusion-height',['+',['get','b'],['*',['get','e'],clamp((t-1500)/900)]]);if(t>2500)upd=null};
+ },
+ 5(){ // Trace: the same lot on live satellite, the owner's mobile found and checked
+  show(['sat','lot'],false);vis('neigh',false);paint('esri','raster-opacity',1);lotStage(0,.14);
+  map.jumpTo({center:LOT,zoom:15.2,pitch:30,bearing:-20,padding:pad('right',.5)});
+  at(150,()=>fly({center:LOT,zoom:17.45,pitch:52,bearing:6},2600));
+  const el=mark(LP(0,12),'<b>Mobile found · checked</b>',{c:'#2FD39A'});
+  at(2700,()=>el.classList.add('on'));
+  at(2900,()=>ease({bearing:32},4100));
+ },
+ 7(){ // Record: the parcel in 3D on its own record, with the lots it can become
+  show(['lot','b3d'],false);lotStage(2);
+  map.jumpTo({center:LOT,zoom:17.15,pitch:58,bearing:-25,padding:pad()});
+  ease({bearing:60},7000);
+ }
+};
+
+function loop(){if(!upd)return;try{upd(performance.now()-chStart)}catch(e){errs.push('upd '+e);upd=null;return}rafA=requestAnimationFrame(loop)}
+function mapCh(i){
+  if(!ready)return;
+  tm.forEach(clearTimeout);tm=[];cancelAnimationFrame(rafA);upd=null;clearMarks();
+  const slot=document.querySelector('[data-mslot="'+i+'"]');
+  if(!slot||!CHS[i])return;
+  if(mapEl.parentNode!==slot)slot.appendChild(mapEl);
+  curSlot=slot;slot.querySelectorAll(':scope>.lg3,:scope>.rch,:scope>.beam,:scope>.flash').forEach(e=>e.remove());
+  try{map.stop()}catch(e){}
+  map.resize();
+  chStart=performance.now()-(reduce?60000:0);
+  try{CHS[i]()}catch(e){errs.push('ch'+i+' '+e)}
+  if(upd)rafA=requestAnimationFrame(loop);
+}
+map.on('load',()=>{
+  try{addLayers()}catch(e){errs.push('layers '+e);return}
+  ready=true;stage.classList.add('has-map');
+  const a=mapEl.querySelector('.maplibregl-ctrl-attrib');if(a)a.classList.remove('maplibregl-compact-show');
+  const k=document.querySelector('.terr .key');if(k)k.textContent='Columns = matching parcels by area · example counts';
+  mapCh(cur);
+});
+const goFlat=go;go=function(i){goFlat(i);mapCh(cur)};
+})();
+</script>
+</body></html>
