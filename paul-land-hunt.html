@@ -103,6 +103,32 @@ body.mapmode #scanmap { position: absolute; inset: 0; height: auto; }
 }
 #rows tr.on { background: #0d1d33; box-shadow: inset 4px 0 0 #ffd23f; }
 #rows .eyecell { white-space: nowrap; }
+#rows .own { margin-top: 5px; color: #fff; font-size: 15px; } #rows .own b { font-weight: 800; }
+#rows .own.lock { color: var(--green); font-size: 13px; }
+#rows .acx { font-weight: 800; color: #fff; margin-bottom: 6px; white-space: nowrap; }
+#rows .reachcell { min-width: 190px; }
+#rows .rbtn { display: inline-flex; align-items: center; gap: 6px; padding: 7px 11px; border-radius: 9px; border: 2px solid var(--green); color: #fff; background: #03130b; font: 800 15px var(--body); text-decoration: none; white-space: nowrap; cursor: pointer; }
+#rows .rbtn.call:hover, #rows .rbtn.mail:hover { background: var(--green); color: #000; }
+#rows .rbtn.mail { display: flex; width: fit-content; max-width: 100%; margin-top: 6px; border-color: var(--blue); background: #0a1a33; font-size: 14px; white-space: normal; word-break: break-all; }
+#rows .rbtn.notes { border-color: #f3c04e; background: #000; font-size: 14px; }
+#rows .rbtn.notes b { background: #f3c04e; color: #000; border-radius: 999px; padding: 0 8px; }
+#rows .rbtn.notes:hover { background: #f3c04e; color: #000; } #rows .rbtn.notes:hover b { background: #000; color: #f3c04e; }
+#rows .rrowbtns { margin-top: 6px; }
+#rows .led, .ck .led { margin-top: 6px; color: #fff; font-size: 14px; }
+#rows .led b, .ck .led b { color: var(--green); }
+.ck .ckwho { color: #fff; font-size: 16px; }
+.ck .led.big { font-size: 16px; margin: 0; }
+.ck .cklab { font: 800 13px var(--mono); letter-spacing: .1em; text-transform: uppercase; color: #f3c04e; }
+.ck .ckpad { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+.ckb { font: 800 14px var(--body); letter-spacing: .02em; padding: 9px 12px; border-radius: 9px; border: 2px solid #4a5263; background: #10141b; color: #fff; cursor: pointer; }
+.ckb:hover { background: #fff; color: #000; }
+.ckb.g { border-color: #12b76a; } .ckb.g:hover { background: #12b76a; color: #000; }
+.ckb.l { border-color: #a3e635; } .ckb.l:hover { background: #a3e635; color: #000; }
+.ckb.r { border-color: #f04438; } .ckb.r:hover { background: #f04438; color: #fff; }
+.ckb.w { border-color: #3b8cff; } .ckb.w:hover { background: #3b8cff; color: #000; }
+.ck input[type=datetime-local] { font: 700 14px var(--body); padding: 7px 8px; border-radius: 8px; border: 2px solid #4a5263; background: #000; color: #fff; color-scheme: dark; }
+.ck .nlist { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; }
+.ck .nlist li { display: grid; gap: 2px; padding: 8px 10px; border-radius: 8px; }
 #rows .eye { display: inline-grid; place-items: center; width: 42px; height: 42px; border-radius: 10px; border: 2px solid var(--blue); background: #0a1a33; color: #fff; }
 #rows .eye:hover, #rows .eye:focus-visible { background: var(--blue); color: #000; }
 #rows .rk { margin-top: 4px; text-align: center; color: #fff; font-weight: 700; }
@@ -547,7 +573,7 @@ footer .fl { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; 
       </div>
       <div class="tablewrap">
         <table>
-          <thead><tr><th>#</th><th>Property</th><th>Acres</th><th>Split</th><th>Expired</th><th>Last asking</th><th>Owner</th><th>Mobile</th><th>Email</th></tr></thead>
+          <thead><tr><th>#</th><th>Property · owner</th><th>Lot · split</th><th>Expired · asking</th><th>Call · email · attempts</th></tr></thead>
           <tbody id="rows"></tbody>
         </table>
       </div>
@@ -744,15 +770,11 @@ function renderList() {
   const rows = f.slice(0, st.shown);
   $("#rows").innerHTML = rows.map((r) => `<tr data-k="${r.rank}">
     <td class="r eyecell"><a class="eye" href="#lot-${r.rank}" title="Detail view" aria-label="Detail view for ${esc(r.a)}"><svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path d="M1.5 12S5.5 4.8 12 4.8 22.5 12 22.5 12 18.5 19.2 12 19.2 1.5 12 1.5 12Z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><circle cx="12" cy="12" r="3.6" fill="currentColor"/></svg></a><div class="rk">${r.rank}</div></td>
-    <td><div class="addr">${esc(r.a)}</div><div class="sub">${esc([r.h, r.t && r.t !== r.h ? r.t : "", r.co].filter(Boolean).join(" · "))}</div></td>
-    <td class="r">${acf(r.ac)}</td>
-    <td>${splitCell(r)}</td>
-    <td>${r.win ? `<span class="pill ${r.win === "fresh" ? "b" : "g"}">${WINS[r.win]}</span>` : r.use ? nearPills(r) : ""}<div class="sub">${r.dom ? n0(r.dom) + " days on market" : ""}${r.x > 1 ? ` · listed ${r.x}×` : ""}</div></td>
-    <td class="r">${r.use ? `${money(r.val)}<div class="sub">tax roll value</div>` : money(r.p)}</td>
-    <td>${esc(r.k)}<div class="sub">${esc(r.rch)}</div></td>
-    <td>${reachCellOf(r, "m")}</td>
-    <td>${reachCellOf(r, "e")}</td>
-    </tr>`).join("") || `<tr><td colspan="9" style="color:#fff">${st.ev === "arm" ? "Adjustable-rate loans come from RealEstateAPI on your key. None loaded yet." : "No lots match. Clear a filter or the search."}</td></tr>`;
+    <td><div class="addr">${esc(r.a)}</div><div class="sub">${esc([r.h, r.t && r.t !== r.h ? r.t : "", r.co].filter(Boolean).join(" · "))}</div>${ownerCellOf(r)}</td>
+    <td><div class="acx">${acf(r.ac)} ac</div>${splitCell(r)}</td>
+    <td>${r.win ? `<span class="pill ${r.win === "fresh" ? "b" : "g"}">${WINS[r.win]}</span>` : r.use ? nearPills(r) : ""}<div class="sub">${r.dom ? n0(r.dom) + " days on market" : ""}${r.x > 1 ? ` · listed ${r.x}×` : ""}</div><div class="sub ask">${r.use ? `Tax roll ${money(r.val)}` : r.p ? `Last asking ${money(r.p)}` : ""}</div></td>
+    <td class="reachcell">${reachCellOf(r)}</td>
+    </tr>`).join("") || `<tr><td colspan="5" style="color:#fff">${st.ev === "arm" ? "Adjustable-rate loans come from RealEstateAPI on your key. None loaded yet." : "No lots match. Clear a filter or the search."}</td></tr>`;
   $("#count").textContent = `${n0(f.length)} of ${n0(R.length)} lots`;
   const left = f.length - rows.length;
   $("#moreBtn").hidden = left <= 0;
@@ -1598,16 +1620,38 @@ window.addEventListener("hashchange", route);
 // ---------- List view: the list on the left, the live satellite map on the right (Thomas 2026-10-26) ----------
 const SPLIT_MIN = 0; // always list + map together: side by side from 760px, map on top below that
 let activeK = null, flyT = null, scrollRaf = 0;
-function reachCellOf(r, kind) {
+function ledgerOf(r) {
   try {
-    const t = traced(r);
-    if (t) {
-      if (kind === "m") { const ph = t.phones || []; const b = ph.find((x) => isMobile(x.t) && !x.dnc) || ph.find((x) => !x.dnc) || ph[0]; return b ? `<span class="ph">${esc(fmtPh(b.n))}</span><div class="sub">${n0(ph.length)} phones</div>` : `<span class="sub">None found</span>`; }
-      const em = t.emails || []; return em.length ? `${esc(em[0].e)}<div class="sub">${n0(em.length)} emails</div>` : `<span class="sub">None found</span>`;
+    const list = readNotes(r);
+    const L = { call: 0, text: 0, email: 0, notes: list.length };
+    for (const n of list) {
+      const k = n.k || (/^Called/.test(n.t) ? "call" : /^Emailed/.test(n.t) ? "email" : /^Texted/.test(n.t) ? "text" : "note");
+      if (k === "call" || k === "text" || k === "email") L[k]++;
     }
-    if (sealedHas(r)) return `<span class="trace on">Traced · code</span>`;
-  } catch (e) {}
-  return `<span class="trace">skip trace</span>`;
+    return L;
+  } catch (e) { return { call: 0, text: 0, email: 0, notes: 0 }; }
+}
+function ownerNameOf(r) { try { const t = traced(r), o = t && t.owner; return o ? (o.full || [o.first, o.last].filter(Boolean).join(" ")) : ""; } catch (e) { return ""; } }
+/** The owner line under the address: first + last name when traced, the owner type always. */
+function ownerCellOf(r) {
+  const nm = ownerNameOf(r);
+  let sealed = false; try { sealed = !nm && sealedHas(r); } catch (e) {}
+  return (nm ? `<div class="own">👤 <b>${esc(nm)}</b></div>` : sealed ? `<div class="own lock">👤 Owner traced · open with your key link</div>` : "") + `<div class="sub">${esc(r.k)} · ${esc(r.rch)}</div>`;
+}
+/** The list's reach cell: one-press call on the best non-DNC mobile, email, notes, and the call / text / email counts. */
+function reachCellOf(r) {
+  let t = null, sealed = false;
+  try { t = traced(r); sealed = !t && sealedHas(r); } catch (e) {}
+  let head = "";
+  if (t) {
+    const ph = t.phones || [], em = t.emails || [];
+    const b = ph.find((x) => isMobile(x.t) && !x.dnc) || ph.find((x) => !x.dnc);
+    head = (b ? `<a class="rbtn call" href="tel:${esc(telOf(b.n))}" data-callk="${r.rank}" data-num="${esc(fmtPh(b.n))}">☎ ${esc(fmtPh(b.n))}</a>` : `<span class="sub">Every number is on Do Not Call</span>`)
+      + (em.length ? `<a class="rbtn mail" href="mailto:${esc(em[0].e)}" data-mailk="${r.rank}">✉ ${esc(em[0].e)}</a>` : "")
+      + `<div class="sub">${n0(ph.length)} phones · ${n0(em.length)} emails</div>`;
+  } else head = sealed ? `<span class="trace on">Traced · code</span>` : `<span class="trace">skip trace</span>`;
+  const L = ledgerOf(r);
+  return `${head}<div class="rrowbtns"><button class="rbtn notes" type="button" data-notesk="${r.rank}">📝 Notes <b>${n0(L.notes)}</b></button></div><div class="led">Calls <b>${L.call}</b> · Texts <b>${L.text}</b> · Emails <b>${L.email}</b></div>`;
 }
 const splitOn = () => innerWidth >= SPLIT_MIN && !document.body.classList.contains("mapmode") && $("#lotview").hidden;
 function syncSplit() {
@@ -1637,7 +1681,7 @@ function focusLot(k, tr) {
   if (tourOn) stopTour();
   const xs = ring[0].map((q) => q[0]), ys = ring[0].map((q) => q[1]);
   clearTimeout(flyT);
-  flyT = setTimeout(() => map.fitBounds([[Math.min(...xs), Math.min(...ys)], [Math.max(...xs), Math.max(...ys)]], { padding: 90, maxZoom: 18, pitch: 45, bearing: 0, duration: reduce ? 0 : 1300, essential: true }), 140);
+  flyT = setTimeout(() => map.fitBounds([[Math.min(...xs), Math.min(...ys)], [Math.max(...xs), Math.max(...ys)]], { padding: { top: 70, bottom: 200, left: 70, right: 70 }, maxZoom: 18, pitch: 45, bearing: 0, duration: reduce ? 0 : 1300, essential: true }), 140);
 }
 function pickRow() {
   if (!splitOn() || performance.now() < holdUntil) return;
@@ -1656,13 +1700,85 @@ function selectLot(k, fromMap) {
   activeK = null; focusLot(k, tr);
   if (fromMap && tr) tr.scrollIntoView({ behavior: reduce ? "auto" : "smooth", block: "center" });
 }
-addEventListener("scroll", () => { lastScroll = performance.now(); if (!scrollRaf) scrollRaf = requestAnimationFrame(() => { scrollRaf = 0; pickRow(); }); }, { passive: true });
-$("#rows").addEventListener("mouseover", (e) => { if (performance.now() - lastScroll < 600) return; const tr = e.target.closest("tr[data-k]"); if (tr && splitOn()) focusLot(Number(tr.dataset.k), tr); });
-new MutationObserver(() => { activeK = null; requestAnimationFrame(pickRow); }).observe($("#rows"), { childList: true });
-addEventListener("resize", () => { syncSplit(); pickRow(); });
-addEventListener("hashchange", () => setTimeout(() => { syncSplit(); activeK = null; pickRow(); }, 60));
+// The map moves only on a click (Thomas: "I should have to click it first, then it locks on"). A re-render keeps the lock.
+new MutationObserver(() => { const tr = activeK != null && $(`#rows tr[data-k="${activeK}"]`); if (tr) tr.classList.add("on"); }).observe($("#rows"), { childList: true });
+addEventListener("resize", syncSplit);
+addEventListener("hashchange", () => setTimeout(syncSplit, 60));
 syncSplit();
-if (map) map.on("idle", function first() { if (!map.getLayer("cols")) return; map.off("idle", first); ensureSat(); activeK = null; pickRow(); });
+if (map) map.on("idle", function first() { if (!map.getLayer("cols")) return; map.off("idle", first); ensureSat(); });
+
+
+// ---------- Call + notes kiosk: dial, log the outcome and take notes from the list, without opening the detail ----------
+// The same pad as Call Ready and the Focus Calendar: call result, then the outcome (KEEP · SELL · OPPT · APPT · UNSURE · RT ·
+// NOT INTERESTED · DNC / STOP), Mark worked, a follow-up date, notes. On this page it saves to this device; in the
+// workspace it saves on the lead.
+const CK_RESULTS = ["NO ANSWER", "VOICEMAIL", "WRONG NUMBER", "CALLBACK"];
+const CK_OUTCOMES = [["KEEP", "g"], ["SELL", "g"], ["OPPT", "g"], ["APPT", "g"], ["UNSURE", "l"], ["RT", "r"], ["NOT INTERESTED", "r"], ["DNC / STOP", "r"]];
+let ckLot = null;
+const ck = document.createElement("aside");
+ck.className = "nwin ck"; ck.id = "ckiosk"; ck.hidden = true; ck.setAttribute("aria-label", "Call and notes");
+document.body.appendChild(ck);
+function ckRow(r) { const c = $(`#rows tr[data-k="${r.rank}"] .reachcell`); if (c) c.innerHTML = reachCellOf(r); }
+function ckLog(r, t, k) {
+  const list = readNotes(r); list.push({ t, k, at: new Date().toISOString() }); writeNotes(r, list);
+  ckDraw(); ckRow(r); if (!$("#lotview").hidden) drawNotes(r);
+}
+function ckDraw() {
+  const r = ckLot; if (!r || ck.hidden) return;
+  const list = readNotes(r), L = ledgerOf(r);
+  let who = "Owner of record"; try { const t = traced(r); if (t && t.owner && t.owner.full) who = t.owner.full; } catch (e) {}
+  ck.querySelector(".who").textContent = `#${r.rank} ${r.a}`;
+  ck.querySelector(".ncount").textContent = list.length;
+  ck.querySelector("[data-ckwho]").innerHTML = `<b>${esc(who)}</b>${ck.dataset.num ? ` · calling <b>${esc(ck.dataset.num)}</b> from your SignalHouse.io line` : ""}`;
+  ck.querySelector("[data-ckled]").innerHTML = `Calls <b>${L.call}</b> · Texts <b>${L.text}</b> · Emails <b>${L.email}</b>`;
+  ck.querySelector(".nlist").innerHTML = list.length ? list.slice().reverse().map((n) => `<li><span class="t">${esc(when(n.at))}</span><span class="b">${esc(n.t)}</span></li>`).join("") : `<li><span class="b" style="color:var(--soft)">No notes yet.</span></li>`;
+}
+function ckOpen(r, num) {
+  ckLot = r; ck.dataset.num = num || "";
+  ck.innerHTML = `<div class="nwin-h"><span class="tt">☎ CALL · 📝 NOTES</span><b class="ncount">0</b><span class="who"></span><button type="button" data-ckclose aria-label="Close">×</button></div>
+    <div class="nwin-b">
+      <div class="ckwho" data-ckwho></div>
+      <div class="led big" data-ckled></div>
+      <div class="cklab">Call result</div>
+      <div class="ckpad">${CK_RESULTS.map((o) => `<button class="ckb" type="button" data-ckres="${o}">${o}</button>`).join("")}</div>
+      <div class="cklab">Outcome</div>
+      <div class="ckpad">${CK_OUTCOMES.map(([o, c]) => `<button class="ckb ${c}" type="button" data-ckout="${o}">${o}</button>`).join("")}</div>
+      <div class="ckpad"><button class="ckb w" type="button" data-ckworked>👁 MARK WORKED</button><input type="datetime-local" data-ckfu aria-label="Follow-up date"><button class="ckb" type="button" data-ckfuset>Set follow-up</button></div>
+      <textarea data-ckbox aria-label="Notes" placeholder="What did the owner say?"></textarea>
+      <div class="pushbar"><button class="btn nsave" type="button" data-cksave>Save note</button><span class="nhint">Rides along in the Follow Up Boss push.</span></div>
+      <ul class="nlist"></ul>
+      <div class="nhint">On this page it saves to this device. In your workspace the call, the outcome and the notes save on the lead.</div>
+    </div>`;
+  ck.hidden = false; ck.classList.remove("flash"); void ck.offsetWidth; ck.classList.add("flash");
+  const nt = $("#ntab"), nw = $("#nwin"); if (nt) nt.hidden = true; if (nw) nw.hidden = true;
+  ckDraw();
+}
+function ckClose() { ck.hidden = true; ckLot = null; const nt = $("#ntab"); if (nt && !$("#lotview").hidden) nt.hidden = false; }
+ck.addEventListener("click", (e) => {
+  const r = ckLot, b = e.target.closest("button"); if (!r || !b) return;
+  if (b.hasAttribute("data-ckclose")) { ckClose(); return; }
+  if (b.dataset.ckres) {
+    if (b.dataset.ckres === "CALLBACK") { const f = ck.querySelector("[data-ckfu]"); f.focus(); try { f.showPicker(); } catch (x) {} return; }
+    ckLog(r, `Call result · ${b.dataset.ckres}${ck.dataset.num ? " · " + ck.dataset.num : ""}`, "outcome"); return;
+  }
+  if (b.dataset.ckout) { ckLog(r, `Outcome · ${b.dataset.ckout}`, "outcome"); return; }
+  if (b.hasAttribute("data-ckworked")) { ckLog(r, "Marked worked · being worked", "worked"); return; }
+  if (b.hasAttribute("data-ckfuset")) { const f = ck.querySelector("[data-ckfu]"); if (!f.value) { f.focus(); return; } ckLog(r, `Follow-up set · ${when(f.value)}`, "followup"); return; }
+  if (b.hasAttribute("data-cksave")) { const box = ck.querySelector("[data-ckbox]"), t = box.value.trim(); if (!t) { box.focus(); return; } box.value = ""; ckLog(r, t, "note"); }
+});
+document.addEventListener("click", (e) => {
+  const a = e.target.closest("[data-callk], [data-mailk], [data-notesk], #lotinner a[href^='tel:'], #lotinner a[href^='mailto:']");
+  if (!a) return;
+  const m = location.hash.match(/^#lot-(\d+)$/);
+  const k = Number(a.dataset.callk || a.dataset.mailk || a.dataset.notesk || (m && m[1]));
+  const r = byRank.get(k); if (!r) return;
+  const href = a.getAttribute("href") || "";
+  if (href.startsWith("tel:")) { const num = a.dataset.num || fmtPh(href.slice(4)); if (splitOn()) selectLot(k, false); ckOpen(r, num); ckLog(r, `Called ${num}`, "call"); return; }
+  if (href.startsWith("mailto:")) { ckOpen(r, ""); ckLog(r, `Emailed ${href.slice(7)}`, "email"); return; }
+  if (a.dataset.notesk) ckOpen(r, "");
+});
+document.addEventListener("keydown", (e) => { if (e.key === "Escape" && !ck.hidden) ckClose(); });
+addEventListener("hashchange", () => { const m = location.hash.match(/^#lot-(\d+)$/); if (ckLot && m && Number(m[1]) !== ckLot.rank) ckClose(); });
 
 renderList();
 route();
