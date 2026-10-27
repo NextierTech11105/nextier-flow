@@ -1,6 +1,6 @@
 <!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Nextier Data Engine · Development · Story Mode</title>
-<meta name="description" content="Story Mode for the Nextier Data Engine, development segment: every parcel in your market on live satellite, search by county, lock onto the land, deal potential, owner of record, click-to-call, every attempt counted, push to Initial SMS. The real engine, running live, with music.">
+<title>Nextier Data Engine · Development · Overview</title>
+<meta name="description" content="Overview of the Nextier Data Engine, development segment: every parcel in your market on live satellite, search by county, lock onto the land, deal potential, owner of record, click-to-call, every attempt counted, push to Initial SMS. The real engine, running live, with music.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=DM+Sans:wght@400;500;700;800&display=swap">
 <style>
@@ -83,14 +83,14 @@ button[disabled]{opacity:.45;cursor:default}
       <p id="txt"></p>
       <div class="controls">
         <button id="prev" type="button">Back</button>
-        <button id="play" type="button" disabled>Play story</button>
+        <button id="play" type="button" disabled>Play overview</button>
         <button id="snd" type="button" aria-pressed="true">Sound on</button>
         <button id="next" type="button">Next</button>
       </div>
     </div>
   </div>
   <nav class="rail" id="rail" aria-label="Chapters"></nav>
-  <div class="foot">The real Nextier Data Engine, running live on New York data. Owner names, phone numbers and emails stay masked in this story; in your workspace they're on every lot. · <a href="dataengine.html">The Data Engine</a></div>
+  <div class="foot">The real Nextier Data Engine, running live on New York data. Owner names, phone numbers and emails stay masked in this overview; in your workspace they're on every lot. · <a href="dataengine.html">The Data Engine</a></div>
 </div>
 <audio id="song" src="media/story-song2-112s.m4a" preload="auto"></audio>
 <script>
@@ -199,7 +199,7 @@ function syncSong(jump) {
 }
 function setPlay(on) {
   playing = on; cancelAnimationFrame(raf);
-  playBtn.textContent = on ? "Pause" : (cur === CH.length - 1 ? "Replay" : "Play story");
+  playBtn.textContent = on ? "Pause" : (cur === CH.length - 1 ? "Replay" : "Play overview");
   if (on) { if (!fin.hidden || (cur === CH.length - 1 && performance.now() - t0 >= DUR - 100)) go(0); t0 = performance.now(); raf = requestAnimationFrame(tick); }
   syncSong(true);
 }
