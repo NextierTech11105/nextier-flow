@@ -1,0 +1,129 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<title>Nextier Data Engine · Cheat Sheet</title>
+<meta name="description" content="Capabilities and capacity of the Nextier Data Engine for Team Musso, on one page.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@700;800&family=IBM+Plex+Sans:wght@500;600;700&display=swap">
+<style>
+:root{--bg:#000;--card:#0a0d12;--line:#2a3442;--fg:#fff;--orange:#ff8a3d;--green:#12b76a;--blue:#4c8dff;color-scheme:dark}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--fg);font:500 17px/1.5 'IBM Plex Sans','Segoe UI',Arial,sans-serif}
+.wrap{max-width:1100px;margin:0 auto;padding:28px 16px 48px}
+.brand{font:800 15px 'Archivo',Arial,sans-serif;letter-spacing:.14em;text-transform:uppercase}
+.brand span{color:var(--orange)}
+h1{font:800 clamp(30px,4.4vw,52px)/1.05 'Archivo',Arial,sans-serif;margin:10px 0 8px}
+h1 em{font-style:normal;color:var(--green)}
+.lede{font-size:20px;font-weight:600;margin:0 0 22px;max-width:60ch}
+h2{font:800 22px 'Archivo',Arial,sans-serif;margin:0 0 12px;color:var(--orange)}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,480px),1fr));gap:16px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:18px 20px}
+ol,ul{margin:0;padding-left:22px}
+li{margin:0 0 9px}
+b{color:#fff}
+.nums{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin-bottom:14px}
+.num{border:1px solid var(--line);border-radius:12px;padding:12px 14px;background:#06080b}
+.num b{display:block;font:800 30px/1.05 'Archivo',Arial,sans-serif}
+.num span{font-weight:600}
+.g{color:var(--green)}.o{color:var(--orange)}.bl{color:var(--blue)}
+.tag{display:inline-block;font-weight:700;font-size:15px;padding:3px 11px;border-radius:999px;border:1px solid var(--orange);background:#4a2309;margin:3px 4px 3px 0}
+.tag.s{border-color:#3a4656;background:#141a22}
+.links a{display:block;color:#fff;font-weight:700;padding:12px 14px;border:1px solid var(--line);border-radius:12px;margin-bottom:8px;text-decoration:none;background:#06080b}
+.links a:hover{border-color:var(--blue)}
+.links small{display:block;font-weight:500}
+.wide{grid-column:1/-1}
+.note{font-weight:600;border-left:4px solid var(--orange);padding:4px 0 4px 12px;margin-top:12px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="brand">NEXT<span>IER</span> · DATA ENGINE · TEAM MUSSO</div>
+  <h1>Your land. Your owners. <em>Your line.</em></h1>
+  <p class="lede">A database you own that finds the land and the owner before anyone else, gets their phone and email, and lets your team call from your own line. Nothing to learn.</p>
+
+  <div class="grid">
+    <section class="card wide">
+      <h2>Your book today · New York, last 2 years</h2>
+      <div class="nums">
+        <div class="num"><b>4,256</b><span>expired land listings</span></div>
+        <div class="num"><b>1,847</b><span>never relisted or sold</span></div>
+        <div class="num"><b class="bl">536</b><span>can be split or built on</span></div>
+        <div class="num"><b class="g">460</b><span>aged 91 days to 2 years</span></div>
+        <div class="num"><b>179</b><span>individual owners</span></div>
+        <div class="num"><b class="g">5</b><span>split by right · Suffolk</span></div>
+        <div class="num"><b>17,648</b><span>commercial sites worth more as development</span></div>
+        <div class="num"><b>18,404</b><span>lots with the owner of record</span></div>
+      </div>
+      <div><b>Event signals in the book:</b>
+        <span class="tag">MLS expired 1,771</span><span class="tag">Expired 2+ times 225</span><span class="tag">Long on market 417</span><span class="tag">Estate / trust 30</span><span class="tag">Developers buying nearby 739</span><span class="tag s">Owner holds more parcels 440</span>
+      </div>
+      <div class="note">At install, on your own RealEstateAPI key: pre-foreclosure · lis pendens · auction · adjustable-rate resets.</div>
+    </section>
+
+    <section class="card">
+      <h2>What it does</h2>
+      <ol>
+        <li><b>Finds the land.</b> Every parcel in New York: state tax rolls, the NYC lot file, OneKey MLS.</li>
+        <li><b>Finds the reason to call now.</b> Expired and never relisted, expired twice, long on market, estate, developers buying next door.</li>
+        <li><b>Reads the deal.</b> Acres, lots by right, last asking, who's building nearby, permit trend.</li>
+        <li><b>Finds the owner.</b> Owner of record, past the LLC to the person who signs.</li>
+        <li><b>Gets phones and emails.</b> Skip trace on your key: every phone tagged mobile or landline, with the Do Not Call check.</li>
+        <li><b>Calls and emails from your line.</b> One click to call, one press to log the outcome, notes on every lot.</li>
+        <li><b>Pushes to outreach.</b> First text or nurture. Nothing sends until a person presses Send.</li>
+        <li><b>Books into your CRM.</b> Appointments go to Follow Up Boss.</li>
+      </ol>
+    </section>
+
+    <section class="card">
+      <h2>Capacity</h2>
+      <ul>
+        <li><b>Texting:</b> up to 500 a day per number once warmed (250 → 400 → 500 over 4 days). Five numbers ≈ <b>2,500 a day</b>.</li>
+        <li><b>Send window:</b> 8 AM–9 PM ET. Sends go at 5 PM; replies land the next morning.</li>
+        <li><b>Calling:</b> one line at a time today, from your own numbers. 500 calls a day ≈ <b>$6–12 a day in minutes</b> (estimate; the carrier quotes voice). One caller makes about 150–250 dials a day; spread calls across 5–10 numbers.</li>
+        <li><b>Skip trace:</b> about 2¢ a lookup on your key. The whole land book ≈ $35.</li>
+        <li><b>Numbers:</b> about $1.15 a month each.</li>
+      </ul>
+    </section>
+
+    <section class="card">
+      <h2>What we've done</h2>
+      <ul>
+        <li>New York, Aug–Sep: <b>14,332 texted · 80% delivered · 1,502 replied</b> (10.5%).</li>
+        <li>Reply rate runs <b>10–20%</b>.</li>
+        <li><b>13 appointments</b> since September, <b>2 deals</b>, including the listing at 2055 Turnbull, Bronx.</li>
+      </ul>
+    </section>
+
+    <section class="card">
+      <h2>You own it</h2>
+      <ul>
+        <li><b>Your keys:</b> SignalHouse (phone lines), Tracerfy (skip trace), RealEstateAPI (event signals), OneKey (MLS).</li>
+        <li><b>Your database</b> on DigitalOcean, hosted and run by us.</li>
+        <li><b>No training.</b> Bryan runs the daily routine; your assistants work the calls.</li>
+      </ul>
+    </section>
+
+    <section class="card">
+      <h2>To start · what we need</h2>
+      <ol>
+        <li>The counties to start with</li>
+        <li>Your keys and OneKey login</li>
+        <li>Who presses Send, and who works the calls</li>
+        <li>Your Follow Up Boss login</li>
+      </ol>
+      <div class="note">Your workspace is built. In-app calling goes live once your SignalHouse key is in and your number is set up for calls.</div>
+    </section>
+
+    <section class="card links">
+      <h2>See it</h2>
+      <a href="data-engine-overview.html">Overview<small>The engine running itself, chapter by chapter</small></a>
+      <a href="paul-land-hunt.html">Hunt Engine<small>List · map · detail · call and email</small></a>
+      <a href="paul-territory-intelligence.html">Territory Intelligence<small>Dashboards · segments · event signals</small></a>
+    </section>
+  </div>
+</div>
+</body>
+</html>
