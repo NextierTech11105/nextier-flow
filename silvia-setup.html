@@ -1,0 +1,157 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="robots" content="noindex">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Silvia's Setup</title>
+<style>
+  /* Layout: one column of numbered step cards, in the order they must be done. */
+  :root {
+    color-scheme: dark;
+    --bg: #07090d; --card: #10151d; --line: #253041; --ink: #ffffff; --soft: #e8eef6;
+    --blue: #4f9bff; --blue-bg: #0f2442; --green: #4ade80; --green-bg: #0d2a1b; --amber: #fbbf24;
+    --mono: ui-monospace, "Cascadia Mono", Consolas, Menlo, monospace;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--ink); font: 17px/1.55 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
+  .wrap { max-width: 760px; margin: 0 auto; padding-block: 32px 64px; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); display: grid; gap: 22px; }
+  h1 { font-size: clamp(30px, 6vw, 40px); line-height: 1.1; margin: 0; letter-spacing: -0.01em; }
+  h2 { font-size: 22px; margin: 0; line-height: 1.25; }
+  p { margin: 0; }
+  a { color: var(--blue); font-weight: 600; }
+  .lede { color: var(--soft); font-size: 18px; }
+  .order { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+  .order span { background: var(--card); border: 1px solid var(--line); padding: 6px 12px; font-weight: 600; font-size: 15px; }
+  .order i { color: var(--blue); font-style: normal; font-weight: 700; }
+  .step { background: var(--card); border: 1px solid var(--line); padding: 20px; display: grid; gap: 14px; }
+  .head { display: flex; gap: 14px; align-items: center; }
+  .num { flex: none; width: 44px; height: 44px; display: grid; place-items: center; background: var(--blue); color: #000; font-weight: 800; font-size: 22px; }
+  .time { color: var(--soft); font-size: 15px; font-weight: 600; }
+  .tag { display: inline-block; font-size: 13px; font-weight: 700; padding: 2px 8px; margin-left: 6px; vertical-align: middle; }
+  .tag.wait { background: #3a2a07; color: var(--amber); }
+  .tag.opt { background: var(--blue-bg); color: var(--blue); }
+  ol { margin: 0; padding-left: 24px; display: grid; gap: 8px; }
+  li { padding-left: 4px; }
+  b { color: var(--ink); }
+  .done { background: var(--green-bg); color: var(--green); font-weight: 700; padding: 10px 14px; }
+  .note { color: var(--soft); font-size: 16px; border-left: 3px solid var(--amber); padding-left: 12px; }
+  .copy { display: grid; grid-template-columns: minmax(0, 1fr) auto; border: 1px solid var(--line); background: #05070a; }
+  .copy code { font: 14px/1.6 var(--mono); padding: 10px 12px; overflow-x: auto; white-space: pre; color: var(--ink); }
+  .copy button { font: 700 15px system-ui, sans-serif; background: var(--blue); color: #000; border: 0; padding: 0 16px; cursor: pointer; }
+  .copy button:focus-visible, a:focus-visible { outline: 3px solid var(--ink); outline-offset: 2px; }
+  kbd { font: 600 15px var(--mono); background: #05070a; border: 1px solid var(--line); padding: 1px 6px; }
+  .yours { border: 1px solid var(--line); padding: 18px 20px; display: grid; gap: 8px; }
+  .yours ul { margin: 0; padding-left: 22px; }
+  footer { color: var(--soft); text-align: center; font-size: 16px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header style="display:grid;gap:12px">
+    <h1>Silvia's Setup</h1>
+    <p class="lede">About 25 minutes. Do the steps in order. Each one tells you when it's done.</p>
+    <div class="order" aria-label="Order of steps">
+      <span>1 GitHub</span><i>→</i><span>2 Invites</span><i>→</i><span>3 Claude</span><i>→</i><span>4 VS Code</span><i>→</i><span>5 Your code</span><i>→</i><span>6 Perplexity</span>
+    </div>
+  </header>
+
+  <section class="step" aria-labelledby="s1">
+    <div class="head"><div class="num">1</div><div><h2 id="s1">Make your GitHub account</h2><div class="time">2 minutes</div></div></div>
+    <ol>
+      <li>Go to <a href="https://github.com/signup" target="_blank" rel="noopener">github.com/signup</a></li>
+      <li>Use <b>your EHOA email</b> and make a password.</li>
+      <li>Pick a username.</li>
+      <li>Type in the code GitHub emails you.</li>
+    </ol>
+    <p class="done">Done when you see your GitHub home page. Text Thomas your username.</p>
+  </section>
+
+  <section class="step" aria-labelledby="s2">
+    <div class="head"><div class="num">2</div><div><h2 id="s2">Accept Thomas's two invites <span class="tag wait">Wait for Thomas</span></h2><div class="time">1 minute</div></div></div>
+    <p>Thomas makes you an owner of two GitHub organizations: <b>Parcelavora</b> and <b>EHOA Advisors</b>.</p>
+    <ol>
+      <li>Open each "invited you" email from GitHub.</li>
+      <li>Click <b>Join</b>.</li>
+    </ol>
+    <p class="done">Done when both show on your GitHub profile under Organizations.</p>
+  </section>
+
+  <section class="step" aria-labelledby="s3">
+    <div class="head"><div class="num">3</div><div><h2 id="s3">Make your Claude account</h2><div class="time">3 minutes</div></div></div>
+    <ol>
+      <li>Go to <a href="https://claude.ai" target="_blank" rel="noopener">claude.ai</a> and sign up with <b>your EHOA email</b>.</li>
+      <li>Click your name (bottom left), then <b>Upgrade plan</b>, then <b>Pro</b>.</li>
+      <li>Thomas enters his card at checkout.</li>
+    </ol>
+    <p class="done">Done when your plan says Pro.</p>
+  </section>
+
+  <section class="step" aria-labelledby="s4">
+    <div class="head"><div class="num">4</div><div><h2 id="s4">Set up VS Code</h2><div class="time">10 minutes</div></div></div>
+    <ol>
+      <li>Install <b>VS Code</b> from <a href="https://code.visualstudio.com" target="_blank" rel="noopener">code.visualstudio.com</a></li>
+      <li>Install <b>Git</b> from <a href="https://git-scm.com/downloads" target="_blank" rel="noopener">git-scm.com</a>. On a Mac, open Terminal, type <kbd>git</kbd> and accept the install it offers.</li>
+      <li>In VS Code, click the <b>person icon</b> (bottom left), then <b>Sign in with GitHub</b>, and approve in the browser.</li>
+      <li>Open the terminal with <kbd>Ctrl</kbd> + <kbd>`</kbd> (Mac: <kbd>Cmd</kbd> + <kbd>`</kbd>) and paste this:</li>
+    </ol>
+    <div class="copy"><code id="ext">code --install-extension anthropic.claude-code --install-extension mhutchie.git-graph --install-extension mechatroner.rainbow-csv --install-extension github.vscode-github-actions --install-extension ms-python.python --install-extension ms-toolsai.jupyter</code><button type="button" data-copy="ext">Copy</button></div>
+    <p class="note">On a Mac, if it says "code not found": press <kbd>Cmd</kbd> + <kbd>Shift</kbd> + <kbd>P</kbd>, run <b>Shell Command: Install 'code' command in PATH</b>, then paste again.</p>
+    <ol start="5">
+      <li>Click the <b>Claude</b> icon in the left bar and sign in with your Claude account.</li>
+    </ol>
+    <p class="done">Done when the Claude panel opens in VS Code.</p>
+  </section>
+
+  <section class="step" aria-labelledby="s5">
+    <div class="head"><div class="num">5</div><div><h2 id="s5">Open your code</h2><div class="time">2 minutes</div></div></div>
+    <ol>
+      <li>Press <kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>P</kbd> (Mac: <kbd>Cmd</kbd> + <kbd>Shift</kbd> + <kbd>P</kbd>) and type <b>Git: Clone</b>.</li>
+      <li>Choose <b>Clone from GitHub</b>, then pick <b>parcelavora</b>.</li>
+      <li>Choose a folder, then click <b>Open</b>.</li>
+    </ol>
+    <p class="done">Done when you see README.md in the left panel.</p>
+  </section>
+
+  <section class="step" aria-labelledby="s6">
+    <div class="head"><div class="num">6</div><div><h2 id="s6">RealEstateAPI in Perplexity <span class="tag opt">Optional</span></h2><div class="time">5 minutes · needs Perplexity Pro or Max</div></div></div>
+    <ol>
+      <li>Get an API key from your RealEstateAPI dashboard. Use a separate key from EHOA's daily one, so Perplexity questions don't use up EHOA's credits.</li>
+      <li>In Perplexity, go to <b>Settings</b>, then <b>Connectors</b>, then <b>+ Custom connector</b>.</li>
+      <li>Name it <b>RealEstateAPI</b> and paste this address:</li>
+    </ol>
+    <div class="copy"><code id="mcp">https://mcp.realestateapi.com/sse</code><button type="button" data-copy="mcp">Copy</button></div>
+    <ol start="4">
+      <li>Choose <b>API key</b> and paste your key.</li>
+    </ol>
+    <p class="note">RealEstateAPI expects the key under the name <b>X-API-Key</b>. If the form has no place for that name, it won't connect. Send Thomas a screenshot of the form.</p>
+    <p class="done">Done when Perplexity can answer a question about a property address.</p>
+  </section>
+
+  <section class="yours" aria-labelledby="yours">
+    <h2 id="yours">What's yours on GitHub</h2>
+    <ul>
+      <li><b>Parcelavora:</b> the new data company</li>
+      <li><b>EHOA:</b> the EHOA slideshow site and the haas app</li>
+      <li><b>Zoho:</b> all Zoho code, moved over as it's pulled out</li>
+    </ul>
+  </section>
+
+  <footer>Stuck on a step? Text Thomas a screenshot.</footer>
+</div>
+<script>
+document.querySelectorAll("[data-copy]").forEach((btn) => {
+  btn.addEventListener("click", () => {
+    const text = document.getElementById(btn.dataset.copy).textContent;
+    const ok = () => { btn.textContent = "Copied"; setTimeout(() => { btn.textContent = "Copy"; }, 1600); };
+    if (navigator.clipboard) {
+      navigator.clipboard.writeText(text).then(ok, () => {
+        const r = document.createRange(); r.selectNodeContents(document.getElementById(btn.dataset.copy));
+        const s = getSelection(); s.removeAllRanges(); s.addRange(r);
+      });
+    }
+  });
+});
+</script>
+</body>
+</html>
