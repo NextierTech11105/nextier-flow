@@ -15,7 +15,7 @@ h1{margin:0;font:700 clamp(18px,1.7vw,32px)/1.15 var(--display);text-align:right
 h1 em{font-style:normal;color:var(--orange)}
 .main{display:grid;grid-template-columns:minmax(0,2.6fr) minmax(0,1fr);gap:24px;min-height:0}
 .stage{position:relative;min-height:0;border-radius:18px;overflow:hidden;border:1px solid var(--line);background:#05070b}
-#eng{position:absolute;left:0;top:0;width:1280px;height:720px;border:0;transform-origin:0 0;background:#000}
+#eng{position:absolute;left:0;top:0;width:1600px;height:900px;border:0;transform-origin:0 0;background:#000}
 #shield{position:absolute;inset:0;z-index:3}
 #spot{position:absolute;z-index:4;pointer-events:none;border:3px solid var(--gold);border-radius:12px;box-shadow:0 0 0 9999px rgba(0,0,0,.32),0 0 34px rgba(255,210,63,.85);opacity:0;transition:left .7s ease,top .7s ease,width .7s ease,height .7s ease,opacity .4s}
 #spot.on{opacity:1}
@@ -98,8 +98,8 @@ button[disabled]{opacity:.45;cursor:default}
 "use strict";
 // PACE slows every chapter and every click/typing step inside it by the same factor (1 = the old 8 s chapters)
 const PACE = 1.5, DUR = 8000 * PACE;
-// the engine renders at VW x VH and is scaled to fit the stage; smaller = everything on screen reads bigger
-const VW = 1280, VH = 720;
+// the engine renders at VW x VH and is scaled to fit the stage
+const VW = 1600, VH = 900;
 const frame = document.getElementById("eng"), stage = document.getElementById("stage"), spotEl = document.getElementById("spot");
 const W = () => frame.contentWindow, D = () => frame.contentWindow.document, $ = (s) => { try { return D().querySelector(s); } catch (e) { return null; } };
 let timers = [];
