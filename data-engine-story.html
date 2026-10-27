@@ -13,11 +13,11 @@ header{display:flex;align-items:center;justify-content:space-between;gap:24px}
 .brand span{color:var(--orange)}
 h1{margin:0;font:700 clamp(18px,1.7vw,32px)/1.15 var(--display);text-align:right;text-wrap:balance}
 h1 em{font-style:normal;color:var(--orange)}
-.main{display:grid;grid-template-columns:minmax(0,2.6fr) minmax(0,1fr);gap:24px;min-height:0}
+.main{display:grid;grid-template-columns:minmax(0,2fr) minmax(0,1fr);gap:24px;min-height:0}
 .stage{position:relative;min-height:0;border-radius:18px;overflow:hidden;border:1px solid var(--line);background:#05070b}
 #eng{position:absolute;left:0;top:0;width:1600px;height:900px;border:0;transform-origin:0 0;background:#000}
 #shield{position:absolute;inset:0;z-index:3}
-#spot{position:absolute;z-index:4;pointer-events:none;border:3px solid var(--gold);border-radius:12px;box-shadow:0 0 0 9999px rgba(0,0,0,.32),0 0 34px rgba(255,210,63,.85);opacity:0;transition:left .7s ease,top .7s ease,width .7s ease,height .7s ease,opacity .4s}
+#spot{position:absolute;z-index:4;pointer-events:none;border:3px solid var(--gold);border-radius:12px;box-shadow:0 0 0 9999px rgba(0,0,0,.32),0 0 34px rgba(255,210,63,.85);opacity:0;transition:left .45s ease,top .45s ease,width .45s ease,height .45s ease,opacity .3s}
 #spot.on{opacity:1}
 .cover{position:absolute;inset:0;z-index:6;display:grid;place-items:center;background:#05070b;font:800 22px var(--body);color:var(--soft)}
 .cover[hidden]{display:none}
@@ -32,22 +32,22 @@ h1 em{font-style:normal;color:var(--orange)}
 .fin-b{display:flex;gap:10px;flex-wrap:wrap;justify-content:center}
 .fin-b a{font:800 18px var(--body);padding:13px 24px;border-radius:12px;background:var(--orange);color:var(--ink);text-decoration:none}
 .narr{display:flex;flex-direction:column;gap:16px;min-height:0;padding:4px 0}
-.step{font:800 18px var(--body);letter-spacing:.14em;text-transform:uppercase;color:var(--orange)}
-.narr h2{margin:0;font:700 clamp(32px,2.9vw,58px)/1.06 var(--display);text-wrap:balance}
-.narr p{margin:0;font-size:clamp(21px,1.6vw,31px);font-weight:500;line-height:1.38;color:var(--fg)}
+.step{font:800 19px var(--body);letter-spacing:.14em;text-transform:uppercase;color:var(--orange)}
+.narr h2{margin:0;font:700 clamp(30px,min(3.2vw,7.1vh),68px)/1.06 var(--display);text-wrap:balance}
+.narr p{margin:0;font-size:clamp(19px,min(1.7vw,3.8vh),36px);font-weight:500;line-height:1.38;color:var(--fg)}
 .controls{margin-top:auto;display:flex;flex-wrap:wrap;gap:8px}
-button{font:800 18px var(--body);color:var(--fg);background:#161616;border:2px solid var(--line);border-radius:12px;padding:10px 16px;cursor:pointer}
+button{font:800 16px var(--body);color:var(--fg);background:#161616;border:2px solid var(--line);border-radius:12px;padding:10px 16px;cursor:pointer}
 button:hover{border-color:var(--blue)}
 button:focus-visible{outline:3px solid var(--orange);outline-offset:2px}
 button[disabled]{opacity:.45;cursor:default}
 #play{background:var(--orange);border-color:var(--orange);color:var(--ink);min-width:140px}
 .rail{display:grid;grid-auto-flow:column;grid-auto-columns:minmax(0,1fr);gap:5px}
-.rail button{display:flex;flex-direction:column;align-items:flex-start;gap:6px;padding:6px 8px;font-size:16px;border-radius:10px;min-width:0;text-align:left}
+.rail button{display:flex;flex-direction:column;align-items:flex-start;gap:6px;padding:6px 8px;font-size:14px;border-radius:10px;min-width:0;text-align:left}
 .rail .bar{display:block;width:100%;height:4px;border-radius:2px;background:var(--line);overflow:hidden}
 .rail .bar i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--blue),var(--orange))}
 .rail .n{color:var(--orange)}
 .rail button[aria-current]{border-color:var(--orange)}
-.foot{font-size:16px;color:var(--fg)}
+.foot{font-size:14px;color:var(--soft)}
 .foot a{color:var(--fg)}
 @media (max-width:900px){
   .wrap{height:auto;padding:12px 14px}
@@ -92,18 +92,15 @@ button[disabled]{opacity:.45;cursor:default}
   <nav class="rail" id="rail" aria-label="Chapters"></nav>
   <div class="foot">The real Nextier Data Engine, running live on New York data. Owner names, phone numbers and emails stay masked in this story; in your workspace they're on every lot. · <a href="dataengine.html">The Data Engine</a></div>
 </div>
-<audio id="song" src="media/story-song2-112s.m4a" preload="auto" loop></audio>
+<audio id="song" src="media/story-song2-112s.m4a" preload="auto"></audio>
 <script>
 (function () {
 "use strict";
-// PACE slows every chapter and every click/typing step inside it by the same factor (1 = the old 8 s chapters)
-const PACE = 1.5, DUR = 8000 * PACE;
-// the engine renders at VW x VH and is scaled to fit the stage
-const VW = 1600, VH = 900;
+const DUR = 8000;
 const frame = document.getElementById("eng"), stage = document.getElementById("stage"), spotEl = document.getElementById("spot");
 const W = () => frame.contentWindow, D = () => frame.contentWindow.document, $ = (s) => { try { return D().querySelector(s); } catch (e) { return null; } };
 let timers = [];
-const T = (fn, ms) => timers.push(setTimeout(() => { try { fn(); } catch (e) { /* a step that misses never stops the story */ } }, ms * PACE));
+const T = (fn, ms) => timers.push(setTimeout(() => { try { fn(); } catch (e) { /* a step that misses never stops the story */ } }, ms));
 const clearT = () => { timers.forEach(clearTimeout); timers = []; };
 function fire(el, type, init) { const w = W(); const C = type === "keydown" ? w.KeyboardEvent : w.Event; el.dispatchEvent(new C(type, Object.assign({ bubbles: true }, init || {}))); }
 function setVal(sel, v) { const el = $(sel); if (!el || el.value === v) return; el.value = v; fire(el, el.tagName === "SELECT" ? "change" : "input"); }
@@ -119,7 +116,7 @@ const foldsClosed = () => D().querySelectorAll("#book .frow.fold.open .flab").fo
 function listReset() { setVal("#q", ""); const any = $('#listwin [data-win=""]'); if (any && any.getAttribute("aria-pressed") !== "true") any.click(); setVal("#sort", "rank"); }
 function listLocked(k, delay) { closeKiosk(); hash("book"); T(() => { const el = $(`#rows tr[data-k="${k}"] .addr`); if (el) { el.scrollIntoView({ block: "center" }); el.click(); } }, delay || 250); }
 function mapLocked(q) { closeKiosk(); hash("map"); setVal("#mapq", q); T(() => enter("#mapq"), 250); }
-function flyLI() { const m = W().__nxMap; if (m) m.flyTo({ center: [-72.95, 40.86], zoom: 8.6, pitch: 52, bearing: -14, duration: 2600 * PACE, essential: true }); }
+function flyLI() { const m = W().__nxMap; if (m) m.flyTo({ center: [-72.95, 40.86], zoom: 8.6, pitch: 52, bearing: -14, duration: 2600, essential: true }); }
 
 // the spotlight follows its element every frame (it moves while the page scrolls and the map flies)
 let spotSel = null, scale = 1, offX = 0, offY = 0;
@@ -138,7 +135,7 @@ const spot = (sel) => { spotSel = sel; };
 })();
 function fit() {
   const sw = stage.clientWidth, sh = stage.clientHeight;
-  scale = Math.min(sw / VW, sh / VH); offX = (sw - VW * scale) / 2; offY = (sh - VH * scale) / 2;
+  scale = Math.min(sw / 1600, sh / 900); offX = (sw - 1600 * scale) / 2; offY = (sh - 900 * scale) / 2;
   frame.style.transform = `translate(${offX}px,${offY}px) scale(${scale})`;
 }
 addEventListener("resize", fit); fit();
@@ -196,9 +193,7 @@ function tick(now) {
 }
 function syncSong(jump) {
   if (!playing || !soundOn) { song.pause(); return; }
-  // the slower story runs longer than the song, so the song loops and its position wraps with it
-  const len = song.duration, raw = cur * DUR / 1000 + Math.max(0, (performance.now() - t0) / 1000);
-  const at = isFinite(len) && len > 0 ? raw % len : raw;
+  const at = cur * DUR / 1000 + Math.max(0, (performance.now() - t0) / 1000);
   if (jump || Math.abs(song.currentTime - at) > 0.8) { try { song.currentTime = at; } catch (e) {} }
   const pr = song.play(); if (pr && pr.catch) pr.catch(() => {});
 }
