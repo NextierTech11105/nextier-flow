@@ -125,6 +125,32 @@ h3{font:800 18px 'Archivo',Arial,sans-serif;margin:6px 0 8px}
     </section>
 
     <section class="card wide">
+      <h2>Event signals · where each one comes from · RealEstateAPI vs Tracerfy</h2>
+      <table>
+        <tr><th>Signal</th><th>Segment</th><th>OneKey MLS · NY open data</th><th>RealEstateAPI</th><th>Tracerfy</th><th>We'd pick</th></tr>
+        <tr><td><b>MLS expired, never relisted or sold</b></td><td>Event</td><td>Your OneKey login: the full listing history, every county</td><td>MLS status flags</td><td>"Failed listing" flag; undercounts Long Island (Suffolk 1,599 vs OneKey 2,270) and covers very little land</td><td class="g"><b>OneKey</b></td></tr>
+        <tr><td><b>Expired 2+ times · long on market</b></td><td>Event</td><td>OneKey listing history and days on market</td><td>No listing-date window</td><td>No listing-date window</td><td class="g"><b>OneKey</b></td></tr>
+        <tr><td><b>Estate · inherited · probate</b></td><td>Event</td><td>Estate or trust named on the tax roll</td><td>Inherited, death and probate filters</td><td>Inherited list; change alerts when a new one appears</td><td class="g"><b>Tracerfy</b> (pay per lead); RealEstateAPI if you subscribe</td></tr>
+        <tr><td><b>Adjustable rate resets · loan coming due</b></td><td>Event</td><td>—</td><td>Loan type and maturity date</td><td>—</td><td class="g"><b>RealEstateAPI only</b> (thin on commercial loans)</td></tr>
+        <tr><td><b>Developers buying nearby · new deeds</b></td><td>Event</td><td>Companies taking title since 2021 (state rolls) + building permits by town</td><td>Corporate owner and last sale date</td><td>Change alerts on a sale or deed</td><td class="g"><b>Open data</b> + Tracerfy alerts</td></tr>
+        <tr><td><b>Absentee · out-of-state owner</b></td><td>Owner + land</td><td>Owner's mailing address on the tax roll</td><td>Absentee filter, owner mailing address</td><td>Owner-occupied flag</td><td class="g"><b>Open data</b> (already on every lot)</td></tr>
+        <tr><td><b>Vacant land · lot size · split by right</b></td><td>Owner + land</td><td>Property class, acres, town zoning + county septic rule</td><td>Vacant, lot size, land-use code</td><td>Land type and lot size (no zoning)</td><td class="g"><b>Open data</b></td></tr>
+        <tr><td><b>Years owned · no mortgage · high equity</b></td><td>Owner + land</td><td>Last deed on the roll</td><td>Years owned, no mortgage, high equity</td><td>Equity and ownership filters</td><td class="g"><b>RealEstateAPI</b> if you subscribe, else Tracerfy</td></tr>
+        <tr><td><b>Owner holds more parcels</b></td><td>Owner + land</td><td>Same owner or mailing address across the rolls</td><td>—</td><td>—</td><td class="g"><b>Open data</b></td></tr>
+        <tr><td><b>Phones + emails</b></td><td>Reach</td><td>—</td><td>—</td><td>Skip trace: mobiles, landlines, emails, line type, Do Not Call</td><td class="g"><b>Tracerfy only</b></td></tr>
+      </table>
+      <table>
+        <tr><th>How you pay</th><th>RealEstateAPI</th><th>Tracerfy</th></tr>
+        <tr><td>Plan</td><td>$600 a month flat, 30,000 credits</td><td>Pay as you go, no monthly</td></tr>
+        <tr><td>Counting a market before you buy</td><td>0 credits</td><td>0 credits (preview)</td></tr>
+        <tr><td>Pulling a list</td><td>Credits per record</td><td>About 10¢ a lead</td></tr>
+        <tr><td>Change alerts</td><td>Daily re-check of your saved properties</td><td>50¢ per new lead (up to 5,000 watched per alert)</td></tr>
+        <tr><td>Skip trace</td><td>—</td><td>2¢ a hit; misses cost nothing</td></tr>
+      </table>
+      <div class="note">Our pick for you: OneKey + NY open data for the land and the listings, Tracerfy for estates, alerts and phones. Add RealEstateAPI only for loan, adjustable-rate and equity data. No foreclosure pulls.</div>
+    </section>
+
+    <section class="card wide">
       <h2>Full cost breakdown · what runs on your own accounts</h2>
       <div class="grid">
         <div>
