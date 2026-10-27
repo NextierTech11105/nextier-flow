@@ -122,9 +122,11 @@
     </ol>
     <div class="copy"><code id="mcp">https://mcp.realestateapi.com/sse</code><button type="button" data-copy="mcp">Copy</button></div>
     <ol start="4">
-      <li>Choose <b>API key</b> and paste your key.</li>
+      <li>If the form lets you add a header, name it <b>x-api-key</b> and paste your key as its value.</li>
+      <li>If it doesn't, choose <b>no authentication</b> and put the key in the address instead:</li>
     </ol>
-    <p class="note">RealEstateAPI expects the key under the name <b>X-API-Key</b>. If the form has no place for that name, it won't connect. Send Thomas a screenshot of the form.</p>
+    <div class="copy"><code id="mcpkey">https://mcp.realestateapi.com/sse?x-api-key=YOUR_KEY</code><button type="button" data-copy="mcpkey">Copy</button></div>
+    <p class="note">Swap YOUR_KEY for your key. RealEstateAPI's own docs show this form. Treat the connector like a password: if the key ever leaks, make a new one in your RealEstateAPI dashboard. Every property lookup spends credits on your account, so check your usage after the first few questions.</p>
     <p class="done">Done when Perplexity can answer a question about a property address.</p>
   </section>
 
