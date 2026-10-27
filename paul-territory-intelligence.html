@@ -257,7 +257,7 @@ $('#cg').innerHTML=S.counties.map(([c,v])=>'<a class="cc" href="#book?co='+encod
 
 /* property book: list + search, click for detail */
 const st={q:'',segs:new Set(['verified','cand','nyc']),win:'',kind:'',co:'',sort:'rank',ev:''};
-function syncEv(){$('#evChips').innerHTML='<b style="align-self:center;margin-right:4px;color:#ff8a3d">Event signals</b>'+EV.map(([k,l,e])=>'<button class="chip'+(e?' ev':'')+'" type="button" data-ev="'+k+'" aria-pressed="'+(st.ev===k)+'">'+l+'<span class="ct">'+n0(R.filter(r=>st.segs.has(r.sg)&&r.ev.includes(k)).length)+'</span></button>').join('')+'<span class="count" style="align-self:center">+ at install on your key: pre-foreclosure · lis pendens · auction · adjustable rate</span>'}
+function syncEv(){$('#evChips').innerHTML='<b style="align-self:center;margin-right:4px;color:#ff8a3d">Event signals</b>'+EV.map(([k,l,e])=>'<button class="chip'+(e?' ev':'')+'" type="button" data-ev="'+k+'" aria-pressed="'+(st.ev===k)+'">'+l+'<span class="ct">'+n0(R.filter(r=>st.segs.has(r.sg)&&r.ev.includes(k)).length)+'</span></button>').join('')+'<span class="count" style="align-self:center">No foreclosure pulls · optional on your key: adjustable-rate resets</span>'}
 $('#evChips').addEventListener('click',e=>{const b=e.target.closest('[data-ev]');if(!b)return;st.ev=st.ev===b.dataset.ev?'':b.dataset.ev;syncEv();renderList()});
 [...new Set(R.map(r=>r.k).filter(Boolean))].sort().forEach(k=>$('#fKind').insertAdjacentHTML('beforeend','<option>'+esc(k)+'</option>'));
 [...new Set(R.map(r=>r.co).filter(Boolean))].sort((a,b)=>coName(a).localeCompare(coName(b))).forEach(c=>$('#fCo').insertAdjacentHTML('beforeend','<option value="'+esc(c)+'">'+esc(coName(c))+'</option>'));
