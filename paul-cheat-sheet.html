@@ -125,6 +125,24 @@ h3{font:800 18px 'Archivo',Arial,sans-serif;margin:6px 0 8px}
     </section>
 
     <section class="card wide">
+      <h2>Your data lake · all of New York State</h2>
+      <p style="margin:0 0 12px;font-weight:600">Every parcel in New York State, in a database you own. <b class="o">Heavy focus and weekly surveillance on Suffolk and Nassau.</b> Also worked: the Bronx, Westchester, and north up to Orange County.</p>
+      <table>
+        <tr><th>Source</th><th>Records</th><th>What's in it (the columns)</th><th class="r">Cost</th></tr>
+        <tr><td><b>NYS tax parcels</b> · state open data, 2025 roll</td><td>Every parcel in NY</td><td>Owner + second owner, mailing address, owner type · Section-Block-Lot, address, ZIP · property class, used as · acres, frontage, depth · year built, living sq ft, bedrooms, baths, style · sewer, water, utilities · land, total and full market value · school district · deed book and page</td><td class="r">$0</td></tr>
+        <tr><td><b>NYC lot file (PLUTO)</b></td><td>Every lot in the 5 boroughs</td><td>Zoning, buildable floor area, building class, lot size · for the Bronx</td><td class="r">$0</td></tr>
+        <tr><td><b>USBizData · Residential</b></td><td>15,801,605</td><td>Name, address, ZIP+4, lat/long · exact and estimated age, birth date · estimated income and wealth · length of residence · homeowner or renter, dwelling type, home value · phone</td><td class="r">$27</td></tr>
+        <tr><td><b>USBizData · Cell</b></td><td>5,141,785</td><td>Cell number, name, address, ZIP</td><td class="r">$27</td></tr>
+        <tr><td><b>USBizData · Email</b></td><td>7,297,939</td><td>Email, name, address, phone, opt-in IP</td><td class="r">$27</td></tr>
+        <tr><td><b>USBizData · Business</b></td><td>5,514,091</td><td>Company, contact, email, phone, website, employees, revenue, SIC code</td><td class="r">$27</td></tr>
+        <tr><td><b>OneKey MLS</b> · your login</td><td>Your MLS</td><td>Listings, expireds, withdrawn, days on market, listing history</td><td class="r">Your membership</td></tr>
+        <tr><td><b>Tracerfy</b> · your key</td><td>On demand</td><td>Mobiles, landlines, emails, line type, Do Not Call · change alerts</td><td class="r">2¢ a hit</td></tr>
+        <tr><td><b>Mapbox + Mapillary</b></td><td>Every lot on the map</td><td>Satellite at every zoom · front-of-house street photos</td><td class="r">$0 at this use</td></tr>
+      </table>
+      <div class="note">How it fits together: parcel → owner of record → matched to the USBizData residential file (age, years at the address, income) → cell + email → Tracerfy only for what's still missing, which keeps skip-trace spend low. Suffolk and Nassau get the weekly sweep: new expireds, back on the market, new deeds, building permits.</div>
+    </section>
+
+    <section class="card wide">
       <h2>Baseline · 50,000 first texts a month + 2,000 calls a day</h2>
       <div class="grid">
         <div>
@@ -136,6 +154,7 @@ h3{font:800 18px 'Archivo',Arial,sans-serif;margin:6px 0 8px}
             <tr><td>Skip trace</td><td>≈ 50,000 hits × 2¢ to find 50,000 mobiles; misses cost nothing</td><td class="r">$1,000 – $1,200</td></tr>
             <tr><td>Phone numbers</td><td>6 texting lines + 20–40 calling lines × $1.15, + $10 campaign</td><td class="r">$40 – $65</td></tr>
             <tr><td>Database + listing re-checks</td><td>DigitalOcean $61 + Apify ≈ $35</td><td class="r">≈ $95</td></tr>
+            <tr><td>Maps + street photos</td><td>Mapbox (inside its monthly allowance) + Mapillary</td><td class="r">$0</td></tr>
             <tr class="tot"><td colspan="2">Baseline month</td><td class="r">≈ $2,150 – $2,950</td></tr>
           </table>
           <div class="note">Add RealEstateAPI ($600) only for loan and adjustable-rate data. Owners come from the NY tax rolls already in your database, so there's no per-lead list cost; pulling lists from Tracerfy instead would add about 10¢ a lead.</div>
@@ -196,7 +215,8 @@ h3{font:800 18px 'Archivo',Arial,sans-serif;margin:6px 0 8px}
             <tr><td>SignalHouse brand + campaign</td><td>Registers your texting with the carriers ($4.50 + $15)</td><td class="r">$19.50</td></tr>
             <tr><td>SignalHouse brand vetting</td><td>Raises how many texts the carriers allow a day</td><td class="r">$40</td></tr>
             <tr><td>5 phone numbers</td><td>$1 each</td><td class="r">$5</td></tr>
-            <tr><td>New York data bundle</td><td>Business file for 4 counties + Nassau parcels (the rest of NY is open data)</td><td class="r">$358</td></tr>
+            <tr><td>USBizData · New York State bundle</td><td>Residential · cell · email · business, 4 files × $27</td><td class="r">$108</td></tr>
+            <tr><td>Nassau parcel shapes</td><td>Lot outlines + measured acres for the Nassau focus (owners come from the state rolls)</td><td class="r">$250</td></tr>
             <tr><td>First skip trace</td><td>Every owner in the land book (1,771 lots) at 2¢</td><td class="r">≈ $35</td></tr>
             <tr class="tot"><td colspan="2">Set-up in your accounts</td><td class="r">≈ $458</td></tr>
           </table>
@@ -211,6 +231,8 @@ h3{font:800 18px 'Archivo',Arial,sans-serif;margin:6px 0 8px}
             <tr><td>Your database</td><td>DigitalOcean, 2 CPU / 4 GB</td><td class="r">$61</td></tr>
             <tr><td>Listing re-checks</td><td>Apify, weekly sweep (estimate)</td><td class="r">≈ $35</td></tr>
             <tr><td>Texting line upkeep</td><td>Campaign $10 + 5 numbers at $1.15</td><td class="r">$16</td></tr>
+            <tr><td>Mapbox satellite</td><td>50,000 map loads + 750,000 satellite tiles a month included; then $5 per 1,000 loads</td><td class="r">$0 at this use</td></tr>
+            <tr><td>Mapillary street photos</td><td>Front-of-house photos; Mapillary doesn't charge</td><td class="r">$0</td></tr>
             <tr class="tot"><td colspan="2">A full month in your accounts</td><td class="r">≈ $560</td></tr>
           </table>
         </div>
