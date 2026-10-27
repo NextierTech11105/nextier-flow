@@ -140,6 +140,8 @@ td .s { display: block; color: var(--fg2); }
 .em { font: 500 15px/1.5 var(--mono); color: var(--fg2); overflow-wrap: anywhere; user-select: all; }
 :focus-visible { outline: 3px solid var(--blue); outline-offset: 2px; }
 @media (prefers-reduced-motion: reduce) { * { scroll-behavior: auto !important; } }
+.em a { color: #fff; }
+.ph .call { color: #fff; border-color: var(--green); }
 </style>
 </head>
 <body>
@@ -390,6 +392,34 @@ td .s { display: block; color: var(--fg2); }
       spin();
     }
   });
+})();
+</script>
+<script id="sealed-phones">
+// Real numbers are sealed (AES-GCM). The plain link stays masked; the private #key= link shows them on that device.
+(async function () {
+  const SEALED = {"iv":"Ai/5+s+zDWxO0cze","ct":"aJsiVPk0Xu+o8L6gf2lKz0j56tuCGtPTGmyJB5o0kl8ToxNXpHFGBIvM5cFRN0O0tVQssm5YcuJYrM/t2aEPmfweLE5/qvbH33NfPUosdH4op48vUYXMW6f9m6zfDqjw14OSjjRhh9+93JOAXA2wVqQ6PZKt7buygAdFq8I31kvlMfzP4dBJYCNxVh92kzvpA75BdK83DbF1p3u2IQHq5dp4L3zrLEevtM9dVPSkp+4dliOVRjyjExoUjs6eHUaoa2oDHLQkth75e6SkDLD0jsH++lzOZa6imRLz6Lzk3UDzrdZazY5Yr4Lb0cMsdkYCoZ+etGFsVdgkecjIRnra5ab5DSWtEbOQlwh25SpK6Oh3mGoETOpufY/5zpl6WZRL3Gyv6b+RcbXI0MkiX2BRijmNv0zqz+lK931vRGyDUQ3YA46JNzOxkjrzhjanY4yy7vZ4gyIlNVKcauudGMhP0EK3g3QPlo/aqZ7jP8LVjgtgUpXxwyUOCbruH0C+RMvueYE0ETLPeAOmC9FvsY6yk9G0S+OHY1ULpejwovQBJXplxobciSdpWoaiX65rXel2xCDRUDvEeHy0Y+m8A2rzIGxHkYk0m91ck6zvZoBAAM+KsazGtM4S3SoqNAVYEiepGLws7wgkBnRuw/HVJrTrcmYIF7Temiz6WronGJRWaeqnxUTKlzcPkLER7wLINGL0ICQQceWfwfcbyxcoaNmKigi0MSeVqLDcsTfr5kSUDlu3g6GBaz5e0xeU9hhbLwPOr46Q1/iANfIxvpr0HYQisuLs+owibmVPaG6HSVqAJhHu/Jnpui+JIro3fv8yYff9x02NroT+4tMligxPzrs8ah4xSwaPxy/x+jqYtJaclzoGKn1h3o6YQcQ6tMhIZPVo2v6hRssZZAxyIFC0plpRM+HP/FxPgha6gR43aDzBCqDzJOCZ6df1srlvtBARPuIFKkh1HU8orj56PxmwxtAQMoRRnEYami9cW2y9vrQTUCgukCB5qGzdsZqu+CBI9GiRO/1ANHtxMfsMYXpsNzEFT+jea4e1xRF8rCV/tQxkO7auNebJx2qQOkNUW3bRp3QcELWxaL+7TBY0xyVEayzdKFSfMVRWxcu+Zhe9a54l6xyXMqG+lsAqKHaE6oYey1v+52+HYe6mMlUfdla8LcpA+RsiVYyjdTBYouUVRWuajEfBwCe8263gCgCZ/uJ9EPThLni7qriE0lYFHZw7KEj+wIeksYfx/gXiGecUNkIU8+Rno8B80gxjUYp9hO3RUJIaIQWqpL5kq14VGJFncmYijGEGHOhjRZYau7gZ27td6P4wyajdC7Tl+bX7hAT0fPMjbPXswudHAyaruFdKBP8WgqNfV1+/oBETexOR3sW0o+jo7wdNG4j9PS7s+V8jytFD13BqwwHUW6lr5jZiygInwnI6Zk1kgHvSOXA+ImpOP46No664uLqUlqNSOo3xFbdLATeeQHztcXgxJuT+Gmc7EvbjozKMopOv0Vadvmd9ZBe8L71bvJxEG+FcociGN5hcPjQp9sLa6g2c0eB0W+sLJhRzmbKnh4OIEp49IMAYDGmA0JPrx6mbhL3K6fw="}, LS = "dr-30th-key";
+  let k = (location.hash.match(/key=([A-Za-z0-9_-]+)/) || [])[1];
+  if (k) { try { localStorage.setItem(LS, k); } catch (e) {} history.replaceState(null, "", location.pathname + location.search); }
+  else { try { k = localStorage.getItem(LS); } catch (e) {} }
+  if (!k || !window.crypto || !crypto.subtle) return;
+  try {
+    const b = (s) => Uint8Array.from(atob(s), (ch) => ch.charCodeAt(0));
+    const raw = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(k));
+    const key = await crypto.subtle.importKey("raw", raw, "AES-GCM", false, ["decrypt"]);
+    const P = JSON.parse(new TextDecoder().decode(await crypto.subtle.decrypt({ name: "AES-GCM", iv: b(SEALED.iv) }, key, b(SEALED.ct))));
+    document.querySelectorAll(".num.mask").forEach((el) => {
+      const real = P.nums[el.textContent.trim()]; if (!real) return;
+      el.textContent = real; el.classList.remove("mask");
+      const a = document.createElement("a"); a.className = "call"; a.href = "tel:+1" + real.replace(/\D/g, ""); a.textContent = "☎ Call"; el.parentElement.appendChild(a);
+    });
+    document.querySelectorAll(".who").forEach((w) => {
+      const n = (w.querySelector(".who-n") || {}).textContent || "", em = w.querySelector(".em");
+      const hit = Object.entries(P.emails).find(([last]) => n.includes(last));
+      if (hit && em) em.innerHTML = hit[1].map((e) => '<a href="mailto:' + e + '">' + e + "</a>").join("<br>");
+    });
+    const meta = document.querySelector(".ph-meta");
+    if (meta) meta.textContent = "22 phones and 12 emails from a Tracerfy skip trace on JEM's own account, Oct 21, 2026. Full numbers, shown on this device only.";
+  } catch (e) { /* wrong or old key: the page stays masked */ }
 })();
 </script>
 </body>
