@@ -1,0 +1,127 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="robots" content="noindex">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Parcelvora — One-Page Plan</title>
+<style>
+  @page { size: letter; margin: 0.6in 0.65in; }
+  body { font: 10.5pt/1.45 "Segoe UI", Arial, sans-serif; color: #111827; margin: 0; }
+  h1 { font-size: 22pt; margin: 0 0 2pt; letter-spacing: -0.01em; }
+  .by { color: #4b5563; margin: 0 0 14pt; }
+  h2 { font-size: 13pt; margin: 16pt 0 5pt; padding-bottom: 3pt; border-bottom: 1.5pt solid #111827; }
+  p { margin: 0 0 6pt; }
+  table { width: 100%; border-collapse: collapse; margin: 4pt 0 8pt; font-size: 9.5pt; page-break-inside: avoid; }
+  th, td { border: 0.75pt solid #d1d5db; padding: 4pt 6pt; text-align: left; vertical-align: top; }
+  th { background: #f3f4f6; font-weight: 600; }
+  td.status { white-space: nowrap; font-weight: 600; }
+  ul { margin: 0 0 6pt; padding-left: 16pt; }
+  li { margin: 0 0 3pt; }
+  ul.tasks { list-style: none; padding-left: 0; }
+  ul.tasks li::before { content: "\2610\00a0\00a0"; }
+  a { color: #1d4ed8; }
+  .note { color: #374151; }
+  @media screen { body { max-width: 860px; margin: 32px auto; padding: 0 16px; } }
+  @media screen {
+    :root { color-scheme: dark; }
+    html, body { background: #0b0f14; }
+    body { color: #ffffff; font-size: 16px; }
+    h1, h2, th, b { color: #ffffff; }
+    h2 { border-bottom-color: #3b82f6; }
+    .by, .note { color: #ffffff; }
+    th { background: #131c28; }
+    table { font-size: 15px; }
+    th, td { border-color: #283546; }
+    a { color: #60a5fa; }
+  }
+</style>
+</head>
+<body>
+<h1>Parcelvora — One-Page Plan</h1>
+<p class="by">October 27, 2026</p>
+
+<h2>The idea</h2>
+<p>Parcelvora sells New York property data, and only data, at a flat monthly price far below the four tools investors and agents pay for today. The core is public record: NYC Open Data and NY State Open Data hold 3,441 tables and about 8.9 billion rows, and pulling them costs $0.</p>
+<p>We take the best screen from each tool and rebuild it on that data: PropertyShark's property report, PropStream's list builder, DealMachine's Driving for Dollars map and ATTOM Property Navigator's comps and value view. At launch we charge extra only where we pay: phone and email lookups.</p>
+<p>No texting, dialing or mail. The customer gets the data and works it their own way.</p>
+
+<h2>What we take from each tool</h2>
+<p>Each tool is best at one screen. We build that screen on public record and put all four in one product.</p>
+<table>
+  <tr><th>Tool</th><th>What it does best</th><th>What we build from it</th></tr>
+  <tr><td><a href="https://www.propertyshark.com/mason/Subscriptions/">PropertyShark</a></td><td>NYC property reports: sales history, legal document scans, violations, zoning, permits. Real owner behind an LLC only on its top tier</td><td>The report: owner, the people behind the LLC, every deed and mortgage one click from the recorded document in ACRIS</td></tr>
+  <tr><td><a href="https://www.propstream.com/pricing">PropStream</a></td><td>List building: 20 lead lists and 165+ filters</td><td>The list builder: stack NYC distress signals (tax arrears, liens, violations, evictions, vacate orders) into one list</td></tr>
+  <tr><td><a href="https://www.dealmachine.com/pricing">DealMachine</a></td><td>Driving for Dollars on every plan: spot a house from the road, get the owner</td><td>The map: tap any lot, open its report</td></tr>
+  <tr><td><a href="https://www.attomdata.com/solutions/property-navigator/pricing/">ATTOM Property Navigator</a></td><td>One yearly price for nationwide search: foreclosure, sales and mortgage search, comps, value and rent estimates, phone numbers</td><td>Comps and market view: recent NYC sales near the lot from DOF sales records; value estimates as a paid add-on</td></tr>
+</table>
+<p>PropertyShark keeps real LLC owners and owner phone numbers for its NYC-only Platinum tier. Public record already names the people behind many LLCs: HPD registration contacts, NY State corporation filings, ACRIS parties and DOB filings.</p>
+
+<h2>What the data costs us</h2>
+<p>Five of the seven layers cost $0 to pull. The one real variable cost is phone and email lookups, and the customer pays for those per hit.</p>
+<table>
+  <tr><th>Layer</th><th>Public source</th><th>Our cost</th></tr>
+  <tr><td>Owner, deeds, mortgages, sales (NYC)</td><td>ACRIS: 17.1M recorded documents, 46.7M party rows. PLUTO: 858,284 tax lots. DOF sales</td><td>$0</td></tr>
+  <tr><td>The recorded document itself</td><td>ACRIS public viewer for Manhattan, Bronx, Brooklyn and Queens. Staten Island is not in ACRIS</td><td>$0</td></tr>
+  <tr><td>Distress signals (NYC)</td><td>Tax lien sale list, unpaid property charges, HPD violations, litigation and vacate orders, DOB and ECB violations, OATH tickets, evictions</td><td>$0</td></tr>
+  <tr><td>People behind an LLC</td><td>HPD registration contacts (810,494 rows), NY State corporation filings (21M), DOB permit filings</td><td>$0</td></tr>
+  <tr><td>Parcels outside NYC</td><td>NY State assessment rolls (23.6M rows)</td><td>$0</td></tr>
+  <tr><td>Homeowner phones and emails</td><td>Skip trace (Tracerfy), billed only on a hit</td><td>About 2¢ per hit</td></tr>
+  <tr><td>Home values, MLS status, other states</td><td>RealEstateAPI credits; MLS data needs a license</td><td>Paid per use</td></tr>
+</table>
+<p>Two of those $0 layers are where the others make money. PropStream charges $5 per deed or mortgage document and 10–12¢ per contact. PropertyShark puts LLC owners behind its $169.95 NYC Platinum tier.</p>
+<p class="note">Row counts are from the <a href="ny-open-data-inventory.html">NY Open Data Inventory</a>, pulled 2026-10-27.</p>
+
+<h2>Price</h2>
+<p>Start at $29 a month, with contacts at 8¢ per hit. That is about half of PropertyShark's cheapest New York plan, under a third of PropStream or DealMachine, and $151 a year less than ATTOM Property Navigator.</p>
+<table>
+  <tr><th>Product</th><th>Entry price</th><th>What the entry price buys</th></tr>
+  <tr><td>Parcelvora (proposed)</td><td>$29/mo</td><td>Unlimited NY reports, lists and map; every NYC deed and mortgage opens in ACRIS; contacts 8¢ per hit</td></tr>
+  <tr><td><a href="https://www.attomdata.com/solutions/property-navigator/pricing/">ATTOM Property Navigator</a></td><td>$499/yr (about $42/mo), billed yearly only</td><td>200 reports and 2,000 exports a month, 1 user, nationwide</td></tr>
+  <tr><td><a href="https://www.propertyshark.com/mason/Subscriptions/">PropertyShark</a></td><td>$59.95/mo (NY)</td><td>175 reports a month. LLC owners and owner phones only on Platinum, $169.95/mo, NYC only</td></tr>
+  <tr><td><a href="https://www.propstream.com/pricing">PropStream</a></td><td>$99/mo ($81 billed yearly)</td><td>20 lead lists, 165+ filters, 25,000 saves and exports. Contacts 12¢, documents $5 each</td></tr>
+  <tr><td><a href="https://www.dealmachine.com/pricing">DealMachine</a></td><td>From $99/mo</td><td>Driving for Dollars and owner data; 10,000 data credits a month on Basic</td></tr>
+</table>
+<p>At 8¢ a contact we charge four times our lookup cost and still undercut PropStream. Prices were read from each company's own page on 2026-10-27.</p>
+
+<h2>What's already built</h2>
+<p>The report is already built on our existing platform. The list builder, a city-wide map and customer signup are the work left.</p>
+<table>
+  <tr><th>Piece</th><th>Status</th><th>Notes</th></tr>
+  <tr><td>NYC property report: owner, deeds, mortgages, people behind the LLC, permits, violations</td><td class="status">Built</td><td>The Property Book, on our existing platform</td></tr>
+  <tr><td>Long Island and upstate parcel report</td><td class="status">Built</td><td>Same report route, on the NY State assessment rolls</td></tr>
+  <tr><td>Click a deed, open the recorded document</td><td class="status">Not built</td><td>The report already holds every deed's ACRIS ID; 3 small code edits</td></tr>
+  <tr><td>Distress list builder</td><td class="status">Partly built</td><td>The hunt engine already reads the distress signals (tax liens, HPD violations and vacates, ECB penalties), but only as hand-run scripts with no screen</td></tr>
+  <tr><td>Map</td><td class="status">Partly built</td><td>The Property Book draws each lot in 3D; no city-wide tap-a-lot map yet</td></tr>
+  <tr><td>Phone and email lookups</td><td class="status">Partly built</td><td>Works on Nextier's Tracerfy account; Parcelvora needs its own</td></tr>
+  <tr><td>Card billing</td><td class="status">Not checked</td><td>Stripe subscribe and checkout code exists; not tested live</td></tr>
+</table>
+
+<h2>Risks and limits</h2>
+<p>The biggest limits are coverage and freshness, not cost.</p>
+<ul>
+  <li><b>New York only at launch.</b> Other states need paid data (RealEstateAPI or ATTOM). Price that as an add-on so the $29 plan stays cheap to run.</li>
+  <li><b>Staten Island has no deed history.</b> ACRIS covers Manhattan, Bronx, Brooklyn and Queens only.</li>
+  <li><b>Some feeds run late.</b> The newest deed in ACRIS open data is from 2026-09-30. The tax lien list was last updated 330 days ago, HPD registrations 76 days ago. Show an as-of date on every fact.</li>
+  <li><b>Contacts carry a compliance duty.</b> Customers who text or call need Do Not Call checks. Tracerfy offers one; include the DNC flag on every number we sell.</li>
+  <li><b>Unlimited invites scraping.</b> Cap exports per month so nobody resells the whole book.</li>
+  <li><b>Confirm reuse terms.</b> Check that the NYC and NY State open-data terms allow commercial resale before launch.</li>
+  <li><b>Separate company, separate keys.</b> Its own Tracerfy, RealEstateAPI and Stripe accounts. Never EHOA's or Nextier's.</li>
+  <li><b>Remix ideas, not property.</b> Build our own screens. Copy no competitor's code, wording or branding.</li>
+</ul>
+
+<h2>First 30 days</h2>
+<p>The NYC report alone can earn the first paying customer. The list builder and map come after.</p>
+<ul class="tasks">
+  <li>Week 1: Open Parcelvora's own Tracerfy, RealEstateAPI and Stripe accounts.</li>
+  <li>Week 1: Confirm the NYC and NY State open-data reuse terms.</li>
+  <li>Week 2: Ship the deed click and an as-of date on every fact in the report.</li>
+  <li>Week 2: Put the hunt engine's distress filters behind one list screen.</li>
+  <li>Week 3: Landing page with the price table and a sample report on a real NYC address.</li>
+  <li>Week 3: Show it to 10 investors and agents at $29 a month.</li>
+  <li>Week 4: Turn on billing and sign the first paying customer.</li>
+  <li>Week 4: Pick the next build: city-wide map or Long Island depth.</li>
+</ul>
+<p>Open question: does it run on our existing platform under its own brand, or as a separate app?</p>
+</body>
+</html>
