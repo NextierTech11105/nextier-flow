@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="robots" content="noindex">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>RealEstateAPI in Perplexity</title>
+<style>
+  /* Layout: how it works (3 boxes), setup steps, prompts to copy, then costs and safety. */
+  :root {
+    color-scheme: dark;
+    --bg: #07090d; --card: #10151d; --line: #253041; --ink: #ffffff; --soft: #e8eef6;
+    --blue: #4f9bff; --green: #4ade80; --green-bg: #0d2a1b; --amber: #fbbf24;
+    --mono: ui-monospace, "Cascadia Mono", Consolas, Menlo, monospace;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--ink); font: 17px/1.55 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
+  .wrap { max-width: 760px; margin: 0 auto; padding-block: 32px 64px; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); display: grid; gap: 22px; }
+  h1 { font-size: clamp(30px, 6vw, 40px); line-height: 1.1; margin: 0; }
+  h2 { font-size: 22px; margin: 0; }
+  p { margin: 0; }
+  .lede { color: var(--soft); font-size: 18px; }
+  .flow { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
+  .flow div { background: var(--card); border: 1px solid var(--line); border-top: 4px solid var(--blue); padding: 14px; font-weight: 600; }
+  .flow small { display: block; color: var(--soft); font-weight: 400; font-size: 15px; margin-top: 4px; }
+  .card { background: var(--card); border: 1px solid var(--line); padding: 20px; display: grid; gap: 14px; }
+  ol, ul { margin: 0; padding-left: 24px; display: grid; gap: 8px; }
+  .copy { display: grid; grid-template-columns: minmax(0, 1fr) auto; border: 1px solid var(--line); background: #05070a; }
+  .copy code { font: 14px/1.6 var(--mono); padding: 10px 12px; overflow-x: auto; white-space: pre; color: var(--ink); }
+  .copy button { font: 700 15px system-ui, sans-serif; background: var(--blue); color: #000; border: 0; padding: 0 16px; cursor: pointer; }
+  .copy button:focus-visible { outline: 3px solid var(--ink); outline-offset: 2px; }
+  .done { background: var(--green-bg); color: var(--green); font-weight: 700; padding: 10px 14px; }
+  .note { color: var(--soft); font-size: 16px; border-left: 3px solid var(--amber); padding-left: 12px; }
+  .ask { display: grid; gap: 6px; }
+  .ask .what { color: var(--soft); font-size: 15px; }
+  footer { color: var(--soft); text-align: center; font-size: 16px; }
+  @media (max-width: 560px) { .flow { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header style="display:grid;gap:12px">
+    <h1>RealEstateAPI in Perplexity</h1>
+    <p class="lede">Ask Perplexity about any property. RealEstateAPI supplies the records.</p>
+  </header>
+
+  <div class="flow" aria-label="How it works">
+    <div>1. You ask<small>"Who owns 123 Main St?"</small></div>
+    <div>2. Perplexity calls RealEstateAPI<small>with your key</small></div>
+    <div>3. Records come back<small>Perplexity writes the answer</small></div>
+  </div>
+
+  <section class="card" aria-labelledby="setup">
+    <h2 id="setup">Set it up · 5 minutes · needs Perplexity Pro or Max</h2>
+    <ol>
+      <li>In your RealEstateAPI dashboard, copy an API key. Use one that's separate from EHOA's daily key.</li>
+      <li>In Perplexity, go to <b>Settings → Connectors → + Custom connector</b> and pick <b>Remote</b>.</li>
+      <li>Name it <b>RealEstateAPI</b> and paste this address:</li>
+    </ol>
+    <div class="copy"><code id="url">https://mcp.realestateapi.com/sse</code><button type="button" data-copy="url">Copy</button></div>
+    <ol start="4">
+      <li>If the form lets you add a header, name it <b>x-api-key</b> and paste your key as its value.</li>
+      <li>If it doesn't, choose <b>no authentication</b> and use this address instead, with your key in place of YOUR_KEY:</li>
+    </ol>
+    <div class="copy"><code id="urlkey">https://mcp.realestateapi.com/sse?x-api-key=YOUR_KEY</code><button type="button" data-copy="urlkey">Copy</button></div>
+    <p class="done">Done when Perplexity answers "Who owns" a real address with an owner's name.</p>
+  </section>
+
+  <section class="card" aria-labelledby="asks">
+    <h2 id="asks">What to ask</h2>
+    <div class="ask"><div class="copy"><code id="q1">Find pre-foreclosure homes in Queens, NY with at least 40% equity</code><button type="button" data-copy="q1">Copy</button></div><span class="what">Property search</span></div>
+    <div class="ask"><div class="copy"><code id="q2">Who owns 123 Main St, Brooklyn, NY, and what mortgages are on it?</code><button type="button" data-copy="q2">Copy</button></div><span class="what">Owner, deed and mortgages</span></div>
+    <div class="ask"><div class="copy"><code id="q3">What is 123 Main St, Brooklyn, NY worth? Show 5 comps.</code><button type="button" data-copy="q3">Copy</button></div><span class="what">Value estimate and comps</span></div>
+    <div class="ask"><div class="copy"><code id="q4">Is 123 Main St, Brooklyn, NY listed for sale right now?</code><button type="button" data-copy="q4">Copy</button></div><span class="what">MLS status</span></div>
+    <div class="ask"><div class="copy"><code id="q5">Who is behind ABC Holdings LLC in New York?</code><button type="button" data-copy="q5">Copy</button></div><span class="what">Company lookup</span></div>
+    <div class="ask"><div class="copy"><code id="q6">Find a phone number for the owner of 123 Main St, Brooklyn, NY</code><button type="button" data-copy="q6">Copy</button></div><span class="what">Skip trace, the priciest lookup</span></div>
+    <p class="note">Swap in a real address or company name.</p>
+  </section>
+
+  <section class="card" aria-labelledby="costs">
+    <h2 id="costs">Costs and safety</h2>
+    <ul>
+      <li><b>Every lookup spends your RealEstateAPI credits.</b> Check your usage after the first 5 questions. Connectors can bill more than direct calls.</li>
+      <li><b>Skip traces cost the most.</b> Ask for phones only when you need them.</li>
+      <li><b>Your key works like a password.</b> If it ever leaks, make a new one in your RealEstateAPI dashboard.</li>
+    </ul>
+  </section>
+
+  <footer>Perplexity won't add it? Text Thomas a screenshot of the error.</footer>
+</div>
+<script>
+document.querySelectorAll("[data-copy]").forEach((btn) => {
+  btn.addEventListener("click", () => {
+    const el = document.getElementById(btn.dataset.copy);
+    const done = () => { btn.textContent = "Copied"; setTimeout(() => { btn.textContent = "Copy"; }, 1600); };
+    const pick = () => { const r = document.createRange(); r.selectNodeContents(el); const s = getSelection(); s.removeAllRanges(); s.addRange(r); };
+    if (navigator.clipboard) navigator.clipboard.writeText(el.textContent).then(done, pick); else pick();
+  });
+});
+</script>
+</body>
+</html>
