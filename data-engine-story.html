@@ -1,0 +1,227 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Nextier Data Engine · Development · Story Mode</title>
+<meta name="description" content="Story Mode for the Nextier Data Engine, development segment: every parcel in your market on live satellite, search by county, lock onto the land, deal potential, owner of record, click-to-call, every attempt counted, push to Initial SMS. The real engine, running live, with music.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=DM+Sans:wght@400;500;700;800&display=swap">
+<style>
+:root{--bg:#000;--line:#2a2a2a;--fg:#fff;--soft:#e8edf6;--orange:#FF8A3D;--blue:#4C8DFF;--gold:#ffd23f;--ink:#0A1022;--display:'Space Grotesk','Trebuchet MS',Arial,sans-serif;--body:'DM Sans','Segoe UI',Arial,sans-serif;color-scheme:dark}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--fg);font-family:var(--body)}
+.wrap{height:100vh;height:100dvh;display:grid;grid-template-rows:auto minmax(0,1fr) auto auto;gap:10px;padding:12px 24px 10px}
+header{display:flex;align-items:center;justify-content:space-between;gap:24px}
+.brand{font:700 20px var(--display);letter-spacing:.08em;white-space:nowrap}
+.brand span{color:var(--orange)}
+h1{margin:0;font:700 clamp(18px,1.7vw,32px)/1.15 var(--display);text-align:right;text-wrap:balance}
+h1 em{font-style:normal;color:var(--orange)}
+.main{display:grid;grid-template-columns:minmax(0,2.6fr) minmax(0,1fr);gap:24px;min-height:0}
+.stage{position:relative;min-height:0;border-radius:18px;overflow:hidden;border:1px solid var(--line);background:#05070b}
+#eng{position:absolute;left:0;top:0;width:1600px;height:900px;border:0;transform-origin:0 0;background:#000}
+#shield{position:absolute;inset:0;z-index:3}
+#spot{position:absolute;z-index:4;pointer-events:none;border:3px solid var(--gold);border-radius:12px;box-shadow:0 0 0 9999px rgba(0,0,0,.32),0 0 34px rgba(255,210,63,.85);opacity:0;transition:left .45s ease,top .45s ease,width .45s ease,height .45s ease,opacity .3s}
+#spot.on{opacity:1}
+.cover{position:absolute;inset:0;z-index:6;display:grid;place-items:center;background:#05070b;font:800 22px var(--body);color:var(--soft)}
+.cover[hidden]{display:none}
+.fin{position:absolute;inset:0;z-index:7;display:grid;place-items:center;background:rgba(0,0,0,.88);text-align:center;padding:24px}
+.fin[hidden]{display:none}
+.fin-in{display:grid;gap:16px;justify-items:center;max-width:900px}
+.loop{display:flex;flex-wrap:wrap;justify-content:center;gap:8px;align-items:center;font:800 16px var(--body)}
+.loop span{padding:7px 13px;border-radius:999px;border:1px solid #2A3550;background:#0B1020}
+.loop i{font-style:normal;color:var(--orange)}
+.fin h2{margin:0;font:700 clamp(30px,4vw,56px)/1.05 var(--display)}
+.fin h2 em{font-style:normal;color:var(--orange)}
+.fin-b{display:flex;gap:10px;flex-wrap:wrap;justify-content:center}
+.fin-b a{font:800 18px var(--body);padding:13px 24px;border-radius:12px;background:var(--orange);color:var(--ink);text-decoration:none}
+.narr{display:flex;flex-direction:column;gap:16px;min-height:0;padding:4px 0}
+.step{font:800 15px var(--body);letter-spacing:.14em;text-transform:uppercase;color:var(--orange)}
+.narr h2{margin:0;font:700 clamp(28px,2.6vw,54px)/1.06 var(--display);text-wrap:balance}
+.narr p{margin:0;font-size:clamp(18px,1.35vw,27px);line-height:1.4;color:var(--soft)}
+.controls{margin-top:auto;display:flex;flex-wrap:wrap;gap:8px}
+button{font:800 16px var(--body);color:var(--fg);background:#161616;border:2px solid var(--line);border-radius:12px;padding:10px 16px;cursor:pointer}
+button:hover{border-color:var(--blue)}
+button:focus-visible{outline:3px solid var(--orange);outline-offset:2px}
+button[disabled]{opacity:.45;cursor:default}
+#play{background:var(--orange);border-color:var(--orange);color:var(--ink);min-width:140px}
+.rail{display:grid;grid-auto-flow:column;grid-auto-columns:minmax(0,1fr);gap:5px}
+.rail button{display:flex;flex-direction:column;align-items:flex-start;gap:6px;padding:6px 8px;font-size:14px;border-radius:10px;min-width:0;text-align:left}
+.rail .bar{display:block;width:100%;height:4px;border-radius:2px;background:var(--line);overflow:hidden}
+.rail .bar i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--blue),var(--orange))}
+.rail .n{color:var(--orange)}
+.rail button[aria-current]{border-color:var(--orange)}
+.foot{font-size:14px;color:var(--soft)}
+.foot a{color:var(--fg)}
+@media (max-width:900px){
+  .wrap{height:auto;padding:12px 14px}
+  header{flex-direction:column;align-items:flex-start;gap:8px}
+  h1{text-align:left}
+  .main{grid-template-columns:minmax(0,1fr)}
+  .stage{aspect-ratio:16/9}
+  .rail{grid-auto-flow:row;grid-template-columns:repeat(4,minmax(0,1fr))}
+}
+</style></head><body>
+<div class="wrap">
+  <header>
+    <div class="brand">NEXT<span>IER</span> · DATA ENGINE · DEVELOPMENT</div>
+    <h1>Deal origination starts with a foundational database <em>that you own. Not lists.</em></h1>
+  </header>
+  <div class="main">
+    <div class="stage" id="stage">
+      <iframe id="eng" src="paul-land-hunt.html?story=1#map" title="The Nextier Data Engine, running live" tabindex="-1"></iframe>
+      <div id="shield" aria-hidden="true"></div>
+      <div id="spot" aria-hidden="true"></div>
+      <div class="cover" id="cover">Loading the Data Engine…</div>
+      <div class="fin" id="fin" hidden>
+        <div class="fin-in">
+          <div class="loop"><span>Parcel</span><i>→</i><span>Signal</span><i>→</i><span>Owner</span><i>→</i><span>Call</span><i>→</i><span>First text</span><i>→</i><span>Reply</span><i>→</i><span>Deal</span></div>
+          <h2>Stop waiting for deals. <em>Originate them.</em></h2>
+          <div class="fin-b"><a href="https://www.nxtier.ai/book/nextier" target="_blank" rel="noopener">Book 15 minutes</a><button type="button" id="finReplay">Replay</button></div>
+        </div>
+      </div>
+    </div>
+    <div class="narr">
+      <div class="step" id="step">Chapter 1 of 14</div>
+      <h2 id="ttl"></h2>
+      <p id="txt"></p>
+      <div class="controls">
+        <button id="prev" type="button">Back</button>
+        <button id="play" type="button" disabled>Play story</button>
+        <button id="snd" type="button" aria-pressed="true">Sound on</button>
+        <button id="next" type="button">Next</button>
+      </div>
+    </div>
+  </div>
+  <nav class="rail" id="rail" aria-label="Chapters"></nav>
+  <div class="foot">The real Nextier Data Engine, running live on New York data. Owner names, phone numbers and emails stay masked in this story; in your workspace they're on every lot. · <a href="dataengine.html">The Data Engine</a></div>
+</div>
+<audio id="song" src="media/story-song2-112s.m4a" preload="auto"></audio>
+<script>
+(function () {
+"use strict";
+const DUR = 8000;
+const frame = document.getElementById("eng"), stage = document.getElementById("stage"), spotEl = document.getElementById("spot");
+const W = () => frame.contentWindow, D = () => frame.contentWindow.document, $ = (s) => { try { return D().querySelector(s); } catch (e) { return null; } };
+let timers = [];
+const T = (fn, ms) => timers.push(setTimeout(() => { try { fn(); } catch (e) { /* a step that misses never stops the story */ } }, ms));
+const clearT = () => { timers.forEach(clearTimeout); timers = []; };
+function fire(el, type, init) { const w = W(); const C = type === "keydown" ? w.KeyboardEvent : w.Event; el.dispatchEvent(new C(type, Object.assign({ bubbles: true }, init || {}))); }
+function setVal(sel, v) { const el = $(sel); if (!el || el.value === v) return; el.value = v; fire(el, el.tagName === "SELECT" ? "change" : "input"); }
+function typeInto(sel, text, total) { const el = $(sel); if (!el) return; el.value = ""; fire(el, "input"); const per = Math.max(35, Math.floor(total / text.length)); for (let i = 1; i <= text.length; i++) T(() => { el.value = text.slice(0, i); fire(el, "input"); }, per * i); }
+const click = (sel) => { const el = $(sel); if (el) el.click(); return el; };
+const enter = (sel) => { const el = $(sel); if (el) fire(el, "keydown", { key: "Enter" }); };
+const hash = (h) => { if (W().location.hash !== "#" + h) W().location.hash = h; };
+const scrollEl = (sel, block, smooth) => { const el = $(sel); if (el) el.scrollIntoView({ block: block || "center", behavior: smooth === false ? "auto" : "smooth" }); };
+const closeKiosk = () => click("#ckiosk:not([hidden]) [data-ckclose]");
+const unlockPanel = () => click("#opanel:not([hidden]) [data-opclose]");
+function fold(i, open) { const r = D().querySelectorAll("#book .frow.fold")[i]; if (r && r.classList.contains("open") !== open) r.querySelector(".flab").click(); }
+const foldsClosed = () => D().querySelectorAll("#book .frow.fold.open .flab").forEach((l) => l.click());
+function listReset() { setVal("#q", ""); const any = $('#listwin [data-win=""]'); if (any && any.getAttribute("aria-pressed") !== "true") any.click(); setVal("#sort", "rank"); }
+function listLocked(k, delay) { closeKiosk(); hash("book"); T(() => { const el = $(`#rows tr[data-k="${k}"] .addr`); if (el) { el.scrollIntoView({ block: "center" }); el.click(); } }, delay || 250); }
+function mapLocked(q) { closeKiosk(); hash("map"); setVal("#mapq", q); T(() => enter("#mapq"), 250); }
+function flyLI() { const m = W().__nxMap; if (m) m.flyTo({ center: [-72.95, 40.86], zoom: 8.6, pitch: 52, bearing: -14, duration: 2600, essential: true }); }
+
+// the spotlight follows its element every frame (it moves while the page scrolls and the map flies)
+let spotSel = null, scale = 1, offX = 0, offY = 0;
+const spot = (sel) => { spotSel = sel; };
+(function loop() {
+  const el = spotSel && $(spotSel);
+  if (el) {
+    const r = el.getBoundingClientRect(), sw = stage.clientWidth, sh = stage.clientHeight;
+    let x = offX + r.left * scale - 7, y = offY + r.top * scale - 7, w = r.width * scale + 14, h = r.height * scale + 14;
+    if (r.width && r.height && y < sh && y + h > 0) {
+      x = Math.max(4, x); y = Math.max(4, y); w = Math.min(w, sw - x - 4); h = Math.min(h, sh - y - 4);
+      Object.assign(spotEl.style, { left: x + "px", top: y + "px", width: w + "px", height: h + "px" }); spotEl.classList.add("on");
+    } else spotEl.classList.remove("on");
+  } else spotEl.classList.remove("on");
+  requestAnimationFrame(loop);
+})();
+function fit() {
+  const sw = stage.clientWidth, sh = stage.clientHeight;
+  scale = Math.min(sw / 1600, sh / 900); offX = (sw - 1600 * scale) / 2; offY = (sh - 900 * scale) / 2;
+  frame.style.transform = `translate(${offX}px,${offY}px) scale(${scale})`;
+}
+addEventListener("resize", fit); fit();
+
+const CH = [
+  { k: "Map", t: "Every parcel in your market. Mapped. Measured. Ranked.", x: "19,419 lots across New York on live satellite. Every dot is a parcel: expired land, and commercial sites worth more as development.",
+    run() { closeKiosk(); unlockPanel(); hash("map"); setVal("#mapq", ""); T(flyLI, 200); T(() => spot("#mapqct"), 3400); } },
+  { k: "Search", t: "Any county. Any town. Any parcel. One search.", x: "Type Suffolk County and the map narrows to Suffolk. The same box takes a town, a ZIP, a parcel ID or an owner's name.",
+    run() { closeKiosk(); unlockPanel(); hash("map"); typeInto("#mapq", "Suffolk County", 1700); T(() => spot("#mapqct"), 2000); } },
+  { k: "Lock on", t: "Click the land. The map locks on.", x: "Enter, and the map flies to the parcel: the line is the county tax-map boundary, on live satellite. Nothing moves until you click.",
+    run() { closeKiosk(); hash("map"); setVal("#mapq", "Suffolk County"); T(() => enter("#mapq"), 400); T(() => spot("#opanel .op-a"), 1900); } },
+  { k: "Deal potential", t: "The deal, read before the first call.", x: "Acres. Lots by right under town zoning and the septic rule. Last asking. Who's building next door. Which way permits are heading. The next move.",
+    run() { mapLocked("Suffolk County"); T(() => spot("#opanel .op-deal"), 1300); } },
+  { k: "List + map", t: "Every lot ranked. Every lot on the map.", x: "The Property Book on the left, the satellite on the right. Click a row and the map locks onto that parcel. The eye opens the full record.",
+    run() { closeKiosk(); unlockPanel(); hash("book"); listReset(); foldsClosed(); T(() => scrollEl("#book .tablewrap", "start", false), 300); T(() => spot("#book .tablewrap"), 900); listLocked(3, 3300); T(() => spot("#rows tr.on"), 4400); } },
+  { k: "Signals", t: "We find the owners most likely to have to sell.", x: "Event signals: MLS expired and never relisted, estates, adjustable rates about to reset. Narrow to listings that died one to two years ago.",
+    run() { closeKiosk(); hash("book"); listReset(); foldsClosed(); T(() => scrollEl("#book .tools", "start", false), 200); T(() => fold(0, true), 600); T(() => spot("#book .frow.fold.open"), 800); T(() => { fold(0, false); fold(1, true); }, 3600); T(() => click('#listwin [data-win="deep"]'), 4600); T(() => spot("#book .frow.fold.open"), 3800); } },
+  { k: "Zoning", t: "We read the deal in the dirt before the market does.", x: "Zoning allows a split. Big enough to split. NYC building sites. Town zoning and the county septic rule decide how many lots the land becomes.",
+    run() { closeKiosk(); hash("book"); foldsClosed(); T(() => scrollEl("#book .tools", "start", false), 200); T(() => fold(2, true), 500); T(() => spot("#book .frow.fold.open"), 800); } },
+  { k: "Lot size", t: "Precision targeting. Biggest land first.", x: "Ten acres and up, five to ten, two to five. Sort the whole book by acreage in one click.",
+    run() { closeKiosk(); hash("book"); foldsClosed(); T(() => scrollEl("#book .tools", "start", false), 200); T(() => fold(4, true), 400); T(() => spot("#book .frow.fold.open"), 700); T(() => { setVal("#sort", "ac"); scrollEl("#book .tablewrap", "start"); }, 3600); T(() => spot("#rows tr[data-k]"), 4400); } },
+  { k: "Owner", t: "We cut through the LLC to the person who signs.", x: "Owner of record on every lot, straight from the state tax roll. Parcel ID by section, block and lot. Where the owner actually lives, and what else they hold.",
+    run() { hash("book"); listReset(); foldsClosed(); listLocked(5); T(() => spot("#opanel .op-pid"), 1300); T(() => spot("#opanel .op-facts"), 3600); } },
+  { k: "Reach", t: "Verified. Compliant. Reachable.", x: "Skip trace on your key: every phone with its line type and the Do Not Call check. Do Not Call numbers get no Call button. Masked here; real in your workspace.",
+    run() { hash("book"); listReset(); listLocked(3); T(() => { const d = $('#opanel details[data-f="ph"]'); if (d && !d.open) d.querySelector("summary").click(); }, 1500); T(() => { scrollEl('#opanel details[data-f="ph"]', "start"); spot('#opanel details[data-f="ph"]'); }, 1800); } },
+  { k: "Call", t: "One press. Every outcome logged.", x: "Call from your own line and the call pad opens on the lead: no answer, voicemail, wrong number, callback, keep, sell, OPPT, APPT, Do Not Call.",
+    run() { hash("book"); listReset(); listLocked(3); T(() => click("#opanel a[data-callk]"), 1300); T(() => spot("#ckiosk"), 1600); T(() => click('#ckiosk [data-ckres="VOICEMAIL"]'), 4000); T(() => click('#ckiosk [data-ckout="SELL"]'), 5200); T(() => { scrollEl("#ckiosk .nlist", "nearest"); spot("#ckiosk .nlist"); }, 5500); } },
+  { k: "Attempts", t: "Every touch counted.", x: "Calls, texts and emails on every lot, right in the list. Nothing falls through a crack.",
+    run() { closeKiosk(); hash("book"); listReset(); listLocked(3); T(() => spot("#rows tr.on .reachcell"), 1300); T(() => spot("#rows tr.on .led"), 3800); } },
+  { k: "Push", t: "Nothing moves without your command.", x: "Push the lead to Initial SMS or Pipeline Nurture. It's staged, not sent: not one text goes out until you press Send.",
+    run() { closeKiosk(); hash("book"); listReset(); listLocked(3); T(() => spot('#opanel [data-to="Initial SMS"]'), 1300); T(() => click('#opanel [data-to="Initial SMS"]'), 3600); T(() => { scrollEl("#ckiosk .nlist", "nearest"); spot("#ckiosk .nlist"); }, 4000); } },
+  { k: "Record", t: "One record. Total intelligence.", x: "The eye opens the full record: parcel record, zoning math, listing history, and the deals lost nearby with what they teach.",
+    run() { closeKiosk(); hash("lot-3"); T(() => scrollEl("#d-record", "start"), 900); T(() => spot("#d-record"), 1400); T(() => scrollEl("#d-lost", "start"), 4300); T(() => spot("#d-lost"), 4900); } },
+];
+
+const rail = document.getElementById("rail"), stepEl = document.getElementById("step"), ttl = document.getElementById("ttl"), txt = document.getElementById("txt");
+const playBtn = document.getElementById("play"), sndBtn = document.getElementById("snd"), fin = document.getElementById("fin"), song = document.getElementById("song");
+CH.forEach((c, i) => { const b = document.createElement("button"); b.type = "button"; b.innerHTML = `<span class="bar"><i></i></span><span><span class="n">${String(i + 1).padStart(2, "0")}</span> ${c.k}</span>`; b.addEventListener("click", () => { go(i); if (playing) t0 = performance.now(); syncSong(true); }); rail.appendChild(b); });
+const railBtns = [...rail.children];
+let cur = 0, playing = false, t0 = 0, raf = 0, ready = false, soundOn = true;
+function go(i) {
+  cur = Math.max(0, Math.min(CH.length - 1, i));
+  fin.hidden = true; clearT(); spot(null);
+  stepEl.textContent = `Chapter ${cur + 1} of ${CH.length}`; ttl.textContent = CH[cur].t; txt.textContent = CH[cur].x;
+  railBtns.forEach((b, j) => { b.querySelector(".bar i").style.width = j < cur ? "100%" : "0"; if (j === cur) b.setAttribute("aria-current", "step"); else b.removeAttribute("aria-current"); });
+  if (ready) try { CH[cur].run(); } catch (e) {}
+  t0 = performance.now();
+}
+function tick(now) {
+  if (!playing) return;
+  const p = Math.min(1, (now - t0) / DUR);
+  railBtns[cur].querySelector(".bar i").style.width = (p * 100) + "%";
+  if (p >= 1) { if (cur === CH.length - 1) { setPlay(false); railBtns[cur].querySelector(".bar i").style.width = "100%"; spot(null); fin.hidden = false; return; } go(cur + 1); }
+  raf = requestAnimationFrame(tick);
+}
+function syncSong(jump) {
+  if (!playing || !soundOn) { song.pause(); return; }
+  const at = cur * DUR / 1000 + Math.max(0, (performance.now() - t0) / 1000);
+  if (jump || Math.abs(song.currentTime - at) > 0.8) { try { song.currentTime = at; } catch (e) {} }
+  const pr = song.play(); if (pr && pr.catch) pr.catch(() => {});
+}
+function setPlay(on) {
+  playing = on; cancelAnimationFrame(raf);
+  playBtn.textContent = on ? "Pause" : (cur === CH.length - 1 ? "Replay" : "Play story");
+  if (on) { if (!fin.hidden || (cur === CH.length - 1 && performance.now() - t0 >= DUR - 100)) go(0); t0 = performance.now(); raf = requestAnimationFrame(tick); }
+  syncSong(true);
+}
+playBtn.addEventListener("click", () => setPlay(!playing));
+sndBtn.addEventListener("click", () => { soundOn = !soundOn; sndBtn.setAttribute("aria-pressed", String(soundOn)); sndBtn.textContent = soundOn ? "Sound on" : "Sound off"; syncSong(true); });
+document.getElementById("next").addEventListener("click", () => { go(cur + 1); if (playing) t0 = performance.now(); syncSong(true); });
+document.getElementById("prev").addEventListener("click", () => { go(cur - 1); if (playing) t0 = performance.now(); syncSong(true); });
+document.getElementById("finReplay").addEventListener("click", () => { go(0); setPlay(true); });
+document.addEventListener("keydown", (e) => { if (e.key === "ArrowRight") document.getElementById("next").click(); else if (e.key === "ArrowLeft") document.getElementById("prev").click(); else if (e.key === " " && e.target === document.body) { e.preventDefault(); setPlay(!playing); } });
+
+// Ready when the engine has its list and its map. Deep link: data-engine-story.html#ch5
+const m = /^#ch(\d+)$/.exec(location.hash || "");
+go(m ? Math.min(Math.max(+m[1], 1), CH.length) - 1 : 0);
+function whenReady() {
+  let n = 0;
+  const iv = setInterval(() => {
+    n++;
+    let ok = false; try { ok = !!$("#rows tr[data-k]") && !!W().__nxMap; } catch (e) {}
+    if (ok || n > 60) { clearInterval(iv); ready = true; document.getElementById("cover").hidden = true; playBtn.disabled = false; go(cur); }
+  }, 250);
+}
+frame.addEventListener("load", whenReady);
+})();
+</script>
+</body></html>
