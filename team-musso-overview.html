@@ -166,7 +166,7 @@ const CH = [
     run() { hash("book"); listReset(); listLocked(3); T(() => click("#opanel a[data-callk]"), 1300); T(() => spot("#ckiosk"), 1600); T(() => click('#ckiosk [data-ckres="VOICEMAIL"]'), 4000); T(() => click('#ckiosk [data-ckout="SELL"]'), 5200); T(() => { scrollEl("#ckiosk .nlist", "nearest"); spot("#ckiosk .nlist"); }, 5500); } },
   { k: "Attempts", t: "Every touch counted.", x: "Calls, texts and emails on every lot, right in the list. Nothing falls through a crack.",
     run() { closeKiosk(); hash("book"); listReset(); listLocked(3); T(() => spot("#rows tr.on .reachcell"), 1300); T(() => spot("#rows tr.on .led"), 3800); } },
-  { k: "Push", t: "Nothing moves without your command.", x: "Push the lead to Initial SMS or Pipeline Nurture. It's staged, not sent: not one text goes out until you press Send.",
+  { k: "Push", t: "Nothing moves without your command.", x: "Wherever your first outreach campaign launches, we've got you. Push the lead to Initial SMS or Pipeline Nurture. It's staged, not sent: not one text goes out until you press Send.",
     run() { closeKiosk(); hash("book"); listReset(); listLocked(3); T(() => spot('#opanel [data-to="Initial SMS"]'), 1300); T(() => click('#opanel [data-to="Initial SMS"]'), 3600); T(() => { scrollEl("#ckiosk .nlist", "nearest"); spot("#ckiosk .nlist"); }, 4000); } },
   { k: "Record", t: "One record. Total intelligence.", x: "The eye opens the full record: parcel record, zoning math, listing history, and the deals lost nearby with what they teach.",
     run() { closeKiosk(); hash("lot-3"); T(() => scrollEl("#d-record", "start"), 900); T(() => spot("#d-record"), 1400); T(() => scrollEl("#d-lost", "start"), 4300); T(() => spot("#d-lost"), 4900); } },
