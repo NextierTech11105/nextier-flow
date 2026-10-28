@@ -1,7 +1,7 @@
 <!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>Team Musso · Nextier Data Engine · Overview</title>
 <meta name="robots" content="noindex,nofollow">
-<meta name="description" content="Team Musso's Nextier Data Engine, running live: every parcel in New York State on live satellite, search by county, lock onto the land, deal potential, owner of record, click-to-call, every attempt counted, push to Initial SMS. The real engine, running live, with music.">
+<meta name="description" content="Team Musso's Nextier Data Engine, running live: access to every parcel in New York State, focused on Suffolk and Nassau, on live satellite, search by county, lock onto the land, deal potential, owner of record, click-to-call, every attempt counted, push to Initial SMS. The real engine, running live, with music.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=DM+Sans:wght@400;500;700;800&display=swap">
 <style>
@@ -142,7 +142,7 @@ function fit() {
 addEventListener("resize", fit); fit();
 
 const CH = [
-  { k: "Map", t: "Every parcel in your market. Mapped. Measured. Ranked.", x: "19,419 lots across New York State on live satellite, Suffolk and Nassau first. Every dot is a parcel: expired land, and commercial sites worth more as development.",
+  { k: "Map", t: "Every parcel in your market. Mapped. Measured. Ranked.", x: "Access to all of New York State. Focus on Suffolk and Nassau first. 19,419 lots on live satellite: every dot is a parcel, expired land and commercial sites worth more as development.",
     run() { closeKiosk(); unlockPanel(); hash("map"); setVal("#mapq", ""); T(flyLI, 200); T(() => spot("#mapqct"), 3400); } },
   { k: "Search", t: "Any county. Any town. Any parcel. One search.", x: "Type Suffolk County and the map narrows to Suffolk. The same box takes a town, a ZIP, a parcel ID or an owner's name.",
     run() { closeKiosk(); unlockPanel(); hash("map"); typeInto("#mapq", "Suffolk County", 1700); T(() => spot("#mapqct"), 2000); } },

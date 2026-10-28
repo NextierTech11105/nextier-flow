@@ -82,9 +82,12 @@ b{color:#fff}
 .chain span{font-weight:700;font-size:15px;padding:6px 12px;border-radius:999px;border:1px solid var(--blue);background:#0f2347}
 .chain span.tf{border-color:var(--orange);background:#4a2309}
 .chain i{font-style:normal;font-weight:800;color:var(--orange)}
-.focus{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 14px}
-.focus span{font-weight:800;padding:6px 12px;border-radius:12px;border:1px solid var(--line);background:var(--card2)}
-.focus span.hot{border-color:var(--orange);background:#4a2309}
+.rings{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,240px),1fr));gap:10px;margin:0 0 16px}
+.ring{border-radius:14px;padding:12px 14px;font-weight:700;font-size:18px}
+.ring b{display:block;font:800 14px 'Archivo',Arial,sans-serif;letter-spacing:.1em;margin-bottom:4px}
+.ring.f{border:2px solid var(--orange);background:#4a2309}
+.ring.n{border:2px solid var(--blue);background:#0f2347}
+.ring.a{border:2px dashed #64748b;background:var(--card2)}
 /* lead preview */
 .lp{border:2px solid var(--blue);border-radius:16px;overflow:hidden}
 .lp .hd{padding:14px 16px;background:linear-gradient(90deg,#0f2347,#0a0d12)}
@@ -169,7 +172,7 @@ td.r,th.r{text-align:right;white-space:nowrap;font-weight:700}
           <span class="lbl">Finds it · calls it · keeps the record</span>
           <h2>🧠 The Data Engine</h2>
           <div class="flow">
-            <div class="st"><div class="ic">🗺️</div><div><b>Finds the land</b><span>Every parcel in New York: state tax rolls, the NYC lot file, OneKey MLS.</span></div></div>
+            <div class="st"><div class="ic">🗺️</div><div><b>Finds the land</b><span>Access to every parcel in New York; focus on Suffolk + Nassau. State tax rolls, the NYC lot file, OneKey MLS.</span></div></div>
             <div class="st"><div class="ic">🎯</div><div><b>Finds the reason to call now</b><span>Expired and never relisted, expired twice, long on market, estate, developers buying next door.</span></div></div>
             <div class="st"><div class="ic">📐</div><div><b>Reads the deal</b><span>Acres, lots by right, last asking, who's building nearby, permit trend.</span></div></div>
             <div class="st"><div class="ic">👤</div><div><b>Finds the owner</b><span>Owner of record, past the LLC to the person who signs.</span></div></div>
@@ -228,7 +231,7 @@ td.r,th.r{text-align:right;white-space:nowrap;font-weight:700}
       </div>
       <h3 style="margin-top:16px">🚦 To start · what we need</h3>
       <div class="num-list">
-        <div>The counties to start with</div>
+        <div>Your OK on the focus: Suffolk + Nassau first</div>
         <div>Your keys and OneKey login</div>
         <div>Who presses Send, and who works the calls</div>
         <div>Your Follow Up Boss login</div>
@@ -237,9 +240,13 @@ td.r,th.r{text-align:right;white-space:nowrap;font-weight:700}
     </section>
 
     <section class="card wide" id="lake">
-      <h2>🌊 Your data lake · all of New York State</h2>
-      <p style="margin:0 0 10px;font-weight:600">Every parcel in New York State, in a database you own.</p>
-      <div class="focus"><span class="hot">🎯 Suffolk · weekly surveillance</span><span class="hot">🎯 Nassau · weekly surveillance</span><span>🏙️ The Bronx</span><span>🌳 Westchester</span><span>⛰️ North up to Orange County</span></div>
+      <h2>🌊 Your data lake · access to the whole state, focus on Suffolk + Nassau</h2>
+      <p style="margin:0 0 12px;font-weight:600">Access and focus are two different things. You have every parcel in New York State. We work where you're focused, not all over the map.</p>
+      <div class="rings">
+        <div class="ring f"><b>🎯 FOCUS · first</b>Suffolk + Nassau · weekly surveillance</div>
+        <div class="ring n"><b>➡️ NEXT · when you say</b>The Bronx, all the way up to Orange County</div>
+        <div class="ring a"><b>🔓 ACCESS · in your lake</b>All of New York State</div>
+      </div>
       <div class="srcs">
         <div class="sr" style="--c:var(--green)"><div class="top"><span class="nm">🏛️ NYS tax parcels</span><span class="cost">$0</span></div><div class="rec">Every parcel in NY</div><div class="cols">State open data, 2025 roll · owner + second owner, mailing address, owner type · Section-Block-Lot, address, ZIP · property class · acres, frontage, depth · year built, living sq ft, beds, baths · sewer, water · land, total and full market value · school district · deed book and page</div></div>
         <div class="sr" style="--c:var(--green)"><div class="top"><span class="nm">🏙️ NYC lot file (PLUTO)</span><span class="cost">$0</span></div><div class="rec">Every lot in the 5 boroughs</div><div class="cols">Zoning, buildable floor area, building class, lot size · for the Bronx</div></div>
