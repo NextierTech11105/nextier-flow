@@ -1,0 +1,220 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<title>Team Musso · First 30 Days</title>
+<meta name="description" content="The Team Musso execution map, the rules that govern it, and what to expect in the first 30 days.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@700;800&family=IBM+Plex+Sans:wght@500;600;700&display=swap">
+<style>
+:root{--bg:#000;--card:#0a0d12;--line:#2a3442;--fg:#fff;--orange:#ff8a3d;--green:#12b76a;--blue:#4c8dff;color-scheme:dark}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--fg);font:500 17px/1.5 'IBM Plex Sans','Segoe UI',Arial,sans-serif}
+.wrap{max-width:1100px;margin:0 auto;padding:28px 16px 48px}
+.brand{font:800 15px 'Archivo',Arial,sans-serif;letter-spacing:.14em;text-transform:uppercase}
+.brand span{color:var(--orange)}
+h1{font:800 clamp(30px,4.4vw,52px)/1.05 'Archivo',Arial,sans-serif;margin:10px 0 8px}
+h1 em{font-style:normal;color:var(--green)}
+.lede{font-size:20px;font-weight:600;margin:0 0 22px;max-width:62ch}
+h2{font:800 22px 'Archivo',Arial,sans-serif;margin:0 0 12px;color:var(--orange)}
+h3{font:800 18px 'Archivo',Arial,sans-serif;margin:0 0 8px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,480px),1fr));gap:16px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:18px 20px}
+.wide{grid-column:1/-1}
+ol,ul{margin:0;padding-left:22px}
+li{margin:0 0 9px}
+b{color:#fff}
+.g{color:var(--green)}.o{color:var(--orange)}.bl{color:var(--blue)}
+.note{font-weight:600;border-left:4px solid var(--orange);padding:4px 0 4px 12px;margin-top:12px}
+.flow{display:flex;flex-wrap:wrap;align-items:center;gap:6px 4px;margin:0 0 16px}
+.flow span{font-weight:700;font-size:15px;padding:5px 12px;border-radius:999px;border:1px solid var(--orange);background:#4a2309}
+.flow span.us{border-color:var(--blue);background:#0f2347}
+.flow span.you{border-color:var(--green);background:#0b3322}
+.flow i{font-style:normal;font-weight:800;color:var(--orange)}
+.key{display:flex;flex-wrap:wrap;gap:8px 16px;font-weight:600;font-size:15px;margin:0 0 12px}
+.key b{display:inline-block;width:12px;height:12px;border-radius:3px;margin-right:6px;vertical-align:-1px}
+.tw{overflow-x:auto}
+table{width:100%;border-collapse:collapse;margin:0}
+th,td{text-align:left;padding:9px 10px;border-bottom:1px solid var(--line);vertical-align:top}
+th{font-weight:700;color:var(--orange)}
+td.n{font:800 18px 'Archivo',Arial,sans-serif;color:var(--orange);white-space:nowrap}
+.who{display:inline-block;font-weight:700;font-size:14px;padding:2px 9px;border-radius:999px;white-space:nowrap;margin:0 4px 4px 0}
+.who.us{border:1px solid var(--blue);background:#0f2347}
+.who.you{border:1px solid var(--green);background:#0b3322}
+.rules{counter-reset:r;list-style:none;padding:0;display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,320px),1fr));gap:10px}
+.rules li{counter-increment:r;border:1px solid var(--line);border-radius:12px;padding:12px 14px 12px 50px;background:#06080b;position:relative;margin:0}
+.rules li::before{content:counter(r);position:absolute;left:14px;top:11px;font:800 20px 'Archivo',Arial,sans-serif;color:var(--orange)}
+.weeks{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,240px),1fr));gap:12px}
+.wk{border:1px solid var(--line);border-radius:14px;padding:14px 16px;background:#06080b}
+.wk .d{font:800 13px 'Archivo',Arial,sans-serif;letter-spacing:.12em;text-transform:uppercase;color:var(--orange)}
+.wk h3{margin:4px 0 10px;font-size:20px}
+.wk ul{padding-left:18px}
+.wk .done{border-top:1px solid var(--line);margin-top:10px;padding-top:10px;font-weight:700;color:var(--green)}
+.nums{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin-bottom:12px}
+.num{border:1px solid var(--line);border-radius:12px;padding:12px 14px;background:#06080b}
+.num b{display:block;font:800 28px/1.05 'Archivo',Arial,sans-serif}
+.num span{font-weight:600}
+.links a{display:block;color:#fff;font-weight:700;padding:12px 14px;border:1px solid var(--line);border-radius:12px;margin-bottom:8px;text-decoration:none;background:#06080b}
+.links a:hover{border-color:var(--blue)}
+.links small{display:block;font-weight:500}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="brand">NEXT<span>IER</span> · DATA ENGINE · TEAM MUSSO</div>
+  <h1>How it runs. Who decides. <em>Your first 30 days.</em></h1>
+  <p class="lede">One map from parcel to appointment, the rules that keep it clean, and what the first month looks like, week by week.</p>
+
+  <div class="grid">
+    <section class="card wide">
+      <h2>The execution map</h2>
+      <div class="key"><span><b style="background:var(--blue)"></b>Nextier runs it</span><span><b style="background:var(--green)"></b>Your team runs it</span></div>
+      <div class="flow">
+        <span class="us">Find</span><i>→</i><span class="us">Signal</span><i>→</i><span class="us">Read the deal</span><i>→</i><span class="us">Owner</span><i>→</i><span class="us">Phones + email</span><i>→</i><span class="us">Blocks</span><i>→</i><span class="you">Call + email</span><i>→</i><span class="you">First text</span><i>→</i><span class="you">Replies</span><i>→</i><span class="you">Appointment</span><i>→</i><span class="us">Report</span>
+      </div>
+      <div class="tw">
+      <table>
+        <tr><th></th><th>Step</th><th>What happens</th><th>Who</th><th>Where you see it</th></tr>
+        <tr><td class="n">1</td><td><b>Find</b></td><td>Every parcel in New York State. Suffolk and Nassau swept every week; the Bronx, Westchester and up to Orange County worked too.</td><td><span class="who us">Nextier</span></td><td>Hunt Engine map + list</td></tr>
+        <tr><td class="n">2</td><td><b>Signal</b></td><td>The reason to call now: MLS expired and never relisted, expired 2+ times, long on market, estate or trust, developers buying nearby. No foreclosure pulls.</td><td><span class="who us">Nextier</span></td><td>Signal tags on every lot · Territory Intelligence</td></tr>
+        <tr><td class="n">3</td><td><b>Read the deal</b></td><td>Acres, zoning, lots by right, last asking, who's building next door, which way permits are heading.</td><td><span class="who us">Nextier</span></td><td>Deal potential on the lot</td></tr>
+        <tr><td class="n">4</td><td><b>Owner</b></td><td>Owner of record, past the LLC to the person who signs. Where they live, what else they hold.</td><td><span class="who us">Nextier</span></td><td>Owner card on the lot</td></tr>
+        <tr><td class="n">5</td><td><b>Phones + email</b></td><td>Skip trace on your key. Every phone ranked and labeled mobile or landline, with the Do Not Call check.</td><td><span class="who us">Nextier</span> <span class="who you">Paul approves the spend</span></td><td>Phones + emails on the lot</td></tr>
+        <tr><td class="n">6</td><td><b>Blocks</b></td><td>Lots grouped into call and text blocks, best first: split by right, aged expireds, individual owners.</td><td><span class="who us">Nextier builds</span> <span class="who you">Bryan picks</span></td><td>Work this next</td></tr>
+        <tr><td class="n">7</td><td><b>Call + email</b></td><td>One click to call from your own line. One press logs the outcome. Notes on every lot.</td><td><span class="who you">Your assistants</span></td><td>Call pad on the lot</td></tr>
+        <tr><td class="n">8</td><td><b>First text</b></td><td>Wherever your first outreach campaign launches, we've got you. The block is staged, not sent, until a person presses Send.</td><td><span class="who you">Bryan presses Send</span></td><td>Launch page</td></tr>
+        <tr><td class="n">9</td><td><b>Replies</b></td><td>Any reply is a raised hand. Worked first, with a callback date and notes.</td><td><span class="who you">Your assistants</span> <span class="who you">Bryan watches</span></td><td>Inbox · Call Ready</td></tr>
+        <tr><td class="n">10</td><td><b>Appointment</b></td><td>Booked appointments go straight to Follow Up Boss.</td><td><span class="who you">Paul</span></td><td>Follow Up Boss</td></tr>
+        <tr><td class="n">11</td><td><b>Report</b></td><td>Every week a short review. Every month the full report and every cost, line by line.</td><td><span class="who us">Nextier</span></td><td>Your inbox</td></tr>
+      </table>
+      </div>
+    </section>
+
+    <section class="card wide">
+      <h2>Who does what</h2>
+      <div class="grid">
+        <div>
+          <h3 class="g">Paul</h3>
+          <ul><li>Sets the counties and the targets</li><li>Approves volume and spend</li><li>Takes the appointments</li></ul>
+          <h3 class="g" style="margin-top:14px">Bryan · Campaign Director</h3>
+          <ul><li>Runs the daily routine: picks the block, presses Send, watches the replies</li><li>Assigns callbacks to the assistants</li></ul>
+        </div>
+        <div>
+          <h3 class="g">Your assistants</h3>
+          <ul><li>Work the calls and the replies</li><li>Log every outcome and write the notes</li></ul>
+          <h3 class="bl" style="margin-top:14px">Nextier · Thomas, with Claude as his AI assistant</h3>
+          <ul><li>Builds and refreshes your data every week</li><li>Runs skip trace, builds the blocks, writes the reports</li><li>Turns around any address you send with a full report</li></ul>
+        </div>
+      </div>
+    </section>
+
+    <section class="card wide">
+      <h2>Governance · the rules it runs on</h2>
+      <ol class="rules">
+        <li><b>A person presses Send.</b> Nothing goes out on its own. One press approves one block, not the next one.</li>
+        <li><b>Do Not Call, STOP and wrong numbers are blocked.</b> No call button, no text, from then on. If a check can't run, nothing sends.</li>
+        <li><b>Count before you spend.</b> Every pull shows its count and cost first; counting costs 0 credits. Skip trace runs only on lots you approve.</li>
+        <li><b>You set the caps.</b> Monthly limits on skip trace and texting. We don't go past them without your yes.</li>
+        <li><b>Your keys, your bills.</b> Every vendor bills you directly. You see every line.</li>
+        <li><b>Every touch is recorded.</b> Each call, text and email is logged on the lot with the time, the line and the outcome.</li>
+        <li><b>One number per conversation.</b> Replies go out from the number that sent the first text, so the owner keeps one thread.</li>
+        <li><b>Texting hours.</b> Texts go out between 8 AM and 9 PM ET. We send around 5 PM; replies come in the next morning.</li>
+        <li><b>Numbers warm up.</b> A new texting number starts at 250 a day and reaches 500 by day 4. No number is pushed past its daily target.</li>
+        <li><b>Your data stays private.</b> Owner names and phones live in your workspace, never on a public page. Only the logins you name get in.</li>
+        <li><b>No foreclosure pulls.</b></li>
+        <li><b>Changes are your call.</b> New counties, new signals or more volume get decided in the weekly review.</li>
+      </ol>
+    </section>
+
+    <section class="card wide">
+      <h2>The first 30 days</h2>
+      <div class="weeks">
+        <div class="wk">
+          <div class="d">Week 1 · Days 1–7</div>
+          <h3>Install</h3>
+          <ul>
+            <li>Kickoff: counties, targets, who gets a login</li>
+            <li>Keys in: Tracerfy, OneKey, SignalHouse, Follow Up Boss</li>
+            <li>Data lake loaded: NY tax parcels, USBizData NY bundle, Nassau parcel shapes, your MLS</li>
+            <li>Calling numbers bought and set up for calls</li>
+            <li>Texting registration sent to the carriers (their clock; calling doesn't wait for it)</li>
+            <li>First skip trace on the land book: about 1,771 lots, about $35</li>
+          </ul>
+          <div class="done">Done when: you can search any town, open any lot and see the owner and phones.</div>
+        </div>
+        <div class="wk">
+          <div class="d">Week 2 · Days 8–14</div>
+          <h3>First calls</h3>
+          <ul>
+            <li>Click to call live on your own line</li>
+            <li>One walkthrough with Bryan. After that the engine tells him what to work next.</li>
+            <li>First call blocks: best lots first</li>
+            <li>First weekly sweep of Suffolk and Nassau</li>
+            <li>First weekly review, 15 minutes</li>
+          </ul>
+          <div class="done">Done when: your team is calling, and every outcome is logged on the lot.</div>
+        </div>
+        <div class="wk">
+          <div class="d">Week 3 · Days 15–21</div>
+          <h3>Volume</h3>
+          <ul>
+            <li>Calling at full pace for your team</li>
+            <li>Texting live once the carriers approve. First block goes when Bryan presses Send; numbers warm up 250 → 400 → 500 a day.</li>
+            <li>Address requests: send any address, get the full report back</li>
+            <li>Territory Intelligence and your news feed refreshed</li>
+          </ul>
+          <div class="done">Done when: calls and replies come in every day.</div>
+        </div>
+        <div class="wk">
+          <div class="d">Week 4 · Days 22–30</div>
+          <h3>Read the results</h3>
+          <ul>
+            <li>First monthly report: found, traced, called, texted, replied, booked</li>
+            <li>Every cost, line by line</li>
+            <li>Decide month 2: more counties, more volume, which signals worked</li>
+          </ul>
+          <div class="done">Done when: you know what's working and what month 2 looks like.</div>
+        </div>
+      </div>
+    </section>
+
+    <section class="card wide">
+      <h2>What to expect</h2>
+      <div class="nums">
+        <div class="num"><b class="g">80–89%</b><span>of texts delivered</span></div>
+        <div class="num"><b class="g">10–20%</b><span>of delivered texts get a reply</span></div>
+        <div class="num"><b>≈ 7%</b><span>of replies become a real conversation</span></div>
+        <div class="num"><b>1 in 8</b><span>calls runs past a minute</span></div>
+      </div>
+      <ul>
+        <li><b>By day 7:</b> your book is searchable, with owners, and phones on the lots the trace finds.</li>
+        <li><b>By day 14:</b> your team is calling from your own line, and every outcome is logged.</li>
+        <li><b>By day 30:</b> first conversations and callbacks, and a report that shows what's working.</li>
+      </ul>
+      <div class="note">These rates come from our own New York results, not a promise. Land deals take months, not weeks: the first 30 days build the machine and start the conversations, and the deals come from working it every week.</div>
+    </section>
+
+    <section class="card">
+      <h2>What we need from you</h2>
+      <ol>
+        <li>Your keys and logins: Tracerfy, OneKey, SignalHouse, Follow Up Boss</li>
+        <li>The counties to start with</li>
+        <li>Who presses Send, and who works the calls</li>
+        <li>15 minutes a week for the review</li>
+      </ol>
+    </section>
+
+    <section class="card links">
+      <h2>See it</h2>
+      <a href="team-musso-overview.html">Overview<small>Your engine running itself, chapter by chapter</small></a>
+      <a href="paul-land-hunt.html">Hunt Engine<small>List · map · detail · call and email</small></a>
+      <a href="paul-territory-intelligence.html">Territory Intelligence<small>Dashboards · segments · event signals</small></a>
+      <a href="paul-cheat-sheet.html">Cheat sheet<small>Capabilities, capacity and costs</small></a>
+      <a href="paul-news.html">News feed<small>Local and statewide stories, each with why it matters to you</small></a>
+    </section>
+  </div>
+</div>
+</body>
+</html>
