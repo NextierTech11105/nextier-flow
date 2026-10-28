@@ -1,0 +1,179 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<title>Team Musso · How Search Works</title>
+<meta name="description" content="How the Team Musso data lake works inside Postgres, explained like a filing cabinet: raw files in, cleaned and matched, scored, and searched.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@700;800&family=IBM+Plex+Sans:wght@500;600;700&family=IBM+Plex+Mono:wght@500;600&display=swap">
+<style>
+:root{--bg:#000;--card:#0a0d12;--card2:#06080b;--line:#2a3442;--fg:#fff;--orange:#ff8a3d;--green:#12b76a;--blue:#4c8dff;--yellow:#f5c84c;--brown:#b7793f;color-scheme:dark}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--fg);font:500 18px/1.55 'IBM Plex Sans','Segoe UI',Arial,sans-serif}
+.wrap{max-width:1000px;margin:0 auto;padding:28px 16px 48px}
+.brand{font:800 15px 'Archivo',Arial,sans-serif;letter-spacing:.14em;text-transform:uppercase}
+.brand span{color:var(--orange)}
+h1{font:800 clamp(30px,4.6vw,54px)/1.05 'Archivo',Arial,sans-serif;margin:10px 0 8px}
+h1 em{font-style:normal;color:var(--green)}
+.lede{font-size:21px;font-weight:600;margin:0 0 20px}
+h2{font:800 25px 'Archivo',Arial,sans-serif;margin:0 0 6px}
+.sub{font-weight:600;margin:0 0 14px}
+.part{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:20px 22px;margin-bottom:18px}
+.pn{display:inline-block;font:800 13px 'Archivo',Arial,sans-serif;letter-spacing:.12em;text-transform:uppercase;color:var(--orange);margin-bottom:4px}
+b{color:#fff}
+.chain{display:flex;flex-wrap:wrap;align-items:center;gap:8px 6px;margin:0 0 20px}
+.chain span{font-weight:700;font-size:16px;padding:6px 12px;border-radius:999px;border:1px solid var(--blue);background:#0f2347}
+.chain i{font-style:normal;font-weight:800;color:var(--orange)}
+.drawers{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,260px),1fr));gap:12px}
+.drawer{border:2px solid var(--c);border-radius:14px;padding:14px 16px;background:var(--card2)}
+.drawer .h{font:800 20px 'Archivo',Arial,sans-serif;margin-bottom:4px}
+.drawer .tg{display:inline-block;font-weight:700;font-size:13px;border:1px solid var(--c);border-radius:999px;padding:1px 9px;margin-bottom:8px}
+.keys{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,420px),1fr));gap:12px}
+.key{border:1px solid var(--line);border-radius:14px;padding:14px 16px;background:var(--card2)}
+.key .h{font:800 19px 'Archivo',Arial,sans-serif;margin-bottom:8px}
+.ex{display:grid;grid-template-columns:minmax(0,1fr) auto minmax(0,auto);gap:6px 10px;align-items:center;margin:6px 0}
+.ex .from{font-weight:600}
+.ex .ar{color:var(--orange);font-weight:800}
+.ex .to{font:600 16px 'IBM Plex Mono',Consolas,monospace;background:#0f2347;border:1px solid var(--blue);border-radius:8px;padding:2px 8px;white-space:nowrap}
+.reach{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,210px),1fr));gap:10px}
+.r{border-radius:14px;padding:14px;border:2px solid var(--c);background:var(--card2)}
+.r .big{font:800 30px 'Archivo',Arial,sans-serif;line-height:1}
+.r .t{font-weight:800;margin:6px 0 4px}
+.steps{list-style:none;margin:0;padding:0;counter-reset:s}
+.steps li{counter-increment:s;position:relative;padding:12px 14px 12px 64px;border:1px solid var(--line);border-radius:14px;background:var(--card2);margin-bottom:10px}
+.steps li::before{content:counter(s);position:absolute;left:14px;top:12px;width:36px;height:36px;border-radius:50%;background:var(--green);color:#000;font:800 20px/36px 'Archivo',Arial,sans-serif;text-align:center}
+.steps li b{display:block;font-size:19px}
+pre{margin:12px 0 0;font:600 15px/1.55 'IBM Plex Mono',Consolas,monospace;background:#05070a;border:1px solid var(--line);border-left:4px solid var(--green);border-radius:12px;padding:12px 14px;overflow-x:auto;color:#fff}
+.cur{font-weight:700;color:var(--green);margin-top:14px}
+.tabs{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+.tabs span{font-weight:700;font-size:15px;padding:5px 12px;border-radius:8px 8px 2px 2px;border:1px solid var(--yellow);background:#3a2f0b}
+.radar{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,280px),1fr));gap:10px}
+.rd{border:1px solid var(--line);border-radius:12px;padding:12px 14px;background:var(--card2);font-weight:600}
+.rd b{display:block;font-size:18px}
+.note{font-weight:600;border-left:4px solid var(--orange);padding:4px 0 4px 12px;margin-top:14px}
+.sum{font:800 clamp(20px,2.4vw,26px)/1.35 'Archivo',Arial,sans-serif}
+.links a{display:inline-block;color:#fff;font-weight:700;padding:10px 14px;border:1px solid var(--line);border-radius:12px;margin:0 8px 8px 0;text-decoration:none;background:var(--card2)}
+.links a:hover{border-color:var(--blue)}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="brand">NEXT<span>IER</span> · DATA ENGINE · TEAM MUSSO</div>
+  <h1>How a search works. <em>Explained like a filing cabinet.</em></h1>
+  <p class="lede">Your data lake is a Postgres database: one very large, very organized filing cabinet. Here's everything that happens, from the moment the files arrive to the moment you type a town and the right lots come up.</p>
+
+  <div class="chain"><span>📥 Files arrive</span><i>→</i><span>🧽 Cleaned + labeled</span><i>→</i><span>🔗 Owners matched</span><i>→</i><span>🔍 Gaps traced</span><i>→</i><span>🏆 Scored + ranked</span><i>→</i><span>🔎 You search</span></div>
+
+  <section class="part">
+    <div class="pn">Part 1</div>
+    <h2>🗄️ The cabinet has three drawers</h2>
+    <p class="sub">Every record moves from left to right, one drawer at a time.</p>
+    <div class="drawers">
+      <div class="drawer" style="--c:var(--brown)"><div class="h">📥 Drawer 1 · Raw</div><span class="tg">"bronze"</span><div>The files exactly as they arrive: the state tax roll, your USBizData bundle, your MLS sweep, Tracerfy results. <b>Never edited</b>, so any number can be checked back to where it came from.</div></div>
+      <div class="drawer" style="--c:#cfd6e0"><div class="h">🧽 Drawer 2 · Cleaned</div><span class="tg">"silver"</span><div>The same records, rewritten the same way so they can be matched: <b>one row per parcel</b>, one row per person, every address and name labeled with a key.</div></div>
+      <div class="drawer" style="--c:var(--yellow)"><div class="h">🏆 Drawer 3 · Ready</div><span class="tg">"gold"</span><div>Your targets: <b>matched, sorted, scored and ranked.</b> This is the drawer your search opens.</div></div>
+    </div>
+  </section>
+
+  <section class="part">
+    <div class="pn">Part 2</div>
+    <h2>🏷️ Labels make matching possible</h2>
+    <p class="sub">Two lists rarely write the same thing the same way. So every address and every name gets a simple label, a "key", written one way only.</p>
+    <div class="keys">
+      <div class="key">
+        <div class="h">🏠 The address key</div>
+        <div class="ex"><span class="from">128 Pauls Path, Coram 11727</span><span class="ar">→</span><span class="to">128|PAULS|11727</span></div>
+        <div class="ex"><span class="from">Crow Lane · CROW LA · Crow Ln</span><span class="ar">→</span><span class="to">CROW</span></div>
+        <div class="ex"><span class="from">84-74 Main St</span><span class="ar">→</span><span class="to">8474</span></div>
+        <div style="margin-top:8px;font-weight:600">House number, street name, ZIP. Suffixes like Lane or Street are dropped, so spelling can't break a match.</div>
+      </div>
+      <div class="key">
+        <div class="h">👤 The name key</div>
+        <div class="ex"><span class="from">SMITH, JOHN (tax roll)</span><span class="ar">→</span><span class="to">SMITH</span></div>
+        <div class="ex"><span class="from">John Smith (USBizData)</span><span class="ar">→</span><span class="to">SMITH</span></div>
+        <div class="ex"><span class="from">O'Brien · Van Der Berg</span><span class="ar">→</span><span class="to">OBRIEN · VANDERBERG</span></div>
+        <div class="ex"><span class="from">Smith Family Trust</span><span class="ar">→</span><span class="to">SMITH</span></div>
+        <div style="margin-top:8px;font-weight:600">The surname, letters only. Now the tax roll and your bundle speak the same language.</div>
+      </div>
+    </div>
+  </section>
+
+  <section class="part">
+    <div class="pn">Part 3</div>
+    <h2>🔗 Matching each owner to your bundle</h2>
+    <p class="sub">For every parcel, Postgres takes the owner's <b>name key</b> and the <b>address their tax bill goes to</b>, and looks for that same pair in your USBizData files. Every owner lands in one of four buckets.</p>
+    <div class="reach">
+      <div class="r" style="--c:var(--green)"><div class="big">✅ R1</div><div class="t">Found the owner</div>Their phone, cell, email, age and years at the address come straight from your bundle.</div>
+      <div class="r" style="--c:var(--blue)"><div class="big">🏠 R2</div><div class="t">Found the household</div>Someone else living with the owner has a phone.</div>
+      <div class="r" style="--c:var(--orange)"><div class="big">🔍 R3</div><div class="t">Not reachable yet</div>Goes to the Tracerfy line, best first, on your key at 2¢ a hit. When a phone comes back, the owner moves up to R1.</div>
+      <div class="r" style="--c:#cfd6e0"><div class="big">🏢 R4</div><div class="t">A company owns it</div>Matched in the business file, then a person finds who signs.</div>
+    </div>
+    <div class="note">Your bundle goes first because you already own it. Tracerfy only runs on R3, which keeps the skip-trace bill small. Town, state and utility owners are counted but never targeted.</div>
+  </section>
+
+  <section class="part">
+    <div class="pn">Part 4</div>
+    <h2>🏆 Sorting and ranking</h2>
+    <p class="sub">Now every target gets three things, using simple rules anyone can check.</p>
+    <ol class="steps">
+      <li><b>One segment</b>The first rule a parcel fits, in a fixed order: land that can be split, homes on big lots, redevelopment sites, and so on.</li>
+      <li><b>A score from 0 to 100</b>Owner first (individual owners rank highest), then the land, then the reasons to move, then whether you can reach them.</li>
+      <li><b>A tier, P1 to P4, and a rank</b>P1 is the best. Inside each segment, lots are ranked by score, then by size.</li>
+    </ol>
+  </section>
+
+  <section class="part">
+    <div class="pn">Part 5</div>
+    <h2>📑 Tabs make it fast</h2>
+    <p class="sub">Your bundle alone holds 15.8 million residents. Without help, finding one person means reading every one. An <b>index</b> works like the tabs in a binder or the index at the back of a book: Postgres flips straight to the right page.</p>
+    <div class="tabs"><span>County + town</span><span>Address + last name</span><span>Parcel ID</span><span>Segment + tier + score</span><span>Reach (R1–R4)</span><span>Company name</span></div>
+  </section>
+
+  <section class="part" style="border:2px solid var(--green)">
+    <div class="pn">Part 6 · the moment you search</div>
+    <h2>🔎 You type "Brookhaven". Here's what happens.</h2>
+    <ol class="steps">
+      <li><b>You type the town and press Enter.</b>The same box takes a county, a town, a ZIP or an owner's name.</li>
+      <li><b>The page asks Postgres one question.</b>"Give me the targets in Suffolk County, town of Brookhaven, best first."</li>
+      <li><b>Postgres flips to the county + town tab.</b>It goes straight to Brookhaven and never reads the rest of the state.</li>
+      <li><b>It sorts those lots.</b>Tier first, then score: P1 on top.</li>
+      <li><b>It hands back the first page.</b>Address, acres, segment, tier, score: your list view.</li>
+      <li><b>You click a lot.</b>Postgres pulls that one parcel by its ID: land, owner, listing, matched person, phones, and the record of every touch. That's your universal lead card.</li>
+    </ol>
+    <div class="cur">🤓 For the curious, the actual question:</div>
+<pre>select site_addr, acres, segment, tier, score
+from gold.targets
+where county = 'Suffolk' and town = 'Brookhaven'
+order by tier, score desc
+limit 50;</pre>
+  </section>
+
+  <section class="part">
+    <div class="pn">Part 7</div>
+    <h2>🔄 Every Monday, the cabinet updates itself</h2>
+    <p class="sub">The weekly sweep re-checks your listings and writes down what changed.</p>
+    <div class="radar">
+      <div class="rd"><b>🟢 Expired, never relisted</b>Goes to the top of your book.</div>
+      <div class="rd"><b>🔴 Newly listed</b>Taken out of outreach. They have an agent.</div>
+      <div class="rd"><b>⚫ Sold</b>Out of the book. The price becomes a comp.</div>
+      <div class="rd"><b>🔥 For sale by owner</b>A person calls the same day.</div>
+      <div class="rd"><b>🏗️ Builder bought next door</b>The lot gets a neighbor flag.</div>
+      <div class="rd"><b>🧾 The counts</b>Every number on your pages comes from one counting step, so any number traces back to its rows.</div>
+    </div>
+  </section>
+
+  <section class="part" style="border:2px solid var(--blue)">
+    <h2>💡 The whole thing in one breath</h2>
+    <p class="sum">Raw files go in. They're cleaned and labeled the same way. Each owner is matched to your bundle. Tracerfy fills only the gaps. Everything is scored and ranked. When you search, Postgres flips to the right tab and hands you the best lots first.</p>
+    <div class="note">The pages you've seen carry a copy of your book inside the page, so you can try them anywhere. Once your lake is installed, the same search runs on your own Postgres database.</div>
+  </section>
+
+  <section class="part links">
+    <h2>See it</h2>
+    <a href="paul-readme.html">📖 Read Me</a><a href="paul-universal-lead.html">📇 Universal lead card</a><a href="paul-land-hunt.html">🗺️ Hunt Engine</a><a href="paul-glossary.html">🔤 Glossary</a><a href="paul-cheat-sheet.html">📋 Cheat sheet</a><a href="paul-first-30-days.html">🗓️ First 30 Days</a>
+  </section>
+</div>
+</body>
+</html>
