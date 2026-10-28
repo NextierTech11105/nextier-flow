@@ -137,19 +137,29 @@ td.r,th.r{text-align:right;white-space:nowrap;font-weight:700}
   <h1>Your land. Your owners. <em>Your line.</em></h1>
   <p class="lede">A database you own that finds the land and the owner before anyone else, gets their phone and email, and lets your team call from your own line. Nothing to learn.</p>
   <nav class="nav" aria-label="On this page">
-    <a href="#book">📚 Your book</a><a href="#engines">🧠 The two engines</a><a href="#capacity">⚡ Capacity</a><a href="#lake">🌊 Data lake</a><a href="#lead">📇 Universal lead</a><a href="#baseline">🚀 Baseline</a><a href="#sources">🎯 Signal sources</a><a href="#costs">💵 Costs</a><a href="#pages">🧭 Your pages</a>
+    <a href="#scoreboard">📊 Scoreboard</a><a href="#book">📚 Your book</a><a href="#engines">🧠 The two engines</a><a href="#capacity">⚡ Capacity</a><a href="#lake">🌊 Data lake</a><a href="#lead">📇 Universal lead</a><a href="#baseline">🚀 High volume</a><a href="#sources">🎯 Signal sources</a><a href="#costs">💵 Costs</a><a href="#pages">🧭 Your pages</a>
   </nav>
 
   <div class="grid">
+    <section class="card wide" id="scoreboard" style="border:2px solid var(--green)">
+      <h2>📊 The scoreboard · three numbers, every month</h2>
+      <div class="tiles">
+        <div class="tile"><div class="ic">🏗️</div><b>Sites</b><span>qualified development sites found</span></div>
+        <div class="tile"><div class="ic">📞</div><b>Owners</b><span>decision-makers reached</span></div>
+        <div class="tile"><div class="ic">📅</div><b>Consults</b><span>acquisition and listing consultations booked</span></div>
+      </div>
+      <div class="note" style="border-color:var(--green)">Your database gets more valuable every week. Every listing change, deed, permit, verified phone and note your team writes is added to it.</div>
+    </section>
+
     <section class="card wide" id="book">
       <h2>📚 Your book today · New York, last 2 years</h2>
       <div class="tiles">
         <div class="tile"><div class="ic">🏷️</div><b>4,256</b><span>expired land listings</span></div>
         <div class="tile"><div class="ic">🚫</div><b>1,847</b><span>never relisted or sold</span></div>
-        <div class="tile"><div class="ic">✂️</div><b class="bl">536</b><span>can be split or built on</span></div>
+        <div class="tile"><div class="ic">✂️</div><b class="bl">536</b><span>split candidates + building sites (screened)</span></div>
         <div class="tile"><div class="ic">🗓️</div><b class="g">460</b><span>aged 91 days to 2 years</span></div>
         <div class="tile"><div class="ic">👤</div><b>179</b><span>individual owners</span></div>
-        <div class="tile"><div class="ic">🎯</div><b class="g">5</b><span>split by right · Suffolk</span></div>
+        <div class="tile"><div class="ic">🎯</div><b class="g">5</b><span>split by right · Suffolk (zoning + septic math done)</span></div>
         <div class="tile"><div class="ic">🏢</div><b>17,648</b><span>commercial sites worth more as development</span></div>
         <div class="tile"><div class="ic">📜</div><b>18,404</b><span>lots with the owner of record</span></div>
       </div>
@@ -162,6 +172,7 @@ td.r,th.r{text-align:right;white-space:nowrap;font-weight:700}
         <div class="hb"><span>🔁 Expired 2+ times</span><div class="track"><div class="fill" style="width:12.7%"></div></div><span class="v">225</span></div>
         <div class="hb"><span>⚖️ Estate / trust</span><div class="track"><div class="fill" style="width:2%"></div></div><span class="v">30</span></div>
       </div>
+      <div class="note">✂️ Screened, not approved. A survey, road access, wetlands and the town decide the final lot count.</div>
       <div class="note">🏡 The MLS listings here are a sample pulled October 16 to show you the engine. At install it runs on your own OneKey login and refreshes every week.</div>
       <div class="note">🔕 No foreclosure pulls. Optional, on your own RealEstateAPI key: loan data and adjustable-rate resets.</div>
     </section>
@@ -206,10 +217,21 @@ td.r,th.r{text-align:right;white-space:nowrap;font-weight:700}
         <div class="tile"><div class="ic">🔍</div><b>2¢</b><span>a skip-trace lookup on your key. The whole land book ≈ $35.</span></div>
         <div class="tile"><div class="ic">📞</div><b>$1.15</b><span>a month per phone number</span></div>
       </div>
+      <h3 style="margin-top:18px">🧠 A month of the Data Engine at capacity · modeled from our measured rates</h3>
+      <div class="funnel">
+        <div class="fs" style="--w:100%"><span>🔍 Owners skip traced</span><b>2,000</b></div>
+        <div class="fs" style="--w:86%"><span>🧱 Call-ready, with a mobile (36–48% hit rate)</span><b>720–960</b></div>
+        <div class="fs" style="--w:72%"><span>☎️ Dials, 4–5 tries each (1 caller)</span><b>2,900–4,800</b></div>
+        <div class="fs" style="--w:58%"><span>🗣️ Calls past a minute (1 in 8)</span><b>360–600</b></div>
+        <div class="fs" style="--w:44%;background:linear-gradient(90deg,#0b3322,#0f4a30);border-color:var(--green)"><span>📅 Consultations booked</span><b>month 1 sets it</b></div>
+      </div>
+      <div class="note">Two callers: trace 4,000 owners for 1,440–1,920 call-ready leads. The rates come from our own skip traces and call log; we have no measured call-to-booking rate yet, so month 1 sets it.</div>
+      <div class="note">These are our operating limits, not carrier guarantees. Carrier approval, Do Not Call and consent rules apply, and every call and text is checked against STOP and Do Not Call first.</div>
     </section>
 
     <section class="card">
-      <h2>🏆 What we've done</h2>
+      <h2>🏆 What we've actually done</h2>
+      <p style="margin:0 0 10px;font-weight:700">Actual results: our New York texting to homeowners, Aug–Sep. Land owners may answer differently.</p>
       <div class="funnel">
         <div class="fs" style="--w:100%"><span>💬 Texted · New York, Aug–Sep</span><b>14,332</b></div>
         <div class="fs" style="--w:88%"><span>📬 Delivered</span><b>80%</b></div>
@@ -269,7 +291,7 @@ td.r,th.r{text-align:right;white-space:nowrap;font-weight:700}
         <div class="bd">
           <div class="tiles">
             <div class="tile"><div class="ic">📏</div><b>2.37</b><span>acres</span></div>
-            <div class="tile"><div class="ic">✂️</div><b class="g">2</b><span>lots by right</span></div>
+            <div class="tile"><div class="ic">✂️</div><b class="g">2</b><span>lots by right (screening)</span></div>
             <div class="tile"><div class="ic">💵</div><b>$1.5M</b><span>last asking</span></div>
             <div class="tile"><div class="ic">⏳</div><b>173</b><span>days on market</span></div>
           </div>
@@ -283,7 +305,7 @@ td.r,th.r{text-align:right;white-space:nowrap;font-weight:700}
     </section>
 
     <section class="card wide" id="baseline">
-      <h2>🚀 Baseline · 50,000 first texts a month (Campaign Engine) + 2,000 calls a day (click to call)</h2>
+      <h2>🚀 Scenario C · high volume: 50,000 first texts a month (Campaign Engine) + 2,000 calls a day (click to call)</h2>
       <p style="margin:0 0 14px;font-weight:700;font-size:18px">Wherever you launch your first outreach campaign, <b class="o">we've got you.</b> The data engine feeds it, and this is what a launch at this size costs and returns.</p>
       <div class="grid">
         <div>
@@ -312,7 +334,7 @@ td.r,th.r{text-align:right;white-space:nowrap;font-weight:700}
           <div class="note">A multi-line dialer would cut the number of callers, but it isn't built yet.</div>
         </div>
       </div>
-      <h3 style="margin-top:18px">📈 What it should produce · from our own New York results</h3>
+      <h3 style="margin-top:18px">📈 What it could produce · modeled from our measured rates, not a promise</h3>
       <div class="three">
         <div class="col"><div class="h">Low</div><div class="row"><span>📬 Delivered</span><em>40,100</em></div><div class="row"><span>🙋 Replies</span><em>5,000</em></div><div class="row"><span>🗣️ Conversations</span><em>330</em></div><div class="row"><span>📅 Appointments</span><em>5</em></div></div>
         <div class="col" style="border-color:var(--blue)"><div class="h" style="color:#8cb6ff">Mid</div><div class="row"><span>📬 Delivered</span><em>41,150</em></div><div class="row"><span>🙋 Replies</span><em>6,250</em></div><div class="row"><span>🗣️ Conversations</span><em>440</em></div><div class="row"><span>📅 Appointments</span><em>23</em></div></div>
@@ -349,6 +371,16 @@ td.r,th.r{text-align:right;white-space:nowrap;font-weight:700}
 
     <section class="card wide" id="costs">
       <h2>💵 Full cost breakdown · what runs on your own accounts</h2>
+      <p style="margin:0 0 12px;font-weight:700">Three scenarios, all billed to your own accounts at cost. A is the Data Engine alone. B and C add the Campaign Engine (texting) at two volumes.</p>
+      <div class="col" style="border:2px solid var(--blue);margin-bottom:16px">
+        <div class="h" style="color:#8cb6ff">🧠 Scenario A · Data Engine only · 1 caller, no texting · ≈ $200 a month</div>
+        <div class="row"><span>🗄️ Your database · DigitalOcean</span><em>$61</em></div>
+        <div class="row"><span>☎️ Calling · ≈ 4,400 dials (estimate; voice is quoted)</span><em>≈ $80</em></div>
+        <div class="row"><span>🔄 Listing re-checks · Apify</span><em>≈ $35</em></div>
+        <div class="row"><span>🔍 Skip trace · 2,000 owners, you pay only the 720–960 hits</span><em>≈ $15–20</em></div>
+        <div class="row"><span>📞 Calling numbers · 5 × $1.15</span><em>≈ $6</em></div>
+      </div>
+      <div class="note" style="margin:0 0 16px">How it's figured: texts ≈ 1¢ each all-in · calls 1–2¢ a minute (an estimate until SignalHouse quotes voice) · skip trace 2¢ per hit, misses cost nothing.</div>
       <div class="grid">
         <div>
           <h3>🧰 One time, to set up</h3>
@@ -364,7 +396,7 @@ td.r,th.r{text-align:right;white-space:nowrap;font-weight:700}
           </div>
         </div>
         <div>
-          <h3>📅 Every month · a full month</h3>
+          <h3>📅 Scenario B · standard month: 20,000 texts + 500 calls a day</h3>
           <div class="stack" role="img" aria-label="Monthly cost mix"><i style="width:37.4%;--c:var(--orange)"></i><i style="width:35.6%;--c:var(--blue)"></i><i style="width:10.9%;--c:var(--green)"></i><i style="width:7.1%;--c:var(--purple)"></i><i style="width:6.2%;--c:var(--teal)"></i><i style="width:2.8%;--c:var(--yellow)"></i></div>
           <div class="leg">
             <div style="--c:var(--orange)"><span>💬 Texting · 20,000 texts at about 1¢ all-in</span><em>≈ $210</em></div>
