@@ -9,39 +9,123 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@700;800&family=IBM+Plex+Sans:wght@500;600;700&display=swap">
 <style>
-:root{--bg:#000;--card:#0a0d12;--line:#2a3442;--fg:#fff;--orange:#ff8a3d;--green:#12b76a;--blue:#4c8dff;color-scheme:dark}
+:root{--bg:#000;--card:#0a0d12;--card2:#06080b;--line:#2a3442;--fg:#fff;--orange:#ff8a3d;--green:#12b76a;--blue:#4c8dff;--purple:#a78bfa;--teal:#2dd4bf;--yellow:#f5c84c;color-scheme:dark}
 *{box-sizing:border-box}
 html,body{margin:0;background:var(--bg);color:var(--fg);font:500 17px/1.5 'IBM Plex Sans','Segoe UI',Arial,sans-serif}
-.wrap{max-width:1100px;margin:0 auto;padding:28px 16px 48px}
+.wrap{max-width:1140px;margin:0 auto;padding:28px 16px 48px}
 .brand{font:800 15px 'Archivo',Arial,sans-serif;letter-spacing:.14em;text-transform:uppercase}
 .brand span{color:var(--orange)}
 h1{font:800 clamp(30px,4.4vw,52px)/1.05 'Archivo',Arial,sans-serif;margin:10px 0 8px}
 h1 em{font-style:normal;color:var(--green)}
-.lede{font-size:20px;font-weight:600;margin:0 0 22px;max-width:60ch}
-h2{font:800 22px 'Archivo',Arial,sans-serif;margin:0 0 12px;color:var(--orange)}
-.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,480px),1fr));gap:16px}
-.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:18px 20px}
-ol,ul{margin:0;padding-left:22px}
-li{margin:0 0 9px}
+.lede{font-size:20px;font-weight:600;margin:0 0 16px;max-width:64ch}
+h2{font:800 23px 'Archivo',Arial,sans-serif;margin:0 0 12px;color:var(--orange)}
+h3{font:800 18px 'Archivo',Arial,sans-serif;margin:4px 0 10px}
 b{color:#fff}
-.nums{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin-bottom:14px}
-.num{border:1px solid var(--line);border-radius:12px;padding:12px 14px;background:#06080b}
-.num b{display:block;font:800 30px/1.05 'Archivo',Arial,sans-serif}
-.num span{font-weight:600}
 .g{color:var(--green)}.o{color:var(--orange)}.bl{color:var(--blue)}
-.tag{display:inline-block;font-weight:700;font-size:15px;padding:3px 11px;border-radius:999px;border:1px solid var(--orange);background:#4a2309;margin:3px 4px 3px 0}
-.tag.s{border-color:#3a4656;background:#141a22}
-.links a{display:block;color:#fff;font-weight:700;padding:12px 14px;border:1px solid var(--line);border-radius:12px;margin-bottom:8px;text-decoration:none;background:#06080b}
-.links a:hover{border-color:var(--blue)}
-.links small{display:block;font-weight:500}
+.nav{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 20px}
+.nav a{color:#fff;text-decoration:none;font-weight:700;font-size:15px;padding:6px 12px;border:1px solid var(--line);border-radius:999px;background:var(--card2)}
+.nav a:hover{border-color:var(--blue)}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,480px),1fr));gap:16px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:18px 20px;scroll-margin-top:12px}
 .wide{grid-column:1/-1}
 .note{font-weight:600;border-left:4px solid var(--orange);padding:4px 0 4px 12px;margin-top:12px}
-table{width:100%;border-collapse:collapse;margin:0 0 14px}
+.tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,140px),1fr));gap:10px}
+.tile{border:1px solid var(--line);border-radius:14px;padding:12px 14px;background:var(--card2)}
+.tile .ic{font-size:26px;line-height:1}
+.tile b{display:block;font:800 30px/1.05 'Archivo',Arial,sans-serif;margin:6px 0 2px}
+.tile span{font-weight:600;font-size:15px}
+/* horizontal bars */
+.hbars{display:grid;gap:9px}
+.hb{display:grid;grid-template-columns:minmax(0,210px) minmax(0,1fr) 64px;gap:10px;align-items:center;font-weight:700}
+.hb .track{height:18px;border-radius:9px;background:#141a22;overflow:hidden}
+.hb .fill{height:100%;border-radius:9px;background:var(--c,var(--orange))}
+.hb .v{text-align:right;font:800 18px 'Archivo',Arial,sans-serif}
+@media (max-width:560px){.hb{grid-template-columns:1fr 64px}.hb .track{grid-column:1/-1;grid-row:2}}
+/* engines */
+.engines{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,460px),1fr));gap:16px}
+.eng{border-radius:18px;padding:18px 20px;background:var(--card)}
+.eng.de{border:2px solid var(--blue)}
+.eng.oe{border:2px solid var(--orange)}
+.eng .lbl{display:inline-block;font:800 13px 'Archivo',Arial,sans-serif;letter-spacing:.1em;text-transform:uppercase;padding:3px 10px;border-radius:999px;margin-bottom:8px}
+.eng.de .lbl{background:#0f2347;border:1px solid var(--blue)}
+.eng.oe .lbl{background:#4a2309;border:1px solid var(--orange)}
+.eng h2{color:#fff}
+.flow{display:grid;gap:8px}
+.st{display:grid;grid-template-columns:44px minmax(0,1fr);gap:10px;align-items:start;border:1px solid var(--line);border-radius:12px;padding:10px 12px;background:var(--card2)}
+.st .ic{font-size:26px;line-height:1.1;text-align:center}
+.st b{display:block;font-size:17px}
+.st span{font-weight:500}
+.got{margin-top:12px;font:800 19px/1.35 'Archivo',Arial,sans-serif;border:1px dashed var(--orange);border-radius:12px;padding:10px 14px}
+/* funnel */
+.funnel{display:grid;gap:8px}
+.fs{margin:0 auto;border-radius:12px;padding:10px 14px;display:flex;justify-content:space-between;gap:10px;align-items:center;font-weight:700;background:linear-gradient(90deg,#0f2347,#13305f);border:1px solid var(--blue);width:var(--w)}
+.fs b{font:800 22px 'Archivo',Arial,sans-serif}
+@media (max-width:560px){.fs{width:100%!important}}
+/* chips */
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{font-weight:700;font-size:15px;padding:6px 12px;border-radius:12px;border:1px solid var(--line);background:var(--card2)}
+.chip.k{border-color:var(--green);background:#0b3322}
+.num-list{display:grid;gap:8px;counter-reset:n}
+.num-list div{counter-increment:n;display:grid;grid-template-columns:34px minmax(0,1fr);gap:10px;align-items:center;border:1px solid var(--line);border-radius:12px;padding:8px 12px;background:var(--card2);font-weight:600}
+.num-list div::before{content:counter(n);width:30px;height:30px;border-radius:50%;background:var(--green);color:#000;font:800 17px/30px 'Archivo',Arial,sans-serif;text-align:center}
+/* sources */
+.srcs{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,320px),1fr));gap:10px}
+.sr{border:1px solid var(--line);border-top:4px solid var(--c);border-radius:14px;padding:12px 14px;background:var(--card2)}
+.sr .top{display:flex;justify-content:space-between;gap:8px;align-items:baseline;flex-wrap:wrap}
+.sr .nm{font:800 18px 'Archivo',Arial,sans-serif}
+.sr .cost{font-weight:800;color:var(--green);white-space:nowrap}
+.sr .rec{font:800 24px 'Archivo',Arial,sans-serif;margin:4px 0}
+.sr .bar{height:10px;border-radius:5px;background:#141a22;overflow:hidden;margin:2px 0 8px}
+.sr .bar i{display:block;height:100%;background:var(--c)}
+.sr .cols{font-weight:500;font-size:15px}
+.chain{display:flex;flex-wrap:wrap;align-items:center;gap:8px 6px;margin-top:14px}
+.chain span{font-weight:700;font-size:15px;padding:6px 12px;border-radius:999px;border:1px solid var(--blue);background:#0f2347}
+.chain span.tf{border-color:var(--orange);background:#4a2309}
+.chain i{font-style:normal;font-weight:800;color:var(--orange)}
+.focus{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 14px}
+.focus span{font-weight:800;padding:6px 12px;border-radius:12px;border:1px solid var(--line);background:var(--card2)}
+.focus span.hot{border-color:var(--orange);background:#4a2309}
+/* lead preview */
+.lp{border:2px solid var(--blue);border-radius:16px;overflow:hidden}
+.lp .hd{padding:14px 16px;background:linear-gradient(90deg,#0f2347,#0a0d12)}
+.lp .hd b{display:block;font:800 26px 'Archivo',Arial,sans-serif}
+.lp .bd{padding:14px 16px}
+.legend{display:flex;flex-wrap:wrap;gap:6px;margin:10px 0 0}
+.sc{display:inline-flex;align-items:center;gap:6px;font-weight:700;font-size:13px;padding:2px 9px;border-radius:999px;border:1px solid var(--c);white-space:nowrap}
+.sc::before{content:"";width:9px;height:9px;border-radius:50%;background:var(--c)}
+.btn{display:inline-block;margin-top:14px;color:#000;background:var(--green);font-weight:800;text-decoration:none;padding:12px 18px;border-radius:12px;font-size:18px}
+.tag{display:inline-block;font-weight:700;font-size:14px;padding:3px 11px;border-radius:999px;border:1px solid var(--orange);background:#4a2309;margin:3px 4px 3px 0}
+.tag.s{border-color:#3a4656;background:#141a22}
+/* stacked cost bars */
+.stack{display:flex;height:26px;border-radius:13px;overflow:hidden;margin:6px 0 10px;border:1px solid var(--line)}
+.stack i{display:block;height:100%;background:var(--c)}
+.leg{display:grid;gap:6px}
+.leg div{display:grid;grid-template-columns:16px minmax(0,1fr) auto;gap:8px;align-items:center;font-weight:600}
+.leg div::before{content:"";width:14px;height:14px;border-radius:4px;background:var(--c)}
+.leg div em{font-style:normal;font-weight:800}
+.leg div.tot{border-top:2px solid var(--orange);padding-top:8px;margin-top:4px;font-weight:800;font-size:19px}
+.leg div.tot::before{background:transparent}
+.cA{--c:var(--orange)}.cB{--c:var(--blue)}.cC{--c:var(--green)}.cD{--c:var(--purple)}.cE{--c:var(--teal)}.cF{--c:var(--yellow)}.cG{--c:#64748b}
+/* tables */
+.tw{overflow-x:auto}
+table{width:100%;border-collapse:collapse;margin:0 0 12px}
 th,td{text-align:left;padding:9px 10px;border-bottom:1px solid var(--line);vertical-align:top}
 th{font-weight:700;color:var(--orange)}
 td.r,th.r{text-align:right;white-space:nowrap;font-weight:700}
-tr.tot td{border-top:2px solid var(--orange);border-bottom:0;font-weight:800;font-size:19px}
-h3{font:800 18px 'Archivo',Arial,sans-serif;margin:6px 0 8px}
+.pick{display:inline-block;font-weight:800;color:#000;background:var(--green);border-radius:8px;padding:2px 8px}
+.three{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+@media (max-width:620px){.three{grid-template-columns:1fr}}
+.col{border:1px solid var(--line);border-radius:14px;padding:12px;background:var(--card2)}
+.col .h{font:800 16px 'Archivo',Arial,sans-serif;letter-spacing:.08em;text-transform:uppercase;margin-bottom:8px}
+.col .row{display:flex;justify-content:space-between;gap:8px;padding:5px 0;border-bottom:1px solid #1a222d;font-weight:600}
+.col .row:last-child{border-bottom:0}
+.col .row em{font-style:normal;font-weight:800}
+.pay{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,300px),1fr));gap:10px}
+.pay .col .row span{max-width:60%}
+.links{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,250px),1fr));gap:10px}
+.links a{display:block;color:#fff;font-weight:700;padding:12px 14px;border:1px solid var(--line);border-radius:12px;text-decoration:none;background:var(--card2)}
+.links a:hover{border-color:var(--blue)}
+.links small{display:block;font-weight:500}
 </style>
 </head>
 <body>
@@ -49,223 +133,259 @@ h3{font:800 18px 'Archivo',Arial,sans-serif;margin:6px 0 8px}
   <div class="brand">NEXT<span>IER</span> · DATA ENGINE · TEAM MUSSO</div>
   <h1>Your land. Your owners. <em>Your line.</em></h1>
   <p class="lede">A database you own that finds the land and the owner before anyone else, gets their phone and email, and lets your team call from your own line. Nothing to learn.</p>
+  <nav class="nav" aria-label="On this page">
+    <a href="#book">📚 Your book</a><a href="#engines">🧠 The two engines</a><a href="#capacity">⚡ Capacity</a><a href="#lake">🌊 Data lake</a><a href="#lead">📇 Universal lead</a><a href="#baseline">🚀 Baseline</a><a href="#sources">🎯 Signal sources</a><a href="#costs">💵 Costs</a><a href="#pages">🧭 Your pages</a>
+  </nav>
 
   <div class="grid">
-    <section class="card wide">
-      <h2>Your book today · New York, last 2 years</h2>
-      <div class="nums">
-        <div class="num"><b>4,256</b><span>expired land listings</span></div>
-        <div class="num"><b>1,847</b><span>never relisted or sold</span></div>
-        <div class="num"><b class="bl">536</b><span>can be split or built on</span></div>
-        <div class="num"><b class="g">460</b><span>aged 91 days to 2 years</span></div>
-        <div class="num"><b>179</b><span>individual owners</span></div>
-        <div class="num"><b class="g">5</b><span>split by right · Suffolk</span></div>
-        <div class="num"><b>17,648</b><span>commercial sites worth more as development</span></div>
-        <div class="num"><b>18,404</b><span>lots with the owner of record</span></div>
+    <section class="card wide" id="book">
+      <h2>📚 Your book today · New York, last 2 years</h2>
+      <div class="tiles">
+        <div class="tile"><div class="ic">🏷️</div><b>4,256</b><span>expired land listings</span></div>
+        <div class="tile"><div class="ic">🚫</div><b>1,847</b><span>never relisted or sold</span></div>
+        <div class="tile"><div class="ic">✂️</div><b class="bl">536</b><span>can be split or built on</span></div>
+        <div class="tile"><div class="ic">🗓️</div><b class="g">460</b><span>aged 91 days to 2 years</span></div>
+        <div class="tile"><div class="ic">👤</div><b>179</b><span>individual owners</span></div>
+        <div class="tile"><div class="ic">🎯</div><b class="g">5</b><span>split by right · Suffolk</span></div>
+        <div class="tile"><div class="ic">🏢</div><b>17,648</b><span>commercial sites worth more as development</span></div>
+        <div class="tile"><div class="ic">📜</div><b>18,404</b><span>lots with the owner of record</span></div>
       </div>
-      <div><b>Event signals in the book:</b>
-        <span class="tag">MLS expired 1,771</span><span class="tag">Expired 2+ times 225</span><span class="tag">Long on market 417</span><span class="tag">Estate / trust 30</span><span class="tag">Developers buying nearby 739</span><span class="tag s">Owner holds more parcels 440</span>
+      <h3 style="margin-top:18px">🎯 Event signals in the book</h3>
+      <div class="hbars">
+        <div class="hb"><span>⏳ MLS expired</span><div class="track"><div class="fill" style="width:100%"></div></div><span class="v">1,771</span></div>
+        <div class="hb"><span>🏗️ Developers buying nearby</span><div class="track"><div class="fill" style="width:41.7%"></div></div><span class="v">739</span></div>
+        <div class="hb"><span>🏘️ Owner holds more parcels</span><div class="track"><div class="fill" style="width:24.8%;--c:#64748b"></div></div><span class="v">440</span></div>
+        <div class="hb"><span>🐢 Long on market</span><div class="track"><div class="fill" style="width:23.5%"></div></div><span class="v">417</span></div>
+        <div class="hb"><span>🔁 Expired 2+ times</span><div class="track"><div class="fill" style="width:12.7%"></div></div><span class="v">225</span></div>
+        <div class="hb"><span>⚖️ Estate / trust</span><div class="track"><div class="fill" style="width:2%"></div></div><span class="v">30</span></div>
       </div>
-      <div class="note">The MLS listings here are a sample pulled October 16 to show you the engine. At install it runs on your own OneKey login and refreshes every week.</div>
-      <div class="note">No foreclosure pulls. Optional, on your own RealEstateAPI key: loan data and adjustable-rate resets.</div>
+      <div class="note">🏡 The MLS listings here are a sample pulled October 16 to show you the engine. At install it runs on your own OneKey login and refreshes every week.</div>
+      <div class="note">🔕 No foreclosure pulls. Optional, on your own RealEstateAPI key: loan data and adjustable-rate resets.</div>
+    </section>
+
+    <section class="wide" id="engines">
+      <div class="engines">
+        <div class="eng de">
+          <span class="lbl">Finds it · keeps the record</span>
+          <h2>🧠 The Data Engine</h2>
+          <div class="flow">
+            <div class="st"><div class="ic">🗺️</div><div><b>Finds the land</b><span>Every parcel in New York: state tax rolls, the NYC lot file, OneKey MLS.</span></div></div>
+            <div class="st"><div class="ic">🎯</div><div><b>Finds the reason to call now</b><span>Expired and never relisted, expired twice, long on market, estate, developers buying next door.</span></div></div>
+            <div class="st"><div class="ic">📐</div><div><b>Reads the deal</b><span>Acres, lots by right, last asking, who's building nearby, permit trend.</span></div></div>
+            <div class="st"><div class="ic">👤</div><div><b>Finds the owner</b><span>Owner of record, past the LLC to the person who signs.</span></div></div>
+            <div class="st"><div class="ic">📱</div><div><b>Gets phones and emails</b><span>Skip trace on your key: every phone tagged mobile or landline, with the Do Not Call check.</span></div></div>
+            <div class="st"><div class="ic">🧾</div><div><b>Keeps the record</b><span>Every call, text and email logged on the lot, with notes.</span></div></div>
+          </div>
+        </div>
+        <div class="eng oe">
+          <span class="lbl">Reaches the owner</span>
+          <h2>🚀 The Outreach Engine</h2>
+          <div class="flow">
+            <div class="st"><div class="ic">☎️</div><div><b>Calls and emails from your line</b><span>One click to call, one press to log the outcome, notes on every lot.</span></div></div>
+            <div class="st"><div class="ic">💬</div><div><b>Pushes to outreach</b><span>First text or nurture. Nothing sends until a person presses Send.</span></div></div>
+            <div class="st"><div class="ic">📅</div><div><b>Books into your CRM</b><span>Appointments go to Follow Up Boss.</span></div></div>
+          </div>
+          <div class="got">Wherever your first campaign launches, <span class="o">we've got you.</span></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="card wide" id="capacity">
+      <h2>⚡ Capacity</h2>
+      <div class="tiles">
+        <div class="tile"><div class="ic">💬</div><b>500</b><span>texts a day per number once warmed (250 → 400 → 500 over 4 days)</span></div>
+        <div class="tile"><div class="ic">📶</div><b>2,500</b><span>texts a day on five numbers</span></div>
+        <div class="tile"><div class="ic">⏰</div><b>8–9</b><span>send window, 8 AM–9 PM ET. Sends go at 5 PM; replies land the next morning.</span></div>
+        <div class="tile"><div class="ic">☎️</div><b>150–250</b><span>dials a day per caller, one line at a time, spread across 5–10 numbers</span></div>
+        <div class="tile"><div class="ic">💵</div><b>$6–12</b><span>a day in minutes for 500 calls (estimate; the carrier quotes voice)</span></div>
+        <div class="tile"><div class="ic">🔍</div><b>2¢</b><span>a skip-trace lookup on your key. The whole land book ≈ $35.</span></div>
+        <div class="tile"><div class="ic">📞</div><b>$1.15</b><span>a month per phone number</span></div>
+      </div>
     </section>
 
     <section class="card">
-      <h2>What it does</h2>
-      <ol>
-        <li><b>Finds the land.</b> Every parcel in New York: state tax rolls, the NYC lot file, OneKey MLS.</li>
-        <li><b>Finds the reason to call now.</b> Expired and never relisted, expired twice, long on market, estate, developers buying next door.</li>
-        <li><b>Reads the deal.</b> Acres, lots by right, last asking, who's building nearby, permit trend.</li>
-        <li><b>Finds the owner.</b> Owner of record, past the LLC to the person who signs.</li>
-        <li><b>Gets phones and emails.</b> Skip trace on your key: every phone tagged mobile or landline, with the Do Not Call check.</li>
-        <li><b>Calls and emails from your line.</b> One click to call, one press to log the outcome, notes on every lot.</li>
-        <li><b>Pushes to outreach.</b> Wherever your first campaign launches, we've got you: first text or nurture. Nothing sends until a person presses Send.</li>
-        <li><b>Books into your CRM.</b> Appointments go to Follow Up Boss.</li>
-      </ol>
+      <h2>🏆 What we've done</h2>
+      <div class="funnel">
+        <div class="fs" style="--w:100%"><span>💬 Texted · New York, Aug–Sep</span><b>14,332</b></div>
+        <div class="fs" style="--w:88%"><span>📬 Delivered</span><b>80%</b></div>
+        <div class="fs" style="--w:74%"><span>🙋 Replied</span><b>1,502</b></div>
+        <div class="fs" style="--w:58%"><span>📅 Appointments since Sept</span><b>13</b></div>
+        <div class="fs" style="--w:44%;background:linear-gradient(90deg,#0b3322,#0f4a30);border-color:var(--green)"><span>🤝 Deals</span><b>2</b></div>
+      </div>
+      <div class="note">Reply rate runs 10–20% (10.5% here). One of the deals is the listing at 2055 Turnbull, Bronx.</div>
     </section>
 
     <section class="card">
-      <h2>Capacity</h2>
-      <ul>
-        <li><b>Texting:</b> up to 500 a day per number once warmed (250 → 400 → 500 over 4 days). Five numbers ≈ <b>2,500 a day</b>.</li>
-        <li><b>Send window:</b> 8 AM–9 PM ET. Sends go at 5 PM; replies land the next morning.</li>
-        <li><b>Calling:</b> one line at a time today, from your own numbers. 500 calls a day ≈ <b>$6–12 a day in minutes</b> (estimate; the carrier quotes voice). One caller makes about 150–250 dials a day; spread calls across 5–10 numbers.</li>
-        <li><b>Skip trace:</b> about 2¢ a lookup on your key. The whole land book ≈ $35.</li>
-        <li><b>Numbers:</b> about $1.15 a month each.</li>
-      </ul>
-    </section>
-
-    <section class="card">
-      <h2>What we've done</h2>
-      <ul>
-        <li>New York, Aug–Sep: <b>14,332 texted · 80% delivered · 1,502 replied</b> (10.5%).</li>
-        <li>Reply rate runs <b>10–20%</b>.</li>
-        <li><b>13 appointments</b> since September, <b>2 deals</b>, including the listing at 2055 Turnbull, Bronx.</li>
-      </ul>
-    </section>
-
-    <section class="card">
-      <h2>You own it</h2>
-      <ul>
-        <li><b>Your keys:</b> SignalHouse (phone lines), Tracerfy (skip trace), RealEstateAPI (event signals), OneKey (MLS).</li>
-        <li><b>Your database</b> on DigitalOcean, hosted and run by us.</li>
-        <li><b>No training.</b> Bryan runs the daily routine; your assistants work the calls.</li>
-      </ul>
-    </section>
-
-    <section class="card">
-      <h2>To start · what we need</h2>
-      <ol>
-        <li>The counties to start with</li>
-        <li>Your keys and OneKey login</li>
-        <li>Who presses Send, and who works the calls</li>
-        <li>Your Follow Up Boss login</li>
-      </ol>
+      <h2>🔑 You own it</h2>
+      <div class="chips">
+        <span class="chip k">📞 SignalHouse · phone lines</span><span class="chip k">🔍 Tracerfy · skip trace</span><span class="chip k">🏦 RealEstateAPI · event signals</span><span class="chip k">🏡 OneKey · MLS</span>
+      </div>
+      <div class="flow" style="margin-top:12px">
+        <div class="st"><div class="ic">🗄️</div><div><b>Your database</b><span>On DigitalOcean, hosted and run by us.</span></div></div>
+        <div class="st"><div class="ic">🎓</div><div><b>No training</b><span>Bryan runs the daily routine; your assistants work the calls.</span></div></div>
+      </div>
+      <h3 style="margin-top:16px">🚦 To start · what we need</h3>
+      <div class="num-list">
+        <div>The counties to start with</div>
+        <div>Your keys and OneKey login</div>
+        <div>Who presses Send, and who works the calls</div>
+        <div>Your Follow Up Boss login</div>
+      </div>
       <div class="note">Your workspace is built. In-app calling goes live once your SignalHouse key is in and your number is set up for calls.</div>
     </section>
 
-    <section class="card wide">
-      <h2>Your data lake · all of New York State</h2>
-      <p style="margin:0 0 12px;font-weight:600">Every parcel in New York State, in a database you own. <b class="o">Heavy focus and weekly surveillance on Suffolk and Nassau.</b> Also worked: the Bronx, Westchester, and north up to Orange County.</p>
-      <table>
-        <tr><th>Source</th><th>Records</th><th>What's in it (the columns)</th><th class="r">Cost</th></tr>
-        <tr><td><b>NYS tax parcels</b> · state open data, 2025 roll</td><td>Every parcel in NY</td><td>Owner + second owner, mailing address, owner type · Section-Block-Lot, address, ZIP · property class, used as · acres, frontage, depth · year built, living sq ft, bedrooms, baths, style · sewer, water, utilities · land, total and full market value · school district · deed book and page</td><td class="r">$0</td></tr>
-        <tr><td><b>NYC lot file (PLUTO)</b></td><td>Every lot in the 5 boroughs</td><td>Zoning, buildable floor area, building class, lot size · for the Bronx</td><td class="r">$0</td></tr>
-        <tr><td><b>USBizData · Residential</b></td><td>15,801,605</td><td>Name, address, ZIP+4, lat/long · exact and estimated age, birth date · estimated income and wealth · length of residence · homeowner or renter, dwelling type, home value · phone</td><td class="r">$27</td></tr>
-        <tr><td><b>USBizData · Cell</b></td><td>5,141,785</td><td>Cell number, name, address, ZIP</td><td class="r">$27</td></tr>
-        <tr><td><b>USBizData · Email</b></td><td>7,297,939</td><td>Email, name, address, phone, opt-in IP</td><td class="r">$27</td></tr>
-        <tr><td><b>USBizData · Business</b></td><td>5,514,091</td><td>Company, contact, email, phone, website, employees, revenue, SIC code</td><td class="r">$27</td></tr>
-        <tr><td><b>OneKey MLS</b> · your login</td><td>Your MLS</td><td>Listings, expireds, withdrawn, days on market, listing history</td><td class="r">Your membership</td></tr>
-        <tr><td><b>Tracerfy</b> · your key</td><td>On demand</td><td>Mobiles, landlines, emails, line type, Do Not Call · change alerts</td><td class="r">2¢ a hit</td></tr>
-        <tr><td><b>Mapbox + Mapillary</b></td><td>Every lot on the map</td><td>Satellite at every zoom · front-of-house street photos</td><td class="r">$0 at this use</td></tr>
-      </table>
-      <div class="note">How it fits together: parcel → owner of record → matched to the USBizData residential file (age, years at the address, income) → cell + email → Tracerfy only for what's still missing, which keeps skip-trace spend low. Suffolk and Nassau get the weekly sweep: new expireds, back on the market, new deeds, building permits.</div>
+    <section class="card wide" id="lake">
+      <h2>🌊 Your data lake · all of New York State</h2>
+      <p style="margin:0 0 10px;font-weight:600">Every parcel in New York State, in a database you own.</p>
+      <div class="focus"><span class="hot">🎯 Suffolk · weekly surveillance</span><span class="hot">🎯 Nassau · weekly surveillance</span><span>🏙️ The Bronx</span><span>🌳 Westchester</span><span>⛰️ North up to Orange County</span></div>
+      <div class="srcs">
+        <div class="sr" style="--c:var(--green)"><div class="top"><span class="nm">🏛️ NYS tax parcels</span><span class="cost">$0</span></div><div class="rec">Every parcel in NY</div><div class="cols">State open data, 2025 roll · owner + second owner, mailing address, owner type · Section-Block-Lot, address, ZIP · property class · acres, frontage, depth · year built, living sq ft, beds, baths · sewer, water · land, total and full market value · school district · deed book and page</div></div>
+        <div class="sr" style="--c:var(--green)"><div class="top"><span class="nm">🏙️ NYC lot file (PLUTO)</span><span class="cost">$0</span></div><div class="rec">Every lot in the 5 boroughs</div><div class="cols">Zoning, buildable floor area, building class, lot size · for the Bronx</div></div>
+        <div class="sr" style="--c:var(--blue)"><div class="top"><span class="nm">👤 USBizData · Residential</span><span class="cost">$27</span></div><div class="rec">15,801,605</div><div class="bar"><i style="width:100%"></i></div><div class="cols">Name, address, ZIP+4, lat/long · exact and estimated age, birth date · estimated income and wealth · length of residence · homeowner or renter, dwelling type, home value · phone</div></div>
+        <div class="sr" style="--c:var(--blue)"><div class="top"><span class="nm">✉️ USBizData · Email</span><span class="cost">$27</span></div><div class="rec">7,297,939</div><div class="bar"><i style="width:46.2%"></i></div><div class="cols">Email, name, address, phone, opt-in IP</div></div>
+        <div class="sr" style="--c:var(--blue)"><div class="top"><span class="nm">🏢 USBizData · Business</span><span class="cost">$27</span></div><div class="rec">5,514,091</div><div class="bar"><i style="width:34.9%"></i></div><div class="cols">Company, contact, email, phone, website, employees, revenue, SIC code</div></div>
+        <div class="sr" style="--c:var(--blue)"><div class="top"><span class="nm">📱 USBizData · Cell</span><span class="cost">$27</span></div><div class="rec">5,141,785</div><div class="bar"><i style="width:32.5%"></i></div><div class="cols">Cell number, name, address, ZIP</div></div>
+        <div class="sr" style="--c:var(--purple)"><div class="top"><span class="nm">🏡 OneKey MLS</span><span class="cost">Your membership</span></div><div class="rec">Your MLS · your login</div><div class="cols">Listings, expireds, withdrawn, days on market, listing history</div></div>
+        <div class="sr" style="--c:var(--orange)"><div class="top"><span class="nm">🔍 Tracerfy</span><span class="cost">2¢ a hit</span></div><div class="rec">On demand · your key</div><div class="cols">Mobiles, landlines, emails, line type, Do Not Call · change alerts</div></div>
+        <div class="sr" style="--c:var(--teal)"><div class="top"><span class="nm">🛰️ Mapbox + 📸 Mapillary</span><span class="cost">$0 at this use</span></div><div class="rec">Every lot on the map</div><div class="cols">Satellite at every zoom · front-of-house street photos</div></div>
+      </div>
+      <div class="chain"><span>🏛️ Parcel</span><i>→</i><span>📜 Owner of record</span><i>→</i><span>👤 USBizData Residential</span><i>→</i><span>📱 Cell + ✉️ email</span><i>→</i><span class="tf">🔍 Tracerfy fills only the gaps</span></div>
+      <div class="note">Matching to your bundle first keeps skip-trace spend low. Suffolk and Nassau get the weekly sweep: new expireds, back on the market, new deeds, building permits. <a href="paul-how-search-works.html" style="color:#fff">How the search works, step by step →</a></div>
     </section>
 
-    <section class="card wide">
-      <h2>One universal lead · every source joined on one record</h2>
-      <p style="margin:0 0 12px;font-weight:600">The same record in every workspace. Example: lot #3, <b>128 Pauls Path, Coram</b>. Person details stay in your workspace.</p>
-      <table>
-        <tr><th>Section</th><th>Fields</th><th>Source</th><th>Example · 128 Pauls Path</th></tr>
-        <tr><td><b>Property</b></td><td>Address, town, county, ZIP · Section-Block-Lot · property class · acres, frontage, depth · year built, living sq ft, beds, baths · sewer, water · land, total and full market value · school district · deed book and page</td><td>NYS tax parcels · NYC lot file</td><td>Coram, Town of Brookhaven, Suffolk 11727 · vacant land in a commercial area · 2.37 acres (103,003 sq ft)</td></tr>
-        <tr><td><b>Deal potential</b></td><td>Zoning, minimum lot, county septic rule, lots by right · buildable sq ft in NYC</td><td>Town zoning + Suffolk sanitary code</td><td>A1 zoning, 40,000 sq ft minimum, septic rule 40,000 → <b>2 lots by right</b></td></tr>
-        <tr><td><b>Listing history</b></td><td>Status, how long ago it expired, days on market, times listed, last asking</td><td>OneKey MLS</td><td>Expired, aged 1–2 years · 173 days on market · listed once · last asking $1.5M</td></tr>
-        <tr><td><b>Event signals</b></td><td>MLS expired · expired 2+ times · long on market · estate / trust · developers nearby · absentee · out of state · vacant · holds more parcels</td><td>OneKey + open data + Tracerfy alerts</td><td><span class="tag">MLS expired</span><span class="tag">6 developers active nearby</span><span class="tag s">Vacant land</span></td></tr>
-        <tr><td><b>Market around it</b></td><td>Companies taking title nearby · new homes permitted each year</td><td>NYS rolls · Census building permits</td><td>Kelly Real Estate holds 14 new lots in town · Brookhaven permits 360 (2023) → 514 (2024) → 286 (2025)</td></tr>
-        <tr><td><b>Owner</b></td><td>Owner of record (first + last), second owner, owner type · mailing address · lives there, absentee or out of state · other parcels owned</td><td>NYS tax parcels</td><td>Individual owner · name in your workspace</td></tr>
-        <tr><td><b>Person</b></td><td>Age and birth date · estimated income and wealth · years at the address · homeowner, dwelling type, home value · home phone</td><td>USBizData Residential (matched on name + address)</td><td>Joined at install</td></tr>
-        <tr><td><b>Reach</b></td><td>Mobiles 1–5 with line type · landline · emails 1–3 · carrier · Do Not Call · verified</td><td>USBizData Cell + Email first, then Tracerfy for what's missing</td><td>Joined at install</td></tr>
-        <tr><td><b>Business</b> (company owners)</td><td>Company, contact, phone, email, website, employees, revenue, SIC code</td><td>USBizData Business</td><td>— individual owner</td></tr>
-        <tr><td><b>Map + photo</b></td><td>Satellite with the parcel outline · front-of-house street photo</td><td>Mapbox · Mapillary</td><td>Parcel outline on satellite · street photo from 2018</td></tr>
-        <tr><td><b>Outreach</b></td><td>Calls, texts, emails counted · last outcome (no answer, voicemail, callback, sell, appointment, Do Not Call) · notes · follow-up date · pushed to first text or nurture · sent to Follow Up Boss on an appointment</td><td>Nextier</td><td>Not worked yet</td></tr>
-      </table>
-    </section>
-
-    <section class="card wide">
-      <h2>Baseline · 50,000 first texts a month + 2,000 calls a day</h2>
-      <p style="margin:0 0 12px;font-weight:700;font-size:18px">Wherever you launch your first outreach campaign, <b class="o">we've got you.</b> The data engine feeds it, and this is what a launch at this size costs and returns.</p>
-      <div class="grid">
-        <div>
-          <h3>Cost per month, in your own accounts · estimate range</h3>
-          <table>
-            <tr><th>Item</th><th>How it's figured</th><th class="r">Low – high</th></tr>
-            <tr><td>Texting</td><td>50,000 × about 1¢ all-in, plus replies</td><td class="r">$500 – $600</td></tr>
-            <tr><td>Calling minutes</td><td>2,000 a day × 22 days = 44,000 calls ≈ 50,600 minutes × 1–2¢ (voice is quoted)</td><td class="r">$500 – $1,000</td></tr>
-            <tr><td>Skip trace</td><td>≈ 50,000 hits × 2¢ to find 50,000 mobiles; misses cost nothing</td><td class="r">$1,000 – $1,200</td></tr>
-            <tr><td>Phone numbers</td><td>6 texting lines + 20–40 calling lines × $1.15, + $10 campaign</td><td class="r">$40 – $65</td></tr>
-            <tr><td>Database + listing re-checks</td><td>DigitalOcean $61 + Apify ≈ $35</td><td class="r">≈ $95</td></tr>
-            <tr><td>Maps + street photos</td><td>Mapbox (inside its monthly allowance) + Mapillary</td><td class="r">$0</td></tr>
-            <tr class="tot"><td colspan="2">Baseline month</td><td class="r">≈ $2,150 – $2,950</td></tr>
-          </table>
-          <div class="note">Add RealEstateAPI ($600) only for loan and adjustable-rate data. Owners come from the NY tax rolls already in your database, so there's no per-lead list cost; pulling lists from Tracerfy instead would add about 10¢ a lead.</div>
-        </div>
-        <div>
-          <h3>What it takes</h3>
-          <ul>
-            <li><b>Texting:</b> 50,000 a month ≈ 2,300–3,000 a day on send days → <b>6 warmed numbers</b> at 500 a day each. Brand vetting first.</li>
-            <li><b>Calling:</b> 2,000 dials a day → <b>8–13 callers</b> on one line each (150–250 dials a day per person), spread across <b>20–40 numbers</b> so none gets labeled spam. A multi-line dialer cuts the callers, but it isn't built yet.</li>
-            <li><b>Book size:</b> 50,000 a month works through your land and commercial book (≈ 19,400) in under a month. The wider targets (older homes on big lots, vacant land, inherited) are ≈ 237,000 across Long Island, NYC and the Hudson Valley, about 5 months at this pace.</li>
-          </ul>
-          <h3>What it should produce · from our own New York results</h3>
-          <table>
-            <tr><th>Step</th><th class="r">Low</th><th class="r">Mid</th><th class="r">High</th></tr>
-            <tr><td>Delivered (80–89%)</td><td class="r">40,100</td><td class="r">41,150</td><td class="r">44,500</td></tr>
-            <tr><td>Replies (10–20%)</td><td class="r">5,000</td><td class="r">6,250</td><td class="r">10,000</td></tr>
-            <tr><td>Real conversations</td><td class="r">330</td><td class="r">440</td><td class="r">780</td></tr>
-            <tr><td>Appointments</td><td class="r">5</td><td class="r">23</td><td class="r">155</td></tr>
-          </table>
-          <div class="note">Calls come on top: in our own call log about 1 call in 8 ran past a minute, which would be ≈ 5,700 longer calls a month (rough, small sample).</div>
+    <section class="card wide" id="lead">
+      <h2>📇 One universal lead · every source joined on one record</h2>
+      <div class="lp">
+        <div class="hd"><span style="font-weight:800;letter-spacing:.12em;font-size:13px;color:#8cb6ff">LOT #3 · UNIVERSAL LEAD</span><b>128 Pauls Path</b><span style="font-weight:600">Coram, NY 11727 · Town of Brookhaven · Suffolk</span></div>
+        <div class="bd">
+          <div class="tiles">
+            <div class="tile"><div class="ic">📏</div><b>2.37</b><span>acres</span></div>
+            <div class="tile"><div class="ic">✂️</div><b class="g">2</b><span>lots by right</span></div>
+            <div class="tile"><div class="ic">💵</div><b>$1.5M</b><span>last asking</span></div>
+            <div class="tile"><div class="ic">⏳</div><b>173</b><span>days on market</span></div>
+          </div>
+          <div style="margin-top:10px"><span class="tag">⏳ MLS expired</span><span class="tag">🏗️ 6 developers active nearby</span><span class="tag s">🌾 Vacant land</span></div>
+          <div class="legend">
+            <span class="sc" style="--c:var(--green)">🏠 Property · NYS parcels</span><span class="sc" style="--c:var(--yellow)">📐 Deal · zoning</span><span class="sc" style="--c:var(--purple)">⏳ Listing · OneKey</span><span class="sc" style="--c:var(--teal)">🏗️ Market · rolls + permits</span><span class="sc" style="--c:var(--green)">👤 Owner · NYS parcels</span><span class="sc" style="--c:var(--blue)">🧬 Person · USBizData</span><span class="sc" style="--c:var(--blue)">📱 Cell + email · USBizData</span><span class="sc" style="--c:var(--orange)">🔍 Gaps · Tracerfy</span><span class="sc" style="--c:var(--blue)">🏢 Business · USBizData</span><span class="sc" style="--c:#fff">🧾 The record</span>
+          </div>
+          <a class="btn" href="paul-universal-lead.html">📇 Open the full universal lead card →</a>
         </div>
       </div>
     </section>
 
-    <section class="card wide">
-      <h2>Event signals · where each one comes from · RealEstateAPI vs Tracerfy</h2>
+    <section class="card wide" id="baseline">
+      <h2>🚀 Baseline · 50,000 first texts a month + 2,000 calls a day</h2>
+      <p style="margin:0 0 14px;font-weight:700;font-size:18px">Wherever you launch your first outreach campaign, <b class="o">we've got you.</b> The data engine feeds it, and this is what a launch at this size costs and returns.</p>
+      <div class="grid">
+        <div>
+          <h3>💵 Cost per month, in your own accounts · estimate range</h3>
+          <div class="stack" role="img" aria-label="Baseline monthly cost mix"><i class="cA" style="width:43.2%;--c:var(--purple)"></i><i style="width:29.4%;--c:var(--blue)"></i><i style="width:21.6%;--c:var(--orange)"></i><i style="width:3.7%;--c:var(--green)"></i><i style="width:2.1%;--c:var(--yellow)"></i></div>
+          <div class="leg">
+            <div style="--c:var(--purple)"><span>🔍 Skip trace · ≈ 50,000 hits × 2¢; misses cost nothing</span><em>$1,000 – $1,200</em></div>
+            <div style="--c:var(--blue)"><span>☎️ Calling · 2,000 a day × 22 days ≈ 50,600 minutes × 1–2¢</span><em>$500 – $1,000</em></div>
+            <div style="--c:var(--orange)"><span>💬 Texting · 50,000 × about 1¢ all-in, plus replies</span><em>$500 – $600</em></div>
+            <div style="--c:var(--green)"><span>🗄️ Database + listing re-checks · DigitalOcean $61 + Apify ≈ $35</span><em>≈ $95</em></div>
+            <div style="--c:var(--yellow)"><span>📞 Numbers · 6 texting + 20–40 calling × $1.15, + $10 campaign</span><em>$40 – $65</em></div>
+            <div style="--c:var(--teal)"><span>🛰️ Maps + street photos · inside Mapbox's monthly allowance</span><em>$0</em></div>
+            <div class="tot"><span>Baseline month</span><em>≈ $2,150 – $2,950</em></div>
+          </div>
+          <div class="note">Add RealEstateAPI ($600) only for loan and adjustable-rate data. Owners come from the NY tax rolls already in your database, so there's no per-lead list cost; pulling lists from Tracerfy instead would add about 10¢ a lead.</div>
+        </div>
+        <div>
+          <h3>🧰 What it takes</h3>
+          <div class="tiles">
+            <div class="tile"><div class="ic">📱</div><b>6</b><span>warmed texting numbers at 500 a day (2,300–3,000 a day on send days). Brand vetting first.</span></div>
+            <div class="tile"><div class="ic">👥</div><b>8–13</b><span>callers on one line each, 150–250 dials a day per person</span></div>
+            <div class="tile"><div class="ic">☎️</div><b>20–40</b><span>calling numbers so none gets labeled spam</span></div>
+            <div class="tile"><div class="ic">📚</div><b>&lt; 1 mo</b><span>to work through your land and commercial book (≈ 19,400)</span></div>
+            <div class="tile"><div class="ic">🗺️</div><b>≈ 5 mo</b><span>for the wider targets (≈ 237,000 across Long Island, NYC and the Hudson Valley)</span></div>
+          </div>
+          <div class="note">A multi-line dialer would cut the number of callers, but it isn't built yet.</div>
+        </div>
+      </div>
+      <h3 style="margin-top:18px">📈 What it should produce · from our own New York results</h3>
+      <div class="three">
+        <div class="col"><div class="h">Low</div><div class="row"><span>📬 Delivered</span><em>40,100</em></div><div class="row"><span>🙋 Replies</span><em>5,000</em></div><div class="row"><span>🗣️ Conversations</span><em>330</em></div><div class="row"><span>📅 Appointments</span><em>5</em></div></div>
+        <div class="col" style="border-color:var(--blue)"><div class="h" style="color:#8cb6ff">Mid</div><div class="row"><span>📬 Delivered</span><em>41,150</em></div><div class="row"><span>🙋 Replies</span><em>6,250</em></div><div class="row"><span>🗣️ Conversations</span><em>440</em></div><div class="row"><span>📅 Appointments</span><em>23</em></div></div>
+        <div class="col" style="border-color:var(--green)"><div class="h g">High</div><div class="row"><span>📬 Delivered</span><em>44,500</em></div><div class="row"><span>🙋 Replies</span><em>10,000</em></div><div class="row"><span>🗣️ Conversations</span><em>780</em></div><div class="row"><span>📅 Appointments</span><em>155</em></div></div>
+      </div>
+      <div class="note">Delivered runs 80–89%, replies 10–20%. Calls come on top: in our own call log about 1 call in 8 ran past a minute, which would be ≈ 5,700 longer calls a month (rough, small sample).</div>
+    </section>
+
+    <section class="card wide" id="sources">
+      <h2>🎯 Event signals · where each one comes from · RealEstateAPI vs Tracerfy</h2>
+      <div class="tw">
       <table>
-        <tr><th>Signal</th><th>Segment</th><th>OneKey MLS · NY open data</th><th>RealEstateAPI</th><th>Tracerfy</th><th>We'd pick</th></tr>
-        <tr><td><b>MLS expired, never relisted or sold</b></td><td>Event</td><td>Your OneKey login: the full listing history, every county</td><td>MLS status flags</td><td>"Failed listing" flag; undercounts Long Island (Suffolk 1,599 vs OneKey 2,270) and covers very little land</td><td class="g"><b>OneKey</b></td></tr>
-        <tr><td><b>Expired 2+ times · long on market</b></td><td>Event</td><td>OneKey listing history and days on market</td><td>No listing-date window</td><td>No listing-date window</td><td class="g"><b>OneKey</b></td></tr>
-        <tr><td><b>Estate · inherited · probate</b></td><td>Event</td><td>Estate or trust named on the tax roll</td><td>Inherited, death and probate filters</td><td>Inherited list; change alerts when a new one appears</td><td class="g"><b>Tracerfy</b> (pay per lead); RealEstateAPI if you subscribe</td></tr>
-        <tr><td><b>Adjustable rate resets · loan coming due</b></td><td>Event</td><td>—</td><td>Loan type and maturity date</td><td>—</td><td class="g"><b>RealEstateAPI only</b> (thin on commercial loans)</td></tr>
-        <tr><td><b>Developers buying nearby · new deeds</b></td><td>Event</td><td>Companies taking title since 2021 (state rolls) + building permits by town</td><td>Corporate owner and last sale date</td><td>Change alerts on a sale or deed</td><td class="g"><b>Open data</b> + Tracerfy alerts</td></tr>
-        <tr><td><b>Absentee · out-of-state owner</b></td><td>Owner + land</td><td>Owner's mailing address on the tax roll</td><td>Absentee filter, owner mailing address</td><td>Owner-occupied flag</td><td class="g"><b>Open data</b> (already on every lot)</td></tr>
-        <tr><td><b>Vacant land · lot size · split by right</b></td><td>Owner + land</td><td>Property class, acres, town zoning + county septic rule</td><td>Vacant, lot size, land-use code</td><td>Land type and lot size (no zoning)</td><td class="g"><b>Open data</b></td></tr>
-        <tr><td><b>Years owned · no mortgage · high equity</b></td><td>Owner + land</td><td>Last deed on the roll</td><td>Years owned, no mortgage, high equity</td><td>Equity and ownership filters</td><td class="g"><b>RealEstateAPI</b> if you subscribe, else Tracerfy</td></tr>
-        <tr><td><b>Owner holds more parcels</b></td><td>Owner + land</td><td>Same owner or mailing address across the rolls</td><td>—</td><td>—</td><td class="g"><b>Open data</b></td></tr>
-        <tr><td><b>Phones + emails</b></td><td>Reach</td><td>—</td><td>—</td><td>Skip trace: mobiles, landlines, emails, line type, Do Not Call</td><td class="g"><b>Tracerfy only</b></td></tr>
+        <tr><th>Signal</th><th>Segment</th><th>🏡 OneKey MLS · 🏛️ NY open data</th><th>🏦 RealEstateAPI</th><th>🔍 Tracerfy</th><th>We'd pick</th></tr>
+        <tr><td><b>⏳ MLS expired, never relisted or sold</b></td><td>Event</td><td>✅ Your OneKey login: the full listing history, every county</td><td>✅ MLS status flags</td><td>⚠️ "Failed listing" flag; undercounts Long Island (Suffolk 1,599 vs OneKey 2,270) and covers very little land</td><td><span class="pick">OneKey</span></td></tr>
+        <tr><td><b>🔁 Expired 2+ times · 🐢 long on market</b></td><td>Event</td><td>✅ OneKey listing history and days on market</td><td>➖ No listing-date window</td><td>➖ No listing-date window</td><td><span class="pick">OneKey</span></td></tr>
+        <tr><td><b>⚖️ Estate · inherited · probate</b></td><td>Event</td><td>✅ Estate or trust named on the tax roll</td><td>✅ Inherited, death and probate filters</td><td>✅ Inherited list; change alerts when a new one appears</td><td><span class="pick">Tracerfy</span> (pay per lead); RealEstateAPI if you subscribe</td></tr>
+        <tr><td><b>⚠️ Adjustable rate resets · loan coming due</b></td><td>Event</td><td>➖</td><td>✅ Loan type and maturity date</td><td>➖</td><td><span class="pick">RealEstateAPI only</span> (thin on commercial loans)</td></tr>
+        <tr><td><b>🏗️ Developers buying nearby · new deeds</b></td><td>Event</td><td>✅ Companies taking title since 2021 (state rolls) + building permits by town</td><td>✅ Corporate owner and last sale date</td><td>✅ Change alerts on a sale or deed</td><td><span class="pick">Open data</span> + Tracerfy alerts</td></tr>
+        <tr><td><b>✈️ Absentee · out-of-state owner</b></td><td>Owner + land</td><td>✅ Owner's mailing address on the tax roll</td><td>✅ Absentee filter, owner mailing address</td><td>✅ Owner-occupied flag</td><td><span class="pick">Open data</span> (already on every lot)</td></tr>
+        <tr><td><b>🌾 Vacant land · lot size · split by right</b></td><td>Owner + land</td><td>✅ Property class, acres, town zoning + county septic rule</td><td>✅ Vacant, lot size, land-use code</td><td>⚠️ Land type and lot size (no zoning)</td><td><span class="pick">Open data</span></td></tr>
+        <tr><td><b>🗓️ Years owned · no mortgage · high equity</b></td><td>Owner + land</td><td>⚠️ Last deed on the roll</td><td>✅ Years owned, no mortgage, high equity</td><td>✅ Equity and ownership filters</td><td><span class="pick">RealEstateAPI</span> if you subscribe, else Tracerfy</td></tr>
+        <tr><td><b>🏘️ Owner holds more parcels</b></td><td>Owner + land</td><td>✅ Same owner or mailing address across the rolls</td><td>➖</td><td>➖</td><td><span class="pick">Open data</span></td></tr>
+        <tr><td><b>📱 Phones + emails</b></td><td>Reach</td><td>➖</td><td>➖</td><td>✅ Skip trace: mobiles, landlines, emails, line type, Do Not Call</td><td><span class="pick">Tracerfy only</span></td></tr>
       </table>
-      <table>
-        <tr><th>How you pay</th><th>RealEstateAPI</th><th>Tracerfy</th></tr>
-        <tr><td>Plan</td><td>$600 a month flat, 30,000 credits</td><td>Pay as you go, no monthly</td></tr>
-        <tr><td>Counting a market before you buy</td><td>0 credits</td><td>0 credits (preview)</td></tr>
-        <tr><td>Pulling a list</td><td>Credits per record</td><td>About 10¢ a lead</td></tr>
-        <tr><td>Change alerts</td><td>Daily re-check of your saved properties</td><td>50¢ per new lead (up to 5,000 watched per alert)</td></tr>
-        <tr><td>Skip trace</td><td>—</td><td>2¢ a hit; misses cost nothing</td></tr>
-      </table>
+      </div>
+      <div style="font-weight:600;margin:0 0 12px">✅ has it · ⚠️ partial · ➖ doesn't</div>
+      <h3>💳 How you pay</h3>
+      <div class="pay">
+        <div class="col" style="border-color:var(--purple)"><div class="h" style="color:var(--purple)">🏦 RealEstateAPI</div><div class="row"><span>Plan</span><em>$600 a month flat, 30,000 credits</em></div><div class="row"><span>Counting a market</span><em>0 credits</em></div><div class="row"><span>Pulling a list</span><em>Credits per record</em></div><div class="row"><span>Change alerts</span><em>Daily re-check of saved properties</em></div><div class="row"><span>Skip trace</span><em>—</em></div></div>
+        <div class="col" style="border-color:var(--orange)"><div class="h o">🔍 Tracerfy</div><div class="row"><span>Plan</span><em>Pay as you go, no monthly</em></div><div class="row"><span>Counting a market</span><em>0 credits (preview)</em></div><div class="row"><span>Pulling a list</span><em>About 10¢ a lead</em></div><div class="row"><span>Change alerts</span><em>50¢ per new lead (up to 5,000 watched)</em></div><div class="row"><span>Skip trace</span><em>2¢ a hit; misses $0</em></div></div>
+      </div>
       <div class="note">Our pick for you: OneKey + NY open data for the land and the listings, Tracerfy for estates, alerts and phones. Add RealEstateAPI only for loan, adjustable-rate and equity data. No foreclosure pulls.</div>
     </section>
 
-    <section class="card wide">
-      <h2>Full cost breakdown · what runs on your own accounts</h2>
+    <section class="card wide" id="costs">
+      <h2>💵 Full cost breakdown · what runs on your own accounts</h2>
       <div class="grid">
         <div>
-          <h3>One time, to set up</h3>
-          <table>
-            <tr><th>Item</th><th>What it's for</th><th class="r">Cost</th></tr>
-            <tr><td>SignalHouse brand + campaign</td><td>Registers your texting with the carriers ($4.50 + $15)</td><td class="r">$19.50</td></tr>
-            <tr><td>SignalHouse brand vetting</td><td>Raises how many texts the carriers allow a day</td><td class="r">$40</td></tr>
-            <tr><td>5 phone numbers</td><td>$1 each</td><td class="r">$5</td></tr>
-            <tr><td>USBizData · New York State bundle</td><td>Residential · cell · email · business, 4 files × $27</td><td class="r">$108</td></tr>
-            <tr><td>Nassau parcel shapes</td><td>Lot outlines + measured acres for the Nassau focus (owners come from the state rolls)</td><td class="r">$250</td></tr>
-            <tr><td>First skip trace</td><td>Every owner in the land book (1,771 lots) at 2¢</td><td class="r">≈ $35</td></tr>
-            <tr class="tot"><td colspan="2">Set-up in your accounts</td><td class="r">≈ $458</td></tr>
-          </table>
+          <h3>🧰 One time, to set up</h3>
+          <div class="stack" role="img" aria-label="One-time set-up cost mix"><i style="width:54.6%;--c:var(--teal)"></i><i style="width:23.6%;--c:var(--blue)"></i><i style="width:8.7%;--c:var(--yellow)"></i><i style="width:7.7%;--c:var(--purple)"></i><i style="width:4.3%;--c:var(--orange)"></i><i style="width:1.1%;--c:var(--green)"></i></div>
+          <div class="leg">
+            <div style="--c:var(--teal)"><span>🗺️ Nassau parcel shapes · lot outlines + measured acres for the Nassau focus</span><em>$250</em></div>
+            <div style="--c:var(--blue)"><span>📦 USBizData NY State bundle · residential, cell, email, business, 4 × $27</span><em>$108</em></div>
+            <div style="--c:var(--yellow)"><span>🏅 SignalHouse brand vetting · raises how many texts the carriers allow a day</span><em>$40</em></div>
+            <div style="--c:var(--purple)"><span>🔍 First skip trace · every owner in the land book (1,771 lots) at 2¢</span><em>≈ $35</em></div>
+            <div style="--c:var(--orange)"><span>📝 SignalHouse brand + campaign · registers your texting ($4.50 + $15)</span><em>$19.50</em></div>
+            <div style="--c:var(--green)"><span>📞 5 phone numbers · $1 each</span><em>$5</em></div>
+            <div class="tot"><span>Set-up in your accounts</span><em>≈ $458</em></div>
+          </div>
         </div>
         <div>
-          <h3>Every month · a full month</h3>
-          <table>
-            <tr><th>Item</th><th>Volume</th><th class="r">Cost</th></tr>
-            <tr><td>Texting</td><td>20,000 texts at about 1¢ all-in</td><td class="r">≈ $210</td></tr>
-            <tr><td>Calling</td><td>500 calls a day, 22 days (estimate; voice is quoted)</td><td class="r">≈ $200</td></tr>
-            <tr><td>Skip trace</td><td>2,000 owners at 2¢ (15¢ with relatives)</td><td class="r">≈ $40</td></tr>
-            <tr><td>Your database</td><td>DigitalOcean, 2 CPU / 4 GB</td><td class="r">$61</td></tr>
-            <tr><td>Listing re-checks</td><td>Apify, weekly sweep (estimate)</td><td class="r">≈ $35</td></tr>
-            <tr><td>Texting line upkeep</td><td>Campaign $10 + 5 numbers at $1.15</td><td class="r">$16</td></tr>
-            <tr><td>Mapbox satellite</td><td>50,000 map loads + 750,000 satellite tiles a month included; then $5 per 1,000 loads</td><td class="r">$0 at this use</td></tr>
-            <tr><td>Mapillary street photos</td><td>Front-of-house photos; Mapillary doesn't charge</td><td class="r">$0</td></tr>
-            <tr class="tot"><td colspan="2">A full month in your accounts</td><td class="r">≈ $560</td></tr>
-          </table>
+          <h3>📅 Every month · a full month</h3>
+          <div class="stack" role="img" aria-label="Monthly cost mix"><i style="width:37.4%;--c:var(--orange)"></i><i style="width:35.6%;--c:var(--blue)"></i><i style="width:10.9%;--c:var(--green)"></i><i style="width:7.1%;--c:var(--purple)"></i><i style="width:6.2%;--c:var(--teal)"></i><i style="width:2.8%;--c:var(--yellow)"></i></div>
+          <div class="leg">
+            <div style="--c:var(--orange)"><span>💬 Texting · 20,000 texts at about 1¢ all-in</span><em>≈ $210</em></div>
+            <div style="--c:var(--blue)"><span>☎️ Calling · 500 calls a day, 22 days (estimate; voice is quoted)</span><em>≈ $200</em></div>
+            <div style="--c:var(--green)"><span>🗄️ Your database · DigitalOcean, 2 CPU / 4 GB</span><em>$61</em></div>
+            <div style="--c:var(--purple)"><span>🔍 Skip trace · 2,000 owners at 2¢ (15¢ with relatives)</span><em>≈ $40</em></div>
+            <div style="--c:var(--teal)"><span>🔄 Listing re-checks · Apify, weekly sweep (estimate)</span><em>≈ $35</em></div>
+            <div style="--c:var(--yellow)"><span>📞 Texting line upkeep · campaign $10 + 5 numbers at $1.15</span><em>$16</em></div>
+            <div style="--c:#64748b"><span>🛰️ Mapbox · 50,000 map loads + 750,000 satellite tiles a month included</span><em>$0 at this use</em></div>
+            <div style="--c:#64748b"><span>📸 Mapillary street photos · Mapillary doesn't charge</span><em>$0</em></div>
+            <div class="tot"><span>A full month in your accounts</span><em>≈ $560</em></div>
+          </div>
         </div>
       </div>
       <div class="note">No foreclosure pulls. Start lean: text 10,000 and call 250 a day ≈ $330 a month. Add RealEstateAPI ($600, 30,000 credits) only if you want loan and adjustable-rate data. Every cost scales with volume, and you see each bill directly. OneKey and Follow Up Boss stay on your existing accounts. Nextier's install and management fee is quoted by Thomas.</div>
     </section>
 
-    <section class="card links">
-      <h2>See it</h2>
-      <a href="team-musso-overview.html">Overview<small>Your engine running itself, chapter by chapter</small></a>
-      <a href="paul-land-hunt.html">Hunt Engine<small>List · map · detail · call and email</small></a>
-      <a href="paul-territory-intelligence.html">Territory Intelligence<small>Dashboards · segments · event signals</small></a>
-      <a href="paul-news.html">News desk<small>Local and statewide stories, each with why it matters to you</small></a>
+    <section class="card wide" id="pages">
+      <h2>🧭 Your pages</h2>
+      <div class="links">
+        <a href="paul-readme.html">📖 Read Me<small>Start here: the whole thing in plain English</small></a>
+        <a href="team-musso-overview.html">🎬 Overview<small>Your engine running itself, chapter by chapter</small></a>
+        <a href="paul-land-hunt.html">🗺️ Hunt Engine<small>List · map · detail · call and email</small></a>
+        <a href="paul-universal-lead.html">📇 Universal lead card<small>One lot, every source merged</small></a>
+        <a href="paul-territory-intelligence.html">📊 Territory Intelligence<small>Dashboards · segments · event signals</small></a>
+        <a href="paul-how-search-works.html">🔎 How search works<small>Postgres and DigitalOcean, explained simply</small></a>
+        <a href="paul-first-30-days.html">🗓️ First 30 Days<small>Execution map · rules · your keys · the first month</small></a>
+        <a href="paul-glossary.html">🔤 Glossary<small>Every word, in plain English</small></a>
+        <a href="paul-news.html">📰 News feed<small>Local and statewide stories, each with why it matters to you</small></a>
+      </div>
     </section>
   </div>
 </div>
