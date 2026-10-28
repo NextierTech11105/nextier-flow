@@ -43,9 +43,9 @@
   <section class="card">
     <h2>What it is</h2>
     <ul>
-      <li><b>Parcelvora</b> sells New York property data, and only data. Silvia's company. It is <b>not</b> named Nextier.</li>
+      <li><b>Parcelvora</b> sells New York and Florida property data, and only data. Silvia's company. It is <b>not</b> named Nextier.</li>
       <li>It takes the best of four tools: PropertyShark's report, PropStream's list builder, DealMachine's map and ATTOM Property Navigator's comps and values.</li>
-      <li>Most of the data is free public record (NYC + NY State Open Data). Paid only for phones, home values and foreclosures.</li>
+      <li>Most of the data is free public record: NYC + NY State Open Data, and Florida's county tax rolls. Paid only for phones, home values and foreclosures.</li>
       <li>Domains <b>parcelvora.com, .ai and .net</b> were registered Oct 27 through Squarespace. The US trademark office has no filings for PARCELVORA.</li>
     </ul>
   </section>
@@ -59,6 +59,7 @@
       <tr><td>Silvia's setup steps</td><td><a href="silvia-setup.html">silvia-setup.html</a></td></tr>
       <tr><td>RealEstateAPI in Perplexity</td><td><a href="perplexity-realestateapi.html">perplexity-realestateapi.html</a></td></tr>
       <tr><td>The code (private, GitHub login)</td><td><a href="https://github.com/Parcelavora/parcelvora" target="_blank" rel="noopener">github.com/Parcelavora/parcelvora</a></td></tr>
+      <tr><td>Florida tax rolls, all 67 counties (the source)</td><td><a href="https://floridarevenue.com/property/Pages/DataPortal_RequestAssessmentRollGISData.aspx" target="_blank" rel="noopener">Florida Dept. of Revenue data portal</a></td></tr>
     </table></div>
   </section>
 
@@ -78,9 +79,11 @@
     <div class="box"><table>
       <tr><th>Piece</th><th>State</th></tr>
       <tr><td>Property report: owner, deeds, mortgages, people behind an LLC, permits, violations (NYC + Long Island)</td><td><span class="tag done">Done</span></td></tr>
-      <tr><td>Data lake: 1.89M parcels (NYC + Nassau + Suffolk) in Postgres</td><td><span class="tag done">Tested</span></td></tr>
-      <tr><td>Lookup by address, NYC lot or NY parcel id: full property + ownership profile in 8 ms</td><td><span class="tag done">Done</span></td></tr>
-      <tr><td>Owner first + last names: 419,228 NYC · 822,714 Long Island</td><td><span class="tag done">Done</span></td></tr>
+      <tr><td>Data lake: 4.24M parcels in Postgres: NYC, Nassau + Suffolk, Miami-Dade + Broward + Palm Beach</td><td><span class="tag done">Tested</span></td></tr>
+      <tr><td>Lookup by address, NYC lot, NY parcel id or Florida folio: full property + ownership profile in 8 ms</td><td><span class="tag done">Done</span></td></tr>
+      <tr><td>Owner first + last names: 419,228 NYC · 822,714 Long Island · 1,852,220 Florida</td><td><span class="tag done">Done</span></td></tr>
+      <tr><td>Florida: 1,241,335 homesteads (owner lives there) · 732,244 absentee · 217,864 out-of-state owners</td><td><span class="tag done">Done</span></td></tr>
+      <tr><td>All 67 Florida counties: one setting, <code>FL_COUNTIES=all</code></td><td><span class="tag done">Ready</span></td></tr>
       <tr><td>Person behind the LLC: 87,062 NYC buildings</td><td><span class="tag done">Done</span></td></tr>
       <tr><td>README with setup, fields, sources and limits</td><td><span class="tag done">Done</span></td></tr>
       <tr><td>Screens: list builder, report page, map</td><td><span class="tag wait">Next</span></td></tr>
@@ -90,7 +93,7 @@
   <section class="card">
     <h2>Waiting on you</h2>
     <ul>
-      <li><b>Say go</b> to create Parcelvora's database: one Postgres cluster at <b>$15.15/mo</b> on the Nextier DigitalOcean account. Then the lake loads into it.</li>
+      <li><b>Say go</b> to create Parcelvora's database: one Postgres cluster at <b>$15.15/mo</b> on the Nextier DigitalOcean account. The lake builds on the dev box (about 40 minutes) and only the lookup-ready part (2.3 GB) is copied in, so the small plan is enough.</li>
       <li><b>Rename the GitHub org</b> from "Parcelavora" to <code>parcelvora</code>: org Settings → Rename organization. Silvia can do it too.</li>
       <li><b>Create the <code>ehoa-advisors</code> GitHub org</b> and invite Silvia as Owner. Then I move in the EHOA slideshow repo and her haas app.</li>
       <li><b>Lawyer:</b> the code agreement between Nextier and Parcelvora.</li>
@@ -140,6 +143,7 @@
       <li>Some feeds are stale: tax lien list (330 days), HPD registrations (76 days).</li>
       <li>177,081 NYC owners have no first/last split (no comma in the record). The full name still shows.</li>
       <li>No phones or emails in public data. That's the paid skip-trace step.</li>
+      <li>Florida: no map coordinates yet, and no person behind Florida LLCs yet. Sunbiz's free quarterly file of every Florida company's officers is the next layer. Sales are month-precise.</li>
     </ul>
   </section>
 
