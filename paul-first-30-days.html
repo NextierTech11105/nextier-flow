@@ -33,6 +33,11 @@ b{color:#fff}
 .flow span.us{border-color:var(--blue);background:#0f2347}
 .flow span.you{border-color:var(--green);background:#0b3322}
 .flow i{font-style:normal;font-weight:800;color:var(--orange)}
+.flow .fl{font:800 14px 'Archivo',Arial,sans-serif;letter-spacing:.08em;text-transform:uppercase;color:#8cb6ff;margin-right:6px}
+.flow .fl.o{color:var(--orange)}
+.flow .end{font-weight:800;font-size:14px;color:var(--green);margin-left:6px}
+tr.div td{font:800 14px 'Archivo',Arial,sans-serif;letter-spacing:.1em;text-transform:uppercase;color:var(--orange);background:#140c05;padding:8px 10px}
+tr.div.d td{color:#8cb6ff;background:#0a1426}
 .key{display:flex;flex-wrap:wrap;gap:8px 16px;font-weight:600;font-size:15px;margin:0 0 12px}
 .key b{display:inline-block;width:12px;height:12px;border-radius:3px;margin-right:6px;vertical-align:-1px}
 .tw{overflow-x:auto}
@@ -83,20 +88,21 @@ td.n{font:800 18px 'Archivo',Arial,sans-serif;color:var(--orange);white-space:no
     <section class="card wide">
       <h2>The execution map</h2>
       <div class="key"><span><b style="background:var(--blue)"></b>Nextier runs it</span><span><b style="background:var(--green)"></b>Your team runs it</span></div>
-      <div class="flow">
-        <span class="us">Find</span><i>→</i><span class="us">Signal</span><i>→</i><span class="us">Read the deal</span><i>→</i><span class="us">Owner</span><i>→</i><span class="us">Phones + email</span><i>→</i><span class="us">Blocks</span><i>→</i><span class="you">Call + email</span><i>→</i><span class="you">First text</span><i>→</i><span class="you">Replies</span><i>→</i><span class="you">Appointment</span><i>→</i><span class="us">Report</span>
-      </div>
+      <div class="flow"><b class="fl">🧠 Data Engine</b><span class="us">Find</span><i>→</i><span class="us">Signal</span><i>→</i><span class="us">Read the deal</span><i>→</i><span class="us">Owner</span><i>→</i><span class="us">Phones + email</span><i>→</i><span class="us">Blocks</span><i>→</i><span class="you">Click to call</span><b class="end">⛳ the data engine ends here</b></div>
+      <div class="flow"><b class="fl o">🚀 Campaign Engine · its own package</b><span class="you">Email</span><i>→</i><span class="you">First text</span><i>→</i><span class="you">Replies</span><i>→</i><span class="you">Appointment</span><i>→</i><span class="us">Report</span></div>
       <div class="tw">
       <table>
         <tr><th></th><th>Step</th><th>What happens</th><th>Who</th><th>Where you see it</th></tr>
+        <tr class="div d"><td colspan="5">🧠 Data Engine</td></tr>
         <tr><td class="n">1</td><td><b>Find</b></td><td>Every parcel in New York State. Suffolk and Nassau swept every week; the Bronx, Westchester and up to Orange County worked too.</td><td><span class="who us">Nextier</span></td><td>Hunt Engine map + list</td></tr>
         <tr><td class="n">2</td><td><b>Signal</b></td><td>The reason to call now: MLS expired and never relisted, expired 2+ times, long on market, estate or trust, developers buying nearby. No foreclosure pulls.</td><td><span class="who us">Nextier</span></td><td>Signal tags on every lot · Territory Intelligence</td></tr>
         <tr><td class="n">3</td><td><b>Read the deal</b></td><td>Acres, zoning, lots by right, last asking, who's building next door, which way permits are heading.</td><td><span class="who us">Nextier</span></td><td>Deal potential on the lot</td></tr>
         <tr><td class="n">4</td><td><b>Owner</b></td><td>Owner of record, past the LLC to the person who signs. Where they live, what else they hold.</td><td><span class="who us">Nextier</span></td><td>Owner card on the lot</td></tr>
         <tr><td class="n">5</td><td><b>Phones + email</b></td><td>Skip trace on your key. Every phone ranked and labeled mobile or landline, with the Do Not Call check.</td><td><span class="who us">Nextier</span> <span class="who you">Paul approves the spend</span></td><td>Phones + emails on the lot</td></tr>
         <tr><td class="n">6</td><td><b>Blocks</b></td><td>Lots grouped into call and text blocks, best first: split by right, aged expireds, individual owners.</td><td><span class="who us">Nextier builds</span> <span class="who you">Bryan picks</span></td><td>Work this next</td></tr>
-        <tr><td class="n">7</td><td><b>Call + email</b></td><td>One click to call from your own line. One press logs the outcome. Notes on every lot.</td><td><span class="who you">Your assistants</span></td><td>Call pad on the lot</td></tr>
-        <tr><td class="n">8</td><td><b>First text</b></td><td>Wherever your first outreach campaign launches, we've got you. The block is staged, not sent, until a person presses Send.</td><td><span class="who you">Bryan presses Send</span></td><td>Launch page</td></tr>
+        <tr><td class="n">7</td><td><b>Click to call</b></td><td>One click to call from your own line. One press logs the outcome. Notes on every lot. <b>The data engine ends here.</b></td><td><span class="who you">Your assistants</span></td><td>Call pad on the lot</td></tr>
+        <tr class="div"><td colspan="5">🚀 Campaign Engine · its own package</td></tr>
+        <tr><td class="n">8</td><td><b>Email + first text</b></td><td>Emails from your own address; first texts to a whole block. Wherever your first campaign launches, we've got you. Staged, not sent, until a person presses Send.</td><td><span class="who you">Bryan presses Send</span></td><td>Launch page</td></tr>
         <tr><td class="n">9</td><td><b>Replies</b></td><td>Any reply is a raised hand. Worked first, with a callback date and notes.</td><td><span class="who you">Your assistants</span> <span class="who you">Bryan watches</span></td><td>Inbox · Call Ready</td></tr>
         <tr><td class="n">10</td><td><b>Appointment</b></td><td>Booked appointments go straight to Follow Up Boss.</td><td><span class="who you">Paul</span></td><td>Follow Up Boss</td></tr>
         <tr><td class="n">11</td><td><b>Report</b></td><td>Every week a short review. Every month the full report and every cost, line by line.</td><td><span class="who us">Nextier</span></td><td>Your inbox</td></tr>
@@ -148,15 +154,15 @@ td.n{font:800 18px 'Archivo',Arial,sans-serif;color:var(--orange);white-space:no
         <div class="kc">
           <h3>📞 SignalHouse</h3><div class="t">API key</div>
           <ul>
-            <li>☎️ Click to call from your own numbers</li>
-            <li>💬 Texting once the carriers approve your brand</li>
+            <li>☎️ Click to call from your own numbers · 🧠 data engine</li>
+            <li>💬 Texting once the carriers approve your brand · 🚀 Campaign Engine</li>
             <li>✅ Delivery receipts</li>
             <li>🔁 Replies come back on the same number</li>
           </ul>
           <div class="c">💲 Numbers $1.15 a month · texts ~1¢ · calls quoted by the carrier</div>
         </div>
         <div class="kc">
-          <h3>📅 Follow Up Boss</h3><div class="t">API key</div>
+          <h3>📅 Follow Up Boss</h3><div class="t">API key · Campaign Engine</div>
           <ul>
             <li>🤝 Booked appointments go straight into your CRM</li>
           </ul>
@@ -178,7 +184,7 @@ td.n{font:800 18px 'Archivo',Arial,sans-serif;color:var(--orange);white-space:no
         <div><b>🌐 Open data, no key</b><br>🗺️ Every NY tax parcel + the NYC lot file</div>
       </div>
       <h3>🚀 Day 1 order</h3>
-      <div class="order"><span>1️⃣ Tracerfy + OneKey → the data runs</span><span>2️⃣ SignalHouse → calling goes live</span><span>3️⃣ Follow Up Boss → appointments flow in</span></div>
+      <div class="order"><span>1️⃣ Tracerfy + OneKey → the data runs</span><span>2️⃣ SignalHouse → calling goes live</span><span>3️⃣ Follow Up Boss → appointments flow in (Campaign Engine)</span></div>
     </section>
 
     <section class="card wide">
@@ -210,7 +216,7 @@ td.n{font:800 18px 'Archivo',Arial,sans-serif;color:var(--orange);white-space:no
             <li>Keys in: Tracerfy, OneKey, SignalHouse, Follow Up Boss</li>
             <li>Data lake loaded: NY tax parcels, USBizData NY bundle, Nassau parcel shapes, your MLS</li>
             <li>Calling numbers bought and set up for calls</li>
-            <li>Texting registration sent to the carriers (their clock; calling doesn't wait for it)</li>
+            <li>🚀 Campaign Engine, if added: texting registration sent to the carriers (their clock; calling doesn't wait for it)</li>
             <li>First skip trace on the land book: about 1,771 lots, about $35</li>
           </ul>
           <div class="done">Done when: you can search any town, open any lot and see the owner and phones.</div>
@@ -232,7 +238,7 @@ td.n{font:800 18px 'Archivo',Arial,sans-serif;color:var(--orange);white-space:no
           <h3>Volume</h3>
           <ul>
             <li>Calling at full pace for your team</li>
-            <li>Texting live once the carriers approve. First block goes when Bryan presses Send; numbers warm up 250 → 400 → 500 a day.</li>
+            <li>🚀 Campaign Engine: texting live once the carriers approve. First block goes when Bryan presses Send; numbers warm up 250 → 400 → 500 a day.</li>
             <li>Address requests: send any address, get the full report back</li>
             <li>Territory Intelligence and your news feed refreshed</li>
           </ul>
@@ -284,6 +290,10 @@ td.n{font:800 18px 'Archivo',Arial,sans-serif;color:var(--orange);white-space:no
       <a href="paul-territory-intelligence.html">Territory Intelligence<small>Dashboards · segments · event signals</small></a>
       <a href="paul-cheat-sheet.html">Cheat sheet<small>Capabilities, capacity and costs</small></a>
       <a href="paul-news.html">News feed<small>Local and statewide stories, each with why it matters to you</small></a>
+      <a href="paul-readme.html">Read Me<small>The whole thing in plain English</small></a>
+      <a href="paul-universal-lead.html">Universal lead card<small>One lot, every source merged</small></a>
+      <a href="paul-how-search-works.html">How search works<small>Postgres and DigitalOcean, explained simply</small></a>
+      <a href="paul-glossary.html">Glossary<small>Every word, in plain English</small></a>
     </section>
   </div>
 </div>
