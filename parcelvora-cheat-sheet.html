@@ -1,0 +1,149 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="robots" content="noindex">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Parcelvora Cheat Sheet</title>
+<style>
+  /* Layout: one column of cards. What it is, links, who owns what, what's built, what's waiting, prices, rules. */
+  :root {
+    color-scheme: dark;
+    --bg: #07090d; --card: #10151d; --line: #253041; --ink: #ffffff; --soft: #e8eef6;
+    --blue: #4f9bff; --green: #4ade80; --green-bg: #0d2a1b; --amber: #fbbf24; --amber-bg: #3a2a07;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--ink); font: 17px/1.55 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
+  .wrap { max-width: 820px; margin: 0 auto; padding-block: 32px 64px; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); display: grid; gap: 20px; }
+  h1 { font-size: clamp(30px, 6vw, 40px); line-height: 1.1; margin: 0; }
+  h2 { font-size: 21px; margin: 0; }
+  p { margin: 0; }
+  a { color: var(--blue); font-weight: 600; overflow-wrap: anywhere; }
+  .lede { color: var(--soft); font-size: 18px; }
+  .card { background: var(--card); border: 1px solid var(--line); padding: 20px; display: grid; gap: 12px; min-width: 0; }
+  ul { margin: 0; padding-left: 22px; display: grid; gap: 7px; }
+  .box { overflow-x: auto; }
+  table { border-collapse: collapse; width: 100%; font-size: 16px; }
+  th, td { text-align: left; padding: 8px 10px; border-bottom: 1px solid var(--line); vertical-align: top; }
+  th { color: var(--soft); font-size: 14px; letter-spacing: 0.04em; text-transform: uppercase; }
+  .tag { display: inline-block; font-size: 13px; font-weight: 700; padding: 2px 8px; white-space: nowrap; }
+  .done { background: var(--green-bg); color: var(--green); }
+  .wait { background: var(--amber-bg); color: var(--amber); }
+  code { font: 14px ui-monospace, Consolas, Menlo, monospace; background: #05070a; border: 1px solid var(--line); padding: 1px 6px; overflow-wrap: anywhere; }
+  footer { color: var(--soft); text-align: center; font-size: 15px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header style="display:grid;gap:10px">
+    <h1>Parcelvora Cheat Sheet</h1>
+    <p class="lede">Everything about Parcelvora in one place. Updated October 28, 2026.</p>
+  </header>
+
+  <section class="card">
+    <h2>What it is</h2>
+    <ul>
+      <li><b>Parcelvora</b> sells New York property data, and only data. Silvia's company. It is <b>not</b> named Nextier.</li>
+      <li>It takes the best of four tools: PropertyShark's report, PropStream's list builder, DealMachine's map and ATTOM Property Navigator's comps and values.</li>
+      <li>Most of the data is free public record (NYC + NY State Open Data). Paid only for phones, home values and foreclosures.</li>
+      <li>Domains <b>parcelvora.com, .ai and .net</b> were registered Oct 27 through Squarespace. The US trademark office has no filings for PARCELVORA.</li>
+    </ul>
+  </section>
+
+  <section class="card">
+    <h2>Links</h2>
+    <div class="box"><table>
+      <tr><th>What</th><th>Link</th></tr>
+      <tr><td>One-page plan</td><td><a href="parcelvora-plan.html">parcelvora-plan.html</a></td></tr>
+      <tr><td>NY Open Data Inventory (every dataset)</td><td><a href="ny-open-data-inventory.html">ny-open-data-inventory.html</a></td></tr>
+      <tr><td>Silvia's setup steps</td><td><a href="silvia-setup.html">silvia-setup.html</a></td></tr>
+      <tr><td>RealEstateAPI in Perplexity</td><td><a href="perplexity-realestateapi.html">perplexity-realestateapi.html</a></td></tr>
+      <tr><td>The code (private, GitHub login)</td><td><a href="https://github.com/Parcelavora/parcelvora" target="_blank" rel="noopener">github.com/Parcelavora/parcelvora</a></td></tr>
+    </table></div>
+  </section>
+
+  <section class="card">
+    <h2>Who owns what</h2>
+    <ul>
+      <li><b>Silvia:</b> Parcelvora, her EHOA code, and all Zoho code.</li>
+      <li><b>Nextier and EHOA together:</b> residential distressed, wholesaling, fix-and-flip and agents.</li>
+      <li><b>Thomas:</b> the Nextier platform and every other workspace.</li>
+      <li><b>Silvia pays the DigitalOcean bill</b> for Nextier's account, since EHOA runs on it. Parcelvora's database goes on that bill.</li>
+      <li>Put the code deal in writing: a short agreement on what Parcelvora gets from the Nextier code it started with. Have a lawyer write it.</li>
+    </ul>
+  </section>
+
+  <section class="card">
+    <h2>What's built</h2>
+    <div class="box"><table>
+      <tr><th>Piece</th><th>State</th></tr>
+      <tr><td>Property report: owner, deeds, mortgages, people behind an LLC, permits, violations (NYC + Long Island)</td><td><span class="tag done">Done</span></td></tr>
+      <tr><td>Data lake: 1.89M parcels (NYC + Nassau + Suffolk) in Postgres</td><td><span class="tag done">Tested</span></td></tr>
+      <tr><td>Lookup by address, NYC lot or NY parcel id: full property + ownership profile in 8 ms</td><td><span class="tag done">Done</span></td></tr>
+      <tr><td>Owner first + last names: 419,228 NYC · 822,714 Long Island</td><td><span class="tag done">Done</span></td></tr>
+      <tr><td>Person behind the LLC: 87,062 NYC buildings</td><td><span class="tag done">Done</span></td></tr>
+      <tr><td>README with setup, fields, sources and limits</td><td><span class="tag done">Done</span></td></tr>
+      <tr><td>Screens: list builder, report page, map</td><td><span class="tag wait">Next</span></td></tr>
+    </table></div>
+  </section>
+
+  <section class="card">
+    <h2>Waiting on you</h2>
+    <ul>
+      <li><b>Say go</b> to create Parcelvora's database: one Postgres cluster at <b>$15.15/mo</b> on the Nextier DigitalOcean account. Then the lake loads into it.</li>
+      <li><b>Rename the GitHub org</b> from "Parcelavora" to <code>parcelvora</code>: org Settings → Rename organization. Silvia can do it too.</li>
+      <li><b>Create the <code>ehoa-advisors</code> GitHub org</b> and invite Silvia as Owner. Then I move in the EHOA slideshow repo and her haas app.</li>
+      <li><b>Lawyer:</b> the code agreement between Nextier and Parcelvora.</li>
+    </ul>
+  </section>
+
+  <section class="card">
+    <h2>Silvia's setup</h2>
+    <ul>
+      <li>GitHub: <b>SilviSelene</b>, Owner of the Parcelvora org. She has VS Code and the code.</li>
+      <li>She uses <b>Perplexity, not Claude</b>. That's fine. If you want Claude later, Team is $25/seat (standard) or $125 (premium) a month, one bill.</li>
+      <li>RealEstateAPI in Perplexity works through RealEstateAPI's connector, with her own key. Every lookup spends her credits.</li>
+      <li>Never give her your GitHub login. She gets her own repos only.</li>
+    </ul>
+  </section>
+
+  <section class="card">
+    <h2>Prices</h2>
+    <div class="box"><table>
+      <tr><th>Product</th><th>Entry price</th><th>Foreclosures?</th></tr>
+      <tr><td><b>Parcelvora (proposed)</b></td><td><b>$29/mo + 8¢ per contact</b></td><td>Paid add-on (RealEstateAPI)</td></tr>
+      <tr><td>ATTOM Property Navigator</td><td>$499/yr (about $42/mo)</td><td>Yes, every plan</td></tr>
+      <tr><td>PropertyShark (NY)</td><td>$59.95/mo</td><td>Elite ($79.95) and up</td></tr>
+      <tr><td>PropStream</td><td>$99/mo · contacts 12¢ · docs $5 each</td><td>Yes (lead lists)</td></tr>
+      <tr><td>DealMachine</td><td>From $99/mo</td><td>Not checked</td></tr>
+    </table></div>
+    <p>Our costs: public data $0 · database $15.15/mo · phone lookups about 2¢ each · RealEstateAPI credits per lookup.</p>
+  </section>
+
+  <section class="card">
+    <h2>Rules to remember</h2>
+    <ul>
+      <li>Share links like this page (public, no login). Claude links make people log in.</li>
+      <li>Never fork or share the Nextier repo. Its history holds saved keys and every client's code. Copy only the pieces Parcelvora needs.</li>
+      <li>The old repo named <code>nextier</code> is a full platform copy with saved keys. Keep it private.</li>
+      <li>Parcelvora uses its own keys: Tracerfy, RealEstateAPI, Stripe. Never EHOA's or Nextier's.</li>
+      <li>A key in a connector address works like a password. If it leaks, make a new one.</li>
+      <li>Connectors can bill more than direct calls. Check credits after the first few lookups.</li>
+    </ul>
+  </section>
+
+  <section class="card">
+    <h2>Data limits</h2>
+    <ul>
+      <li>NY open data has no foreclosure or lis pendens filings.</li>
+      <li>Staten Island deeds are not in ACRIS. ACRIS open data runs about 4 weeks behind.</li>
+      <li>Some feeds are stale: tax lien list (330 days), HPD registrations (76 days).</li>
+      <li>177,081 NYC owners have no first/last split (no comma in the record). The full name still shows.</li>
+      <li>No phones or emails in public data. That's the paid skip-trace step.</li>
+    </ul>
+  </section>
+
+  <footer>Questions? Ask Claude in VS Code and point it at this page.</footer>
+</div>
+</body>
+</html>
