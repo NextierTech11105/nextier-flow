@@ -1,0 +1,185 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<title>Team Musso · Slideshow</title>
+<meta name="description" content="Every Team Musso page in one slideshow: the live page on screen, what it means in plain words, and a button to open it.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@700;800&family=IBM+Plex+Sans:wght@500;600;700&display=swap">
+<style>
+:root{--bg:#000;--card:#0a0d12;--card2:#06080b;--line:#2a3442;--fg:#fff;--orange:#ff8a3d;--green:#12b76a;--blue:#4c8dff;color-scheme:dark}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html,body{margin:0;height:100%;background:var(--bg);color:var(--fg);font:500 18px/1.5 'IBM Plex Sans','Segoe UI',Arial,sans-serif}
+body{display:flex;flex-direction:column;min-height:100vh;min-height:100dvh}
+button{font:inherit;color:#fff;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:10px 16px;font-weight:700;cursor:pointer}
+button:hover{border-color:var(--blue)}
+button:focus-visible,a:focus-visible{outline:2px solid var(--blue);outline-offset:2px}
+.top{display:flex;align-items:center;gap:14px;padding:12px 16px;border-bottom:1px solid var(--line)}
+.brand{font:800 14px 'Archivo',Arial,sans-serif;letter-spacing:.14em;text-transform:uppercase;white-space:nowrap}
+.brand span{color:var(--orange)}
+.prog{flex:1;height:8px;border-radius:4px;background:#141a22;overflow:hidden;min-width:60px}
+.prog i{display:block;height:100%;width:0;background:var(--green);transition:width .3s}
+.count{font:800 16px 'Archivo',Arial,sans-serif;white-space:nowrap}
+.main{flex:1;display:grid;grid-template-columns:minmax(300px,0.9fr) minmax(0,1.7fr);gap:18px;padding:18px 16px;min-height:0}
+.copy{display:flex;flex-direction:column;justify-content:center;gap:12px;min-width:0}
+.kicker{font:800 15px 'Archivo',Arial,sans-serif;letter-spacing:.12em;text-transform:uppercase;color:var(--orange)}
+.copy h1{font:800 clamp(30px,3.4vw,58px)/1.05 'Archivo',Arial,sans-serif;margin:0;text-wrap:balance}
+.copy .em{font-size:clamp(44px,4vw,64px);line-height:1}
+.copy p{margin:0;font-size:clamp(19px,1.6vw,24px);font-weight:600}
+.copy ul{margin:0;padding:0;list-style:none;display:grid;gap:8px}
+.copy li{font-weight:700;font-size:19px;border:1px solid var(--line);border-radius:12px;padding:8px 12px;background:var(--card2)}
+.open{align-self:flex-start;display:inline-block;color:#000;background:var(--green);font-weight:800;font-size:19px;text-decoration:none;padding:12px 18px;border-radius:12px}
+.url{font-weight:600;font-size:15px;word-break:break-all}
+.stage{position:relative;border:1px solid var(--line);border-radius:16px;overflow:hidden;background:#05070a;min-height:0}
+.stage iframe{position:absolute;left:0;top:0;width:1440px;height:900px;border:0;transform-origin:0 0;background:#000}
+.cover{position:absolute;inset:0;display:grid;place-items:center;font:800 22px 'Archivo',Arial,sans-serif;background:#05070a;transition:opacity .3s}
+.cover.off{opacity:0;pointer-events:none}
+.live{position:absolute;right:10px;top:10px;font-weight:800;font-size:13px;letter-spacing:.1em;background:rgba(0,0,0,.75);border:1px solid var(--green);border-radius:999px;padding:3px 10px;pointer-events:none}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,260px),1fr));gap:10px;align-content:start;overflow:auto;padding:4px}
+.grid a{display:block;color:#fff;text-decoration:none;border:1px solid var(--line);border-radius:14px;padding:14px 16px;background:var(--card2)}
+.grid a:hover{border-color:var(--blue)}
+.grid b{display:block;font:800 20px 'Archivo',Arial,sans-serif}
+.grid small{display:block;font-size:16px;font-weight:500}
+.grid a.first{border:2px solid var(--green)}
+.bottom{display:flex;align-items:center;gap:10px;padding:10px 16px 14px;border-top:1px solid var(--line);flex-wrap:wrap}
+.dots{display:flex;flex-wrap:wrap;gap:6px;flex:1}
+.dots button{padding:6px 10px;font-size:14px;border-radius:999px}
+.dots button[aria-current="step"]{background:var(--green);color:#000;border-color:var(--green)}
+#auto[aria-pressed="true"]{background:var(--orange);color:#000;border-color:var(--orange)}
+@media (max-width:900px){
+  body{display:block}
+  .top{flex-wrap:wrap;gap:8px 12px}
+  .brand{font-size:12px;white-space:normal;flex:1}
+  .prog{order:3;flex-basis:100%}
+  #full{display:none}
+  .main{display:flex;flex-direction:column-reverse}
+  .stage{width:100%;aspect-ratio:1440/900;flex:none}
+  .grid{max-height:none}
+}
+</style>
+</head>
+<body>
+<header class="top">
+  <div class="brand">TEAM MUSSO · NEXT<span>IER</span> DATA ENGINE</div>
+  <div class="prog" aria-hidden="true"><i id="bar"></i></div>
+  <div class="count" id="count" aria-live="polite">1 / 13</div>
+  <button type="button" id="full" aria-label="Full screen">⛶ Full screen</button>
+</header>
+<main class="main">
+  <section class="copy" id="copy" aria-live="polite"></section>
+  <section class="stage" id="stage" aria-label="Live page">
+    <iframe id="frame" title="Live page preview" loading="eager"></iframe>
+    <div class="cover" id="cover">Loading the page…</div>
+    <div class="live" id="livetag">LIVE PAGE</div>
+  </section>
+</main>
+<footer class="bottom">
+  <button type="button" id="prev" aria-label="Previous slide">← Back</button>
+  <button type="button" id="next" aria-label="Next slide">Next →</button>
+  <button type="button" id="auto" aria-pressed="false">▶ Auto</button>
+  <nav class="dots" id="dots" aria-label="Slides"></nav>
+</footer>
+<script>
+(function () {
+  "use strict";
+  const S = [
+    { k: "Welcome", e: "👋", t: "Team Musso · Nextier Data Engine", x: "Your land. Your owners. Your line. One engine, ten pages, three minutes.", b: ["🎯 Focus: Suffolk + Nassau first", "➡️ Next, when you say: the Bronx up to Orange County", "🔓 Access: all of New York State"], u: "paul-cheat-sheet.html", n: "Cheat sheet", o: "the cheat sheet" },
+    { k: "Start here", e: "📖", t: "Read Me", x: "The whole thing in plain English, for Paul, your brother and Bryan. There's a PDF too.", u: "paul-readme.html", n: "Read Me" },
+    { k: "Watch it", e: "🎬", t: "Overview", x: "A 2-minute movie of your real engine running itself, chapter by chapter. Press Play and sit back.", u: "team-musso-overview.html", n: "Overview" },
+    { k: "Find the land", e: "🗺️", t: "Hunt Engine", x: "Type a town, county, ZIP or owner. Click a lot. Read the deal, the owner and the phones, then click to call from your own line.", u: "paul-land-hunt.html", n: "Hunt Engine" },
+    { k: "One lot, every source", e: "📇", t: "Universal lead card", x: "The tax roll, your MLS, the zoning math, your New York bundle and Tracerfy, merged on one card.", u: "paul-universal-lead.html", n: "Lead card" },
+    { k: "Know your market", e: "📊", t: "Territory Intelligence", x: "Lots counted by town and by reason to call: expired, expired twice, long on market, estates, developers next door. Click any number to see the lots.", u: "paul-territory-intelligence.html", n: "Territory" },
+    { k: "Two engines", e: "🧠", t: "Data Engine · Campaign Engine", x: "The Data Engine finds the land and the owner, and ends at click to call. Email and texts are the Campaign Engine, its own package. Wherever you launch, we've got you.", u: "paul-cheat-sheet.html#engines", n: "Engines", o: "the two engines" },
+    { k: "Everything on one page", e: "📋", t: "Cheat sheet", x: "What it does, how much it handles, where the data comes from, and what it costs in your own accounts.", u: "paul-cheat-sheet.html", n: "Cheat sheet" },
+    { k: "Under the hood", e: "🔎", t: "How search works", x: "Your database explained like a filing cabinet, and where it runs on DigitalOcean.", u: "paul-how-search-works.html", n: "How it works" },
+    { k: "The plan", e: "🗓️", t: "First 30 Days", x: "The execution map, the rules, your keys, and the first month week by week.", u: "paul-first-30-days.html", n: "30 days" },
+    { k: "Every word", e: "🔤", t: "Glossary", x: "Type any word you see on these pages and get the plain-English meaning.", u: "paul-glossary.html", n: "Glossary" },
+    { k: "Stay ahead", e: "📰", t: "News feed", x: "Local and statewide stories, each with why it matters to you.", u: "paul-news.html", n: "News" },
+    { k: "Next step", e: "🚀", t: "Start with the Read Me", x: "It links everything. Every page, in one place:", end: true, n: "All pages" },
+  ];
+  const ALL = [
+    ["paul-readme.html", "📖 Read Me", "Start here", true], ["team-musso-overview.html", "🎬 Overview", "The 2-minute movie"],
+    ["paul-land-hunt.html", "🗺️ Hunt Engine", "Search, list, map, every lot"], ["paul-universal-lead.html", "📇 Universal lead card", "One lot, every source"],
+    ["paul-territory-intelligence.html", "📊 Territory Intelligence", "Counts by town and signal"], ["paul-cheat-sheet.html", "📋 Cheat sheet", "Capabilities, capacity, costs"],
+    ["paul-how-search-works.html", "🔎 How search works", "Postgres + DigitalOcean, simply"], ["paul-first-30-days.html", "🗓️ First 30 Days", "Map, rules, keys, the month"],
+    ["paul-glossary.html", "🔤 Glossary", "Every word, plain English"], ["paul-news.html", "📰 News feed", "Why each story matters"],
+  ];
+  const $ = (id) => document.getElementById(id);
+  const copy = $("copy"), stage = $("stage"), frame = $("frame"), cover = $("cover"), live = $("livetag");
+  const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+  let cur = 0, autoT = null, loadedUrl = "", loadTok = 0;
+  // Lift the cover as soon as the page's own document is ready, not after every map tile and photo.
+  function watchLoad(url) {
+    const tok = ++loadTok, want = url.split("#")[0];
+    const done = () => { if (tok === loadTok) cover.classList.add("off"); };
+    const poll = setInterval(() => {
+      if (tok !== loadTok) return clearInterval(poll);
+      try { const d = frame.contentDocument; if (d && d.readyState !== "loading" && d.location.pathname.endsWith(want)) { clearInterval(poll); done(); } } catch (e) {}
+    }, 150);
+    setTimeout(() => { clearInterval(poll); done(); }, 5000);
+  }
+
+  S.forEach((s, i) => { const b = document.createElement("button"); b.type = "button"; b.textContent = (i + 1) + " " + s.n; b.addEventListener("click", () => { stopAuto(); go(i); }); $("dots").appendChild(b); });
+  const dots = [...$("dots").children];
+
+  function fit() {
+    const sw = stage.clientWidth, sh = stage.clientHeight, sc = Math.min(sw / 1440, sh / 900);
+    frame.style.transform = `translate(${(sw - 1440 * sc) / 2}px,${(sh - 900 * sc) / 2}px) scale(${sc})`;
+  }
+  addEventListener("resize", fit);
+  frame.addEventListener("load", () => { if (frame.src && !frame.src.endsWith("about:blank")) cover.classList.add("off"); });
+
+  function go(i) {
+    cur = (i + S.length) % S.length;
+    const s = S[cur];
+    let h = `<div class="kicker">${esc(s.k)}</div><div class="em" aria-hidden="true">${s.e}</div><h1>${esc(s.t)}</h1><p>${esc(s.x)}</p>`;
+    if (s.b) h += "<ul>" + s.b.map((x) => `<li>${esc(x)}</li>`).join("") + "</ul>";
+    if (s.u) h += `<a class="open" href="${esc(s.u)}" target="_blank" rel="noopener">Open ${esc(s.o || s.t)} ↗</a><div class="url">nextiertech11105.github.io/nextier-flow/${esc(s.u)}</div>`;
+    copy.innerHTML = h;
+    if (s.end) {
+      frame.hidden = true; live.hidden = true; cover.classList.add("off");
+      let g = stage.querySelector(".grid");
+      if (!g) { g = document.createElement("div"); g.className = "grid"; g.innerHTML = ALL.map(([u, b, sm, f]) => `<a href="${u}" target="_blank" rel="noopener"${f ? ' class="first"' : ""}><b>${b}</b><small>${sm}</small></a>`).join(""); stage.appendChild(g); }
+      g.hidden = false; g.style.position = "absolute"; g.style.inset = "0"; g.style.padding = "14px";
+      loadedUrl = "";
+    } else {
+      const g = stage.querySelector(".grid"); if (g) g.hidden = true;
+      frame.hidden = false; live.hidden = false;
+      if (loadedUrl !== s.u) { cover.classList.remove("off"); frame.src = s.u; loadedUrl = s.u; watchLoad(s.u); }
+      fit();
+    }
+    $("count").textContent = (cur + 1) + " / " + S.length;
+    $("bar").style.width = ((cur + 1) / S.length * 100) + "%";
+    dots.forEach((d, j) => { if (j === cur) d.setAttribute("aria-current", "step"); else d.removeAttribute("aria-current"); });
+    try { history.replaceState(null, "", "#" + (cur + 1)); } catch (e) {}
+  }
+
+  function stopAuto() { if (autoT) { clearInterval(autoT); autoT = null; $("auto").setAttribute("aria-pressed", "false"); $("auto").textContent = "▶ Auto"; } }
+  $("auto").addEventListener("click", () => {
+    if (autoT) return stopAuto();
+    $("auto").setAttribute("aria-pressed", "true"); $("auto").textContent = "⏸ Pause";
+    autoT = setInterval(() => { if (cur >= S.length - 1) stopAuto(); else go(cur + 1); }, 12000);
+  });
+  $("prev").addEventListener("click", () => { stopAuto(); go(cur - 1); });
+  $("next").addEventListener("click", () => { stopAuto(); go(cur + 1); });
+  $("full").addEventListener("click", () => { const d = document; if (d.fullscreenElement) d.exitFullscreen(); else if (d.documentElement.requestFullscreen) d.documentElement.requestFullscreen().catch(() => {}); });
+  addEventListener("keydown", (e) => {
+    if (e.target.closest && e.target.closest("input,textarea")) return;
+    if (["ArrowRight", "PageDown", " "].includes(e.key)) { e.preventDefault(); stopAuto(); go(cur + 1); }
+    else if (["ArrowLeft", "PageUp"].includes(e.key)) { e.preventDefault(); stopAuto(); go(cur - 1); }
+    else if (e.key === "Home") { stopAuto(); go(0); }
+    else if (e.key === "End") { stopAuto(); go(S.length - 1); }
+  });
+  let sx = null;
+  copy.addEventListener("touchstart", (e) => { sx = e.touches[0].clientX; }, { passive: true });
+  copy.addEventListener("touchend", (e) => { if (sx === null) return; const dx = e.changedTouches[0].clientX - sx; sx = null; if (Math.abs(dx) > 50) { stopAuto(); go(cur + (dx < 0 ? 1 : -1)); } });
+
+  const start = parseInt((location.hash.match(/^#(\d+)$/) || [])[1], 10);
+  go(start >= 1 && start <= S.length ? start - 1 : 0);
+})();
+</script>
+</body>
+</html>
