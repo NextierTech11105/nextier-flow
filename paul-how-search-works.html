@@ -164,6 +164,49 @@ limit 50;</pre>
     </div>
   </section>
 
+  <section class="part" id="digitalocean">
+    <div class="pn">Part 8</div>
+    <h2>🌊 Where the cabinet lives: DigitalOcean</h2>
+    <p class="sub">Your data lake runs in your own DigitalOcean account. Each piece has one job.</p>
+    <div class="radar">
+      <div class="rd"><b>🗄️ Managed PostgreSQL · the cabinet</b>Your database. DigitalOcean runs the machine; we run what's inside. It supports PostGIS for the parcel shapes and the name-matching tools (pg_trgm, fuzzystrmatch).</div>
+      <div class="rd"><b>📦 Spaces · the storage unit</b>Every original file as it arrived: the tax roll, your bundle, each Monday sweep, every Tracerfy result. $5 a month holds 250 GB.</div>
+      <div class="rd"><b>🧑‍💼 Droplet · the clerk</b>A small server that loads new files, runs the Monday sweep and prepares the Tracerfy list.</div>
+      <div class="rd"><b>🌙 Backups · a copy every night</b>A full backup every day, and you can rewind to any moment in the last 7 days.</div>
+      <div class="rd"><b>🛟 Standby node · a second cabinet</b>If the main database fails, the standby takes over on its own.</div>
+      <div class="rd"><b>📖 Read-only node · a copy for reports</b>Big counts and reports run on the copy, so search never waits.</div>
+      <div class="rd"><b>🔔 Alerts · a smoke detector</b>DigitalOcean warns us when the database gets busy or full, before you'd notice.</div>
+      <div class="rd"><b>⬆️ Scale up · a bigger cabinet</b>Move to a bigger plan whenever the book grows. Your data comes with it.</div>
+    </div>
+
+    <h2 style="margin-top:20px">📦 How big it gets · three sizes</h2>
+    <p class="sub">Your full lake (every NY parcel, the four bundle files and their tabs) is an estimated <b>25–40 GB</b>. That fits inside the Start size.</p>
+    <div class="drawers">
+      <div class="drawer" style="--c:var(--green)">
+        <div class="h">🟢 Start</div><span class="tg">Your cheat sheet prices this</span>
+        <div><b>PostgreSQL</b> 2 vCPU · 4 GB · 60 GB disk · <b>$60.90</b></div>
+        <div style="margin-top:6px">If need be: Spaces <b>$5</b> · clerk droplet 1 vCPU · 2 GB <b>$12</b></div>
+        <div style="margin-top:8px;font-weight:600">Holds every NY parcel, your whole USBizData NY bundle (33.7M rows) and the weekly sweeps. Search stays quick through the tabs; the big matching runs as a weekly job.</div>
+        <div style="margin-top:10px;font:800 22px 'Archivo',Arial,sans-serif">$61 – $78 a month</div>
+      </div>
+      <div class="drawer" style="--c:var(--blue)">
+        <div class="h">🔵 Grow</div><span class="tg">When matching or history gets heavy</span>
+        <div><b>PostgreSQL</b> 4 vCPU · 8 GB · 140 GB disk · <b>$122.10</b></div>
+        <div style="margin-top:6px">+ a standby node · clerk 2 vCPU · 4 GB <b>$24</b> · Spaces <b>$5</b></div>
+        <div style="margin-top:8px;font-weight:600">Years of weekly history kept, faster matching, more counties worked at once, and automatic takeover if the database fails.</div>
+        <div style="margin-top:10px;font:800 22px 'Archivo',Arial,sans-serif">≈ $151 a month + standby</div>
+      </div>
+      <div class="drawer" style="--c:var(--orange)">
+        <div class="h">🟠 Full extent</div><span class="tg">More states, more people searching</span>
+        <div><b>PostgreSQL</b> 6 vCPU · 16 GB · 290 GB disk · <b>$244.35</b></div>
+        <div style="margin-top:6px">+ standby + read-only node · clerk 4 vCPU · 8 GB <b>$48</b> · Spaces <b>$5</b></div>
+        <div style="margin-top:8px;font-weight:600">Several state bundles side by side, reports on their own copy, sweeps running in parallel.</div>
+        <div style="margin-top:10px;font:800 22px 'Archivo',Arial,sans-serif">≈ $297 a month + added nodes</div>
+      </div>
+    </div>
+    <div class="note">Sizes are our estimate for your book. Prices are DigitalOcean's list prices, checked October 28, 2026. Extra disk is $0.215 per GB a month; standby and read-only nodes are billed per node. DigitalOcean lets you move up to a bigger plan anytime.</div>
+  </section>
+
   <section class="part" style="border:2px solid var(--blue)">
     <h2>💡 The whole thing in one breath</h2>
     <p class="sum">Raw files go in. They're cleaned and labeled the same way. Each owner is matched to your bundle. Tracerfy fills only the gaps. Everything is scored and ranked. When you search, Postgres flips to the right tab and hands you the best lots first.</p>
