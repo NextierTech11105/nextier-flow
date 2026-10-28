@@ -1,7 +1,7 @@
 <!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>Team Musso · Nextier Data Engine · Overview</title>
 <meta name="robots" content="noindex,nofollow">
-<meta name="description" content="Team Musso's Nextier Data Engine, running live: every parcel in New York State on live satellite, search by county, lock onto the land, deal potential, owner of record, phones and emails, one record per lot. The real engine, running live, with music.">
+<meta name="description" content="Team Musso's Nextier Data Engine, running live: every parcel in New York State on live satellite, search by county, lock onto the land, deal potential, owner of record, click-to-call, every attempt counted, push to Initial SMS. The real engine, running live, with music.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=DM+Sans:wght@400;500;700;800&display=swap">
 <style>
@@ -72,14 +72,14 @@ button[disabled]{opacity:.45;cursor:default}
       <div class="cover" id="cover">Loading the Data Engine…</div>
       <div class="fin" id="fin" hidden>
         <div class="fin-in">
-          <div class="loop"><span>Parcel</span><i>→</i><span>Signal</span><i>→</i><span>Zoning</span><i>→</i><span>Owner</span><i>→</i><span>Phones + email</span><i>→</i><span>One record</span></div>
+          <div class="loop"><span>Parcel</span><i>→</i><span>Signal</span><i>→</i><span>Owner</span><i>→</i><span>Call</span><i>→</i><span>First text</span><i>→</i><span>Reply</span><i>→</i><span>Deal</span></div>
           <h2>Stop waiting for deals. <em>Originate them.</em></h2>
           <div class="fin-b"><a href="paul-land-hunt.html" target="_blank" rel="noopener">Open your Hunt Engine</a><a href="paul-cheat-sheet.html" target="_blank" rel="noopener">Your cheat sheet</a><button type="button" id="finReplay">Replay</button></div>
         </div>
       </div>
     </div>
     <div class="narr">
-      <div class="step" id="step">Chapter 1 of 11</div>
+      <div class="step" id="step">Chapter 1 of 14</div>
       <h2 id="ttl"></h2>
       <p id="txt"></p>
       <div class="controls">
@@ -148,7 +148,7 @@ const CH = [
     run() { closeKiosk(); unlockPanel(); hash("map"); typeInto("#mapq", "Suffolk County", 1700); T(() => spot("#mapqct"), 2000); } },
   { k: "Lock on", t: "Click the land. The map locks on.", x: "Enter, and the map flies to the parcel: the line is the county tax-map boundary, on live satellite. Nothing moves until you click.",
     run() { closeKiosk(); hash("map"); setVal("#mapq", "Suffolk County"); T(() => enter("#mapq"), 400); T(() => spot("#opanel .op-a"), 1900); } },
-  { k: "Deal potential", t: "The deal, read before anyone else sees it.", x: "Acres. Lots by right under town zoning and the septic rule. Last asking. Who's building next door. Which way permits are heading. The next move.",
+  { k: "Deal potential", t: "The deal, read before the first call.", x: "Acres. Lots by right under town zoning and the septic rule. Last asking. Who's building next door. Which way permits are heading. The next move.",
     run() { mapLocked("Suffolk County"); T(() => spot("#opanel .op-deal"), 1300); } },
   { k: "List + map", t: "Every lot ranked. Every lot on the map.", x: "The Property Book on the left, the satellite on the right. Click a row and the map locks onto that parcel. The eye opens the full record.",
     run() { closeKiosk(); unlockPanel(); hash("book"); listReset(); foldsClosed(); T(() => scrollEl("#book .tablewrap", "start", false), 300); T(() => spot("#book .tablewrap"), 900); listLocked(3, 3300); T(() => spot("#rows tr.on"), 4400); } },
@@ -160,8 +160,14 @@ const CH = [
     run() { closeKiosk(); hash("book"); foldsClosed(); T(() => scrollEl("#book .tools", "start", false), 200); T(() => fold(4, true), 400); T(() => spot("#book .frow.fold.open"), 700); T(() => { setVal("#sort", "ac"); scrollEl("#book .tablewrap", "start"); }, 3600); T(() => spot("#rows tr[data-k]"), 4400); } },
   { k: "Owner", t: "We cut through the LLC to the person who signs.", x: "Owner of record on every lot, straight from the state tax roll. Parcel ID by section, block and lot. Where the owner actually lives, and what else they hold.",
     run() { hash("book"); listReset(); foldsClosed(); listLocked(5); T(() => spot("#opanel .op-pid"), 1300); T(() => spot("#opanel .op-facts"), 3600); } },
-  { k: "Reach", t: "Verified. Compliant. Reachable.", x: "Skip trace on your key: every phone with its line type and the Do Not Call check, every email. Masked here; real in your workspace.",
+  { k: "Reach", t: "Verified. Compliant. Reachable.", x: "Skip trace on your key: every phone with its line type and the Do Not Call check. Do Not Call numbers get no Call button. Masked here; real in your workspace.",
     run() { hash("book"); listReset(); listLocked(3); T(() => { const d = $('#opanel details[data-f="ph"]'); if (d && !d.open) d.querySelector("summary").click(); }, 1500); T(() => { scrollEl('#opanel details[data-f="ph"]', "start"); spot('#opanel details[data-f="ph"]'); }, 1800); } },
+  { k: "Call", t: "One press. Every outcome logged.", x: "Call from your own line and the call pad opens on the lead: no answer, voicemail, wrong number, callback, keep, sell, OPPT, APPT, Do Not Call.",
+    run() { hash("book"); listReset(); listLocked(3); T(() => click("#opanel a[data-callk]"), 1300); T(() => spot("#ckiosk"), 1600); T(() => click('#ckiosk [data-ckres="VOICEMAIL"]'), 4000); T(() => click('#ckiosk [data-ckout="SELL"]'), 5200); T(() => { scrollEl("#ckiosk .nlist", "nearest"); spot("#ckiosk .nlist"); }, 5500); } },
+  { k: "Attempts", t: "Every touch counted.", x: "Calls, texts and emails on every lot, right in the list. Nothing falls through a crack.",
+    run() { closeKiosk(); hash("book"); listReset(); listLocked(3); T(() => spot("#rows tr.on .reachcell"), 1300); T(() => spot("#rows tr.on .led"), 3800); } },
+  { k: "Push", t: "Nothing moves without your command.", x: "Push the lead to Initial SMS or Pipeline Nurture. It's staged, not sent: not one text goes out until you press Send.",
+    run() { closeKiosk(); hash("book"); listReset(); listLocked(3); T(() => spot('#opanel [data-to="Initial SMS"]'), 1300); T(() => click('#opanel [data-to="Initial SMS"]'), 3600); T(() => { scrollEl("#ckiosk .nlist", "nearest"); spot("#ckiosk .nlist"); }, 4000); } },
   { k: "Record", t: "One record. Total intelligence.", x: "The eye opens the full record: parcel record, zoning math, listing history, and the deals lost nearby with what they teach.",
     run() { closeKiosk(); hash("lot-3"); T(() => scrollEl("#d-record", "start"), 900); T(() => spot("#d-record"), 1400); T(() => scrollEl("#d-lost", "start"), 4300); T(() => spot("#d-lost"), 4900); } },
 ];
