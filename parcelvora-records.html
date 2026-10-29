@@ -173,7 +173,9 @@
   :focus-visible { outline: 2px solid var(--blue); outline-offset: 2px; }
 
   .head { display: flex; justify-content: space-between; align-items: flex-start; gap: 14px; flex-wrap: wrap; }
-  .brand { font: 800 14px/1 var(--display); letter-spacing: 0.12em; text-transform: uppercase; color: var(--blue); margin-bottom: 6px; }
+  .brandrow { display: flex; align-items: center; gap: 16px; min-width: 0; }
+  .logo { height: 96px; width: auto; border-radius: 10px; background: #fefaf7; border: 1px solid var(--line); box-shadow: var(--shadow); flex: none; }
+  @media (max-width: 560px) { .brandrow { flex-direction: column; align-items: flex-start; } .logo { height: 76px; } }
   h1 { font: 800 clamp(26px, 4vw, 34px)/1.1 var(--display); margin: 0; }
   .sub-title { color: var(--soft); margin: 6px 0 0; max-width: 62ch; }
   .tools { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
@@ -266,10 +268,12 @@
 <body>
 <div class="wrap">
   <header class="head">
-    <div>
-      <div class="brand">Parcelvora</div>
-      <h1>Property Records</h1>
-      <p class="sub-title">Every residential property in New York and Florida: the owner by first and last name, mailing address, value, last sale and property facts.</p>
+    <div class="brandrow">
+      <img class="logo" src="parcelvora-records-logo.jpg" width="640" height="416" alt="Parcelvora">
+      <div>
+        <h1>Property Records</h1>
+        <p class="sub-title">Every residential property in New York and Florida: the owner by first and last name, mailing address, value, last sale and property facts.</p>
+      </div>
     </div>
     <div class="tools">
       <div class="seg" role="group" aria-label="View">
