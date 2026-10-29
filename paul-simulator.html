@@ -1,0 +1,288 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<title>Team Musso · Lead Simulator</title>
+<meta name="description" content="Team Musso × Nextier: the manual week behind one call list, what a lead department would cost on your numbers, and a range of commission income.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@700;800&family=IBM+Plex+Sans:wght@500;600;700&display=swap">
+<style>
+/* Layout: one column, two numbered stages (the manual week + the lead department, then the revenue range), each with one focal number. */
+:root{--bg:#000;--panel:#0a0d12;--panel2:#06080b;--ink:#fff;--line:#2a3442;--accent:#12b76a;--accent-soft:#0b3322;--manual:#ff8a3d;--manual-soft:#4a2309;--band:#12b76a33;--blue:#4c8dff;color-scheme:dark;
+  --display:'Archivo',Arial,sans-serif;--body:'IBM Plex Sans','Segoe UI',Arial,sans-serif}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--ink);font:500 17px/1.5 var(--body)}
+.wrap{max-width:1080px;margin:0 auto;padding:28px 16px 56px;display:grid;gap:36px}
+.brand{font:800 15px var(--display);letter-spacing:.14em;text-transform:uppercase}
+.brand span{color:var(--manual)}
+h1,h2{font-family:var(--display);font-weight:800;margin:0;text-wrap:balance}
+h1{font-size:clamp(30px,4.4vw,48px);line-height:1.08;margin-top:10px}
+h2{font-size:24px}
+.eyebrow{font:800 15px var(--display);letter-spacing:.08em;text-transform:uppercase;color:var(--manual)}
+.lead{font-size:19px;font-weight:600;max-width:64ch;margin:10px 0 0}
+section{display:grid;gap:16px}
+.stagehead{display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+.num{font:800 15px var(--display);letter-spacing:.08em;color:#000;background:var(--accent);border-radius:999px;padding:3px 12px}
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:18px}
+.grid2{display:grid;grid-template-columns:minmax(0,1.5fr) minmax(0,1fr);gap:16px;align-items:start}
+@media (max-width:860px){.grid2{grid-template-columns:minmax(0,1fr)}}
+.tablewrap{overflow-x:auto}
+table{border-collapse:collapse;width:100%;font-variant-numeric:tabular-nums}
+th{font:700 15px var(--body);color:var(--manual);text-align:left;padding:9px 8px;border-bottom:1px solid var(--line)}
+td{padding:8px;border-bottom:1px solid var(--line);vertical-align:middle;font-size:16px}
+td.r,th.r{text-align:right}
+tr.step{transition:background .2s}
+tr.step.on{background:var(--manual-soft)}
+.tool{font-size:15px;font-weight:600}
+.auto{font-weight:700;color:var(--accent);font-size:15px}
+input[type=number]{font:600 16px var(--body);font-variant-numeric:tabular-nums;color:var(--ink);background:var(--panel2);border:1px solid var(--line);border-radius:8px;padding:5px 8px;width:80px;text-align:right}
+input:focus-visible,button:focus-visible{outline:2px solid var(--blue);outline-offset:2px}
+button{font:800 17px var(--body);border-radius:12px;padding:11px 16px;border:2px solid var(--accent);background:var(--accent);color:#000;cursor:pointer}
+button.ghost{background:transparent;color:var(--ink)}
+.clock{display:grid;gap:14px}
+.big{font:800 clamp(40px,7vw,58px)/1 var(--display)}
+.big small{font:700 17px var(--body)}
+.barrow{display:grid;gap:6px}
+.barlbl{display:flex;justify-content:space-between;gap:10px;font-weight:700;font-size:16px}
+.bar{height:16px;background:#141a22;border-radius:8px;overflow:hidden}
+.bar i{display:block;height:100%;width:0;border-radius:8px;transition:width .25s linear}
+.bar .m{background:var(--manual)} .bar .e{background:var(--accent)}
+.kv{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px 14px;font-size:16px;font-weight:600;align-items:center}
+.kv b{font-weight:800;text-align:right;font-variant-numeric:tabular-nums}
+.btns{display:flex;gap:10px;flex-wrap:wrap}
+.note{font-size:15px;font-weight:600;margin:0;border-left:4px solid var(--manual);padding:4px 0 4px 12px}
+.dept{border:2px solid var(--manual);display:grid;gap:12px}
+.dept .kv{font-size:17px}
+.dept .kv b{font:800 20px var(--display)}
+.focal{display:grid;gap:6px;padding:22px;border-radius:16px;background:var(--accent-soft);border:2px solid var(--accent)}
+.focal .big{color:var(--accent)}
+.row2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+@media (max-width:640px){.row2{grid-template-columns:minmax(0,1fr)}}
+.stat{display:grid;gap:4px}
+.stat b{font:800 26px var(--display)}
+.stat span{font-size:16px;font-weight:600}
+.pos{color:var(--accent)} .neg{color:var(--manual)}
+svg text{fill:#fff;font:600 16px var(--body)}
+.inputs{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px}
+.field{display:grid;gap:6px;font-size:16px;font-weight:700}
+.field input{width:100%;text-align:left}
+@media (prefers-reduced-motion:reduce){.bar i,tr.step{transition:none}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="brand">NEXT<span>IER</span> · DATA ENGINE · TEAM MUSSO</div>
+    <h1>From scattered lists to listing appointments</h1>
+    <p class="lead">Stage 1 plays out the manual week it takes to build one 5,000-contact call list, and what a lead department doing it would cost on your numbers. Stage 2 runs that list through the funnel 2,000 times and shows a range of commission income. Every number below is an editable estimate.</p>
+  </header>
+
+  <!-- STAGE 1 -->
+  <section>
+    <div class="stagehead"><span class="num">STAGE 1</span><h2>The manual week</h2></div>
+    <div class="grid2">
+      <div class="panel tablewrap">
+        <table>
+          <thead><tr><th>Step</th><th>Tool</th><th class="r">Hours</th><th class="r">Fees</th><th class="r">Nextier</th></tr></thead>
+          <tbody id="steps"></tbody>
+          <tfoot><tr><td colspan="2"><b>Per 5,000-contact batch</b></td><td class="r"><b id="totH"></b></td><td class="r"><b id="totC"></b></td><td class="r"><b class="auto">~0.5 h</b></td></tr></tfoot>
+        </table>
+      </div>
+      <div class="panel clock">
+        <div class="eyebrow">Time to one call list</div>
+        <div class="big" id="clock">0.0 <small>hours</small></div>
+        <div class="barrow"><div class="barlbl"><span>Manual, 8+ tools</span><span id="mLbl">0 h</span></div><div class="bar"><i class="m" id="mBar"></i></div></div>
+        <div class="barrow"><div class="barlbl"><span>Nextier Data Engine</span><span id="eLbl">0 h</span></div><div class="bar"><i class="e" id="eBar"></i></div></div>
+        <div class="btns"><button id="play">Play the manual week</button><button class="ghost" id="reset">Reset</button></div>
+        <div class="kv">
+          <span>Batches per month</span><b><input type="number" id="batches" value="1" min="1" max="10" aria-label="Batches per month"></b>
+          <span>Value of your hour ($)</span><b><input type="number" id="rate" value="150" min="0" step="10" aria-label="Value of your hour in dollars"></b>
+          <span>Manual hours per month</span><b id="mHrs"></b>
+          <span>Cost of that time + fees per month</span><b class="neg" id="mCost"></b>
+          <span>Skip trace per batch, retail</span><b class="neg" id="skR"></b>
+          <span>Skip trace per batch, Nextier</span><b class="pos" id="skN"></b>
+        </div>
+        <p class="note">Hours are estimates for one agent. Skip trace is figured on 5,000 contacts: 8–15¢ per hit retail, 2–4¢ through Nextier. Fees total uses the retail midpoint.</p>
+      </div>
+    </div>
+    <div class="panel dept">
+      <div class="eyebrow">🧑‍💼 A lead department doing this, on your numbers</div>
+      <div class="kv">
+        <span>What it cost our own New York team</span><b class="neg">$10,000 a month + 5% a closing</b>
+        <span>Your revenue: 21 closings in 12 months × $14,000</span><b class="pos">≈ $294,000 a year</b>
+        <span>That department on your 21 closings</span><b class="neg">≈ $135,000 a year · 46%</b>
+        <span>Closings it needs just to pay for itself</span><b class="neg">≈ 9 more a year</b>
+      </div>
+      <p class="note">On our own New York team, Nextier took over most of a lead department's work. 21 sales in 12 months from RateMyAgent; $14,000 is your average revenue per deal.</p>
+    </div>
+  </section>
+
+  <!-- STAGE 2 -->
+  <section>
+    <div class="stagehead"><span class="num">STAGE 2</span><h2>From replies to closed listings</h2></div>
+    <div class="focal">
+      <div class="eyebrow">Monthly commission, likely range (P10 to P90)</div>
+      <div class="big" id="range">—</div>
+      <p class="note" id="mid" style="border-color:var(--accent)"></p>
+    </div>
+
+    <div class="grid2">
+      <div class="panel tablewrap">
+        <table>
+          <thead><tr><th>Stage</th><th class="r">Rate %</th><th class="r">Expected</th><th class="r">Range</th></tr></thead>
+          <tbody id="funnel"></tbody>
+        </table>
+      </div>
+      <div class="panel" style="display:grid;gap:12px">
+        <div class="eyebrow">Monthly commission across 2,000 runs</div>
+        <div id="hist"></div>
+        <p class="note">Each run varies every rate by the uncertainty below and the revenue per deal by ±15%. Closings run about 60 to 90 days behind the first contacts.</p>
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="inputs">
+        <label class="field">Contacts per month<input type="number" id="contacts" value="5000" step="500" min="0"></label>
+        <label class="field">Your revenue per deal ($)<input type="number" id="rev" value="14000" step="500" min="0"></label>
+        <label class="field">Uncertainty on each rate (±%)<input type="number" id="spread" value="40" step="5" min="0" max="90"></label>
+      </div>
+    </div>
+
+    <div class="row2">
+      <div class="panel stat"><span>12-month commission (P10 to P90)</span><b id="yr"></b></div>
+      <div class="panel stat"><span>Median year</span><b class="pos" id="ymed"></b></div>
+    </div>
+    <p class="note">Estimates for planning, not a forecast or a guarantee. Nextier's install and management fee is quoted by Thomas.</p>
+  </section>
+</div>
+
+<script>
+const STEPS=[
+ ["Export expired and withdrawn listings","MLS",3,0],
+ ["Find relisted homes against last month","MLS + spreadsheet",2,0],
+ ["Search new deeds at the county clerk","County clerk site",6,0],
+ ["Pull building permits, town by town","Town permit portals",6,0],
+ ["Merge lists, clean and dedupe addresses","Excel",4,0],
+ ["Look up owner names","Tax rolls",4,0],
+ ["Skip trace for phone numbers","Retail vendor, 8–15¢/hit",2,575],
+ ["Test which numbers are good","Manual dials",4,0],
+ ["Scrub against Do-Not-Call","DNC vendor",1,100],
+ ["Scrub leads: litigators, landlines, dupes, dead numbers","Excel + lookups",3,0],
+ ["Organize into campaign blocks by signal, town, priority","Excel tabs",4,0],
+ ["Rank who to call first","Gut feel",3,0],
+ ["Load dialer and CRM, map fields","Dialer + CRM",2,150],
+ ["Log every call by hand","CRM notes",5,0]
+];
+const ENGINE_H=0.5;
+const $=id=>document.getElementById(id);
+const fmt$=v=>"$"+Math.round(v).toLocaleString("en-US");
+const k$=v=>Math.abs(v)>=1e6?"$"+(v/1e6).toFixed(2)+"M":Math.abs(v)>=1000?"$"+Math.round(v/1000)+"K":"$"+Math.round(v);
+
+const tb=$("steps");
+STEPS.forEach((s,i)=>{
+  const tr=document.createElement("tr");tr.className="step";tr.id="s"+i;
+  tr.innerHTML=`<td>${s[0]}</td><td class="tool">${s[1]}</td><td class="r"><input type="number" id="h${i}" value="${s[2]}" min="0" step="0.5" aria-label="Hours for ${s[0]}"></td><td class="r">${i===6?"$400–750":s[3]?fmt$(s[3]):"—"}</td><td class="r auto">${i===6?"2–4¢/hit · $100–200":"Automated"}</td>`;
+  tb.appendChild(tr);
+});
+const hours=()=>STEPS.map((s,i)=>Math.max(0,+$("h"+i).value||0));
+function stage1(){
+  const h=hours(),tot=h.reduce((a,b)=>a+b,0),fees=STEPS.reduce((a,s)=>a+s[3],0);
+  const b=Math.max(1,+$("batches").value||1),r=+$("rate").value||0;
+  $("totH").textContent=tot.toFixed(1)+" h";$("totC").textContent=fmt$(fees);
+  $("mHrs").textContent=(tot*b).toFixed(0)+" h";
+  $("mCost").textContent=fmt$(tot*b*r+fees*b);
+  $("skR").textContent=fmt$(400*b)+"–"+fmt$(750*b);
+  $("skN").textContent=fmt$(100*b)+"–"+fmt$(200*b);
+  return tot;
+}
+let timer=null;
+function resetPlay(){clearInterval(timer);timer=null;
+  document.querySelectorAll("tr.step").forEach(t=>t.classList.remove("on","done"));
+  $("clock").innerHTML='0.0 <small>hours</small>';$("mBar").style.width="0";$("eBar").style.width="0";$("mLbl").textContent="0 h";$("eLbl").textContent="0 h";}
+function play(){
+  resetPlay();const h=hours(),tot=stage1();
+  const reduce=matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const show=(acc)=>{$("clock").innerHTML=acc.toFixed(1)+' <small>hours</small>';$("mBar").style.width=(acc/tot*100)+"%";$("mLbl").textContent=acc.toFixed(1)+" h";};
+  const finish=()=>{$("eBar").style.width=Math.max(1,ENGINE_H/tot*100)+"%";$("eLbl").textContent=ENGINE_H+" h";
+    document.querySelectorAll("tr.step").forEach(t=>{t.classList.remove("on");t.classList.add("done")});};
+  if(reduce){show(tot);finish();return;}
+  let i=0,acc=0;
+  timer=setInterval(()=>{
+    if(i>0)$("s"+(i-1)).classList.replace("on","done");
+    if(i>=STEPS.length){clearInterval(timer);timer=null;finish();return;}
+    $("s"+i).classList.add("on");acc+=h[i];show(acc);i++;
+  },550);
+}
+$("play").onclick=play;$("reset").onclick=resetPlay;
+tb.addEventListener("input",stage1);$("batches").oninput=stage1;$("rate").oninput=stage1;
+
+/* Stage 2 */
+const FUN=[
+ ["Reachable (valid number, delivered)",60],
+ ["Positive reply",2],
+ ["Appointment booked",30],
+ ["Appointment completed",70],
+ ["Listing signed",30],
+ ["Listing closed",75]
+];
+const fb=$("funnel");
+fb.innerHTML=`<tr><td>Contacts worked</td><td class="r">—</td><td class="r" id="e0"></td><td class="r tool">fixed</td></tr>`+
+ FUN.map((f,i)=>`<tr><td>${f[0]}</td><td class="r"><input type="number" id="r${i}" value="${f[1]}" min="0" max="100" step="0.5" aria-label="${f[0]} rate, percent"></td><td class="r" id="e${i+1}"></td><td class="r tool" id="g${i+1}"></td></tr>`).join("");
+
+function rng(seed){return()=>{seed|=0;seed=seed+0x6D2B79F5|0;let t=Math.imul(seed^seed>>>15,1|seed);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
+function poisson(l,R){if(l<=0)return 0;if(l>30){let u=R(),v=R();return Math.max(0,Math.round(l+Math.sqrt(l)*Math.sqrt(-2*Math.log(u||1e-9))*Math.cos(6.283*v)))}
+  let L=Math.exp(-l),k=0,p=1;do{k++;p*=R()}while(p>L);return k-1}
+const pct=(a,p)=>a[Math.min(a.length-1,Math.floor(p*a.length))];
+
+function stage2(){
+  const C=Math.max(0,+$("contacts").value||0),REV=Math.max(0,+$("rev").value||0),sp=Math.min(.9,(+$("spread").value||0)/100);
+  const rates=FUN.map((f,i)=>Math.min(1,Math.max(0,(+$("r"+i).value||0)/100)));
+  // expected counts
+  let n=C;$("e0").textContent=Math.round(C).toLocaleString();
+  rates.forEach((r,i)=>{n*=r;$("e"+(i+1)).textContent=n<10?n.toFixed(1):Math.round(n).toLocaleString()});
+  const R=rng(20261028),RUNS=2000,mon=[],yr=[],stageS=FUN.map(()=>[]);
+  for(let k=0;k<RUNS;k++){
+    let ysum=0;
+    for(let m=0;m<12;m++){
+      let x=C;
+      for(let i=0;i<rates.length;i++){
+        const r=Math.min(1,Math.max(0,rates[i]*(1+sp*(2*R()-1))));
+        x=x*r; if(i===rates.length-1) x=poisson(x,R);
+        if(m===0)stageS[i].push(x);
+      }
+      const g=x*REV*(1+.15*(2*R()-1));
+      if(m===0)mon.push(g); ysum+=g;
+    }
+    yr.push(ysum);
+  }
+  mon.sort((a,b)=>a-b);yr.sort((a,b)=>a-b);stageS.forEach(a=>a.sort((a,b)=>a-b));
+  stageS.forEach((a,i)=>{const lo=pct(a,.1),hi=pct(a,.9),f=v=>v<10?v.toFixed(1):Math.round(v).toLocaleString();$("g"+(i+1)).textContent=f(lo)+"–"+f(hi)});
+  const p10=pct(mon,.1),p50=pct(mon,.5),p90=pct(mon,.9);
+  $("range").textContent=k$(p10)+" – "+k$(p90);
+  $("mid").textContent="Median month: "+fmt$(p50)+" in commission at "+fmt$(REV)+" revenue per deal.";
+  $("yr").textContent=k$(pct(yr,.1))+" – "+k$(pct(yr,.9));
+  $("ymed").textContent=fmt$(pct(yr,.5));
+  drawHist(mon,p10,p50,p90);
+}
+function drawHist(a,p10,p50,p90){
+  const W=420,H=230,pl=8,pr=8,pt=24,pb=44,max=a[a.length-1]||1,B=24,bins=new Array(B).fill(0);
+  a.forEach(v=>bins[Math.min(B-1,Math.floor(v/max*B))]++);
+  const bm=Math.max(...bins),bw=(W-pl-pr)/B,x=v=>pl+(v/max)*(W-pl-pr);
+  let s=`<svg viewBox="0 0 ${W} ${H}" width="100%" role="img" aria-label="Distribution of monthly commission">`;
+  s+=`<rect x="${x(p10)}" y="${pt}" width="${Math.max(1,x(p90)-x(p10))}" height="${H-pt-pb}" fill="var(--band)"/>`;
+  bins.forEach((c,i)=>{const h=c/bm*(H-pt-pb);s+=`<rect x="${pl+i*bw+1}" y="${H-pb-h}" width="${bw-2}" height="${h}" rx="2" fill="${i*max/B>=p10&&i*max/B<=p90?"var(--accent)":"var(--line)"}"/>`});
+  s+=`<line x1="${pl}" x2="${W-pr}" y1="${H-pb}" y2="${H-pb}" stroke="var(--line)"/>`;
+  s+=`<line x1="${x(p50)}" x2="${x(p50)}" y1="${pt-6}" y2="${H-pb}" stroke="#fff" stroke-dasharray="3 3"/>`;
+  s+=`<text x="${Math.min(W-120,x(p50)+4)}" y="${pt-8}">median ${k$(p50)}</text>`;
+  [0,.5,1].forEach(t=>{const v=max*t,anc=t===0?"start":t===1?"end":"middle";s+=`<text x="${x(v)}" y="${H-pb+20}" text-anchor="${anc}">${k$(v)}</text>`});
+  s+=`<text x="${pl}" y="${H-4}">P10–P90 shaded</text></svg>`;
+  $("hist").innerHTML=s;
+}
+document.querySelectorAll("#funnel input,#contacts,#rev,#spread").forEach(el=>el.addEventListener("input",stage2));
+stage1();stage2();
+(function rest(){const tot=stage1();$("clock").innerHTML=tot.toFixed(1)+' <small>hours</small>';$("mBar").style.width="100%";$("mLbl").textContent=tot.toFixed(1)+" h";$("eBar").style.width=Math.max(1,ENGINE_H/tot*100)+"%";$("eLbl").textContent=ENGINE_H+" h";})();
+</script>
+</body>
+</html>
