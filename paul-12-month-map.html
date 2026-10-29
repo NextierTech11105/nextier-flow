@@ -9,7 +9,8 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@700;800&family=IBM+Plex+Sans:wght@500;600;700&display=swap">
 <style>
-/* Layout: the goal, the four numbers, how 50,000 adds up, then 12 month cards in three phases. */
+/* Layout: the two options side by side, a sticky Texts first / Calls first switch,
+   then 12 month cards that redraw for the chosen option. */
 :root{--bg:#000;--card:#0a0d12;--line:#2a3442;--fg:#fff;--orange:#ff8a3d;--green:#12b76a;--blue:#4c8dff;color-scheme:dark}
 *{box-sizing:border-box}
 body{margin:0;background:var(--bg);color:var(--fg);font:500 17px/1.55 "IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif}
@@ -22,10 +23,32 @@ p{margin:0}
 .eyebrow{font-size:15px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--orange)}
 .lede{font-size:19px;max-width:62ch}
 .lede b{color:var(--green)}
-.money{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px}
-.money div{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:14px 16px}
-.money b{display:block;font-family:Archivo,sans-serif;font-size:30px;font-weight:800}
-.money span{font-size:15px;font-weight:600}
+
+/* The two options */
+.compare{display:flex;flex-direction:column;gap:14px}
+.opts{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:14px}
+.opt{background:var(--card);border:1px solid var(--line);border-top:4px solid var(--orange);border-radius:10px;padding:18px;display:flex;flex-direction:column;gap:12px;min-width:0}
+.opt.call{border-top-color:var(--blue)}
+.opt .big{font-family:Archivo,sans-serif;font-size:30px;font-weight:800;line-height:1.1}
+.opt .big span{display:block;font-family:"IBM Plex Sans",sans-serif;font-size:15px;font-weight:600}
+.opt dl{margin:0;display:flex;flex-direction:column;gap:10px}
+.opt dt{font-size:14px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--orange)}
+.opt.call dt{color:#8cb6ff}
+.opt dd{margin:2px 0 0}
+.both{background:var(--card);border:1px solid var(--line);border-left:4px solid var(--green);border-radius:10px;padding:16px;font-weight:600}
+.both b{color:var(--green)}
+
+/* The switch */
+.switch{position:sticky;top:0;z-index:5;background:var(--bg);border-bottom:1px solid var(--line);padding:12px 0;display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.switch p{font-weight:700;margin-right:4px}
+.switch button{font:700 16px "IBM Plex Sans",sans-serif;color:var(--fg);background:var(--card);border:1px solid var(--line);border-radius:999px;padding:10px 18px;cursor:pointer}
+.switch button[aria-pressed="true"]{background:var(--orange);border-color:var(--orange);color:#000}
+.switch button[data-set="calls"][aria-pressed="true"]{background:var(--blue);border-color:var(--blue)}
+.switch button:focus-visible{outline:3px solid var(--fg);outline-offset:2px}
+
+/* One option shows at a time */
+body[data-mode="sms"] .only-c,body[data-mode="calls"] .only-s{display:none}
+
 .mix{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:18px;display:flex;flex-direction:column;gap:10px}
 .mix ul{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:8px}
 .mix li{display:flex;gap:12px;align-items:baseline}
@@ -35,11 +58,11 @@ p{margin:0}
 .phase>h2 span{color:var(--green)}
 .months{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:14px}
 .month{background:var(--card);border:1px solid var(--line);border-left:4px solid var(--blue);border-radius:10px;padding:16px;display:flex;flex-direction:column;gap:8px;min-width:0}
-.month.full{border-left-color:var(--green)}
+body[data-mode="sms"] .month.fs,body[data-mode="calls"] .month.fc{border-left-color:var(--green)}
 .month .n{font-size:15px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--orange)}
 .month .tx{font-family:Archivo,sans-serif;font-size:24px;font-weight:800;font-variant-numeric:tabular-nums}
 .month .tx span{font-family:"IBM Plex Sans",sans-serif;font-size:15px;font-weight:600}
-.month.full .tx{color:var(--green)}
+body[data-mode="sms"] .month.fs .tx,body[data-mode="calls"] .month.fc .tx{color:var(--green)}
 .month ul{margin:0;padding-left:20px;display:flex;flex-direction:column;gap:4px}
 .who{display:flex;flex-wrap:wrap;gap:6px}
 .tag{font-size:14px;font-weight:700;border-radius:999px;padding:2px 10px;border:1px solid var(--line)}
@@ -51,23 +74,52 @@ p{margin:0}
 a{color:var(--fg)}
 </style>
 </head>
-<body>
+<body data-mode="sms">
 <div class="wrap">
   <header style="display:flex;flex-direction:column;gap:10px">
     <p class="eyebrow">Team Musso · the year, month by month</p>
     <h1>12-Month Map</h1>
-    <p class="lede">The goal: <b>50,000 owners texted every month</b>, from month 3 on. First texts are the foundation; follow-ups ride on top. Month 1 is the <a href="paul-first-30-days.html">First 30 Days</a> page.</p>
+    <p class="lede">Two ways to run the year. <b>Texts first</b> reaches 50,000 owners a month. <b>Calls first</b> reaches about 4,000 a month per caller. Run either one, or both. Month 1 is the <a href="paul-first-30-days.html">First 30 Days</a> page.</p>
   </header>
 
-  <section class="money" aria-label="The plan in four numbers">
-    <div><b>50,000</b><span>owners texted every month, from month 3</span></div>
-    <div><b>40,000</b><span>first texts a month: the foundation</span></div>
-    <div><b>10,000</b><span>follow-ups a month to owners who didn't answer</span></div>
-    <div><b>10 numbers</b><span>500 a day each once warm (room for 20)</span></div>
+  <section class="compare" aria-labelledby="cmp">
+    <h2 id="cmp">Texts first or calls first</h2>
+    <div class="opts">
+      <article class="opt">
+        <p class="eyebrow">Texts first · Campaign Engine</p>
+        <p class="big">50,000<span>owners a month</span></p>
+        <dl>
+          <div><dt>How</dt><dd>First texts Wednesday to Saturday at 5 PM, about 2,500 an evening. Follow-ups go to owners who didn't answer.</dd></div>
+          <div><dt>Who</dt><dd>One person presses Send. Your team answers the replies.</dd></div>
+          <div><dt>Starts</dt><dd>Month 2. The carriers approve texting first.</dd></div>
+          <div><dt>Needs</dt><dd>Texting registration and 10 numbers.</dd></div>
+          <div><dt>The story</dt><dd>You hear it when you call back an owner who replied.</dd></div>
+        </dl>
+      </article>
+      <article class="opt call">
+        <p class="eyebrow" style="color:#8cb6ff">Calls first · Data Engine</p>
+        <p class="big">~4,000<span>owners a month per caller</span></p>
+        <dl>
+          <div><dt>How</dt><dd>Callers dial from blocks every weekday, about 200 calls a day each.</dd></div>
+          <div><dt>Who</dt><dd>Your callers.</dd></div>
+          <div><dt>Starts</dt><dd>Week 2. No carrier wait.</dd></div>
+          <div><dt>Needs</dt><dd>Calling numbers and callers.</dd></div>
+          <div><dt>The story</dt><dd>You hear it on the first call.</dd></div>
+        </dl>
+        <p style="font-weight:700">50,000 a month by calls alone takes about 12 callers.</p>
+      </article>
+    </div>
+    <p class="both"><b>Both:</b> text first, then your callers call everyone who got the text but didn't reply. Or call first, then text the owners you couldn't reach. Nothing goes out until a person presses it.</p>
   </section>
 
-  <section class="mix" aria-labelledby="mix">
-    <h2 id="mix">How 50,000 adds up</h2>
+  <div class="switch" role="group" aria-label="Show the year for">
+    <p>Show the year for:</p>
+    <button type="button" data-set="sms" aria-pressed="true">Texts first</button>
+    <button type="button" data-set="calls" aria-pressed="false">Calls first</button>
+  </div>
+
+  <section class="mix only-s" aria-labelledby="mix-s">
+    <h2 id="mix-s">How 50,000 adds up</h2>
     <ul>
       <li><b>~40,000</b><span>first texts. Wednesday to Saturday, Send pressed at 5 PM, about 2,500 an evening. One press runs until the evening is done.</span></li>
       <li><b>~10,000</b><span>follow-ups. 500 every weekday, to owners who didn't answer, 30+ days after their first text.</span></li>
@@ -75,95 +127,130 @@ a{color:var(--fg)}
     <p class="sum">Why evenings: people reply when they wake up. Thursday to Sunday mornings are for working replies.</p>
   </section>
 
+  <section class="mix only-c" aria-labelledby="mix-c">
+    <h2 id="mix-c">How the calls add up</h2>
+    <ul>
+      <li><b>~200</b><span>calls a day per caller, with click to call.</span></li>
+      <li><b>~4,000</b><span>calls a month per caller (21 weekdays).</span></li>
+      <li><b>~12,000</b><span>a month with 3 callers. The year below uses 3 callers.</span></li>
+    </ul>
+    <p class="sum">Each caller you add: about 4,000 more calls a month.</p>
+  </section>
+
   <section class="phase" aria-labelledby="p1">
-    <h2 id="p1">Months 1–3 · <span>Set up and hit 50,000</span></h2>
+    <h2 id="p1">Months 1–3 · <span class="only-s">Set up and hit 50,000</span><span class="only-c">Set up and full speed</span></h2>
     <div class="months">
       <article class="month">
         <p class="n">Month 1</p><h3>Set up</h3>
-        <p class="tx">0 <span>texts (calls only)</span></p>
+        <p class="tx only-s">0 <span>texts (calls only)</span></p>
+        <p class="tx only-c">~8,000 <span>calls, from week 2</span></p>
         <ul>
-          <li>Your own texting account. Registration filed with the carriers.</li>
-          <li>10 texting numbers bought.</li>
-          <li>First 10,000 owners staged, then keep tracing to 35,000 → about 20,000 with a good cell phone.</li>
+          <li class="only-s">Your own texting account. Registration filed with the carriers.</li>
+          <li class="only-s">10 texting numbers bought.</li>
+          <li class="only-s">First 10,000 owners staged, then keep tracing to 35,000 → about 20,000 with a good cell phone.</li>
+          <li class="only-c">Calling numbers bought. Calls don't wait on the carriers.</li>
+          <li class="only-c">First 10,000 owners staged: phones ranked, Do Not Call checked.</li>
           <li>Calling from blocks by week 2.</li>
         </ul>
         <div class="who"><span class="tag nx">Nextier</span><span class="tag you">Your team</span></div>
-        <p class="done">Done when: <em>the carriers approve texting.</em></p>
+        <p class="done">Done when: <em class="only-s">the carriers approve texting.</em><em class="only-c">callers are dialing every weekday.</em></p>
       </article>
-      <article class="month">
-        <p class="n">Month 2</p><h3>First texts</h3>
-        <p class="tx">~20,000 <span>texted</span></p>
+      <article class="month fc">
+        <p class="n">Month 2</p><h3><span class="only-s">First texts</span><span class="only-c">Full speed</span></h3>
+        <p class="tx only-s">~20,000 <span>texted</span></p>
+        <p class="tx only-c">~12,000 <span>calls</span></p>
         <ul>
-          <li>Wednesday to Saturday, press Send at 5 PM.</li>
-          <li>Numbers warm up: 250 → 400 → 500 a day each, full speed by day 4.</li>
-          <li>Replies come in the next morning. Answer every one.</li>
-          <li>65,000 more owners traced.</li>
+          <li class="only-s">Wednesday to Saturday, press Send at 5 PM.</li>
+          <li class="only-s">Numbers warm up: 250 → 400 → 500 a day each, full speed by day 4.</li>
+          <li class="only-s">Replies come in the next morning. Answer every one.</li>
+          <li class="only-s">65,000 more owners traced.</li>
+          <li class="only-c">3 callers, about 200 calls a day each.</li>
+          <li class="only-c">Every answered call: get the story, ask for the appointment.</li>
+          <li class="only-c">20,000 more owners traced.</li>
         </ul>
         <div class="who"><span class="tag you">Your team</span><span class="tag nx">Nextier</span></div>
-        <p class="done">Done when: <em>every traced owner has a first text.</em></p>
+        <p class="done">Done when: <em class="only-s">every traced owner has a first text.</em><em class="only-c">every caller makes 200 calls a day.</em></p>
       </article>
-      <article class="month full">
-        <p class="n">Month 3</p><h3>50,000 a month</h3>
-        <p class="tx">~50,000 <span>texted</span></p>
+      <article class="month fs fc">
+        <p class="n">Month 3</p><h3><span class="only-s">50,000 a month</span><span class="only-c">Second try</span></h3>
+        <p class="tx only-s">~50,000 <span>texted</span></p>
+        <p class="tx only-c">~12,000 <span>calls</span></p>
         <ul>
-          <li>About 40,000 first texts.</li>
-          <li>Follow-ups switch on, 30 days after the first texts: about 10,000.</li>
-          <li>From here on, about 65,000 owners traced a month.</li>
+          <li class="only-s">About 40,000 first texts.</li>
+          <li class="only-s">Follow-ups switch on, 30 days after the first texts: about 10,000.</li>
+          <li class="only-s">From here on, about 65,000 owners traced a month.</li>
+          <li class="only-c">Owners who didn't pick up get called again on their next-best phone, at a different time of day.</li>
+          <li class="only-c">Want more owners? Turn on texts and everyone you couldn't reach gets a first text.</li>
+          <li class="only-c">From here on, about 20,000 owners traced a month.</li>
         </ul>
         <div class="who"><span class="tag nx">Nextier</span><span class="tag you">Your team</span></div>
-        <p class="done">Done when: <em>50,000 texted in one month.</em></p>
+        <p class="done">Done when: <em class="only-s">50,000 texted in one month.</em><em class="only-c">every no-answer has had a second try.</em></p>
       </article>
     </div>
   </section>
 
   <section class="phase" aria-labelledby="p2">
-    <h2 id="p2">Months 4–8 · <span>Hold 50,000</span></h2>
+    <h2 id="p2">Months 4–8 · <span class="only-s">Hold 50,000</span><span class="only-c">Hold 12,000</span></h2>
     <div class="months">
-      <article class="month full">
-        <p class="n">Month 4</p><h3>Replies are the job</h3>
-        <p class="tx">50,000 <span>texted</span></p>
+      <article class="month fs fc">
+        <p class="n">Month 4</p><h3><span class="only-s">Replies are the job</span><span class="only-c">Callbacks are the job</span></h3>
+        <p class="tx only-s">50,000 <span>texted</span></p>
+        <p class="tx only-c">12,000 <span>calls</span></p>
         <ul>
-          <li>Expect 3,000+ replies a month. Most say no or STOP.</li>
-          <li>Every good reply gets a call the same day.</li>
+          <li class="only-s">Expect 3,000+ replies a month. Most say no or STOP.</li>
+          <li class="only-s">Every good reply gets a call the same day.</li>
+          <li class="only-s">Callers can also call everyone who got a text but didn't reply.</li>
+          <li class="only-c">Every "call me back" gets called on the day they asked.</li>
+          <li class="only-c">Every good conversation gets an appointment ask.</li>
         </ul>
         <div class="who"><span class="tag you">Your team</span></div>
-        <p class="done">Done when: <em>no good reply waits a day.</em></p>
+        <p class="done">Done when: <em class="only-s">no good reply waits a day.</em><em class="only-c">no callback is missed.</em></p>
       </article>
-      <article class="month full">
+      <article class="month fs fc">
         <p class="n">Month 5</p><h3>Weekly refresh</h3>
-        <p class="tx">50,000 <span>texted</span></p>
+        <p class="tx only-s">50,000 <span>texted</span></p>
+        <p class="tx only-c">12,000 <span>calls</span></p>
         <ul>
           <li>Every week, new expireds, sold, and back-on-market owners are added to your book.</li>
-          <li>Keeps the 40,000 first texts a month going.</li>
+          <li class="only-s">Keeps the 40,000 first texts a month going.</li>
+          <li class="only-c">Keeps every caller's list full.</li>
         </ul>
         <div class="who"><span class="tag nx">Nextier</span></div>
         <p class="done">Done when: <em>new owners show up every Monday.</em></p>
       </article>
-      <article class="month full">
+      <article class="month fs fc">
         <p class="n">Month 6</p><h3>Half-year check</h3>
-        <p class="tx">50,000 <span>texted</span></p>
+        <p class="tx only-s">50,000 <span>texted</span></p>
+        <p class="tx only-c">12,000 <span>calls</span></p>
         <ul>
-          <li>Scoreboard: texts → replies → good replies → deals.</li>
-          <li>Fix the weakest step. Rewrite the first text that gets the fewest replies.</li>
+          <li class="only-s">Scoreboard: texts → replies → good replies → deals.</li>
+          <li class="only-s">Fix the weakest step. Rewrite the first text that gets the fewest replies.</li>
+          <li class="only-c">Scoreboard: calls → answered → good conversations → deals.</li>
+          <li class="only-c">Fix the weakest step. Rewrite the opening line that gets hung up on most.</li>
         </ul>
         <div class="who"><span class="tag nx">Nextier</span><span class="tag you">Your team</span></div>
         <p class="done">Done when: <em>one fix is in.</em></p>
       </article>
-      <article class="month full">
+      <article class="month fs fc">
         <p class="n">Month 7</p><h3>"Not now" comes back</h3>
-        <p class="tx">50,000 <span>texted</span></p>
+        <p class="tx only-s">50,000 <span>texted</span></p>
+        <p class="tx only-c">12,000 <span>calls</span></p>
         <ul>
-          <li>Everyone who said "not now" gets a check-in text.</li>
-          <li>One press texts the whole group.</li>
+          <li>Everyone who said "not now" gets a check-in.</li>
+          <li class="only-s">One press texts the whole group.</li>
+          <li class="only-c">They go to the top of next week's call list.</li>
         </ul>
         <div class="who"><span class="tag you">Your team</span></div>
-        <p class="done">Done when: <em>the "not now" group is texted.</em></p>
+        <p class="done">Done when: <em>the "not now" group is reached.</em></p>
       </article>
-      <article class="month full">
+      <article class="month fs fc">
         <p class="n">Month 8</p><h3>Want more?</h3>
-        <p class="tx">50,000 <span>texted</span></p>
+        <p class="tx only-s">50,000 <span>texted</span></p>
+        <p class="tx only-c">12,000 <span>calls</span></p>
         <ul>
-          <li>Calendar has room? Add numbers toward 20 to reach up to 100,000 a month.</li>
+          <li class="only-s">Calendar has room? Add numbers toward 20 to reach up to 100,000 a month.</li>
+          <li class="only-c">Each caller you add: about 4,000 more calls a month.</li>
+          <li class="only-c">Or turn on texts to reach 50,000 owners a month.</li>
         </ul>
         <div class="who"><span class="tag you">Your team</span><span class="tag nx">Nextier</span></div>
         <p class="done">Done when: <em>volume matches the calendar.</em></p>
@@ -174,27 +261,30 @@ a{color:var(--fg)}
   <section class="phase" aria-labelledby="p3">
     <h2 id="p3">Months 9–12 · <span>Bigger and next year</span></h2>
     <div class="months">
-      <article class="month full">
+      <article class="month fs fc">
         <p class="n">Month 9</p><h3>Referrals</h3>
-        <p class="tx">50,000 <span>texted</span></p>
+        <p class="tx only-s">50,000 <span>texted</span></p>
+        <p class="tx only-c">12,000 <span>calls</span></p>
         <ul>
           <li>Every closed seller gets a thank-you and a referral ask.</li>
         </ul>
         <div class="who"><span class="tag you">Your team</span></div>
         <p class="done">Done when: <em>every closed seller is asked.</em></p>
       </article>
-      <article class="month full">
+      <article class="month fs fc">
         <p class="n">Month 10</p><h3>Cut and double down</h3>
-        <p class="tx">50,000 <span>texted</span></p>
+        <p class="tx only-s">50,000 <span>texted</span></p>
+        <p class="tx only-c">12,000 <span>calls</span></p>
         <ul>
-          <li>Lists that reply most get more owners. Lists that don't reply get cut.</li>
+          <li>Lists that answer most get more owners. Lists that don't answer get cut.</li>
         </ul>
         <div class="who"><span class="tag nx">Nextier</span></div>
         <p class="done">Done when: <em>next month's lists are the winners.</em></p>
       </article>
-      <article class="month full">
+      <article class="month fs fc">
         <p class="n">Month 11</p><h3>New ground</h3>
-        <p class="tx">50,000 <span>texted</span></p>
+        <p class="tx only-s">50,000 <span>texted</span></p>
+        <p class="tx only-c">12,000 <span>calls</span></p>
         <ul>
           <li>Suffolk + Nassau stay first.</li>
           <li>When they run low, add the next area: the Bronx, Westchester, up to Orange County.</li>
@@ -202,12 +292,14 @@ a{color:var(--fg)}
         <div class="who"><span class="tag nx">Nextier</span><span class="tag you">Your team</span></div>
         <p class="done">Done when: <em>next year's area is picked.</em></p>
       </article>
-      <article class="month full">
+      <article class="month fs fc">
         <p class="n">Month 12</p><h3>The year in numbers</h3>
-        <p class="tx">50,000 <span>texted</span></p>
+        <p class="tx only-s">50,000 <span>texted</span></p>
+        <p class="tx only-c">12,000 <span>calls</span></p>
         <ul>
-          <li>About 500,000 texts sent.</li>
-          <li>About 400,000 owners reached.</li>
+          <li class="only-s">About 500,000 texts sent.</li>
+          <li class="only-s">About 400,000 owners reached.</li>
+          <li class="only-c">About 140,000 calls made.</li>
           <li>Set year two's number.</li>
         </ul>
         <div class="who"><span class="tag nx">Nextier</span><span class="tag you">Your team</span></div>
@@ -217,10 +309,31 @@ a{color:var(--fg)}
   </section>
 
   <footer class="foot">
-    <p>Every text is checked against STOP and Do Not Call first. Follow-ups stop when an owner replies or says STOP.</p>
-    <p>Each number can take up to 2,000 texts a day (the carrier's limit). We run them at 500 so the carriers don't start filtering. More volume means more numbers, never pushing one number harder.</p>
-    <p>These are planning numbers, not a promise. The <a href="paul-simulator.html">simulator</a> assumes 5,000 new owners a month, which comes to about $31K in a normal month. This plan sends 40,000 first texts a month. Run the simulator again once month 3's real numbers are in.</p>
+    <p>Every call and text is checked against Do Not Call and STOP first. Follow-up texts stop when an owner replies or says STOP.</p>
+    <p>Each texting number can take up to 2,000 texts a day (the carrier's limit). We run them at 500 so the carriers don't start filtering. More texts means more numbers, never pushing one number harder.</p>
+    <p>These are planning numbers, not a promise. Calls assume about 200 a day per caller with click to call. The <a href="paul-simulator.html">simulator</a> assumes 5,000 new owners a month, which comes to about $31K in a normal month. Run it again once real numbers are in.</p>
   </footer>
 </div>
+<script>
+// Texts first / Calls first switch. #calls in the link opens straight to Calls first.
+(function () {
+  var body = document.body;
+  var buttons = document.querySelectorAll(".switch [data-set]");
+  function show(mode) {
+    body.setAttribute("data-mode", mode);
+    for (var i = 0; i < buttons.length; i++) {
+      buttons[i].setAttribute("aria-pressed", String(buttons[i].getAttribute("data-set") === mode));
+    }
+  }
+  for (var i = 0; i < buttons.length; i++) {
+    buttons[i].addEventListener("click", function () {
+      var mode = this.getAttribute("data-set");
+      show(mode);
+      try { history.replaceState(null, "", mode === "calls" ? "#calls" : "#texts"); } catch (e) {}
+    });
+  }
+  if (location.hash === "#calls") show("calls");
+})();
+</script>
 </body>
 </html>
