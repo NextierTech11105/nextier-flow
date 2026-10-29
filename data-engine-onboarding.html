@@ -1,0 +1,147 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Data Engine Onboarding</title>
+<style>
+  :root { --bg:#05070c; --card:#0b111c; --rule:#1d2a3d; --fg:#ffffff; --blue:#3b8cff; --green:#36d887; --amber:#ffc547; --red:#ff6b7a; }
+  * { box-sizing: border-box; }
+  body { margin:0; background:var(--bg); color:var(--fg); font:17px/1.55 system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif; }
+  .wrap { max-width:1040px; margin:0 auto; padding:28px 16px 64px; }
+  h1 { font-size:34px; line-height:1.15; margin:6px 0 6px; }
+  h2 { font-size:23px; margin:0 0 12px; }
+  h3 { font-size:19px; margin:0 0 8px; }
+  .kick { font-weight:700; letter-spacing:.08em; text-transform:uppercase; color:var(--blue); font-size:14px; }
+  .lead { font-size:20px; font-weight:600; margin:10px 0 0; }
+  .card { background:var(--card); border:1px solid var(--rule); border-radius:16px; padding:20px; margin-top:18px; }
+  .grid { display:grid; gap:14px; grid-template-columns:repeat(auto-fit,minmax(230px,1fr)); }
+  .step { border:1px solid var(--rule); border-radius:14px; padding:16px; background:#08101b; }
+  .step .n { display:inline-block; font-weight:800; color:#05070c; background:var(--blue); border-radius:8px; padding:2px 9px; margin-bottom:8px; }
+  .flow { display:flex; flex-wrap:wrap; gap:10px; align-items:stretch; }
+  .flow .f { flex:1 1 170px; border:1px solid var(--rule); border-radius:12px; padding:12px 14px; background:#08101b; }
+  .flow .f b { display:block; font-size:18px; }
+  .done { margin-top:10px; padding:10px 12px; border-left:4px solid var(--green); background:#0a1a13; border-radius:8px; font-weight:600; }
+  ul, ol { margin:6px 0 0; padding-left:22px; }
+  li { margin:5px 0; }
+  .tag { display:inline-block; font-weight:700; font-size:14px; border-radius:999px; padding:2px 10px; margin:2px 4px 2px 0; border:1px solid var(--rule); }
+  .g { color:var(--green); } .a { color:var(--amber); } .r { color:var(--red); } .b { color:var(--blue); }
+  table { width:100%; border-collapse:collapse; font-size:16px; }
+  th, td { text-align:left; padding:9px 10px; border-bottom:1px solid var(--rule); vertical-align:top; }
+  th { font-size:14px; letter-spacing:.06em; text-transform:uppercase; color:var(--blue); }
+  .rules li b { color:var(--fg); }
+  @media (max-width:560px) { h1 { font-size:27px; } body { font-size:16px; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="kick">Nextier Data Engine · Onboarding</div>
+  <h1>From your state's public records to a call from your own line in 30 days.</h1>
+  <p class="lead">Your foundational database powers everything. We install it, tag every property, find the owners, and connect your line. You call.</p>
+
+  <section class="card">
+    <h2>How the engine works</h2>
+    <div class="flow">
+      <div class="f"><b>1 · Foundational database</b>Every parcel in your state or county from government open data: owner of record, full address, lot size, land use.</div>
+      <div class="f"><b>2 · State business bundle</b>People, cell, email and business records layered onto the same properties.</div>
+      <div class="f"><b>3 · Scan + tag</b>Every property gets a deal persona and a deal potential, with the reason and its source.</div>
+      <div class="f"><b>4 · Owner contacts</b>Phones and emails on your own skip-trace key. Name and address are already on file, so every trace is the low-cost one.</div>
+      <div class="f"><b>5 · Click to call</b>From your own number, on every property. Every outcome logged.</div>
+    </div>
+    <p style="margin:12px 0 0">No third-party property data subscription is required. The base is public record, which you own once it is in your database.</p>
+  </section>
+
+  <section class="card">
+    <h2>What we need from you</h2>
+    <p style="margin:0 0 8px">Every account is in your name. Every bill goes to you, at cost.</p>
+    <table>
+      <tr><th>Account</th><th>What it does</th></tr>
+      <tr><td><b>DigitalOcean</b></td><td>Your database. Nightly backups, 7-day rewind.</td></tr>
+      <tr><td><b>Tracerfy</b></td><td>Phones and emails for owners. You pay only for hits.</td></tr>
+      <tr><td><b>SignalHouse.io</b></td><td>Your calling number. Click to call rings from it.</td></tr>
+      <tr><td><b>Your MLS login</b> <span class="tag a">if you have one</span></td><td>Weekly listing refresh: expired, back on market, sold.</td></tr>
+      <tr><td><b>Apify</b></td><td>Runs the weekly refresh.</td></tr>
+      <tr><td><b>Mapbox</b></td><td>Satellite and 3D maps on every property.</td></tr>
+      <tr><td><b>Your CRM</b> <span class="tag a">optional</span></td><td>Booked consultations land there.</td></tr>
+      <tr><td><b>Your focus</b></td><td>The state or counties to work first.</td></tr>
+    </table>
+  </section>
+
+  <section class="card">
+    <h2>The first 30 days</h2>
+    <div class="grid">
+      <div class="step"><span class="n">Week 1</span><h3>Foundation</h3>
+        <ul>
+          <li>Keys in. Workspace live.</li>
+          <li>Your state's public records cloned into your database, segmented by county.</li>
+          <li>State business bundle layered in.</li>
+          <li>Every property scanned and tagged with a deal persona and deal potential.</li>
+        </ul>
+        <div class="done">Done when: your book opens with every property tagged and every owner of record on file.</div>
+      </div>
+      <div class="step"><span class="n">Week 2</span><h3>Reach</h3>
+        <ul>
+          <li>Your first 10,000 owners traced on your key: phones ranked, line type labeled, Do Not Call checked, known TCPA litigators removed.</li>
+          <li>Your calling number connected.</li>
+          <li>One walkthrough with your team.</li>
+        </ul>
+        <div class="done">Done when: any property opens with its owner and ranked phones, and Call rings from your number.</div>
+      </div>
+      <div class="step"><span class="n">Week 3</span><h3>Work it</h3>
+        <ul>
+          <li>Call blocks of up to 5,000, best properties first.</li>
+          <li>Your team calls from the property. Every outcome logged.</li>
+          <li>Weekly refresh: new listing events tagged and added.</li>
+        </ul>
+        <div class="done">Done when: your team is calling every day and every call is on the record.</div>
+      </div>
+      <div class="step"><span class="n">Week 4</span><h3>Read it</h3>
+        <ul>
+          <li>Scoreboard: sites found · owners reached · consultations booked. Bottom line: cost per deal.</li>
+          <li>Every vendor cost, line by line.</li>
+          <li>Month 2 decided: more counties, more volume, the personas that worked.</li>
+        </ul>
+        <div class="done">Done when: you know what is working and what month 2 looks like.</div>
+      </div>
+    </div>
+  </section>
+
+  <section class="card">
+    <h2>How every property is tagged</h2>
+    <p style="margin:0 0 10px">Rules, not guesses. Every reason names its public source. Where a town does not publish its zoning, the property says so.</p>
+    <table>
+      <tr><th>Deal persona</th><th>What it means</th></tr>
+      <tr><td><span class="tag g">Subdivide</span></td><td>Lots by right under published zoning, or big enough to split.</td></tr>
+      <tr><td><span class="tag b">Redevelopment</span></td><td>A commercial site worth more as development than its current use.</td></tr>
+      <tr><td><span class="tag b">Build</span></td><td>Unused buildable floor area under current zoning (cities that publish it).</td></tr>
+      <tr><td><span class="tag a">Builder lot</span></td><td>One buildable lot.</td></tr>
+    </table>
+    <table style="margin-top:14px">
+      <tr><th>Deal potential is scored from</th><th>Source</th></tr>
+      <tr><td>What the zoning allows</td><td>County and city zoning where published</td></tr>
+      <tr><td>Lot size</td><td>State tax parcels</td></tr>
+      <tr><td>Pulse of the neighborhood: new homes permitted, by town</td><td>US Census building permits</td></tr>
+      <tr><td>Developers buying nearby, subdivisions in town</td><td>State assessment rolls</td></tr>
+      <tr><td>Owner holds other parcels</td><td>State assessment rolls</td></tr>
+    </table>
+    <p style="margin:10px 0 0"><span class="tag g">High</span><span class="tag b">Medium</span><span class="tag a">Low</span> · filter by persona and potential in one click.</p>
+  </section>
+
+  <section class="card rules">
+    <h2>The rules</h2>
+    <ul>
+      <li><b>Your accounts, your keys, your data.</b> Every bill in your name, at cost.</li>
+      <li><b>Nothing sends until you press it.</b></li>
+      <li><b>STOP and Do Not Call are enforced on every call and every text.</b></li>
+      <li><b>Your book stays yours.</b> It lives in your database.</li>
+    </ul>
+  </section>
+
+  <section class="card">
+    <h2>Where it lives</h2>
+    <p style="margin:0">Your workspace → <b>Properties</b> → <b>Data Engine</b> (list view, map view, detail view) · <b>Territory Intelligence</b> · <b>News Feed</b>.</p>
+  </section>
+</div>
+</body>
+</html>
