@@ -1,0 +1,205 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<title>Team Musso · Data Engine Guide</title>
+<meta name="description" content="How to use the Team Musso Data Engine, one click at a time: find a lot, open it, get the owner's phone, call.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@700;800&family=IBM+Plex+Sans:wght@500;600;700&display=swap">
+<style>
+:root{--bg:#000;--card:#0a0d12;--line:#2a3442;--fg:#fff;--orange:#ff8a3d;--green:#12b76a;--blue:#4c8dff;color-scheme:dark}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--fg);font:500 17px/1.55 'IBM Plex Sans','Segoe UI',Arial,sans-serif}
+.wrap{max-width:1100px;margin:0 auto;padding:28px 16px 56px}
+.brand{font:800 15px 'Archivo',Arial,sans-serif;letter-spacing:.14em;text-transform:uppercase}
+.brand span{color:var(--orange)}
+h1{font:800 clamp(30px,4.4vw,52px)/1.05 'Archivo',Arial,sans-serif;margin:10px 0 8px}
+h1 em{font-style:normal;color:var(--green)}
+.lede{font-size:20px;font-weight:600;margin:0 0 20px;max-width:64ch}
+h2{font:800 24px 'Archivo',Arial,sans-serif;margin:0 0 12px;color:var(--orange)}
+h3{font:800 19px 'Archivo',Arial,sans-serif;margin:16px 0 8px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:20px 22px;margin:0 0 18px}
+.toc{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 22px}
+.toc a{color:#fff;text-decoration:none;font-weight:700;font-size:15px;padding:6px 12px;border:1px solid var(--line);border-radius:999px;background:#06080b}
+.toc a:hover{border-color:var(--blue)}
+.flow{display:flex;flex-wrap:wrap;align-items:center;gap:8px 6px;margin:4px 0 6px}
+.flow span{font-weight:800;font-size:17px;padding:8px 16px;border-radius:999px;border:2px solid var(--blue);background:#0f2347}
+.flow span.go{border-color:var(--green);background:#0b3322}
+.flow i{font-style:normal;font-weight:800;font-size:20px;color:var(--orange)}
+.steps{counter-reset:s;list-style:none;padding:0;margin:0}
+.steps>li{counter-increment:s;position:relative;padding:4px 0 14px 54px;margin:0}
+.steps>li::before{content:counter(s);position:absolute;left:0;top:0;width:38px;height:38px;border-radius:50%;display:grid;place-items:center;font:800 18px 'Archivo',Arial,sans-serif;background:var(--orange);color:#000}
+.steps>li b{color:#fff}
+.btn{display:inline-block;font-weight:800;font-size:15px;padding:3px 10px;border-radius:8px;border:1px solid #fff;background:#111;white-space:nowrap}
+.btn.g{border-color:var(--green);background:#0b3322}
+.btn.b{border-color:var(--blue);background:#0f2347}
+.tag{display:inline-block;font-weight:800;font-size:14px;padding:3px 10px;border-radius:999px;background:var(--green);color:#000;margin:0 4px 4px 0;white-space:nowrap}
+.tag.w{background:#fff}
+.shot{display:block;width:100%;height:auto;border:1px solid var(--line);border-radius:12px;margin:12px 0 4px}
+.cap{font-size:15px;font-weight:600;margin:0 0 6px}
+.tw{overflow-x:auto}
+table{width:100%;border-collapse:collapse}
+th,td{text-align:left;padding:10px;border-bottom:1px solid var(--line);vertical-align:top}
+th{font-weight:800;color:var(--orange)}
+td:first-child{font-weight:800;white-space:nowrap}
+.bar{display:flex;flex-wrap:wrap;align-items:center;gap:8px;border:1px solid var(--line);border-radius:14px;padding:12px 14px;background:#06080b;margin:10px 0}
+.bar .lab{font:800 14px 'Archivo',Arial,sans-serif;letter-spacing:.12em;color:#fff;margin-right:4px}
+.note{font-weight:700;border-left:4px solid var(--orange);padding:6px 0 6px 12px;margin:12px 0 0}
+.soon{border:2px dashed var(--blue);border-radius:16px;padding:16px 20px;margin:0 0 18px;background:#06101f}
+.soon .k{font:800 13px 'Archivo',Arial,sans-serif;letter-spacing:.14em;text-transform:uppercase;color:#8cb6ff}
+.rules{list-style:none;padding:0;margin:0;display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,300px),1fr));gap:10px}
+.rules li{border:1px solid var(--line);border-radius:12px;padding:12px 14px;background:#06080b;font-weight:600}
+.rules li b{display:block;font-size:18px;margin-bottom:2px}
+.first{border:2px solid var(--green);border-radius:16px;padding:20px 22px;margin:0 0 18px;background:#04140c}
+.first h2{color:var(--green)}
+a{color:#8cb6ff}
+footer{font-size:15px;font-weight:600;margin-top:24px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="brand">Team Musso <span>·</span> Nextier Data Engine</div>
+  <h1>Your Data Engine, <em>one click at a time.</em></h1>
+  <p class="lede">Every lot in New York with its owner, ready to call. This page shows you every click, in order. Ten minutes and you have it.</p>
+
+  <nav class="toc">
+    <a href="#loop">The loop</a><a href="#login">1 · Log in</a><a href="#tabs">2 · Your tabs</a><a href="#find">3 · Find lots</a>
+    <a href="#open">4 · Open a lot</a><a href="#phones">5 · Get phones</a><a href="#call">6 · Call</a><a href="#search">7 · Property Search</a>
+    <a href="#first">Your first 10 minutes</a><a href="#rules">Rules</a>
+  </nav>
+
+  <section class="card" id="loop">
+    <h2>The whole job is five steps</h2>
+    <div class="flow"><span>Find</span><i>→</i><span>Open</span><i>→</i><span>Pull</span><i>→</i><span>Trace · 2¢</span><i>→</i><span class="go">☎ Call</span></div>
+    <p class="note">The Data Engine stops at the call. Nothing here ever sends a text blast or a campaign.</p>
+  </section>
+
+  <section class="card" id="login">
+    <h2>1 · Log in</h2>
+    <ol class="steps">
+      <li>Thomas sets up your login and sends you your <b>email and password</b>.</li>
+      <li>Go to <b>nxtier.ai</b> and log in with them. Same login every time.</li>
+      <li>You land on your <b>Data Engine</b>. There is no menu to learn. Everything is on this one screen, in the tabs across the top.</li>
+    </ol>
+  </section>
+
+  <section class="card" id="tabs">
+    <h2>2 · Your tabs</h2>
+    <div class="tw"><table>
+      <tr><th>Tab</th><th>What it is</th><th>Use it to</th></tr>
+      <tr><td>Data Engine</td><td>Your lots: the list on the left, the live satellite map on the right.</td><td><b>Start here every day.</b></td></tr>
+      <tr><td>Territory Intelligence</td><td>The big picture of your territory: the scan, the funnel, segments, the market, where it is.</td><td>See where the opportunity is before you dig in.</td></tr>
+      <tr><td>News Feed</td><td>What is moving in your market.</td><td>Have something to talk about on the call.</td></tr>
+      <tr><td>Property Report</td><td>The full public record for any NYC or Long Island address.</td><td>Read one property top to bottom.</td></tr>
+      <tr><td>Data Engine · Property Search</td><td>All of New York: any county, any property type, any lot size, any district, any radius.</td><td>Find lots outside your list, then download them as CSV blocks.</td></tr>
+    </table></div>
+  </section>
+
+  <section class="card" id="find">
+    <h2>3 · Find lots</h2>
+    <img class="shot" src="img/sop/data-engine-list.png" alt="The Data Engine list view: search box and filters on the left, satellite map on the right" loading="lazy">
+    <p class="cap">The list on the left, the map on the right. Owner names show inside your workspace.</p>
+    <ol class="steps">
+      <li><b>Type</b> in the big search box: an address, a town, a ZIP, a parcel ID or an owner's name.</li>
+      <li><b>Or tap a filter:</b> <span class="btn">Event signal</span> <span class="btn">MLS expired</span> <span class="btn">Development · zoning</span> <span class="btn">Commercial</span> <span class="btn">Lot size</span></li>
+      <li>Under Development · zoning, tap what you build: <span class="tag">Zoning allows a split</span><span class="tag">Big enough to split</span><span class="tag">Commercial</span></li>
+      <li>Pick a county in the <span class="btn">All of New York</span> box. <b>Start with Suffolk, then Nassau.</b> Pick an owner type in <span class="btn">Any owner</span>.</li>
+      <li>The count tells you how many lots match, for example <b>"1,240 of 19,419 lots"</b>.</li>
+      <li>The map follows the list. Click any dot to jump to that lot.</li>
+    </ol>
+  </section>
+
+  <section class="card" id="open">
+    <h2>4 · Open a lot</h2>
+    <img class="shot" src="img/sop/data-engine-detail.png" alt="A lot's detail view: address, bullets, tags, the Click to call button and the Lot / Split / Expired / Owner boxes" loading="lazy">
+    <p class="cap">One lot, everything about it, on one page.</p>
+    <ol class="steps">
+      <li>Click the <b>👁 eye</b> or the address on any row.</li>
+      <li><b>Read the top:</b> the street photo, the lot's story in bullets, and the loud tags: <span class="tag">Aged</span><span class="tag">3 lots by right</span><span class="tag w">Absentee owner</span><span class="tag">6 developers active here</span></li>
+      <li><b>Read the boxes:</b> LOT · SPLIT · EXPIRED · LAST ASKING · LISTED · OWNER.</li>
+      <li><b>The buttons:</b> <span class="btn g">☎ Click to call</span> <span class="btn b">✉ Email</span> <span class="btn">Notes</span> <span class="btn b">Find similar</span> <span class="btn b">▶ Story mode</span> <span class="btn b">Front of house</span></li>
+      <li><b>Scroll down</b> for the parcel record, <b>Owner &amp; how to reach them</b>, Call + email, the live 3D lot and the live satellite.</li>
+      <li><span class="btn">← Property Book</span> takes you back to the list, right where you were.</li>
+    </ol>
+  </section>
+
+  <section class="card" id="phones">
+    <h2>5 · Get the owner's phone</h2>
+    <p>Above the list there is one bar. It works on the lots in your list, in order, up to 2,000 at a time.</p>
+    <div class="bar"><span class="lab">THIS LIST</span><span class="btn b">Pull into your workspace</span><span class="btn b">Trace · phones + emails</span><span class="btn">Check trace results</span><span class="btn">Download this list</span></div>
+    <ol class="steps">
+      <li><b>Narrow the list</b> to the lots you want to work (one block is up to 2,000).</li>
+      <li>Press <span class="btn b">Pull</span>. Those lots become owners in your workspace.</li>
+      <li>Press <span class="btn b">Trace</span>. It shows you the cost <b>before</b> it runs: about <b>2¢ per owner</b>, on your own Tracerfy account.</li>
+      <li>Give it a few minutes, then press <span class="btn">Check trace results</span>.</li>
+      <li>Every phone lands on its lot with its <b>line type</b> (mobile or landline) and a <b>DNC</b> flag if it has one.</li>
+      <li><b>Just one lot?</b> Open it and press <span class="btn b">Trace this one</span>.</li>
+    </ol>
+  </section>
+
+  <section class="card" id="call">
+    <h2>6 · Call</h2>
+    <ol class="steps">
+      <li>Open a traced lot. The <b>Call + email</b> card lists every phone with its line type.</li>
+      <li>Press <span class="btn g">☎ Call</span>. It rings from <b>your SignalHouse.io line</b>.</li>
+      <li>The call and how it went are logged on that owner, so the next call starts where this one ended.</li>
+      <li><b>Skip any number marked DNC.</b></li>
+    </ol>
+    <p class="note">Your SignalHouse line and Tracerfy account are connected at install. Until they are, Call and Trace tell you what is missing.</p>
+  </section>
+
+  <div class="soon">
+    <div class="k">Coming next</div>
+    <h3 style="margin-top:4px">💬 Click to text, right next to Call</h3>
+    <p style="margin:0">One text to one owner from your own line. A message library sorted by stage (Opener, Follow-up, Appointment, Reply): tap one and it drops in with the owner's first name and street already filled. When they write back, the reply pops up on your screen. One text at a time, never a campaign.</p>
+  </div>
+
+  <section class="card" id="search">
+    <h2>7 · Property Search: all of New York</h2>
+    <ol class="steps">
+      <li>Open the <b>Data Engine · Property Search</b> tab.</li>
+      <li>Pick a <b>county</b> (Suffolk and Nassau are at the top), a <b>property type</b> (Vacant land, 1-family homes, Commercial …) and a <b>lot size</b>. Tap <span class="btn">½ acre +</span> or <span class="btn">1 acre +</span>. Press <span class="btn b">Search</span>.</li>
+      <li><b>Read each owner line.</b> It says who owns it and where they get their mail, in plain words: <span class="tag w">Trust · mails out of state (FL)</span> <span class="tag w">Individual · lives there</span></li>
+      <li><span class="btn">Most likely first</span> puts estates, out-of-state owners and absentee owners on top.</li>
+      <li><b>Group by</b> town or school district (zoning district in NYC). Tap a group to narrow to it.</li>
+      <li><b>Radius:</b> type an address in <span class="btn">Near</span>, pick the miles, press Search. Or switch to <span class="btn">Map</span> and click any spot.</li>
+      <li><b>Find:</b> type a parcel ID, an address or an owner's name.</li>
+      <li><span class="btn b">Full report</span> opens the whole public record. In NYC every deed and mortgage opens the scanned document.</li>
+      <li><span class="btn g">⬇ CSV blocks</span> downloads the results in blocks of 2,000, ranked and labeled. Block 01 holds the most likely sellers, ready for a 2¢ skip trace.</li>
+    </ol>
+  </section>
+
+  <section class="card">
+    <h2>Territory Intelligence &amp; News Feed</h2>
+    <img class="shot" src="img/sop/territory.png" alt="Territory Intelligence: headline numbers on the left, the territory map on the right" loading="lazy">
+    <p class="cap">Your territory at a glance. The tabs across its top (Scan · Funnel · Segments · Market · Where) each tell one part of the story.</p>
+  </section>
+
+  <section class="first" id="first">
+    <h2>Your first 10 minutes</h2>
+    <ol class="steps">
+      <li>Open <b>Data Engine</b>. Set the county box to <b>Suffolk</b>.</li>
+      <li>Under <b>Development · zoning</b>, tap <span class="tag">Zoning allows a split</span>.</li>
+      <li>Click the <b>#1</b> lot. Read the tags, then press <span class="btn b">▶ Story mode</span> and let it walk you through.</li>
+      <li>Press <span class="btn">← Property Book</span>. Press <span class="btn b">Pull</span>, then <span class="btn b">Trace</span>. Check the cost, then confirm.</li>
+      <li>A few minutes later: <span class="btn">Check trace results</span>. Open the lot again and press <span class="btn g">☎ Call</span>.</li>
+      <li>Then try Property Search: <b>Suffolk → Vacant land → 1 acre + → Near your office → 2 mi → Search</b>. Tap <span class="btn">Map</span>, then <span class="btn g">⬇ CSV blocks</span>.</li>
+    </ol>
+  </section>
+
+  <section class="card" id="rules">
+    <h2>The rules</h2>
+    <ul class="rules">
+      <li><b>One click, one call.</b>Nothing in the Data Engine sends in bulk. Ever.</li>
+      <li><b>DNC and STOP are respected.</b>A number marked DNC is never called. A STOP is never texted again.</li>
+      <li><b>Your accounts, your costs.</b>Traces run on your Tracerfy account (about 2¢ an owner). Calls ring from your SignalHouse line.</li>
+      <li><b>The public record is the source.</b>Owners, mailing addresses, lot sizes and zoning come from New York's own records.</li>
+    </ul>
+  </section>
+
+  <footer>Something look off? Take a screenshot and text it to Thomas.</footer>
+</div>
+</body>
+</html>
