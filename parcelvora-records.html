@@ -1,0 +1,683 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Parcelvora Property Records</title>
+<script>try { const t = localStorage.getItem("pv-theme"); if (t === "light" || t === "dark") document.documentElement.dataset.theme = t; } catch (e) {}</script>
+<script data-src="parcelvora-records-data.json">
+// Parcelvora static preview: answers the page's /api/* calls from a sample file, so the same page runs on a static host
+// (GitHub Pages) with no server and no database. Mirrors server.mjs: same filters, sorts, paging, CSV and profile shape.
+(() => {
+  const script = document.currentScript;
+  const realFetch = window.fetch.bind(window);
+  const ready = realFetch(script.dataset.src).then((r) => r.json());
+  const reply = (body, status = 200) => new Response(JSON.stringify(body), { status, headers: { "content-type": "application/json" } });
+  const num = (v) => (v === null || v === undefined || v === "" || !Number.isFinite(Number(v)) ? null : Number(v));
+  const has = (v) => v !== null && v !== undefined && v !== "";
+  const list = (v) => String(v || "").split(",").map((s) => s.trim()).filter(Boolean);
+  const YEAR_MS = 365 * 24 * 3600 * 1000;
+
+  function matcher(q) {
+    const tests = [];
+    const b = String(q.get("bbox") || "").split(",").map(Number);
+    if (b.length === 4 && b.every(Number.isFinite)) tests.push((r) => has(r.lat) && r.lat >= b[1] && r.lat <= b[3] && r.lon >= b[0] && r.lon <= b[2]);
+    if (q.get("region")) tests.push((r) => r.region === q.get("region"));
+    if (q.get("county")) tests.push((r) => r.county === q.get("county"));
+    if (q.get("town")) { const t = q.get("town").trim().toUpperCase(); tests.push((r) => String(r.town || "").toUpperCase() === t); }
+    if (/^\d{5}$/.test(q.get("zip") || "")) tests.push((r) => r.zip === q.get("zip"));
+    const use = list(q.get("use")); if (use.length) tests.push((r) => use.includes(r.use));
+    const owner = list(q.get("owner")); if (owner.length) tests.push((r) => owner.includes(r.owner_type));
+    const flags = list(q.get("flags"));
+    if (flags.includes("absentee")) tests.push((r) => r.absentee === true);
+    if (flags.includes("homestead")) tests.push((r) => r.owner_occupied === true);
+    if (flags.includes("out_of_state")) tests.push((r) => r.out_of_state === true);
+    const range = (param, field, op) => { const v = num(q.get(param)); if (v !== null) tests.push((r) => has(r[field]) && op(Number(r[field]), v)); };
+    range("min", "value", (a, v) => a >= v); range("max", "value", (a, v) => a <= v);
+    range("built_from", "year_built", (a, v) => a >= v); range("built_to", "year_built", (a, v) => a <= v);
+    range("sqft_min", "sqft", (a, v) => a >= v); range("sqft_max", "sqft", (a, v) => a <= v);
+    range("units_min", "units", (a, v) => a >= v);
+    if (q.get("sold") === "12m") tests.push((r) => has(r.sale_date) && (r.region === "NYC" || Date.now() - Date.parse(r.sale_date) <= YEAR_MS));
+    return (r) => tests.every((t) => t(r));
+  }
+
+  // nulls last, then parcel id, like the server's order by
+  const by = (field, dir) => (a, b) => {
+    const x = a[field], y = b[field];
+    if (!has(x) || !has(y)) return has(x) ? -1 : has(y) ? 1 : String(a.id).localeCompare(String(b.id));
+    const c = typeof x === "number" && typeof y === "number" ? x - y : String(x).localeCompare(String(y));
+    return c ? dir * c : String(a.id).localeCompare(String(b.id));
+  };
+  const SORTS = { value_desc: by("value", -1), value_asc: by("value", 1), built_asc: by("year_built", 1), built_desc: by("year_built", -1),
+    sqft_desc: by("sqft", -1), address: by("address", 1) };
+  const select = (rows, q) => rows.filter(matcher(q)).sort(SORTS[q.get("sort")] || SORTS.value_desc);
+
+  const CSV_COLS = ["id", "region", "county", "town", "address", "zip", "owner_name", "owner_first", "owner_last", "owner_type",
+    "owner_occupied", "absentee", "out_of_state", "mail_addr", "mail_city", "mail_state", "mail_zip", "use", "year_built", "units",
+    "sqft", "acres", "value", "value_basis", "sale_price", "sale_date", "lat", "lon"];
+  const cell = (x) => (!has(x) ? "" : /[",\n]/.test(String(x)) ? `"${String(x).replace(/"/g, '""')}"` : String(x));
+
+  // The same JSON shape gold.lookup() returns, built from one sample row.
+  function profile(r) {
+    const mailing = [r.mail_addr, r.mail_city, [r.mail_state, r.mail_zip].filter(has).join(" ")].filter(has).join(", ");
+    const deed = (bk, pg) => [bk, pg].filter(has).join(" / ") || undefined;
+    const sale = has(r.sale_price) ? (r.region === "FL"
+      ? { price_usd: r.sale_price, month: String(r.sale_date).slice(0, 7), deed_book_page: r.sale_deed }
+      : { price_usd: r.sale_price, date: r.sale_date, what_sold: r.what_sold }) : undefined;
+    return {
+      parcel: { id: r.id, region: r.region, county: r.county, town: r.town, address: r.address, zip: r.zip, lat: r.lat, lon: r.lon },
+      property: { use: r.use, class: r.class, class_description: r.class_desc, year_built: r.year_built, residential_units: r.units,
+        building_sqft: r.sqft, lot_acres: r.acres, value_usd: r.value, value_basis: r.value_basis, zoning: r.zoning, exemptions: r.exemptions },
+      owner: { name: r.owner_name, first_name: r.owner_first, last_name: r.owner_last, second_owner: r.owner2, type: r.owner_type,
+        owner_occupied: r.owner_occupied, absentee: r.absentee, out_of_state: r.out_of_state, mailing_address: mailing || undefined,
+        held_since_2021: r.held_since_2021, deed_book_page: deed(r.deed_book, r.deed_page) },
+      registered_contact: has(r.officer_name) ? { name: r.officer_name, role: String(r.officer_type || "").replace(/([a-z])([A-Z])/g, "$1 $2"),
+        company: r.officer_company, address: [r.officer_addr, r.officer_zip].filter(has).join(" ") || undefined } : undefined,
+      last_sale: sale,
+    };
+  }
+  const key = (s) => String(s || "").toUpperCase().replace(/[^0-9A-Z]/g, "");
+
+  window.fetch = async (input, init) => {
+    const url = new URL(typeof input === "string" ? input : input.url, location.href);
+    const route = /\/api\/(records|map|lookup|counties)$/.exec(url.pathname);
+    if (!route) return realFetch(input, init);
+    const d = await ready, q = url.searchParams;
+    if (route[1] === "records") {
+      const all = select(d.rows, q);
+      const size = Math.min(Math.max(num(q.get("size")) || 50, 1), 200), page = Math.min(Math.max(num(q.get("page")) || 1, 1), 200);
+      return reply({ total: Math.min(all.length, 10000), capped: all.length > 10000, page, size, rows: all.slice((page - 1) * size, page * size) });
+    }
+    if (route[1] === "map") {
+      const all = d.rows.filter(matcher(q)).filter((r) => has(r.lat));
+      return reply({ more: all.length > 1500, rows: all.slice(0, 1500) });
+    }
+    if (route[1] === "counties") {
+      const m = new Map();
+      for (const r of d.rows) { const k = r.region + "|" + r.county; m.set(k, (m.get(k) || 0) + 1); }
+      return reply({ counties: [...m].map(([k, parcels]) => ({ region: k.split("|")[0], county: k.split("|")[1], parcels }))
+        .sort((a, b) => (a.region + a.county).localeCompare(b.region + b.county)) });
+    }
+    const id = q.get("id"), term = String(q.get("q") || "").trim();
+    let found;
+    if (id) found = d.rows.filter((r) => r.id === id && (!q.get("county") || r.county === q.get("county")));
+    else {
+      const k = key(term), words = term.toUpperCase().split(/\s+/).filter(Boolean);
+      found = d.rows.filter((r) => key(r.id) === k);
+      if (!found.length) found = d.rows.filter((r) => { const a = String(r.address || "").toUpperCase(); return words.length && words.every((w) => a.includes(w)); });
+    }
+    return reply({ results: found.slice(0, 10).map(profile) });
+  };
+
+  // Download: the page links to /api/records.csv; here the file is made in the browser from the same filtered rows.
+  document.addEventListener("click", async (e) => {
+    const a = e.target.closest && e.target.closest("#download");
+    if (!a) return;
+    e.preventDefault();
+    const d = await ready, rows = select(d.rows, new URL(a.href, location.href).searchParams).slice(0, 5000);
+    const body = [CSV_COLS.join(","), ...rows.map((r) => CSV_COLS.map((c) => cell(r[c])).join(","))].join("\n");
+    const link = document.createElement("a");
+    link.href = URL.createObjectURL(new Blob([body], { type: "text/csv" }));
+    link.download = "parcelvora-records.csv";
+    document.body.appendChild(link); link.click(); link.remove();
+    setTimeout(() => URL.revokeObjectURL(link.href), 10000);
+  }, true);
+
+  // Say plainly that this is a sample.
+  document.addEventListener("DOMContentLoaded", () => ready.then((d) => {
+    const s = document.querySelector(".sub-title");
+    if (s) s.textContent += ` Preview: a sample of ${d.rows.length.toLocaleString("en-US")} parcels. The full lake holds ${Number(d.meta.total).toLocaleString("en-US")}.`;
+  }));
+})();
+</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@700;800&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500&display=swap">
+<link rel="stylesheet" href="https://api.mapbox.com/mapbox-gl-js/v3.17.0/mapbox-gl.css">
+<style>
+  /* Layout: title + toolbar (Table | Map, Download, Hide Filters, theme), search, a 3-column grid of collapsible filter
+     cards, then the records table or the Mapbox map. A drawer on the right holds one property's full profile. */
+  :root {
+    color-scheme: light;
+    --bg: #e3eefc; --card: #ffffff; --card-2: #f3f8ff; --line: #c9dbf2; --text: #0a1a2f; --soft: #33465e;
+    --blue: #1b6fe0; --blue-ink: #ffffff; --blue-tint: #dceafd; --shadow: 0 1px 2px rgba(16, 52, 104, 0.08), 0 4px 14px rgba(16, 52, 104, 0.06);
+    --green: #0f9a58; --amber: #f2a93b; --red: #d7372f; --slate: #52637a; --tag-ink: #ffffff; --amber-ink: #1d1300;
+    --map-style: "mapbox://styles/mapbox/light-v11";
+    --display: 'Archivo', 'Arial Narrow', Arial, sans-serif;
+    --body: 'IBM Plex Sans', system-ui, -apple-system, 'Segoe UI', sans-serif;
+    --mono: 'IBM Plex Mono', ui-monospace, Consolas, monospace;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      color-scheme: dark;
+      --bg: #06101e; --card: #0d1828; --card-2: #112036; --line: #1f3350; --text: #f6f9ff; --soft: #cfdbec;
+      --blue: #4f9bff; --blue-ink: #04101f; --blue-tint: #10284a; --shadow: none;
+      --green: #22c37a; --amber: #f5b544; --red: #ff6b62; --slate: #8ea0b8; --tag-ink: #04101f; --amber-ink: #1d1300;
+    }
+  }
+  :root[data-theme="dark"] {
+    color-scheme: dark;
+    --bg: #06101e; --card: #0d1828; --card-2: #112036; --line: #1f3350; --text: #f6f9ff; --soft: #cfdbec;
+    --blue: #4f9bff; --blue-ink: #04101f; --blue-tint: #10284a; --shadow: none;
+    --green: #22c37a; --amber: #f5b544; --red: #ff6b62; --slate: #8ea0b8; --tag-ink: #04101f; --amber-ink: #1d1300;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; }
+  body { background: var(--bg); color: var(--text); font: 15px/1.5 var(--body); min-height: 100vh; }
+  .wrap { max-width: 1440px; margin: 0 auto; padding: 22px max(16px, env(safe-area-inset-right, 0px)) 48px max(16px, env(safe-area-inset-left, 0px));
+    display: grid; gap: 16px; }
+  button, input, select { font: inherit; color: inherit; }
+  :focus-visible { outline: 2px solid var(--blue); outline-offset: 2px; }
+
+  .head { display: flex; justify-content: space-between; align-items: flex-start; gap: 14px; flex-wrap: wrap; }
+  .brand { font: 800 14px/1 var(--display); letter-spacing: 0.12em; text-transform: uppercase; color: var(--blue); margin-bottom: 6px; }
+  h1 { font: 800 clamp(26px, 4vw, 34px)/1.1 var(--display); margin: 0; }
+  .sub-title { color: var(--soft); margin: 6px 0 0; max-width: 62ch; }
+  .tools { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+  .btn { display: inline-flex; align-items: center; gap: 7px; background: var(--card); border: 1px solid var(--line); padding: 8px 13px;
+    border-radius: 8px; font-weight: 600; cursor: pointer; box-shadow: var(--shadow); text-decoration: none; white-space: nowrap; }
+  .btn:hover { border-color: var(--blue); }
+  .btn svg { width: 17px; height: 17px; flex: none; }
+  .seg { display: inline-flex; background: var(--card); border: 1px solid var(--line); border-radius: 8px; padding: 3px; box-shadow: var(--shadow); }
+  .seg button { border: 0; background: transparent; padding: 6px 13px; border-radius: 6px; font-weight: 600; cursor: pointer; display: inline-flex; gap: 6px; align-items: center; }
+  .seg button svg { width: 16px; height: 16px; }
+  .seg button[aria-pressed="true"] { background: var(--blue); color: var(--blue-ink); }
+
+  .search { display: flex; gap: 8px; }
+  .search input { flex: 1; min-width: 0; background: var(--card); border: 1px solid var(--line); border-radius: 8px; padding: 10px 13px; font-size: 16px; box-shadow: var(--shadow); }
+  .search .btn { background: var(--blue); color: var(--blue-ink); border-color: var(--blue); }
+
+  .filters { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 320px), 1fr)); gap: 12px; align-items: start; }
+  .fcard { background: var(--card); border: 1px solid var(--line); border-radius: 10px; box-shadow: var(--shadow); min-width: 0; }
+  .fcard > button { width: 100%; display: flex; justify-content: space-between; align-items: center; gap: 8px; background: none; border: 0;
+    padding: 12px 14px; font: 700 15px var(--body); cursor: pointer; text-align: left; }
+  .fcard > button svg { width: 16px; height: 16px; transition: transform 0.15s; color: var(--soft); }
+  .fcard > button[aria-expanded="false"] svg { transform: rotate(-90deg); }
+  .fbody { padding: 0 14px 14px; display: grid; gap: 10px; }
+  .pair { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  label.f { display: grid; gap: 4px; font-size: 14px; font-weight: 600; color: var(--soft); min-width: 0; }
+  label.f input, label.f select { width: 100%; background: var(--card-2); border: 1px solid var(--line); border-radius: 7px; padding: 8px 10px; font-size: 15px; color: var(--text); font-weight: 400; }
+  .chips { display: flex; gap: 6px; flex-wrap: wrap; }
+  .chip { background: var(--card-2); border: 1px solid var(--line); border-radius: 999px; padding: 5px 12px; font-weight: 600; cursor: pointer; }
+  .chip[aria-pressed="true"] { background: var(--blue); border-color: var(--blue); color: var(--blue-ink); }
+  .clear { justify-self: start; background: none; border: 0; padding: 0; color: var(--blue); font-weight: 700; cursor: pointer; }
+
+  .panel { background: var(--card); border: 1px solid var(--line); border-radius: 10px; box-shadow: var(--shadow); min-width: 0; }
+  .bar { display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap; padding: 12px 14px; border-bottom: 1px solid var(--line); }
+  .bar h2 { font: 800 18px var(--display); margin: 0; }
+  #count { color: var(--soft); font-weight: 600; }
+  .bar select { background: var(--card-2); border: 1px solid var(--line); border-radius: 7px; padding: 6px 9px; }
+  .scroll { overflow-x: auto; }
+  table { border-collapse: collapse; width: 100%; min-width: 980px; }
+  th { text-align: left; font-size: 13px; letter-spacing: 0.05em; text-transform: uppercase; color: var(--soft); background: var(--card-2);
+    padding: 10px 14px; border-bottom: 1px solid var(--line); white-space: nowrap; }
+  td { padding: 12px 14px; border-bottom: 1px solid var(--line); vertical-align: top; }
+  tbody tr { cursor: pointer; }
+  tbody tr:hover { background: var(--card-2); }
+  .strong { font-weight: 700; }
+  .sm { color: var(--soft); font-size: 14px; }
+  .mono { font: 500 13px var(--mono); color: var(--soft); }
+  .tags { display: flex; gap: 5px; flex-wrap: wrap; margin-top: 5px; }
+  .tag { font: 800 11.5px/1 var(--display); letter-spacing: 0.05em; text-transform: uppercase; padding: 5px 7px; border-radius: 4px; color: var(--tag-ink); }
+  .t-home { background: var(--green); } .t-abs { background: var(--amber); color: var(--amber-ink); } .t-oos { background: var(--red); }
+  .t-llc { background: var(--blue); color: var(--blue-ink); } .t-other { background: var(--slate); }
+  .eye { background: var(--blue-tint); border: 1px solid var(--line); border-radius: 8px; width: 36px; height: 36px; display: grid; place-items: center; cursor: pointer; color: var(--blue); }
+  .eye svg { width: 18px; height: 18px; }
+  .pager { display: flex; justify-content: space-between; align-items: center; gap: 10px; padding: 12px 14px; flex-wrap: wrap; }
+  .pager .btn:disabled { opacity: 0.45; cursor: default; }
+  .empty { padding: 28px 14px; color: var(--soft); text-align: center; }
+
+  #mapView { position: relative; }
+  #map { height: min(72vh, 760px); border-radius: 0 0 10px 10px; }
+  .legend { display: flex; gap: 14px; flex-wrap: wrap; font-size: 14px; color: var(--soft); }
+  .legend i { display: inline-block; width: 11px; height: 11px; border-radius: 50%; margin-right: 6px; vertical-align: -1px; }
+  .note { position: absolute; z-index: 2; left: 50%; top: 70px; transform: translateX(-50%); background: var(--card); border: 1px solid var(--blue);
+    border-radius: 8px; padding: 8px 14px; font-weight: 700; pointer-events: none; box-shadow: var(--shadow); }
+
+  .scrim { position: fixed; inset: 0; background: rgba(4, 16, 31, 0.45); z-index: 20; }
+  .drawer { position: fixed; z-index: 21; top: 0; right: 0; bottom: 0; width: min(560px, 100vw); background: var(--bg); border-left: 1px solid var(--line);
+    overflow-y: auto; padding: 18px 16px 32px; display: grid; gap: 12px; align-content: start; }
+  .drawer h2 { font: 800 26px/1.15 var(--display); margin: 0; }
+  .drawer h3 { font: 800 13px var(--display); letter-spacing: 0.08em; text-transform: uppercase; color: var(--blue); margin: 0 0 6px; }
+  .drawer ul { margin: 0; padding-left: 20px; display: grid; gap: 4px; }
+  .drawer .box { background: var(--card); border: 1px solid var(--line); border-radius: 10px; padding: 12px 14px; box-shadow: var(--shadow); }
+  .dtop { display: flex; justify-content: space-between; gap: 8px; }
+  [hidden] { display: none !important; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="head">
+    <div>
+      <div class="brand">Parcelvora</div>
+      <h1>Property Records</h1>
+      <p class="sub-title">Every parcel in New York and Florida: the owner by first and last name, mailing address, value, last sale and property facts.</p>
+    </div>
+    <div class="tools">
+      <div class="seg" role="group" aria-label="View">
+        <button type="button" id="vTable" aria-pressed="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M3 5h18M3 12h18M3 19h18"/></svg>Table</button>
+        <button type="button" id="vMap" aria-pressed="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M9 4 3 6v14l6-2 6 2 6-2V4l-6 2-6-2zM9 4v14M15 6v14"/></svg>Map</button>
+      </div>
+      <a class="btn" id="download" href="/api/records.csv"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 4v11m0 0-4-4m4 4 4-4M4 19h16"/></svg>Download</a>
+      <button type="button" class="btn" id="toggleFilters" aria-expanded="true" aria-controls="filters"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M3 5h18l-7 8v6l-4 2v-8L3 5z"/></svg><span>Hide Filters</span></button>
+      <button type="button" class="btn" id="theme" aria-label="Switch to dark mode"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg><span>Dark</span></button>
+    </div>
+  </header>
+
+  <form class="search" id="search" role="search">
+    <input id="q" type="search" placeholder="Find one property: address, Florida folio, NYC BBL or NY parcel id" aria-label="Find a property">
+    <button class="btn" type="submit">Find</button>
+  </form>
+
+  <section class="filters" id="filters" aria-label="Filters">
+    <div class="fcard">
+      <button type="button" aria-expanded="true">Location<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button>
+      <div class="fbody">
+        <div class="pair">
+          <label class="f">Region<select id="region"><option value="">Every region</option></select></label>
+          <label class="f">County<select id="county"><option value="">Every county</option></select></label>
+        </div>
+        <div class="pair">
+          <label class="f">Town / city<input id="town" type="text" autocomplete="off"></label>
+          <label class="f">ZIP<input id="zip" type="text" inputmode="numeric" maxlength="5" autocomplete="off"></label>
+        </div>
+      </div>
+    </div>
+    <div class="fcard">
+      <button type="button" aria-expanded="true">Property<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button>
+      <div class="fbody">
+        <label class="f">Use<select id="use">
+          <option value="">Every use</option>
+          <option value="one_family">Single family</option>
+          <option value="two_family,three_family,multifamily_small">2–9 units</option>
+          <option value="multifamily">Multifamily (10+)</option>
+          <option value="condo,coop">Condo / co-op</option>
+          <option value="mobile_home">Mobile home</option>
+          <option value="vacant_res,vacant_commercial,vacant_other">Vacant land</option>
+          <option value="commercial,mixed_use,motel_hotel,parking">Commercial</option>
+          <option value="industrial">Industrial</option>
+          <option value="agricultural">Agricultural</option>
+        </select></label>
+        <div class="pair">
+          <label class="f">Built from<input id="built_from" type="number" min="1700" max="2100" placeholder="1900"></label>
+          <label class="f">Built to<input id="built_to" type="number" min="1700" max="2100" placeholder="2026"></label>
+        </div>
+      </div>
+    </div>
+    <div class="fcard">
+      <button type="button" aria-expanded="true">Owner<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button>
+      <div class="fbody">
+        <label class="f">Owner type<select id="owner">
+          <option value="">Any owner</option>
+          <option value="individual">Person</option>
+          <option value="entity">LLC / company</option>
+          <option value="trust">Trust</option>
+          <option value="estate">Estate</option>
+        </select></label>
+        <div class="chips" data-flags>
+          <button type="button" class="chip" aria-pressed="false" data-flag="homestead">Owner lives there</button>
+          <button type="button" class="chip" aria-pressed="false" data-flag="absentee">Absentee</button>
+        </div>
+      </div>
+    </div>
+    <div class="fcard">
+      <button type="button" aria-expanded="true">Value<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button>
+      <div class="fbody">
+        <div class="pair">
+          <label class="f">Min $<input id="min" type="number" min="0" step="10000"></label>
+          <label class="f">Max $<input id="max" type="number" min="0" step="10000"></label>
+        </div>
+        <span class="sm">Florida: just value. NY outside NYC: full market value. NYC: assessed value.</span>
+      </div>
+    </div>
+    <div class="fcard">
+      <button type="button" aria-expanded="true">Property Details<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button>
+      <div class="fbody">
+        <div class="pair">
+          <label class="f">Sq ft from<input id="sqft_min" type="number" min="0" step="100"></label>
+          <label class="f">Sq ft to<input id="sqft_max" type="number" min="0" step="100"></label>
+        </div>
+        <label class="f">Units, at least<input id="units_min" type="number" min="0" step="1"></label>
+      </div>
+    </div>
+    <div class="fcard">
+      <button type="button" aria-expanded="true">Sale &amp; Mailing<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button>
+      <div class="fbody">
+        <div class="chips">
+          <button type="button" class="chip" aria-pressed="false" id="sold">Sold in the last 12 months</button>
+        </div>
+        <div class="chips" data-flags>
+          <button type="button" class="chip" aria-pressed="false" data-flag="out_of_state">Mailing address out of state</button>
+        </div>
+        <button type="button" class="clear" id="clear">Clear every filter</button>
+      </div>
+    </div>
+  </section>
+
+  <section class="panel" id="tableView">
+    <div class="bar">
+      <div><h2>Records</h2><div id="count" aria-live="polite">Loading…</div></div>
+      <label class="sm">Sort <select id="sort">
+        <option value="value_desc">Highest value</option>
+        <option value="value_asc">Lowest value</option>
+        <option value="built_asc">Oldest built</option>
+        <option value="built_desc">Newest built</option>
+        <option value="sqft_desc">Largest building</option>
+        <option value="address">Address A–Z</option>
+      </select></label>
+    </div>
+    <div class="scroll">
+      <table>
+        <thead><tr><th>Property</th><th>Owner</th><th>Mailing Address</th><th>Value &amp; Sale</th><th>Property Details</th><th>Actions</th></tr></thead>
+        <tbody id="rows"></tbody>
+      </table>
+    </div>
+    <div class="pager">
+      <button type="button" class="btn" id="prev">← Previous</button>
+      <span id="pageInfo" class="sm"></span>
+      <button type="button" class="btn" id="next">Next →</button>
+    </div>
+  </section>
+
+  <section class="panel" id="mapView" hidden>
+    <div class="bar">
+      <div><h2>Map</h2><div id="mapCount" aria-live="polite">Zoom in to street level to load parcels.</div></div>
+      <div class="legend" aria-label="Map colors">
+        <span><i style="background:var(--green)"></i>Owner lives there</span>
+        <span><i style="background:var(--amber)"></i>Absentee</span>
+        <span><i style="background:var(--blue)"></i>LLC / company</span>
+        <span><i style="background:var(--slate)"></i>Other</span>
+      </div>
+    </div>
+    <div id="map"></div>
+    <div class="note" id="note" hidden>Zoom in to load parcels</div>
+  </section>
+</div>
+
+<div class="scrim" id="scrim" hidden></div>
+<aside class="drawer" id="drawer" role="dialog" aria-modal="true" aria-label="Property details" hidden></aside>
+
+<script src="https://api.mapbox.com/mapbox-gl-js/v3.17.0/mapbox-gl.js"></script>
+<script>
+(() => {
+  const TOKEN = "pk.eyJ1IjoibmV4dGllcjExMTA1IiwiYSI6ImNtaXVrbmRodTFrY3YzanEwamFoZG44dWQifQ.EGNVQPofUwZm60KP6iID_g";
+  const $ = (id) => document.getElementById(id);
+  const esc = (s) => String(s ?? "").replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+  const money = (n) => (n == null || n === "" ? "" : "$" + Math.round(Number(n)).toLocaleString("en-US"));
+  const int = (n) => (n == null || n === "" ? "" : Math.round(Number(n)).toLocaleString("en-US"));
+  const title = (s) => String(s ?? "").toLowerCase().replace(/\b\w/g, (c) => c.toUpperCase());
+  const store = { get: (k) => { try { return localStorage.getItem(k); } catch (e) { return null; } },
+                  set: (k, v) => { try { localStorage.setItem(k, v); } catch (e) {} } };
+  const REGION = { NYC: "New York City", LI: "Long Island", NYS: "New York State", FL: "Florida" };
+  const CENTER = { NYC: [-73.95, 40.68], LI: [-73.3, 40.8], NYS: [-74.0, 41.5], FL: [-80.1918, 25.7617] };
+  const USE = { one_family: "Single family", two_family: "Two-family", three_family: "Three-family", multifamily: "Multifamily",
+    multifamily_small: "Multifamily (2–9)", condo: "Condo", coop: "Co-op", mobile_home: "Mobile home", vacant_res: "Vacant residential",
+    vacant_commercial: "Vacant commercial", vacant_other: "Vacant land", commercial: "Commercial", mixed_use: "Mixed use",
+    industrial: "Industrial", agricultural: "Agricultural", motel_hotel: "Hotel / motel", parking: "Parking", community: "Institutional",
+    government: "Government", utility: "Utility", residential_other: "Residential (other)", other: "Other" };
+  const BASIS = { just_value: "Just value", full_market_value: "Full market value", assessed_total: "Assessed value" };
+  const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+  const saleDate = (d, region) => { const m = /^(\d{4})-(\d{2})-(\d{2})/.exec(d || ""); if (!m) return d || "";
+    return region === "FL" ? `${MONTHS[+m[2] - 1]} ${m[1]}` : `${MONTHS[+m[2] - 1]} ${+m[3]}, ${m[1]}`; };
+  const stateOf = (r) => (r.region === "FL" ? "FL" : "NY");
+
+  function ownerName(p) {
+    if (p.owner_first || p.owner_last) return [p.owner_first, p.owner_last].filter(Boolean).join(" ");
+    return title(p.owner_name || "Owner not on record");
+  }
+  function tags(o) {
+    const t = [];
+    if (o.owner_occupied) t.push('<span class="tag t-home">Owner lives there</span>');
+    if (o.absentee) t.push('<span class="tag t-abs">Absentee</span>');
+    if (o.out_of_state) t.push('<span class="tag t-oos">Out of state</span>');
+    const ty = o.owner_type || o.type;
+    if (ty === "entity") t.push('<span class="tag t-llc">LLC / company</span>');
+    if (ty === "trust" || ty === "estate" || ty === "public") t.push(`<span class="tag t-other">${esc(ty)}</span>`);
+    return t.join("");
+  }
+
+  // ── theme: light blue by default, dark on request or by the system setting ─────────────────────────────────────
+  const isDark = () => (document.documentElement.dataset.theme || (matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light")) === "dark";
+  const mapStyle = () => (isDark() ? "mapbox://styles/mapbox/dark-v11" : "mapbox://styles/mapbox/light-v11");
+  function paintThemeButton() {
+    $("theme").setAttribute("aria-label", isDark() ? "Switch to light mode" : "Switch to dark mode");
+    $("theme").querySelector("span").textContent = isDark() ? "Light" : "Dark";
+  }
+  $("theme").addEventListener("click", () => {
+    const next = isDark() ? "light" : "dark";
+    document.documentElement.dataset.theme = next; store.set("pv-theme", next);
+    paintThemeButton(); if (map) map.setStyle(mapStyle());
+  });
+  paintThemeButton();
+
+  // ── filters ────────────────────────────────────────────────────────────────────────────────────────────────────
+  const FIELDS = ["region", "county", "town", "zip", "use", "owner", "min", "max", "built_from", "built_to", "sqft_min", "sqft_max", "units_min"];
+  function params() {
+    const p = new URLSearchParams();
+    for (const id of FIELDS) { const v = $(id).value.trim(); if (v) p.set(id, v); }
+    const f = [...document.querySelectorAll("[data-flags] .chip[aria-pressed=true]")].map((b) => b.dataset.flag);
+    if (f.length) p.set("flags", f.join(","));
+    if ($("sold").getAttribute("aria-pressed") === "true") p.set("sold", "12m");
+    p.set("sort", $("sort").value);
+    return p;
+  }
+  let counties = [], page = 1, seq = 0, typing = null;
+  function fillCounties() {
+    const r = $("region").value, keep = $("county").value;
+    const list = counties.filter((c) => !r || c.region === r);
+    $("county").innerHTML = '<option value="">Every county</option>' + list.map((c) =>
+      `<option value="${esc(c.county)}">${esc(c.county)}${r ? "" : " · " + esc(REGION[c.region] || c.region)}</option>`).join("");
+    if (list.some((c) => c.county === keep)) $("county").value = keep;
+  }
+  function changed() {
+    page = 1;
+    $("download").href = "/api/records.csv?" + params();
+    if (!$("tableView").hidden) loadTable();
+    if (!$("mapView").hidden) loadMap();
+  }
+
+  document.querySelectorAll(".fcard > button").forEach((b) => b.addEventListener("click", () => {
+    const open = b.getAttribute("aria-expanded") !== "true";
+    b.setAttribute("aria-expanded", String(open)); b.nextElementSibling.hidden = !open;
+  }));
+  $("toggleFilters").addEventListener("click", () => {
+    const show = $("filters").hidden;
+    $("filters").hidden = !show;
+    $("toggleFilters").setAttribute("aria-expanded", String(show));
+    $("toggleFilters").querySelector("span").textContent = show ? "Hide Filters" : "Show Filters";
+  });
+  $("region").addEventListener("change", () => { fillCounties(); changed(); });
+  ["county", "use", "owner", "sort"].forEach((id) => $(id).addEventListener("change", changed));
+  ["town", "zip", "min", "max", "built_from", "built_to", "sqft_min", "sqft_max", "units_min"].forEach((id) =>
+    $(id).addEventListener("input", () => { clearTimeout(typing); typing = setTimeout(changed, 450); }));
+  document.querySelectorAll(".chip").forEach((b) => b.addEventListener("click", () => {
+    b.setAttribute("aria-pressed", b.getAttribute("aria-pressed") === "true" ? "false" : "true"); changed();
+  }));
+  $("clear").addEventListener("click", () => {
+    FIELDS.forEach((id) => { $(id).value = ""; });
+    document.querySelectorAll(".chip").forEach((b) => b.setAttribute("aria-pressed", "false"));
+    fillCounties(); changed();
+  });
+
+  // ── table ──────────────────────────────────────────────────────────────────────────────────────────────────────
+  let rows = [];
+  const EYE = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg>';
+  async function loadTable() {
+    const p = params(); p.set("page", page); p.set("size", 50);
+    const mine = ++seq;
+    $("count").textContent = "Loading…";
+    try {
+      const res = await fetch("/api/records?" + p);
+      const j = await res.json();
+      if (mine !== seq) return;
+      if (!res.ok) throw new Error(j.error || res.status);
+      rows = j.rows;
+      const pages = Math.max(1, Math.ceil(j.total / j.size));
+      $("count").textContent = j.total ? `${int(j.total)}${j.capped ? "+" : ""} records` : "No records match these filters";
+      $("pageInfo").textContent = j.total ? `Page ${j.page} of ${int(pages)}${j.capped ? "+" : ""}` : "";
+      $("prev").disabled = j.page <= 1; $("next").disabled = j.page >= pages;
+      $("rows").innerHTML = rows.length ? rows.map((r, i) => `
+        <tr data-i="${i}">
+          <td><div class="strong">${esc(r.address || "No street address")}</div>
+              <div class="sm">${esc([title(r.town), stateOf(r) + (r.zip ? " " + r.zip : "")].filter(Boolean).join(", "))}</div>
+              <div class="mono">${esc(r.id)} · ${esc(r.county)}</div></td>
+          <td><div class="strong">${esc(ownerName(r))}</div><div class="tags">${tags(r)}</div></td>
+          <td>${r.mail_addr ? `<div>${esc(title(r.mail_addr))}</div><div class="sm">${esc([title(r.mail_city), [r.mail_state, r.mail_zip].filter(Boolean).join(" ")].filter(Boolean).join(", "))}</div>`
+                            : '<span class="sm">Not on the roll</span>'}</td>
+          <td><div class="strong">${money(r.value) || "—"}</div><div class="sm">${esc(BASIS[r.value_basis] || "")}</div>
+              ${r.sale_price ? `<div class="sm">Sold ${money(r.sale_price)} · ${esc(saleDate(r.sale_date, r.region))}</div>` : ""}</td>
+          <td><div>${esc(USE[r.use] || r.use || "—")}</div>
+              <div class="sm">${[r.units ? int(r.units) + " units" : "", r.sqft ? int(r.sqft) + " sq ft" : "", r.year_built ? "Built " + r.year_built : "",
+                                 r.acres ? r.acres + " acres" : ""].filter(Boolean).join(" · ")}</div></td>
+          <td><button type="button" class="eye" data-i="${i}" aria-label="Open details for ${esc(r.address || r.id)}">${EYE}</button></td>
+        </tr>`).join("") : '<tr><td colspan="6" class="empty">No records match these filters. Clear one and try again.</td></tr>';
+    } catch (e) {
+      if (mine === seq) { $("count").textContent = "Could not load records. Change a filter to try again."; $("rows").innerHTML = ""; }
+    }
+  }
+  $("rows").addEventListener("click", (e) => { const tr = e.target.closest("tr[data-i]"); if (tr) { const r = rows[+tr.dataset.i]; openDetail(r.id, r.county); } });
+  $("prev").addEventListener("click", () => { if (page > 1) { page--; loadTable(); $("tableView").scrollIntoView({ block: "start" }); } });
+  $("next").addEventListener("click", () => { page++; loadTable(); $("tableView").scrollIntoView({ block: "start" }); });
+
+  // ── map ────────────────────────────────────────────────────────────────────────────────────────────────────────
+  const MIN_ZOOM = 14;
+  let map = null, mapRows = [], mtimer = null, mseq = 0, pickId = "";
+  function addLayers() {
+    if (map.getSource("parcels")) return;
+    map.addSource("parcels", { type: "geojson", data: { type: "FeatureCollection", features: [] } });
+    const css = getComputedStyle(document.documentElement);
+    const c = (v) => css.getPropertyValue(v).trim();
+    map.addLayer({ id: "parcels", type: "circle", source: "parcels", paint: {
+      "circle-radius": ["interpolate", ["linear"], ["zoom"], 14, 3.5, 17, 6.5, 19, 9],
+      "circle-color": ["match", ["get", "kind"], "home", c("--green"), "abs", c("--amber"), "llc", c("--blue"), c("--slate")],
+      "circle-stroke-color": isDark() ? "#000000" : "#ffffff", "circle-stroke-width": 1 } });
+    map.addLayer({ id: "pick", type: "circle", source: "parcels", filter: ["==", ["get", "id"], pickId], paint: {
+      "circle-radius": ["interpolate", ["linear"], ["zoom"], 14, 8, 19, 14], "circle-color": "rgba(0,0,0,0)",
+      "circle-stroke-color": c("--text"), "circle-stroke-width": 3 } });
+    drawMap();
+  }
+  function drawMap() {
+    const src = map && map.getSource("parcels");
+    if (src) src.setData({ type: "FeatureCollection", features: mapRows.filter((r) => r.lat != null).map((r) => ({
+      type: "Feature", geometry: { type: "Point", coordinates: [r.lon, r.lat] },
+      properties: { id: r.id, county: r.county, kind: r.owner_occupied ? "home" : r.absentee ? "abs" : r.owner_type === "entity" ? "llc" : "other" } })) });
+  }
+  async function loadMap() {
+    if (!map) return;
+    if (map.getZoom() < MIN_ZOOM) { $("note").hidden = false; mapRows = []; drawMap(); $("mapCount").textContent = "Zoom in to street level to load parcels."; return; }
+    $("note").hidden = true;
+    const b = map.getBounds(), p = params();
+    p.set("bbox", [b.getWest(), b.getSouth(), b.getEast(), b.getNorth()].map((x) => x.toFixed(6)).join(","));
+    const mine = ++mseq;
+    $("mapCount").textContent = "Loading…";
+    try {
+      const res = await fetch("/api/map?" + p);
+      const j = await res.json();
+      if (mine !== mseq) return;
+      if (!res.ok) throw new Error(j.error || res.status);
+      mapRows = j.rows; drawMap();
+      $("mapCount").textContent = `${int(mapRows.length)}${j.more ? "+" : ""} parcels in view` + (j.more ? " · zoom in for every one" : "");
+    } catch (e) { if (mine === mseq) $("mapCount").textContent = "Could not load parcels. Move the map to try again."; }
+  }
+  function ensureMap(center) {
+    if (!TOKEN) { $("mapCount").textContent = "The map needs a Mapbox public token (MAPBOX_PUBLIC_TOKEN on the server)."; return; }
+    if (map) { map.resize(); if (center) map.jumpTo({ center, zoom: Math.max(map.getZoom(), 17) }); else loadMap(); return; }
+    mapboxgl.accessToken = TOKEN;
+    map = new mapboxgl.Map({ container: "map", style: mapStyle(), center: center || CENTER[$("region").value] || CENTER.FL, zoom: center ? 17 : 15 });
+    map.addControl(new mapboxgl.NavigationControl({ visualizePitch: true }), "top-right");
+    map.on("style.load", addLayers);
+    map.on("load", loadMap);
+    map.on("moveend", () => { clearTimeout(mtimer); mtimer = setTimeout(loadMap, 250); });
+    map.on("click", "parcels", (e) => { const f = e.features[0]; openDetail(f.properties.id, f.properties.county); });
+    map.on("mouseenter", "parcels", () => { map.getCanvas().style.cursor = "pointer"; });
+    map.on("mouseleave", "parcels", () => { map.getCanvas().style.cursor = ""; });
+  }
+  function setView(v, center) {
+    const table = v === "table";
+    $("vTable").setAttribute("aria-pressed", String(table)); $("vMap").setAttribute("aria-pressed", String(!table));
+    $("tableView").hidden = !table; $("mapView").hidden = table;
+    store.set("pv-view", v);
+    if (table) loadTable(); else ensureMap(center);
+  }
+  $("vTable").addEventListener("click", () => setView("table"));
+  $("vMap").addEventListener("click", () => setView("map"));
+
+  // ── detail drawer ──────────────────────────────────────────────────────────────────────────────────────────────
+  let lastFocus = null;
+  function closeDetail() {
+    $("drawer").hidden = true; $("scrim").hidden = true;
+    pickId = ""; if (map && map.getLayer("pick")) map.setFilter("pick", ["==", ["get", "id"], ""]);
+    if (lastFocus) lastFocus.focus();
+  }
+  async function openDetail(id, county) {
+    lastFocus = document.activeElement;
+    $("drawer").hidden = false; $("scrim").hidden = false;
+    $("drawer").innerHTML = '<div class="dtop"><span></span><button type="button" class="btn" id="close">Close</button></div><div class="box">Loading the full profile…</div>';
+    $("close").onclick = closeDetail; $("close").focus();
+    pickId = id; if (map && map.getLayer("pick")) map.setFilter("pick", ["==", ["get", "id"], id]);
+    let p = null;
+    try {
+      const j = await (await fetch(`/api/lookup?id=${encodeURIComponent(id)}${county ? "&county=" + encodeURIComponent(county) : ""}`)).json();
+      p = (j.results || [])[0];
+    } catch (e) {}
+    if ($("drawer").hidden) return;
+    if (!p) { $("drawer").querySelector(".box").textContent = "No profile found for this parcel."; return; }
+    const o = p.owner || {}, pr = p.property || {}, pa = p.parcel || {}, rc = p.registered_contact, ls = p.last_sale;
+    const li = (label, v) => (v == null || v === "" ? "" : `<li>${label}: <b>${esc(v)}</b></li>`);
+    $("drawer").innerHTML = `
+      <div class="dtop">
+        ${pa.lat != null ? '<button type="button" class="btn" id="onMap">Show on map</button>' : "<span></span>"}
+        <button type="button" class="btn" id="close">Close</button>
+      </div>
+      <div>
+        <h2>${esc(o.first_name || o.last_name ? [o.first_name, o.last_name].filter(Boolean).join(" ") : title(o.name || "Owner not on record"))}</h2>
+        <div class="sm">${esc(pa.address || "")}${pa.town ? " · " + esc(title(pa.town)) : ""}${pa.zip ? " " + esc(pa.zip) : ""}</div>
+        <div class="tags">${tags(o)}</div>
+      </div>
+      <div class="box"><h3>Owner</h3><ul>
+        ${li("First name", o.first_name)}${li("Last name", o.last_name)}${li("Name on record", o.name)}${li("Second owner", o.second_owner)}${li("Owner type", o.type)}
+        ${li("Mailing address", o.mailing_address)}${o.held_since_2021 ? "<li><b>Same owner since at least 2021</b></li>" : ""}
+        ${li("Deed book / page", o.deed_book_page)}
+      </ul></div>
+      ${rc ? `<div class="box"><h3>The person behind it</h3><ul>${li("Name", rc.name)}${li("Role", rc.role)}${li("Company", rc.company)}${li("Address", rc.address)}</ul></div>` : ""}
+      <div class="box"><h3>Property</h3><ul>
+        ${li("Use", USE[pr.use] || pr.use)}${li("Class", pr.class_description || pr.class)}${li("Year built", pr.year_built)}
+        ${li("Building", pr.building_sqft ? int(pr.building_sqft) + " sq ft" : "")}${li("Residential units", pr.residential_units)}
+        ${li("Lot", pr.lot_acres ? pr.lot_acres + " acres" : "")}
+        ${li("Value", pr.value_usd ? money(pr.value_usd) + " (" + (BASIS[pr.value_basis] || String(pr.value_basis || "").replace(/_/g, " ")).toLowerCase() + ")" : "")}
+        ${li("Zoning", pr.zoning)}${li("Exemptions", pr.exemptions)}
+      </ul></div>
+      ${ls ? `<div class="box"><h3>Last sale</h3><ul>${li("Price", money(ls.price_usd))}${li("Date", ls.date ? saleDate(ls.date, pa.region) : ls.month ? saleDate(String(ls.month).slice(0, 7) + "-01", "FL") : "")}${li("What sold", ls.what_sold)}${li("Deed book / page", ls.deed_book_page)}</ul></div>` : ""}
+      <div class="box"><h3>Parcel</h3><ul>${li("Parcel id", pa.id)}${li("County", pa.county)}${li("Region", REGION[pa.region] || pa.region)}</ul></div>`;
+    $("close").onclick = closeDetail; $("close").focus();
+    if ($("onMap")) $("onMap").onclick = () => { $("drawer").hidden = true; $("scrim").hidden = true; setView("map", [pa.lon, pa.lat]); };
+  }
+  $("scrim").addEventListener("click", closeDetail);
+  document.addEventListener("keydown", (e) => { if (e.key === "Escape" && !$("drawer").hidden) closeDetail(); });
+
+  $("search").addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const q = $("q").value.trim(); if (!q) return;
+    try {
+      const j = await (await fetch("/api/lookup?q=" + encodeURIComponent(q))).json();
+      const hit = (j.results || [])[0];
+      if (!hit) { $("q").setCustomValidity(`Nothing found for “${q}”`); $("q").reportValidity(); return; }
+      openDetail(hit.parcel.id, hit.parcel.county);
+    } catch (err) { $("q").setCustomValidity("The search did not answer. Try again."); $("q").reportValidity(); }
+  });
+  $("q").addEventListener("input", () => $("q").setCustomValidity(""));
+
+  // ── start ──────────────────────────────────────────────────────────────────────────────────────────────────────
+  fetch("/api/counties").then((r) => r.json()).then((j) => {
+    counties = j.counties || [];
+    const regions = [...new Set(counties.map((c) => c.region))];
+    $("region").innerHTML = '<option value="">Every region</option>' + regions.map((r) => `<option value="${r}">${esc(REGION[r] || r)}</option>`).join("");
+    fillCounties();
+  }).catch(() => {});
+  $("download").href = "/api/records.csv?" + params();
+  setView(store.get("pv-view") === "map" ? "map" : "table");
+})();
+</script>
+</body>
+</html>
