@@ -1,0 +1,206 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Court Update Robot</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@700;800&family=IBM+Plex+Mono:wght@400;500&family=Source+Sans+3:wght@400;600;700&display=swap">
+<style>
+  /* Layout: one reading column; each section = a docket-stamp label beside its content, stacked on phones. */
+  :root {
+    color-scheme: dark;
+    --bg: #0d1320;
+    --panel: #151d2e;
+    --panel-edge: #26324a;
+    --ink: #f5f7fb;
+    --ink-soft: #d9e0ec;
+    --stamp: #f3b94d;
+    --match: #5fe08f;
+    --font-display: "Archivo", "Arial Narrow", "Helvetica Neue", Arial, sans-serif;
+    --font-body: "Source Sans 3", "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+    --font-mono: "IBM Plex Mono", ui-monospace, "SFMono-Regular", Consolas, monospace;
+  }
+  html { background: var(--bg); }
+  body {
+    background: var(--bg);
+    color: var(--ink);
+    font-family: var(--font-body);
+    font-size: 18px;
+    line-height: 1.6;
+    padding-left: max(16px, env(safe-area-inset-left, 0px));
+    padding-right: max(16px, env(safe-area-inset-right, 0px));
+    padding-block: 40px 64px;
+  }
+  .page { max-width: 820px; margin: 0 auto; display: grid; gap: 44px; }
+  header { display: grid; gap: 14px; }
+  .eyebrow {
+    font-family: var(--font-mono); font-size: 15px; letter-spacing: 0.06em; text-transform: uppercase;
+    color: var(--stamp);
+  }
+  h1 {
+    font-family: var(--font-display); font-weight: 800; font-size: clamp(38px, 7vw, 58px);
+    line-height: 1.02; margin: 0; letter-spacing: -0.01em; text-wrap: balance;
+  }
+  .lede { font-size: 21px; color: var(--ink); margin: 0; max-width: 62ch; text-wrap: pretty; }
+
+  section { display: grid; grid-template-columns: 130px minmax(0, 1fr); gap: 8px 28px; align-items: start; }
+  .label {
+    font-family: var(--font-display); font-weight: 800; font-size: 22px; letter-spacing: 0.08em;
+    color: var(--stamp); padding-top: 3px; border-top: 3px solid var(--stamp);
+  }
+  .body { min-width: 0; display: grid; gap: 14px; border-top: 1px solid var(--panel-edge); padding-top: 14px; }
+  .body p { margin: 0; max-width: 64ch; }
+  ul { margin: 0; padding-left: 1.2em; display: grid; gap: 6px; }
+  li::marker { color: var(--stamp); }
+  strong { color: var(--ink); font-weight: 700; }
+  .soft { color: var(--ink-soft); }
+
+  .labels { display: flex; flex-wrap: wrap; gap: 8px; }
+  .chip {
+    font-family: var(--font-mono); font-size: 15px; padding: 4px 10px; border-radius: 4px;
+    border: 1px solid var(--panel-edge); background: var(--panel); color: var(--ink);
+  }
+
+  .example { display: grid; grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr); gap: 14px; align-items: stretch; }
+  .pane { min-width: 0; background: var(--panel); border: 1px solid var(--panel-edge); border-radius: 6px; padding: 16px 18px; display: grid; gap: 10px; align-content: start; }
+  .pane h3 { margin: 0; font-family: var(--font-display); font-size: 16px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--ink-soft); }
+  .docket { margin: 0; font-family: var(--font-mono); font-size: 15px; line-height: 1.7; white-space: pre-wrap; color: var(--ink); overflow-x: auto; }
+  .changed { color: var(--stamp); }
+  .arrow { align-self: center; font-family: var(--font-display); font-size: 30px; color: var(--stamp); }
+  .note-out { font-family: var(--font-mono); font-size: 16px; background: var(--bg); border: 1px solid var(--stamp); border-radius: 4px; padding: 8px 12px; }
+  .define { font-size: 16px; color: var(--ink-soft); }
+
+  ol.steps { list-style: none; margin: 0; padding: 0; display: grid; gap: 12px; counter-reset: step; }
+  ol.steps li { counter-increment: step; display: grid; grid-template-columns: 40px minmax(0, 1fr); gap: 12px; align-items: baseline; }
+  ol.steps li::before {
+    content: counter(step); font-family: var(--font-display); font-weight: 800; font-size: 22px; color: var(--bg);
+    background: var(--stamp); border-radius: 50%; width: 34px; height: 34px; display: grid; place-items: center;
+  }
+
+  .stats { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+  .stat { background: var(--panel); border: 1px solid var(--panel-edge); border-radius: 6px; padding: 16px 18px; display: grid; gap: 4px; align-content: start; }
+  .stat .num { font-family: var(--font-display); font-weight: 800; font-size: 34px; line-height: 1.1; font-variant-numeric: tabular-nums; }
+  .stat .num.good { color: var(--match); }
+  .stat .what { font-size: 17px; color: var(--ink-soft); }
+
+  .still { background: var(--panel); border-left: 4px solid var(--stamp); border-radius: 0 6px 6px 0; padding: 14px 18px; display: grid; gap: 8px; }
+  footer { font-family: var(--font-mono); font-size: 15px; color: var(--ink-soft); border-top: 1px solid var(--panel-edge); padding-top: 16px; }
+
+  @media (max-width: 640px) {
+    section { grid-template-columns: minmax(0, 1fr); }
+    .label { width: fit-content; padding-right: 12px; }
+    .example { grid-template-columns: minmax(0, 1fr); }
+    .arrow { transform: rotate(90deg); justify-self: center; }
+    .stats { grid-template-columns: minmax(0, 1fr); }
+  }
+</style>
+</head>
+<body>
+
+<div class="page">
+  <header>
+    <div class="eyebrow">EHOA · Zoho · turned on Thursday, Oct 29, 2026</div>
+    <h1>The Court Update Robot</h1>
+    <p class="lede">It reads every court update the court emails us and writes what happened onto the lead in Zoho. That is the job Jose did by hand.</p>
+  </header>
+
+  <section>
+    <div class="label">WHO</div>
+    <div class="body">
+      <ul>
+        <li><strong>Built for:</strong> EHOA. Thomas, Silvia, and everyone in Group Court Updates.</li>
+        <li><strong>Takes over:</strong> Jose's daily court-update work.</li>
+        <li><strong>Where you see it:</strong> in Zoho, on the lead, where the team already works. Nobody has to learn anything new.</li>
+      </ul>
+    </div>
+  </section>
+
+  <section>
+    <div class="label">WHAT</div>
+    <div class="body">
+      <p>Each time the court sends an update on a foreclosure case, the robot writes three things on that lead in Zoho:</p>
+      <ul>
+        <li>the same short note Jose wrote, sent to Group Court Updates</li>
+        <li>the updated Legal Stage</li>
+        <li>the auction date, when one is set</li>
+      </ul>
+      <div class="labels" aria-label="The notes it writes">
+        <span class="chip">JFS Filed</span><span class="chip">JFS Granted</span><span class="chip">OOR Filed</span><span class="chip">OOR Granted</span>
+        <span class="chip">Extension Filed</span><span class="chip">Extension Granted</span><span class="chip">Auction Scheduled</span>
+        <span class="chip">Aged Auction</span><span class="chip">Sold at Auction</span><span class="chip">Discontinued Action</span>
+      </div>
+      <div class="example">
+        <div class="pane">
+          <h3>What the court sent</h3>
+          <pre class="docket"><span class="changed">Last Appearance Date: 10/22/2026  (changed)</span>
+On For: Auction - Foreclosed Property
+Appearance Outcome: Not Held
+Next auction date: none</pre>
+        </div>
+        <div class="arrow" aria-hidden="true">→</div>
+        <div class="pane">
+          <h3>What the robot writes in Zoho</h3>
+          <div class="note-out">Note: aged auction</div>
+          <div class="note-out">Legal Stage: Aged Auction</div>
+          <p class="define">Aged auction means the auction was not held and no new auction is set yet.</p>
+        </div>
+      </div>
+      <p>It checks every 15 minutes, day and night, weekends included.</p>
+    </div>
+  </section>
+
+  <section>
+    <div class="label">WHY</div>
+    <div class="body">
+      <ul>
+        <li>Jose cost <strong>$400 a week</strong>.</li>
+        <li>The court sends about <strong>400 updates a day</strong>. One person could get to about 60.</li>
+        <li>About 1 in 10 updates waited <strong>more than a month</strong> before anyone typed it in.</li>
+        <li>Zoho already saved the full court email. It just threw most of it away, so a person had to look everything up again.</li>
+      </ul>
+    </div>
+  </section>
+
+  <section>
+    <div class="label">HOW</div>
+    <div class="body">
+      <ol class="steps">
+        <li><span>The court emails an update through eTrack, its own alert service.</span></li>
+        <li><span>Zoho saves the email, the same as always.</span></li>
+        <li><span>Every 15 minutes the robot reads the new emails and works out what changed, the way Jose did.</span></li>
+        <li><span>It writes the note and the stage on the lead, only when something actually changed, so there are no repeat notes.</span></li>
+      </ol>
+      <p class="soft">There's an off switch. Thomas can pause it any time.</p>
+    </div>
+  </section>
+
+  <section>
+    <div class="label">IMPACT</div>
+    <div class="body">
+      <div class="stats">
+        <div class="stat"><div class="num good">82 / 100</div><div class="what">same answer as Jose, tested on his last 1,795 notes (89 / 100 when the court had sent an email)</div></div>
+        <div class="stat"><div class="num">1 day sooner</div><div class="what">the robot usually had the update about a day before Jose typed it</div></div>
+        <div class="stat"><div class="num">12,000+</div><div class="what">court emails read a month, every one, instead of about 1,800</div></div>
+        <div class="stat"><div class="num good">$20,800</div><div class="what">saved a year ($400 a week)</div></div>
+      </div>
+      <p>It also matches about 4,000 court emails a month that Zoho never connected to a lead, by their case number.</p>
+    </div>
+  </section>
+
+  <section>
+    <div class="label">STILL HUMAN</div>
+    <div class="body">
+      <div class="still">
+        <p><strong>Sign new cases up for court emails.</strong> The court does not allow robots on its website. It's a few a day, and Silvia's team can do it in minutes.</p>
+        <p><strong>Anything the court website shows before the email arrives.</strong> The robot catches it when the court's email comes in.</p>
+      </div>
+    </div>
+  </section>
+
+  <footer>Court Update Robot · Nextier for EHOA · turned on Oct 29, 2026, 11:24 AM ET · tested against Jose's last 30 days of notes</footer>
+</div>
+</body>
+</html>
