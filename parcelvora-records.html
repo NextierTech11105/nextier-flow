@@ -138,14 +138,14 @@
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@700;800&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500&display=swap">
 <link rel="stylesheet" href="https://api.mapbox.com/mapbox-gl-js/v3.17.0/mapbox-gl.css">
 <style>
-  /* Layout: title + toolbar (Table | Map, Download, Hide Filters, theme), search, a 3-column grid of collapsible filter
-     cards, then the records table or the Mapbox map. A drawer on the right holds one property's full profile. */
+  /* Layout: title + toolbar (Table + Map | Table | Map, Download, Hide Filters, theme), search, a 3-column grid of
+     collapsible filter cards, then the records table and the Mapbox map side by side and synced: the table lists what
+     the map shows. A drawer on the right holds one property's full profile. */
   :root {
     color-scheme: light;
     --bg: #e3eefc; --card: #ffffff; --card-2: #f3f8ff; --line: #c9dbf2; --text: #0a1a2f; --soft: #33465e;
     --blue: #1b6fe0; --blue-ink: #ffffff; --blue-tint: #dceafd; --shadow: 0 1px 2px rgba(16, 52, 104, 0.08), 0 4px 14px rgba(16, 52, 104, 0.06);
     --green: #0f9a58; --amber: #f2a93b; --red: #d7372f; --slate: #52637a; --tag-ink: #ffffff; --amber-ink: #1d1300;
-    --map-style: "mapbox://styles/mapbox/light-v11";
     --display: 'Archivo', 'Arial Narrow', Arial, sans-serif;
     --body: 'IBM Plex Sans', system-ui, -apple-system, 'Segoe UI', sans-serif;
     --mono: 'IBM Plex Mono', ui-monospace, Consolas, monospace;
@@ -167,7 +167,7 @@
   * { box-sizing: border-box; }
   html, body { margin: 0; }
   body { background: var(--bg); color: var(--text); font: 15px/1.5 var(--body); min-height: 100vh; }
-  .wrap { max-width: 1440px; margin: 0 auto; padding: 22px max(16px, env(safe-area-inset-right, 0px)) 48px max(16px, env(safe-area-inset-left, 0px));
+  .wrap { max-width: 1680px; margin: 0 auto; padding: 22px max(16px, env(safe-area-inset-right, 0px)) 48px max(16px, env(safe-area-inset-left, 0px));
     display: grid; gap: 16px; }
   button, input, select { font: inherit; color: inherit; }
   :focus-visible { outline: 2px solid var(--blue); outline-offset: 2px; }
@@ -182,7 +182,7 @@
   .btn:hover { border-color: var(--blue); }
   .btn svg { width: 17px; height: 17px; flex: none; }
   .seg { display: inline-flex; background: var(--card); border: 1px solid var(--line); border-radius: 8px; padding: 3px; box-shadow: var(--shadow); }
-  .seg button { border: 0; background: transparent; padding: 6px 13px; border-radius: 6px; font-weight: 600; cursor: pointer; display: inline-flex; gap: 6px; align-items: center; }
+  .seg button { border: 0; background: transparent; padding: 6px 13px; border-radius: 6px; font-weight: 600; cursor: pointer; display: inline-flex; gap: 6px; align-items: center; white-space: nowrap; }
   .seg button svg { width: 16px; height: 16px; }
   .seg button[aria-pressed="true"] { background: var(--blue); color: var(--blue-ink); }
 
@@ -205,10 +205,18 @@
   .chip[aria-pressed="true"] { background: var(--blue); border-color: var(--blue); color: var(--blue-ink); }
   .clear { justify-self: start; background: none; border: 0; padding: 0; color: var(--blue); font-weight: 700; cursor: pointer; }
 
+  /* the two views: side by side and synced (split), or one at a time */
+  .views { display: grid; gap: 16px; align-items: start; }
+  .views[data-view="split"] { grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr); }
+  .views[data-view="table"] #mapView, .views[data-view="map"] #tableView { display: none; }
+  .views[data-view="split"] #mapView { position: sticky; top: 12px; }
+  .views[data-view="split"] .col-mail { display: none; }
+  .views[data-view="split"] table { min-width: 640px; }
+
   .panel { background: var(--card); border: 1px solid var(--line); border-radius: 10px; box-shadow: var(--shadow); min-width: 0; }
   .bar { display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap; padding: 12px 14px; border-bottom: 1px solid var(--line); }
   .bar h2 { font: 800 18px var(--display); margin: 0; }
-  #count { color: var(--soft); font-weight: 600; }
+  #count, #mapCount { color: var(--soft); font-weight: 600; }
   .bar select { background: var(--card-2); border: 1px solid var(--line); border-radius: 7px; padding: 6px 9px; }
   .scroll { overflow-x: auto; }
   table { border-collapse: collapse; width: 100%; min-width: 980px; }
@@ -216,7 +224,7 @@
     padding: 10px 14px; border-bottom: 1px solid var(--line); white-space: nowrap; }
   td { padding: 12px 14px; border-bottom: 1px solid var(--line); vertical-align: top; }
   tbody tr { cursor: pointer; }
-  tbody tr:hover { background: var(--card-2); }
+  tbody tr:hover, tbody tr.hl { background: var(--blue-tint); }
   .strong { font-weight: 700; }
   .sm { color: var(--soft); font-size: 14px; }
   .mono { font: 500 13px var(--mono); color: var(--soft); }
@@ -232,10 +240,17 @@
 
   #mapView { position: relative; }
   #map { height: min(72vh, 760px); border-radius: 0 0 10px 10px; }
+  .views[data-view="split"] #map { height: calc(100vh - 100px); min-height: 420px; }
   .legend { display: flex; gap: 14px; flex-wrap: wrap; font-size: 14px; color: var(--soft); }
   .legend i { display: inline-block; width: 11px; height: 11px; border-radius: 50%; margin-right: 6px; vertical-align: -1px; }
-  .note { position: absolute; z-index: 2; left: 50%; top: 70px; transform: translateX(-50%); background: var(--card); border: 1px solid var(--blue);
-    border-radius: 8px; padding: 8px 14px; font-weight: 700; pointer-events: none; box-shadow: var(--shadow); }
+  .note { position: absolute; z-index: 2; left: 50%; top: 90px; transform: translateX(-50%); background: var(--card); border: 1px solid var(--blue);
+    border-radius: 8px; padding: 8px 14px; font-weight: 700; pointer-events: none; box-shadow: var(--shadow); white-space: nowrap; }
+
+  @media (max-width: 1100px) {
+    .views[data-view="split"] { grid-template-columns: 1fr; }
+    .views[data-view="split"] #mapView { position: static; order: -1; }
+    .views[data-view="split"] #map { height: 50vh; min-height: 300px; }
+  }
 
   .scrim { position: fixed; inset: 0; background: rgba(4, 16, 31, 0.45); z-index: 20; }
   .drawer { position: fixed; z-index: 21; top: 0; right: 0; bottom: 0; width: min(560px, 100vw); background: var(--bg); border-left: 1px solid var(--line);
@@ -258,8 +273,9 @@
     </div>
     <div class="tools">
       <div class="seg" role="group" aria-label="View">
-        <button type="button" id="vTable" aria-pressed="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M3 5h18M3 12h18M3 19h18"/></svg>Table</button>
-        <button type="button" id="vMap" aria-pressed="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M9 4 3 6v14l6-2 6 2 6-2V4l-6 2-6-2zM9 4v14M15 6v14"/></svg>Map</button>
+        <button type="button" data-view="split" aria-pressed="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M3 4h18v16H3zM12 4v16"/></svg>Table + Map</button>
+        <button type="button" data-view="table" aria-pressed="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M3 5h18M3 12h18M3 19h18"/></svg>Table</button>
+        <button type="button" data-view="map" aria-pressed="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M9 4 3 6v14l6-2 6 2 6-2V4l-6 2-6-2zM9 4v14M15 6v14"/></svg>Map</button>
       </div>
       <a class="btn" id="download" href="/api/records.csv"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 4v11m0 0-4-4m4 4 4-4M4 19h16"/></svg>Download</a>
       <button type="button" class="btn" id="toggleFilters" aria-expanded="true" aria-controls="filters"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M3 5h18l-7 8v6l-4 2v-8L3 5z"/></svg><span>Hide Filters</span></button>
@@ -289,7 +305,7 @@
     <div class="fcard">
       <button type="button" aria-expanded="true">Property<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button>
       <div class="fbody">
-        <label class="f">Use<select id="use">
+        <label class="f">Type<select id="use">
           <option value="">Every residential type</option>
           <option value="one_family">Single family</option>
           <option value="two_family,three_family,multifamily_small">2–9 units</option>
@@ -354,44 +370,46 @@
     </div>
   </section>
 
-  <section class="panel" id="tableView">
-    <div class="bar">
-      <div><h2>Records</h2><div id="count" aria-live="polite">Loading…</div></div>
-      <label class="sm">Sort <select id="sort">
-        <option value="value_desc">Highest value</option>
-        <option value="value_asc">Lowest value</option>
-        <option value="built_asc">Oldest built</option>
-        <option value="built_desc">Newest built</option>
-        <option value="sqft_desc">Largest building</option>
-        <option value="address">Address A–Z</option>
-      </select></label>
-    </div>
-    <div class="scroll">
-      <table>
-        <thead><tr><th>Property</th><th>Owner</th><th>Mailing Address</th><th>Value &amp; Sale</th><th>Property Details</th><th>Actions</th></tr></thead>
-        <tbody id="rows"></tbody>
-      </table>
-    </div>
-    <div class="pager">
-      <button type="button" class="btn" id="prev">← Previous</button>
-      <span id="pageInfo" class="sm"></span>
-      <button type="button" class="btn" id="next">Next →</button>
-    </div>
-  </section>
-
-  <section class="panel" id="mapView" hidden>
-    <div class="bar">
-      <div><h2>Map</h2><div id="mapCount" aria-live="polite">Zoom in to street level to load parcels.</div></div>
-      <div class="legend" aria-label="Map colors">
-        <span><i style="background:var(--green)"></i>Owner lives there</span>
-        <span><i style="background:var(--amber)"></i>Absentee</span>
-        <span><i style="background:var(--blue)"></i>LLC / company</span>
-        <span><i style="background:var(--slate)"></i>Other</span>
+  <div class="views" id="views" data-view="split">
+    <section class="panel" id="tableView">
+      <div class="bar">
+        <div><h2>Records</h2><div id="count" aria-live="polite">Loading…</div></div>
+        <label class="sm">Sort <select id="sort">
+          <option value="value_desc">Highest value</option>
+          <option value="value_asc">Lowest value</option>
+          <option value="built_asc">Oldest built</option>
+          <option value="built_desc">Newest built</option>
+          <option value="sqft_desc">Largest building</option>
+          <option value="address">Address A–Z</option>
+        </select></label>
       </div>
-    </div>
-    <div id="map"></div>
-    <div class="note" id="note" hidden>Zoom in to load parcels</div>
-  </section>
+      <div class="scroll">
+        <table>
+          <thead><tr><th>Property</th><th>Owner</th><th class="col-mail">Mailing Address</th><th>Value &amp; Sale</th><th>Property Details</th><th>Actions</th></tr></thead>
+          <tbody id="rows"></tbody>
+        </table>
+      </div>
+      <div class="pager">
+        <button type="button" class="btn" id="prev">← Previous</button>
+        <span id="pageInfo" class="sm"></span>
+        <button type="button" class="btn" id="next">Next →</button>
+      </div>
+    </section>
+
+    <section class="panel" id="mapView">
+      <div class="bar">
+        <div><h2>Map</h2><div id="mapCount" aria-live="polite">Loading the map…</div></div>
+        <div class="legend" aria-label="Map colors">
+          <span><i style="background:var(--green)"></i>Owner lives there</span>
+          <span><i style="background:var(--amber)"></i>Absentee</span>
+          <span><i style="background:var(--blue)"></i>LLC / company</span>
+          <span><i style="background:var(--slate)"></i>Other</span>
+        </div>
+      </div>
+      <div id="map"></div>
+      <div class="note" id="note" hidden>Zoom in to see each property</div>
+    </section>
+  </div>
 </div>
 
 <div class="scrim" id="scrim" hidden></div>
@@ -410,11 +428,9 @@
                   set: (k, v) => { try { localStorage.setItem(k, v); } catch (e) {} } };
   const REGION = { NYC: "New York City", LI: "Long Island", NYS: "New York State", FL: "Florida" };
   const CENTER = { NYC: [-73.95, 40.68], LI: [-73.3, 40.8], NYS: [-74.0, 41.5], FL: [-80.1918, 25.7617] };
-  const USE = { one_family: "Single family", two_family: "Two-family", three_family: "Three-family", multifamily: "Multifamily",
-    multifamily_small: "Multifamily (2–9)", condo: "Condo", coop: "Co-op", mobile_home: "Mobile home", vacant_res: "Vacant residential",
-    vacant_commercial: "Vacant commercial", vacant_other: "Vacant land", commercial: "Commercial", mixed_use: "Mixed use",
-    industrial: "Industrial", agricultural: "Agricultural", motel_hotel: "Hotel / motel", parking: "Parking", community: "Institutional",
-    government: "Government", utility: "Utility", residential_other: "Residential (other)", other: "Other" };
+  const USE = { one_family: "Single family", two_family: "Two-family", three_family: "Three-family", multifamily: "Apartment building",
+    multifamily_small: "Multifamily (2–9)", condo: "Condo", coop: "Co-op", mobile_home: "Mobile home", vacant_res: "Vacant residential lot",
+    residential_other: "Residential (other)" };
   const BASIS = { just_value: "Just value", full_market_value: "Full market value", assessed_total: "Assessed value" };
   const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
   const saleDate = (d, region) => { const m = /^(\d{4})-(\d{2})-(\d{2})/.exec(d || ""); if (!m) return d || "";
@@ -450,6 +466,12 @@
   });
   paintThemeButton();
 
+  // ── view: table + map side by side and synced (the table lists what the map shows), or one at a time ──────────
+  let view = "split", map = null, mapReady = false;
+  const showsTable = () => view !== "map", showsMap = () => view !== "table";
+  const synced = () => view === "split" && mapReady;
+  function bboxOf() { const b = map.getBounds(); return [b.getWest(), b.getSouth(), b.getEast(), b.getNorth()].map((x) => x.toFixed(6)).join(","); }
+
   // ── filters ────────────────────────────────────────────────────────────────────────────────────────────────────
   const FIELDS = ["region", "county", "town", "zip", "use", "owner", "min", "max", "built_from", "built_to", "sqft_min", "sqft_max", "units_min"];
   function params() {
@@ -461,6 +483,8 @@
     p.set("sort", $("sort").value);
     return p;
   }
+  function tableParams() { const p = params(); if (synced()) p.set("bbox", bboxOf()); return p; }
+  const refreshDownload = () => { $("download").href = "/api/records.csv?" + tableParams(); };
   let counties = [], page = 1, seq = 0, typing = null;
   function fillCounties() {
     const r = $("region").value, keep = $("county").value;
@@ -470,10 +494,9 @@
     if (list.some((c) => c.county === keep)) $("county").value = keep;
   }
   function changed() {
-    page = 1;
-    $("download").href = "/api/records.csv?" + params();
-    if (!$("tableView").hidden) loadTable();
-    if (!$("mapView").hidden) loadMap();
+    page = 1; refreshDownload();
+    if (showsTable()) loadTable();
+    if (showsMap()) loadMap();
   }
 
   document.querySelectorAll(".fcard > button").forEach((b) => b.addEventListener("click", () => {
@@ -485,8 +508,14 @@
     $("filters").hidden = !show;
     $("toggleFilters").setAttribute("aria-expanded", String(show));
     $("toggleFilters").querySelector("span").textContent = show ? "Hide Filters" : "Show Filters";
+    if (map) requestAnimationFrame(() => map.resize());
   });
-  $("region").addEventListener("change", () => { fillCounties(); changed(); });
+  $("region").addEventListener("change", () => {
+    fillCounties();
+    const c = CENTER[$("region").value];
+    if (c && map && showsMap()) map.jumpTo({ center: c, zoom: 15 });   // moving the map reloads the synced table
+    changed();
+  });
   ["county", "use", "owner", "sort"].forEach((id) => $(id).addEventListener("change", changed));
   ["town", "zip", "min", "max", "built_from", "built_to", "sqft_min", "sqft_max", "units_min"].forEach((id) =>
     $(id).addEventListener("input", () => { clearTimeout(typing); typing = setTimeout(changed, 450); }));
@@ -503,7 +532,7 @@
   let rows = [];
   const EYE = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg>';
   async function loadTable() {
-    const p = params(); p.set("page", page); p.set("size", 50);
+    const p = tableParams(); p.set("page", page); p.set("size", 50);
     const mine = ++seq;
     $("count").textContent = "Loading…";
     try {
@@ -513,16 +542,17 @@
       if (!res.ok) throw new Error(j.error || res.status);
       rows = j.rows;
       const pages = Math.max(1, Math.ceil(j.total / j.size));
-      $("count").textContent = j.total ? `${int(j.total)}${j.capped ? "+" : ""} records` : "No records match these filters";
+      $("count").textContent = j.total ? `${int(j.total)}${j.capped ? "+" : ""} records${synced() ? " in the map view" : ""}`
+                                       : synced() ? "Nothing in the map view. Move the map or clear a filter." : "No records match these filters";
       $("pageInfo").textContent = j.total ? `Page ${j.page} of ${int(pages)}${j.capped ? "+" : ""}` : "";
       $("prev").disabled = j.page <= 1; $("next").disabled = j.page >= pages;
       $("rows").innerHTML = rows.length ? rows.map((r, i) => `
-        <tr data-i="${i}">
+        <tr data-i="${i}" data-id="${esc(r.id)}">
           <td><div class="strong">${esc(r.address || "No street address")}</div>
               <div class="sm">${esc([title(r.town), stateOf(r) + (r.zip ? " " + r.zip : "")].filter(Boolean).join(", "))}</div>
               <div class="mono">${esc(r.id)} · ${esc(r.county)}</div></td>
           <td><div class="strong">${esc(ownerName(r))}</div><div class="tags">${tags(r)}</div></td>
-          <td>${r.mail_addr ? `<div>${esc(title(r.mail_addr))}</div><div class="sm">${esc([title(r.mail_city), [r.mail_state, r.mail_zip].filter(Boolean).join(" ")].filter(Boolean).join(", "))}</div>`
+          <td class="col-mail">${r.mail_addr ? `<div>${esc(title(r.mail_addr))}</div><div class="sm">${esc([title(r.mail_city), [r.mail_state, r.mail_zip].filter(Boolean).join(" ")].filter(Boolean).join(", "))}</div>`
                             : '<span class="sm">Not on the roll</span>'}</td>
           <td><div class="strong">${money(r.value) || "—"}</div><div class="sm">${esc(BASIS[r.value_basis] || "")}</div>
               ${r.sale_price ? `<div class="sm">Sold ${money(r.sale_price)} · ${esc(saleDate(r.sale_date, r.region))}</div>` : ""}</td>
@@ -530,44 +560,54 @@
               <div class="sm">${[r.units ? int(r.units) + " units" : "", r.sqft ? int(r.sqft) + " sq ft" : "", r.year_built ? "Built " + r.year_built : "",
                                  r.acres ? r.acres + " acres" : ""].filter(Boolean).join(" · ")}</div></td>
           <td><button type="button" class="eye" data-i="${i}" aria-label="Open details for ${esc(r.address || r.id)}">${EYE}</button></td>
-        </tr>`).join("") : '<tr><td colspan="6" class="empty">No records match these filters. Clear one and try again.</td></tr>';
+        </tr>`).join("") : `<tr><td colspan="6" class="empty">${synced() ? "Nothing in the map view. Move the map or clear a filter." : "No records match these filters. Clear one and try again."}</td></tr>`;
     } catch (e) {
       if (mine === seq) { $("count").textContent = "Could not load records. Change a filter to try again."; $("rows").innerHTML = ""; }
     }
   }
-  $("rows").addEventListener("click", (e) => { const tr = e.target.closest("tr[data-i]"); if (tr) { const r = rows[+tr.dataset.i]; openDetail(r.id, r.county); } });
+  $("rows").addEventListener("click", (e) => {
+    const tr = e.target.closest("tr[data-i]"); if (!tr) return;
+    const r = rows[+tr.dataset.i]; selected = r; mark(r); openDetail(r.id, r.county);
+  });
+  $("rows").addEventListener("mouseover", (e) => { const tr = e.target.closest("tr[data-i]"); if (tr) mark(rows[+tr.dataset.i]); });
+  $("rows").addEventListener("mouseleave", () => mark(selected));
   $("prev").addEventListener("click", () => { if (page > 1) { page--; loadTable(); $("tableView").scrollIntoView({ block: "start" }); } });
   $("next").addEventListener("click", () => { page++; loadTable(); $("tableView").scrollIntoView({ block: "start" }); });
 
   // ── map ────────────────────────────────────────────────────────────────────────────────────────────────────────
   const MIN_ZOOM = 14;
-  let map = null, mapRows = [], mtimer = null, mseq = 0, pickId = "";
+  let mapRows = [], mtimer = null, mseq = 0, selected = null;
+  // the one property being hovered or opened, ringed on the map whatever the zoom
+  function mark(r) {
+    const src = map && map.getSource("sel");
+    if (src) src.setData({ type: "FeatureCollection", features: r && r.lat != null ? [{ type: "Feature", geometry: { type: "Point", coordinates: [Number(r.lon), Number(r.lat)] }, properties: {} }] : [] });
+  }
   function addLayers() {
     if (map.getSource("parcels")) return;
-    map.addSource("parcels", { type: "geojson", data: { type: "FeatureCollection", features: [] } });
     const css = getComputedStyle(document.documentElement);
     const c = (v) => css.getPropertyValue(v).trim();
+    map.addSource("parcels", { type: "geojson", data: { type: "FeatureCollection", features: [] } });
+    map.addSource("sel", { type: "geojson", data: { type: "FeatureCollection", features: [] } });
     map.addLayer({ id: "parcels", type: "circle", source: "parcels", paint: {
       "circle-radius": ["interpolate", ["linear"], ["zoom"], 14, 3.5, 17, 6.5, 19, 9],
       "circle-color": ["match", ["get", "kind"], "home", c("--green"), "abs", c("--amber"), "llc", c("--blue"), c("--slate")],
       "circle-stroke-color": isDark() ? "#000000" : "#ffffff", "circle-stroke-width": 1 } });
-    map.addLayer({ id: "pick", type: "circle", source: "parcels", filter: ["==", ["get", "id"], pickId], paint: {
-      "circle-radius": ["interpolate", ["linear"], ["zoom"], 14, 8, 19, 14], "circle-color": "rgba(0,0,0,0)",
-      "circle-stroke-color": c("--text"), "circle-stroke-width": 3 } });
-    drawMap();
+    map.addLayer({ id: "sel", type: "circle", source: "sel", paint: {
+      "circle-radius": ["interpolate", ["linear"], ["zoom"], 10, 9, 19, 16], "circle-color": "rgba(0,0,0,0)",
+      "circle-stroke-color": c("--red"), "circle-stroke-width": 3.5 } });
+    drawMap(); mark(selected);
   }
   function drawMap() {
     const src = map && map.getSource("parcels");
     if (src) src.setData({ type: "FeatureCollection", features: mapRows.filter((r) => r.lat != null).map((r) => ({
-      type: "Feature", geometry: { type: "Point", coordinates: [r.lon, r.lat] },
+      type: "Feature", geometry: { type: "Point", coordinates: [Number(r.lon), Number(r.lat)] },
       properties: { id: r.id, county: r.county, kind: r.owner_occupied ? "home" : r.absentee ? "abs" : r.owner_type === "entity" ? "llc" : "other" } })) });
   }
   async function loadMap() {
-    if (!map) return;
-    if (map.getZoom() < MIN_ZOOM) { $("note").hidden = false; mapRows = []; drawMap(); $("mapCount").textContent = "Zoom in to street level to load parcels."; return; }
+    if (!mapReady) return;
+    if (map.getZoom() < MIN_ZOOM) { $("note").hidden = false; mapRows = []; drawMap(); $("mapCount").textContent = "Zoom in to street level to see each property."; return; }
     $("note").hidden = true;
-    const b = map.getBounds(), p = params();
-    p.set("bbox", [b.getWest(), b.getSouth(), b.getEast(), b.getNorth()].map((x) => x.toFixed(6)).join(","));
+    const p = params(); p.set("bbox", bboxOf());
     const mine = ++mseq;
     $("mapCount").textContent = "Loading…";
     try {
@@ -576,37 +616,51 @@
       if (mine !== mseq) return;
       if (!res.ok) throw new Error(j.error || res.status);
       mapRows = j.rows; drawMap();
-      $("mapCount").textContent = `${int(mapRows.length)}${j.more ? "+" : ""} parcels in view` + (j.more ? " · zoom in for every one" : "");
-    } catch (e) { if (mine === mseq) $("mapCount").textContent = "Could not load parcels. Move the map to try again."; }
+      $("mapCount").textContent = `${int(mapRows.length)}${j.more ? "+" : ""} properties in view` + (j.more ? " · zoom in for every one" : "");
+    } catch (e) { if (mine === mseq) $("mapCount").textContent = "Could not load properties. Move the map to try again."; }
   }
   function ensureMap(center) {
     if (!TOKEN) { $("mapCount").textContent = "The map needs a Mapbox public token (MAPBOX_PUBLIC_TOKEN on the server)."; return; }
-    if (map) { map.resize(); if (center) map.jumpTo({ center, zoom: Math.max(map.getZoom(), 17) }); else loadMap(); return; }
+    if (map) {
+      requestAnimationFrame(() => { map.resize(); if (center) map.jumpTo({ center, zoom: Math.max(map.getZoom(), 17) }); else loadMap(); });
+      return;
+    }
     mapboxgl.accessToken = TOKEN;
     map = new mapboxgl.Map({ container: "map", style: mapStyle(), center: center || CENTER[$("region").value] || CENTER.FL, zoom: center ? 17 : 15 });
     map.addControl(new mapboxgl.NavigationControl({ visualizePitch: true }), "top-right");
     map.on("style.load", addLayers);
-    map.on("load", loadMap);
-    map.on("moveend", () => { clearTimeout(mtimer); mtimer = setTimeout(loadMap, 250); });
-    map.on("click", "parcels", (e) => { const f = e.features[0]; openDetail(f.properties.id, f.properties.county); });
+    map.on("load", () => { mapReady = true; loadMap(); if (view === "split") { page = 1; loadTable(); } refreshDownload(); });
+    map.on("moveend", () => {
+      clearTimeout(mtimer);
+      mtimer = setTimeout(() => { loadMap(); if (synced()) { page = 1; loadTable(); refreshDownload(); } }, 250);
+    });
+    map.on("click", "parcels", (e) => {
+      const f = e.features[0], id = f.properties.id;
+      selected = { id, lat: f.geometry.coordinates[1], lon: f.geometry.coordinates[0] }; mark(selected);
+      document.querySelectorAll("#rows tr.hl").forEach((tr) => tr.classList.remove("hl"));
+      const tr = [...document.querySelectorAll("#rows tr[data-id]")].find((t) => t.dataset.id === id);
+      if (tr) { tr.classList.add("hl"); tr.scrollIntoView({ block: "nearest" }); }
+      openDetail(id, f.properties.county);
+    });
     map.on("mouseenter", "parcels", () => { map.getCanvas().style.cursor = "pointer"; });
     map.on("mouseleave", "parcels", () => { map.getCanvas().style.cursor = ""; });
   }
   function setView(v, center) {
-    const table = v === "table";
-    $("vTable").setAttribute("aria-pressed", String(table)); $("vMap").setAttribute("aria-pressed", String(!table));
-    $("tableView").hidden = !table; $("mapView").hidden = table;
-    store.set("pv-view", v);
-    if (table) loadTable(); else ensureMap(center);
+    view = v; $("views").dataset.view = v;
+    document.querySelectorAll(".seg button").forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.view === v)));
+    store.set("pv-layout", v);
+    if (showsMap()) ensureMap(center);
+    if (showsTable() && (v !== "split" || mapReady || !TOKEN)) { page = 1; loadTable(); }
+    refreshDownload();
   }
-  $("vTable").addEventListener("click", () => setView("table"));
-  $("vMap").addEventListener("click", () => setView("map"));
+  document.querySelectorAll(".seg button").forEach((b) => b.addEventListener("click", () => setView(b.dataset.view)));
 
   // ── detail drawer ──────────────────────────────────────────────────────────────────────────────────────────────
   let lastFocus = null;
   function closeDetail() {
     $("drawer").hidden = true; $("scrim").hidden = true;
-    pickId = ""; if (map && map.getLayer("pick")) map.setFilter("pick", ["==", ["get", "id"], ""]);
+    selected = null; mark(null);
+    document.querySelectorAll("#rows tr.hl").forEach((tr) => tr.classList.remove("hl"));
     if (lastFocus) lastFocus.focus();
   }
   async function openDetail(id, county) {
@@ -614,15 +668,15 @@
     $("drawer").hidden = false; $("scrim").hidden = false;
     $("drawer").innerHTML = '<div class="dtop"><span></span><button type="button" class="btn" id="close">Close</button></div><div class="box">Loading the full profile…</div>';
     $("close").onclick = closeDetail; $("close").focus();
-    pickId = id; if (map && map.getLayer("pick")) map.setFilter("pick", ["==", ["get", "id"], id]);
     let p = null;
     try {
       const j = await (await fetch(`/api/lookup?id=${encodeURIComponent(id)}${county ? "&county=" + encodeURIComponent(county) : ""}`)).json();
       p = (j.results || [])[0];
     } catch (e) {}
     if ($("drawer").hidden) return;
-    if (!p) { $("drawer").querySelector(".box").textContent = "No profile found for this parcel."; return; }
+    if (!p) { $("drawer").querySelector(".box").textContent = "No profile found for this property."; return; }
     const o = p.owner || {}, pr = p.property || {}, pa = p.parcel || {}, rc = p.registered_contact, ls = p.last_sale;
+    if (pa.lat != null) { selected = { id: pa.id, lat: pa.lat, lon: pa.lon }; mark(selected); }
     const li = (label, v) => (v == null || v === "" ? "" : `<li>${label}: <b>${esc(v)}</b></li>`);
     $("drawer").innerHTML = `
       <div class="dtop">
@@ -641,7 +695,7 @@
       </ul></div>
       ${rc ? `<div class="box"><h3>The person behind it</h3><ul>${li("Name", rc.name)}${li("Role", rc.role)}${li("Company", rc.company)}${li("Address", rc.address)}</ul></div>` : ""}
       <div class="box"><h3>Property</h3><ul>
-        ${li("Use", USE[pr.use] || pr.use)}${li("Class", pr.class_description || pr.class)}${li("Year built", pr.year_built)}
+        ${li("Type", USE[pr.use] || pr.use)}${li("Class", pr.class_description || pr.class)}${li("Year built", pr.year_built)}
         ${li("Building", pr.building_sqft ? int(pr.building_sqft) + " sq ft" : "")}${li("Residential units", pr.residential_units)}
         ${li("Lot", pr.lot_acres ? pr.lot_acres + " acres" : "")}
         ${li("Value", pr.value_usd ? money(pr.value_usd) + " (" + (BASIS[pr.value_basis] || String(pr.value_basis || "").replace(/_/g, " ")).toLowerCase() + ")" : "")}
@@ -650,7 +704,11 @@
       ${ls ? `<div class="box"><h3>Last sale</h3><ul>${li("Price", money(ls.price_usd))}${li("Date", ls.date ? saleDate(ls.date, pa.region) : ls.month ? saleDate(String(ls.month).slice(0, 7) + "-01", "FL") : "")}${li("What sold", ls.what_sold)}${li("Deed book / page", ls.deed_book_page)}</ul></div>` : ""}
       <div class="box"><h3>Parcel</h3><ul>${li("Parcel id", pa.id)}${li("County", pa.county)}${li("Region", REGION[pa.region] || pa.region)}</ul></div>`;
     $("close").onclick = closeDetail; $("close").focus();
-    if ($("onMap")) $("onMap").onclick = () => { $("drawer").hidden = true; $("scrim").hidden = true; setView("map", [pa.lon, pa.lat]); };
+    if ($("onMap")) $("onMap").onclick = () => {
+      $("drawer").hidden = true; $("scrim").hidden = true;
+      if (view === "table") setView("map", [pa.lon, pa.lat]);
+      else if (map) map.flyTo({ center: [pa.lon, pa.lat], zoom: Math.max(map.getZoom(), 17) });
+    };
   }
   $("scrim").addEventListener("click", closeDetail);
   document.addEventListener("keydown", (e) => { if (e.key === "Escape" && !$("drawer").hidden) closeDetail(); });
@@ -674,8 +732,8 @@
     $("region").innerHTML = '<option value="">Every region</option>' + regions.map((r) => `<option value="${r}">${esc(REGION[r] || r)}</option>`).join("");
     fillCounties();
   }).catch(() => {});
-  $("download").href = "/api/records.csv?" + params();
-  setView(store.get("pv-view") === "map" ? "map" : "table");
+  const saved = store.get("pv-layout");
+  setView(saved === "table" || saved === "map" ? saved : "split");
 })();
 </script>
 </body>
