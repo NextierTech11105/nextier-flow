@@ -18,9 +18,11 @@
   const has = (v) => v !== null && v !== undefined && v !== "";
   const list = (v) => String(v || "").split(",").map((s) => s.trim()).filter(Boolean);
   const YEAR_MS = 365 * 24 * 3600 * 1000;
+  const RESIDENTIAL = ["one_family", "two_family", "three_family", "multifamily_small", "multifamily", "condo", "coop", "mobile_home",
+    "residential_other", "vacant_res"];
 
   function matcher(q) {
-    const tests = [];
+    const tests = [(r) => RESIDENTIAL.includes(r.use)];
     const b = String(q.get("bbox") || "").split(",").map(Number);
     if (b.length === 4 && b.every(Number.isFinite)) tests.push((r) => has(r.lat) && r.lat >= b[1] && r.lat <= b[3] && r.lon >= b[0] && r.lon <= b[2]);
     if (q.get("region")) tests.push((r) => r.region === q.get("region"));
@@ -95,7 +97,7 @@
     }
     if (route[1] === "counties") {
       const m = new Map();
-      for (const r of d.rows) { const k = r.region + "|" + r.county; m.set(k, (m.get(k) || 0) + 1); }
+      for (const r of d.rows.filter((x) => RESIDENTIAL.includes(x.use))) { const k = r.region + "|" + r.county; m.set(k, (m.get(k) || 0) + 1); }
       return reply({ counties: [...m].map(([k, parcels]) => ({ region: k.split("|")[0], county: k.split("|")[1], parcels }))
         .sort((a, b) => (a.region + a.county).localeCompare(b.region + b.county)) });
     }
@@ -107,7 +109,7 @@
       found = d.rows.filter((r) => key(r.id) === k);
       if (!found.length) found = d.rows.filter((r) => { const a = String(r.address || "").toUpperCase(); return words.length && words.every((w) => a.includes(w)); });
     }
-    return reply({ results: found.slice(0, 10).map(profile) });
+    return reply({ results: found.filter((r) => RESIDENTIAL.includes(r.use)).slice(0, 10).map(profile) });
   };
 
   // Download: the page links to /api/records.csv; here the file is made in the browser from the same filtered rows.
@@ -127,7 +129,7 @@
   // Say plainly that this is a sample.
   document.addEventListener("DOMContentLoaded", () => ready.then((d) => {
     const s = document.querySelector(".sub-title");
-    if (s) s.textContent += ` Preview: a sample of ${d.rows.length.toLocaleString("en-US")} parcels. The full lake holds ${Number(d.meta.total).toLocaleString("en-US")}.`;
+    if (s) s.textContent += ` Preview: a sample of ${d.rows.length.toLocaleString("en-US")} properties. The full lake holds ${Number(d.meta.total).toLocaleString("en-US")} residential properties.`;
   }));
 })();
 </script>
@@ -252,7 +254,7 @@
     <div>
       <div class="brand">Parcelvora</div>
       <h1>Property Records</h1>
-      <p class="sub-title">Every parcel in New York and Florida: the owner by first and last name, mailing address, value, last sale and property facts.</p>
+      <p class="sub-title">Every residential property in New York and Florida: the owner by first and last name, mailing address, value, last sale and property facts.</p>
     </div>
     <div class="tools">
       <div class="seg" role="group" aria-label="View">
@@ -288,16 +290,13 @@
       <button type="button" aria-expanded="true">Property<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button>
       <div class="fbody">
         <label class="f">Use<select id="use">
-          <option value="">Every use</option>
+          <option value="">Every residential type</option>
           <option value="one_family">Single family</option>
           <option value="two_family,three_family,multifamily_small">2–9 units</option>
-          <option value="multifamily">Multifamily (10+)</option>
+          <option value="multifamily">Apartment building (10+)</option>
           <option value="condo,coop">Condo / co-op</option>
           <option value="mobile_home">Mobile home</option>
-          <option value="vacant_res,vacant_commercial,vacant_other">Vacant land</option>
-          <option value="commercial,mixed_use,motel_hotel,parking">Commercial</option>
-          <option value="industrial">Industrial</option>
-          <option value="agricultural">Agricultural</option>
+          <option value="vacant_res">Vacant residential lot</option>
         </select></label>
         <div class="pair">
           <label class="f">Built from<input id="built_from" type="number" min="1700" max="2100" placeholder="1900"></label>
