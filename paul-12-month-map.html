@@ -1,0 +1,230 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex">
+<title>Team Musso · 12-Month Map</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@700;800&family=IBM+Plex+Sans:wght@500;600;700&display=swap">
+<style>
+/* Layout: the goal, the four numbers, how 50,000 adds up, then 12 month cards in three phases. */
+:root{--bg:#000;--card:#0a0d12;--line:#2a3442;--fg:#fff;--orange:#ff8a3d;--green:#12b76a;--blue:#4c8dff;color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--fg);font:500 17px/1.55 "IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif}
+.wrap{max-width:1000px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:36px 64px;display:flex;flex-direction:column;gap:34px}
+h1,h2,h3{font-family:Archivo,"Arial Narrow",system-ui,sans-serif;margin:0;text-wrap:balance}
+h1{font-size:clamp(32px,6vw,48px);font-weight:800;line-height:1.05}
+h2{font-size:26px;font-weight:800}
+h3{font-size:21px;font-weight:800}
+p{margin:0}
+.eyebrow{font-size:15px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--orange)}
+.lede{font-size:19px;max-width:62ch}
+.lede b{color:var(--green)}
+.money{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px}
+.money div{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:14px 16px}
+.money b{display:block;font-family:Archivo,sans-serif;font-size:30px;font-weight:800}
+.money span{font-size:15px;font-weight:600}
+.mix{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:18px;display:flex;flex-direction:column;gap:10px}
+.mix ul{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:6px}
+.mix li{display:flex;gap:12px;align-items:baseline}
+.mix li b{font-family:Archivo,sans-serif;font-size:22px;font-weight:800;min-width:96px;font-variant-numeric:tabular-nums}
+.mix .sum{border-top:1px solid var(--line);padding-top:10px;font-weight:700}
+.phase{display:flex;flex-direction:column;gap:14px}
+.phase>h2 span{color:var(--green)}
+.months{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:14px}
+.month{background:var(--card);border:1px solid var(--line);border-left:4px solid var(--blue);border-radius:10px;padding:16px;display:flex;flex-direction:column;gap:8px;min-width:0}
+.month.full{border-left-color:var(--green)}
+.month .n{font-size:15px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--orange)}
+.month .tx{font-family:Archivo,sans-serif;font-size:24px;font-weight:800;font-variant-numeric:tabular-nums}
+.month .tx span{font-family:"IBM Plex Sans",sans-serif;font-size:15px;font-weight:600}
+.month.full .tx{color:var(--green)}
+.month ul{margin:0;padding-left:20px;display:flex;flex-direction:column;gap:4px}
+.who{display:flex;flex-wrap:wrap;gap:6px}
+.tag{font-size:14px;font-weight:700;border-radius:999px;padding:2px 10px;border:1px solid var(--line)}
+.tag.nx{border-color:var(--blue)}
+.tag.you{border-color:var(--orange)}
+.done{font-size:16px;font-weight:700;border-top:1px solid var(--line);padding-top:8px;margin-top:auto}
+.done em{font-style:normal;color:var(--green)}
+.foot{font-size:15px;display:flex;flex-direction:column;gap:6px;max-width:80ch}
+a{color:var(--fg)}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header style="display:flex;flex-direction:column;gap:10px">
+    <p class="eyebrow">Team Musso · the year, month by month</p>
+    <h1>12-Month Map</h1>
+    <p class="lede">The goal: <b>50,000 owners texted every month</b>, first texts plus follow-ups, from month 5 on. Month 1 is the <a href="paul-first-30-days.html">First 30 Days</a> page.</p>
+  </header>
+
+  <section class="money" aria-label="The plan in four numbers">
+    <div><b>50,000</b><span>owners texted every month, from month 5</span></div>
+    <div><b>1 a month</b><span>per owner for 5 months: first text, then 4 follow-ups</span></div>
+    <div><b>10 numbers</b><span>500 a day each once warm = 5,000 a day (room for 20)</span></div>
+    <div><b>12,000</b><span>new owners a month keep the book full</span></div>
+  </section>
+
+  <section class="mix" aria-labelledby="mix">
+    <h2 id="mix">How 50,000 adds up (month 5 on)</h2>
+    <ul>
+      <li><b>12,000</b><span>new owners get their first text</span></li>
+      <li><b>~36,000</b><span>owners from the last 4 months get their next follow-up</span></li>
+      <li><b>~2,000</b><span>group texts: Being Worked, good replies, "not now"</span></li>
+    </ul>
+    <p class="sum">≈ 2,400 texts a weekday. 10 warm numbers can send 5,000.</p>
+  </section>
+
+  <section class="phase" aria-labelledby="p1">
+    <h2 id="p1">Months 1–4 · <span>Set up and ramp</span></h2>
+    <div class="months">
+      <article class="month">
+        <p class="n">Month 1</p><h3>Set up</h3>
+        <p class="tx">0 <span>texts (calls only)</span></p>
+        <ul>
+          <li>Your own texting account. Registration filed with the carriers.</li>
+          <li>10 texting numbers bought.</li>
+          <li>20,000 owners traced in Suffolk + Nassau → about 12,000 with a good cell phone.</li>
+          <li>Calling from blocks by week 2.</li>
+        </ul>
+        <div class="who"><span class="tag nx">Nextier</span><span class="tag you">Your team</span></div>
+        <p class="done">Done when: <em>the carriers approve texting.</em></p>
+      </article>
+      <article class="month">
+        <p class="n">Month 2</p><h3>First texts</h3>
+        <p class="tx">~12,000 <span>texted</span></p>
+        <ul>
+          <li>Numbers warm up: 250 → 400 → 500 a day each, full speed by day 4.</li>
+          <li>About 12,000 owners get their first text.</li>
+          <li>25,000 more owners traced.</li>
+          <li>Every reply answered the same day.</li>
+        </ul>
+        <div class="who"><span class="tag you">Your team</span><span class="tag nx">Nextier</span></div>
+        <p class="done">Done when: <em>every traced owner has a first text.</em></p>
+      </article>
+      <article class="month">
+        <p class="n">Month 3</p><h3>Follow-ups switch on</h3>
+        <p class="tx">~25,000 <span>texted</span></p>
+        <ul>
+          <li>30 days after the first text, owners who didn't answer get follow-up #1.</li>
+          <li>Follow-ups start at 500 a day.</li>
+          <li>15,000 new owners get a first text. 25,000 more traced.</li>
+        </ul>
+        <div class="who"><span class="tag nx">Nextier</span></div>
+        <p class="done">Done when: <em>follow-ups are ON.</em></p>
+      </article>
+      <article class="month">
+        <p class="n">Month 4</p><h3>Follow-ups to full speed</h3>
+        <p class="tx">~40,000 <span>texted</span></p>
+        <ul>
+          <li>Follow-ups go from 500 to 2,000 a day.</li>
+          <li>Each owner gets one text a month, follow-ups 30 days apart.</li>
+          <li>15,000 new owners get a first text.</li>
+          <li>Decide who calls back good replies. Every good reply is called the same day.</li>
+        </ul>
+        <div class="who"><span class="tag nx">Nextier</span><span class="tag you">Your team</span></div>
+        <p class="done">Done when: <em>follow-ups run at 2,000 a day.</em></p>
+      </article>
+    </div>
+  </section>
+
+  <section class="phase" aria-labelledby="p2">
+    <h2 id="p2">Months 5–8 · <span>50,000 a month</span></h2>
+    <div class="months">
+      <article class="month full">
+        <p class="n">Month 5</p><h3>Goal hit</h3>
+        <p class="tx">~50,000 <span>texted</span></p>
+        <ul>
+          <li>12,000 new + ~36,000 follow-ups + ~2,000 group texts.</li>
+          <li>From here on: 20,000 owners traced a month → about 12,000 new.</li>
+        </ul>
+        <div class="who"><span class="tag nx">Nextier</span><span class="tag you">Your team</span></div>
+        <p class="done">Done when: <em>50,000 texted in one month.</em></p>
+      </article>
+      <article class="month full">
+        <p class="n">Month 6</p><h3>Half-year check</h3>
+        <p class="tx">50,000 <span>texted</span></p>
+        <ul>
+          <li>Scoreboard: texts → replies → good replies → deals.</li>
+          <li>Fix the weakest step. Rewrite the follow-up that gets the fewest replies.</li>
+        </ul>
+        <div class="who"><span class="tag nx">Nextier</span><span class="tag you">Your team</span></div>
+        <p class="done">Done when: <em>one fix is in.</em></p>
+      </article>
+      <article class="month full">
+        <p class="n">Month 7</p><h3>Hold the line</h3>
+        <p class="tx">50,000 <span>texted</span></p>
+        <ul>
+          <li>Monthly check: every owner still in the book got a text in the last 30 days.</li>
+          <li>Want more? Add numbers toward 20 → 100,000 a month.</li>
+        </ul>
+        <div class="who"><span class="tag nx">Nextier</span></div>
+        <p class="done">Done when: <em>nobody went 30 days without a text.</em></p>
+      </article>
+      <article class="month full">
+        <p class="n">Month 8</p><h3>"Not now" comes back</h3>
+        <p class="tx">50,000 <span>texted</span></p>
+        <ul>
+          <li>Everyone who said "not now" gets a check-in text.</li>
+          <li>One press texts the whole group.</li>
+        </ul>
+        <div class="who"><span class="tag you">Your team</span></div>
+        <p class="done">Done when: <em>the "not now" group is texted.</em></p>
+      </article>
+    </div>
+  </section>
+
+  <section class="phase" aria-labelledby="p3">
+    <h2 id="p3">Months 9–12 · <span>Bigger and next year</span></h2>
+    <div class="months">
+      <article class="month full">
+        <p class="n">Month 9</p><h3>Referrals</h3>
+        <p class="tx">50,000 <span>texted</span></p>
+        <ul>
+          <li>Every closed seller gets a thank-you and a referral ask.</li>
+        </ul>
+        <div class="who"><span class="tag you">Your team</span></div>
+        <p class="done">Done when: <em>every closed seller is asked.</em></p>
+      </article>
+      <article class="month full">
+        <p class="n">Month 10</p><h3>Cut and double down</h3>
+        <p class="tx">50,000 <span>texted</span></p>
+        <ul>
+          <li>Lists that reply most get more owners. Lists that don't reply get cut.</li>
+        </ul>
+        <div class="who"><span class="tag nx">Nextier</span></div>
+        <p class="done">Done when: <em>next month's lists are the winners.</em></p>
+      </article>
+      <article class="month full">
+        <p class="n">Month 11</p><h3>New ground</h3>
+        <p class="tx">50,000 <span>texted</span></p>
+        <ul>
+          <li>Suffolk + Nassau stay first.</li>
+          <li>When they run low, add the next area: the Bronx, Westchester, up to Orange County.</li>
+        </ul>
+        <div class="who"><span class="tag nx">Nextier</span><span class="tag you">Your team</span></div>
+        <p class="done">Done when: <em>next year's area is picked.</em></p>
+      </article>
+      <article class="month full">
+        <p class="n">Month 12</p><h3>The year in numbers</h3>
+        <p class="tx">50,000 <span>texted</span></p>
+        <ul>
+          <li>About 500,000 texts sent.</li>
+          <li>About 140,000 owners reached.</li>
+          <li>Set year two's number.</li>
+        </ul>
+        <div class="who"><span class="tag nx">Nextier</span><span class="tag you">Your team</span></div>
+        <p class="done">Done when: <em>year two has a target.</em></p>
+      </article>
+    </div>
+  </section>
+
+  <footer class="foot">
+    <p>Every text is checked against STOP and Do Not Call first. Follow-ups stop when an owner replies or says STOP.</p>
+    <p>Each number can take up to 2,000 texts a day (the carrier's limit). We run them at 500 so the carriers don't start filtering. More volume means more numbers, never pushing one number harder.</p>
+    <p>These are planning numbers, not a promise. The <a href="paul-simulator.html">simulator</a> assumes 5,000 new owners a month, which comes to about $31K in a normal month. This plan sends 12,000 new owners a month plus their follow-ups. Run the simulator again once month 5's real numbers are in.</p>
+  </footer>
+</div>
+</body>
+</html>
