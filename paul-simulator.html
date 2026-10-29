@@ -123,7 +123,7 @@ svg text{fill:#fff;font:600 16px var(--body)}
   <section>
     <div class="stagehead"><span class="num">STAGE 2</span><h2>From replies to closed listings</h2></div>
     <div class="focal">
-      <div class="eyebrow">Monthly commission, likely range (P10 to P90)</div>
+      <div class="eyebrow">What a normal month pays you</div>
       <div class="big" id="range">—</div>
       <p class="note" id="mid" style="border-color:var(--accent)"></p>
     </div>
@@ -136,9 +136,9 @@ svg text{fill:#fff;font:600 16px var(--body)}
         </table>
       </div>
       <div class="panel" style="display:grid;gap:12px">
-        <div class="eyebrow">Monthly commission across 2,000 runs</div>
+        <div class="eyebrow">Good months, bad months</div>
         <div id="hist"></div>
-        <p class="note">Each run varies every rate by the uncertainty below and the revenue per deal by ±15%. Closings run about 60 to 90 days behind the first contacts.</p>
+        <p class="note">We played out 2,000 different months. Tall bars = what happens most. Green = a normal month. Grey = a lucky or unlucky month. Money from a deal lands about 2 to 3 months after the first call.</p>
       </div>
     </div>
 
@@ -151,8 +151,8 @@ svg text{fill:#fff;font:600 16px var(--body)}
     </div>
 
     <div class="row2">
-      <div class="panel stat"><span>12-month commission (P10 to P90)</span><b id="yr"></b></div>
-      <div class="panel stat"><span>Median year</span><b class="pos" id="ymed"></b></div>
+      <div class="panel stat"><span>A normal year</span><b id="yr"></b></div>
+      <div class="panel stat"><span>Most likely year</span><b class="pos" id="ymed"></b></div>
     </div>
     <p class="note">Estimates for planning, not a forecast or a guarantee. Nextier's install and management fee is quoted by Thomas.</p>
   </section>
@@ -261,7 +261,7 @@ function stage2(){
   stageS.forEach((a,i)=>{const lo=pct(a,.1),hi=pct(a,.9),f=v=>v<10?v.toFixed(1):Math.round(v).toLocaleString();$("g"+(i+1)).textContent=f(lo)+"–"+f(hi)});
   const p10=pct(mon,.1),p50=pct(mon,.5),p90=pct(mon,.9);
   $("range").textContent=k$(p10)+" – "+k$(p90);
-  $("mid").textContent="Median month: "+fmt$(p50)+" in commission at "+fmt$(REV)+" revenue per deal.";
+  $("mid").textContent="Most months: about "+fmt$(p50)+" (at "+fmt$(REV)+" per deal).";
   $("yr").textContent=k$(pct(yr,.1))+" – "+k$(pct(yr,.9));
   $("ymed").textContent=fmt$(pct(yr,.5));
   drawHist(mon,p10,p50,p90);
@@ -275,9 +275,9 @@ function drawHist(a,p10,p50,p90){
   bins.forEach((c,i)=>{const h=c/bm*(H-pt-pb);s+=`<rect x="${pl+i*bw+1}" y="${H-pb-h}" width="${bw-2}" height="${h}" rx="2" fill="${i*max/B>=p10&&i*max/B<=p90?"var(--accent)":"var(--line)"}"/>`});
   s+=`<line x1="${pl}" x2="${W-pr}" y1="${H-pb}" y2="${H-pb}" stroke="var(--line)"/>`;
   s+=`<line x1="${x(p50)}" x2="${x(p50)}" y1="${pt-6}" y2="${H-pb}" stroke="#fff" stroke-dasharray="3 3"/>`;
-  s+=`<text x="${Math.min(W-120,x(p50)+4)}" y="${pt-8}">median ${k$(p50)}</text>`;
+  s+=`<text x="${Math.min(W-120,x(p50)+4)}" y="${pt-8}">most months ${k$(p50)}</text>`;
   [0,.5,1].forEach(t=>{const v=max*t,anc=t===0?"start":t===1?"end":"middle";s+=`<text x="${x(v)}" y="${H-pb+20}" text-anchor="${anc}">${k$(v)}</text>`});
-  s+=`<text x="${pl}" y="${H-4}">P10–P90 shaded</text></svg>`;
+  s+=`<text x="${pl}" y="${H-4}">green = a normal month</text></svg>`;
   $("hist").innerHTML=s;
 }
 document.querySelectorAll("#funnel input,#contacts,#rev,#spread").forEach(el=>el.addEventListener("input",stage2));
