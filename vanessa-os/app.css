@@ -37,9 +37,9 @@
     --surface: #13161b;
     --surface-2: #1b1f26;
     --line: #2a303a;
-    --text: #f3f6f4;
-    --text-2: #c7cfca;
-    --muted: #8e9892;
+    --text: #ffffff;
+    --text-2: #ffffff;
+    --muted: #e4e9e6;
     --accent: #2fd07f;
     --accent-ink: #04140b;
     --accent-soft: #0f2a1c;
@@ -59,9 +59,9 @@
   --surface: #13161b;
   --surface-2: #1b1f26;
   --line: #2a303a;
-  --text: #f3f6f4;
-  --text-2: #c7cfca;
-  --muted: #8e9892;
+  --text: #ffffff;
+  --text-2: #ffffff;
+  --muted: #e4e9e6;
   --accent: #2fd07f;
   --accent-ink: #04140b;
   --accent-soft: #0f2a1c;
@@ -81,7 +81,6 @@ html { -webkit-text-size-adjust: 100%; }
 body {
   margin: 0; background: var(--bg); color: var(--text);
   font: 16px/1.45 var(--font);
-  padding-bottom: calc(var(--tabbar-h) + env(safe-area-inset-bottom));
   overflow-x: hidden;
 }
 button, input, select, textarea { font: inherit; color: inherit; }
@@ -106,7 +105,7 @@ svg { width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-width:
 .net.off { background: var(--danger-soft); color: var(--danger); }
 .badge { position: absolute; top: 4px; right: 4px; min-width: 18px; height: 18px; padding: 0 5px; border-radius: 9px; background: var(--danger); color: #fff; font: 700 11px/18px var(--mono); text-align: center; }
 
-main { max-width: 760px; margin: 0 auto; padding: 16px var(--gutter) 24px; outline: none; }
+main { max-width: 760px; margin: 0 auto; padding: 16px var(--gutter) calc(32px + env(safe-area-inset-bottom)); outline: none; }
 h1 { font: 800 26px/1.15 var(--display); font-stretch: 112%; margin: 4px 0 4px; letter-spacing: -.01em; }
 h2 { font: 700 13px var(--display); letter-spacing: .1em; text-transform: uppercase; color: var(--muted); margin: 26px 0 10px; }
 h3 { font: 700 17px/1.25 var(--font); margin: 0; }
@@ -203,7 +202,8 @@ textarea { min-height: 110px; resize: vertical; line-height: 1.45; }
 .map-legend { display: flex; flex-wrap: wrap; gap: 6px 12px; padding: 10px 12px; font-size: 12px; color: var(--muted); border-top: 1px solid var(--line); }
 .map-legend span { display: inline-flex; gap: 6px; align-items: center; }
 
-.tabbar { position: fixed; bottom: 0; left: 0; right: 0; z-index: 30; height: calc(var(--tabbar-h) + env(safe-area-inset-bottom)); padding-bottom: env(safe-area-inset-bottom); display: grid; grid-template-columns: repeat(5, 1fr); background: var(--surface); border-top: 1px solid var(--line); }
+.tabbar { position: sticky; top: var(--topbar-h); z-index: 19; height: var(--tabbar-h); display: grid; grid-template-columns: repeat(5, 1fr); background: var(--surface); border-bottom: 1px solid var(--line); }
+.tabbar a[aria-current="page"]::after { content: ""; position: absolute; left: 22%; right: 22%; bottom: 0; height: 3px; border-radius: 3px 3px 0 0; background: var(--accent); }
 .tabbar a { position: relative; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; font-size: 11px; font-weight: 600; color: var(--muted); text-decoration: none; }
 .tabbar a[aria-current="page"] { color: var(--text); }
 .tabbar a[aria-current="page"] svg { stroke: var(--accent); }
@@ -237,7 +237,7 @@ table.map-table th, table.map-table td { text-align: left; padding: 8px 6px; bor
 table.map-table th { font: 700 11px var(--mono); text-transform: uppercase; color: var(--muted); }
 .table-scroll { overflow-x: auto; }
 
-.toast { position: fixed; left: 50%; bottom: calc(var(--tabbar-h) + 16px + env(safe-area-inset-bottom)); transform: translateX(-50%) translateY(20px); opacity: 0; pointer-events: none; z-index: 60; background: var(--text); color: var(--bg); padding: 12px 16px; border-radius: 12px; font-weight: 600; font-size: 14px; max-width: calc(100% - 32px); transition: .2s; }
+.toast { position: fixed; left: 50%; bottom: calc(16px + env(safe-area-inset-bottom)); transform: translateX(-50%) translateY(20px); opacity: 0; pointer-events: none; z-index: 60; background: var(--text); color: var(--bg); padding: 12px 16px; border-radius: 12px; font-weight: 600; font-size: 14px; max-width: calc(100% - 32px); transition: .2s; }
 .toast.show { opacity: 1; transform: translateX(-50%); }
 
 .empty { text-align: center; padding: 28px 12px; color: var(--muted); }
