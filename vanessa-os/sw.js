@@ -1,5 +1,5 @@
 /* Vanessa OS service worker — caches the app shell so the demo opens offline. */
-var CACHE = "vos-shell-v6";
+var CACHE = "vos-shell-v7";
 var SHELL = ["./", "index.html", "app.css", "app.js", "manifest.webmanifest", "icon.svg"];
 self.addEventListener("install", function (e) {
   e.waitUntil(caches.open(CACHE).then(function (c) { return c.addAll(SHELL); }).then(function () { return self.skipWaiting(); }));

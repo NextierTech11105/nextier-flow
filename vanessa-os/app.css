@@ -264,3 +264,39 @@ table.map-table th { font: 700 11px var(--mono); text-transform: uppercase; colo
 
 @media (max-width: 380px) { .kpi b { font-size: 24px; } .addr { font-size: 20px; } .act { font-size: 13px; } }
 @media (max-width: 420px) { .brand-text span { display: none; } }
+
+/* ---------- phone layout (≤ 600px) ---------- */
+.ribbon-short { display: none; }
+@media (max-width: 600px) {
+  :root { --topbar-h: 56px; --gutter: 14px; }
+  .demo-ribbon { padding: 4px var(--gutter); font-size: 11px; }
+  .ribbon-long { display: none; }
+  .ribbon-short { display: inline; }
+  .topbar { padding: 0 var(--gutter); gap: 6px; }
+  .brand-text span, .topbar-div { display: none; }
+  .net { padding: 0; width: 10px; height: 10px; font-size: 0; border-radius: 50%; background: var(--accent); }
+  .net.off { background: var(--danger); }
+  .icon-btn { width: 40px; height: 40px; }
+  .theme-toggle button { min-height: 32px; padding: 0 9px; }
+  .tabbar { height: 58px; }
+  .tabbar a { font-size: 11px; gap: 2px; }
+  .tabbar a svg { width: 22px; height: 22px; }
+  main { padding-top: 12px; }
+  h1 { font-size: 23px; }
+  h2 { margin: 20px 0 8px; }
+  .card { padding: 14px; }
+  .kpi { padding: 10px; }
+  .kpi b { font-size: 26px; }
+  .grid2 { grid-template-columns: 1fr; }
+  .card.hero .grid2 .btn, .btn.block { min-height: 54px; }
+  .actions { gap: 8px; }
+  .act { min-height: 60px; font-size: 13px; }
+  .act.rec { min-height: 70px; }
+  .addr { font-size: 21px; }
+  .sheet-backdrop { align-items: stretch; }
+  .sheet { max-height: none; height: 100%; border-radius: 0; padding-top: calc(4px + env(safe-area-inset-top)); }
+  .sheet-grip { display: none; }
+  .kcol { flex-basis: 82vw; }
+  .seg button { font-size: 13px; padding: 0 8px; }
+  .toast { bottom: calc(12px + env(safe-area-inset-bottom)); }
+}
