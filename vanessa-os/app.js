@@ -845,6 +845,8 @@
     var due = openTasks().filter(function (t) { return t.due && t.due <= dayKey(); }).length;
     var tb = $("#taskBadge"); tb.hidden = !due; tb.textContent = due;
     var net = $("#netState"); net.textContent = navigator.onLine ? "Online" : "Offline · not uploaded"; net.title = navigator.onLine ? "Online — changes saved on this device" : "Offline — changes saved on this device, not uploaded"; net.classList.toggle("off", !navigator.onLine);
+    var eff = S.settings.theme === "system" ? (matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light") : S.settings.theme;
+    $$(".theme-toggle [data-act=theme]").forEach(function (b) { b.setAttribute("aria-pressed", String(b.getAttribute("data-v") === eff)); });
     var key = location.hash;
     if (key !== lastRoute) { lastRoute = key; window.scrollTo(0, 0); }
     bindView();
