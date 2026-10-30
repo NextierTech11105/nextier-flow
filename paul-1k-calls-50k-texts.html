@@ -1,0 +1,289 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex,nofollow">
+<title>Team Musso · 1,000 Calls + 50,000 Texts</title>
+<meta name="description" content="1,000 calls a day and 50,000 texts a month for Team Musso: the road there and the monthly bills, split by Data Engine and Campaign Engine.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@700;800&family=IBM+Plex+Sans:wght@500;600;700&display=swap">
+<style>
+/* Layout: the two engines at full speed, the road as three stops, then the bills by engine.
+   Data Engine = blue, Campaign Engine = orange, the same as the cheat sheet and the 12-month map. */
+:root{
+  --bg:#000;--card:#0a0d12;--card2:#06080b;--line:#2a3442;--fg:#fff;
+  --orange:#ff8a3d;--orange-soft:#4a2309;--blue:#4c8dff;--blue-ink:#8cb6ff;--blue-soft:#0f2347;--green:#12b76a;--green-soft:#0b3322;
+  color-scheme:dark}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--fg);font:500 17px/1.55 "IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif}
+.wrap{max-width:1100px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:32px 64px;display:flex;flex-direction:column;gap:36px}
+h1,h2,h3{font-family:Archivo,"Arial Narrow",system-ui,sans-serif;margin:0;text-wrap:balance}
+h1{font-size:clamp(32px,6vw,52px);font-weight:800;line-height:1.05}
+h1 em{font-style:normal;color:var(--orange)}
+h1 i{font-style:normal;color:var(--blue-ink)}
+h2{font-size:26px;font-weight:800}
+h3{font-size:21px;font-weight:800}
+p{margin:0}
+a{color:var(--fg)}
+.brand{font:800 15px Archivo,sans-serif;letter-spacing:.14em;text-transform:uppercase}
+.brand span{color:var(--orange)}
+.lede{font-size:20px;font-weight:600;max-width:62ch}
+.nav{display:flex;flex-wrap:wrap;gap:8px}
+.nav a{text-decoration:none;font-weight:700;font-size:15px;padding:7px 13px;border:1px solid var(--line);border-radius:999px;background:var(--card2)}
+.nav a:hover,.nav a:focus-visible{border-color:var(--blue)}
+section{display:flex;flex-direction:column;gap:14px;scroll-margin-top:12px}
+
+/* The two engines */
+.engines{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,320px),1fr));gap:14px}
+.eng{background:var(--card);border:2px solid var(--line);border-radius:16px;padding:18px 20px;display:flex;flex-direction:column;gap:12px;min-width:0}
+.eng.de{border-color:var(--blue)}
+.eng.ce{border-color:var(--orange)}
+.lbl{align-self:flex-start;font:800 15px Archivo,sans-serif;letter-spacing:.1em;text-transform:uppercase;padding:4px 12px;border-radius:999px}
+.de .lbl{background:var(--blue-soft);border:1px solid var(--blue)}
+.ce .lbl{background:var(--orange-soft);border:1px solid var(--orange)}
+.big{font:800 44px/1 Archivo,sans-serif;font-variant-numeric:tabular-nums}
+.big span{font:700 19px "IBM Plex Sans",sans-serif}
+.sub{font-weight:700;margin-top:-4px}
+dl{margin:0;display:flex;flex-direction:column;gap:10px}
+dt{font-size:15px;font-weight:700;text-transform:uppercase;letter-spacing:.08em}
+.de dt{color:var(--blue-ink)}
+.ce dt{color:var(--orange)}
+dd{margin:2px 0 0}
+.bill{margin-top:auto;border-top:1px solid var(--line);padding-top:12px;font:800 26px Archivo,sans-serif;font-variant-numeric:tabular-nums}
+.bill span{display:block;font:600 15px "IBM Plex Sans",sans-serif}
+.total{background:var(--green-soft);border:2px solid var(--green);border-radius:14px;padding:14px 18px;font-size:19px;font-weight:700}
+.total b{font-family:Archivo,sans-serif;font-size:24px;font-variant-numeric:tabular-nums}
+
+/* The road: three stops */
+.road{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,300px),1fr));gap:14px;counter-reset:stop}
+.stop{background:var(--card);border:1px solid var(--line);border-top:4px solid var(--blue);border-radius:14px;padding:16px 18px;display:flex;flex-direction:column;gap:10px;min-width:0}
+.stop.hit{border-top-color:var(--green)}
+.when{font-size:15px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--orange)}
+.stop h3 .ok{color:var(--green)}
+.nums{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:4px}
+.nums li{display:flex;gap:10px;align-items:baseline}
+.nums b{font:800 20px Archivo,sans-serif;min-width:84px;font-variant-numeric:tabular-nums}
+.steps{margin:0;padding-left:20px;display:flex;flex-direction:column;gap:5px}
+.bills{margin-top:auto;border-top:1px solid var(--line);padding-top:10px;display:flex;flex-direction:column;gap:4px}
+.bills div{display:flex;justify-content:space-between;gap:10px;font-weight:600}
+.bills em{font-style:normal;font-weight:800;white-space:nowrap;font-variant-numeric:tabular-nums}
+.bills .t{border-top:1px solid var(--line);padding-top:6px;margin-top:2px;font-weight:800}
+.once{font-size:15px;font-weight:700}
+.year{background:var(--card);border:1px solid var(--line);border-left:4px solid var(--green);border-radius:12px;padding:14px 16px;font-weight:700}
+.year b{font-family:Archivo,sans-serif;font-size:20px}
+.slow{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px 18px;display:flex;flex-direction:column;gap:10px}
+.slow ul{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,240px),1fr));gap:10px}
+.slow li{border:1px solid var(--line);border-radius:12px;padding:10px 12px;background:var(--card2)}
+.slow li b{display:block}
+
+/* Bill lines */
+.lines{display:flex;flex-direction:column;gap:8px}
+.line{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:4px 12px;align-items:baseline;border-bottom:1px solid var(--line);padding-bottom:8px}
+.line b{font-size:17px}
+.line small{grid-column:1;font-size:15px;font-weight:500}
+.line em{grid-column:2;grid-row:1;font-style:normal;font-weight:800;white-space:nowrap;font-variant-numeric:tabular-nums}
+.line.sum{border-bottom:0;border-top:2px solid var(--line);padding-top:10px;font-size:20px}
+.de .line.sum{border-top-color:var(--blue)}
+.ce .line.sum{border-top-color:var(--orange)}
+.line.sum b{font-family:Archivo,sans-serif;font-size:20px}
+
+.foot{display:flex;flex-direction:column;gap:8px;max-width:84ch}
+.foot ul{margin:0;padding-left:20px;display:flex;flex-direction:column;gap:6px}
+.links{display:flex;flex-wrap:wrap;gap:10px}
+.links a{text-decoration:none;font-weight:700;padding:10px 16px;border:1px solid var(--line);border-radius:12px;background:var(--card)}
+.links a:hover,.links a:focus-visible{border-color:var(--green)}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header style="display:flex;flex-direction:column;gap:12px">
+    <p class="brand">Nextier · <span>Team Musso</span></p>
+    <h1><i>1,000 calls a day</i> + <em>50,000 texts</em> a month</h1>
+    <p class="lede">Where you land at full speed, the road there, and what it costs each month in your own accounts. Split by engine.</p>
+    <nav class="nav" aria-label="On this page">
+      <a href="#speed">⚡ Full speed</a><a href="#road">🛣️ The road</a><a href="#bills">💵 Monthly bills</a><a href="#how">🧮 How it's figured</a>
+    </nav>
+  </header>
+
+  <section id="speed" aria-labelledby="speed-h">
+    <h2 id="speed-h">⚡ At full speed</h2>
+    <div class="engines">
+      <article class="eng de">
+        <p class="lbl">🧠 Data Engine · calls</p>
+        <p class="big">1,000 <span>calls a day</span></p>
+        <p class="sub">≈ 21,000 a month, every weekday</p>
+        <dl>
+          <div><dt>How</dt><dd>Click to call from your own lines, one owner at a time.</dd></div>
+          <div><dt>Who calls</dt><dd>5 callers, about 200 calls a day each.</dd></div>
+          <div><dt>Who they call</dt><dd>Month 1: owners from your blocks. From month 2: everyone who got a text but didn't reply.</dd></div>
+          <div><dt>Needs</dt><dd>10–20 calling numbers, so none gets labeled spam.</dd></div>
+          <div><dt>Starts</dt><dd>Week 2. Calls don't wait on the carriers. Full speed in month 2.</dd></div>
+        </dl>
+        <p class="bill">≈ $1,150–1,900 a month<span>Includes the skip trace for every owner you call or text.</span></p>
+      </article>
+      <article class="eng ce">
+        <p class="lbl">🚀 Campaign Engine · texts</p>
+        <p class="big">50,000 <span>texts a month</span></p>
+        <p class="sub">≈ 40,000 first texts + ≈ 10,000 follow-ups</p>
+        <dl>
+          <div><dt>How</dt><dd>First texts Wednesday to Saturday, Send pressed at 5 PM, about 2,500 an evening. Follow-ups: 500 every weekday to owners who didn't answer.</dd></div>
+          <div><dt>Who</dt><dd>One person presses Send. Your team answers the replies.</dd></div>
+          <div><dt>Needs</dt><dd>Texting registration and 10 texting numbers at 500 a day each.</dd></div>
+          <div><dt>Starts</dt><dd>Month 2, once the carriers approve texting. 50,000 in month 3.</dd></div>
+        </dl>
+        <p class="bill">≈ $600–700 a month<span>Texts, replies, texting numbers and the campaign.</span></p>
+      </article>
+    </div>
+    <p class="total">Both engines at full speed: <b>≈ $1,750–2,600 a month</b> in your own accounts.</p>
+  </section>
+
+  <section id="road" aria-labelledby="road-h">
+    <h2 id="road-h">🛣️ The road</h2>
+    <div class="road">
+      <article class="stop">
+        <p class="when">Month 1</p>
+        <h3>Set up + first calls</h3>
+        <ul class="nums">
+          <li><b>~600</b><span>calls a day from week 2 (3 callers)</span></li>
+          <li><b>~8,000</b><span>calls in the month</span></li>
+          <li><b>0</b><span>texts. The carriers are approving.</span></li>
+          <li><b>~35,000</b><span>owners traced</span></li>
+        </ul>
+        <ul class="steps">
+          <li>Week 1: your texting, calling and skip-trace accounts open. Suffolk + Nassau owners load into your database.</li>
+          <li>Week 1: texting registration filed (brand, vetting, campaign), plus a 15-minute call with SignalHouse.</li>
+          <li>Week 1: 10 texting and 10 calling numbers bought. First 10,000 owners traced.</li>
+          <li>Week 2: 3 callers start.</li>
+        </ul>
+        <div class="bills">
+          <div><span>🧠 Data Engine</span><em>≈ $600–1,000</em></div>
+          <div><span>🚀 Campaign Engine</span><em>≈ $20</em></div>
+          <div class="t"><span>Month 1</span><em>≈ $620–1,020</em></div>
+        </div>
+        <p class="once">Plus set-up, once: ≈ $440–450 (below).</p>
+      </article>
+      <article class="stop hit">
+        <p class="when">Month 2</p>
+        <h3><span class="ok">✅</span> 1,000 calls a day</h3>
+        <ul class="nums">
+          <li><b>1,000</b><span>calls a day (5 callers)</span></li>
+          <li><b>~21,000</b><span>calls in the month</span></li>
+          <li><b>~40,000</b><span>first texts</span></li>
+          <li><b>~65,000</b><span>owners traced</span></li>
+        </ul>
+        <ul class="steps">
+          <li>5 callers, 200 calls a day each.</li>
+          <li>Texting approved: first texts go out the first Wednesday at 5 PM.</li>
+          <li>Each number warms up: 250 → 400 → 500 a day, full speed by day 4.</li>
+          <li>Replies come in the next morning. Answer every one.</li>
+        </ul>
+        <div class="bills">
+          <div><span>🧠 Data Engine</span><em>≈ $1,150–1,900</em></div>
+          <div><span>🚀 Campaign Engine</span><em>≈ $490–590</em></div>
+          <div class="t"><span>Month 2</span><em>≈ $1,640–2,490</em></div>
+        </div>
+      </article>
+      <article class="stop hit">
+        <p class="when">Month 3 on</p>
+        <h3><span class="ok">✅</span> 50,000 texts a month</h3>
+        <ul class="nums">
+          <li><b>1,000</b><span>calls a day</span></li>
+          <li><b>~21,000</b><span>calls a month</span></li>
+          <li><b>50,000</b><span>texts a month</span></li>
+          <li><b>~65,000</b><span>owners traced a month</span></li>
+        </ul>
+        <ul class="steps">
+          <li>Follow-ups switch on, 30 days after the first texts: 500 every weekday.</li>
+          <li>Replies are the job: 3,000–5,000 a month. Most say no or STOP.</li>
+          <li>Every good reply gets a call the same day.</li>
+          <li>Callers work everyone who got a text but didn't reply.</li>
+        </ul>
+        <div class="bills">
+          <div><span>🧠 Data Engine</span><em>≈ $1,150–1,900</em></div>
+          <div><span>🚀 Campaign Engine</span><em>≈ $600–700</em></div>
+          <div class="t"><span>Every month</span><em>≈ $1,750–2,600</em></div>
+        </div>
+      </article>
+    </div>
+    <p class="year">First 12 months: <b>≈ 240,000 calls</b> · <b>≈ 540,000 texts</b> · <b>≈ $20,000–30,000</b> in vendor bills, set-up included.</p>
+    <div class="slow">
+      <h3>What can slow it down</h3>
+      <ul>
+        <li><b>⏳ Carrier approval</b>Texts start when the carriers approve. Calls don't wait.</li>
+        <li><b>👥 Callers</b>1,000 a day is 5 people dialing every weekday. Each caller is about 4,000 calls a month.</li>
+        <li><b>🏡 Owners to text</b>40,000 new owners a month (≈ 65,000 traced). Suffolk + Nassau first; when they run low, the Bronx up to Orange County.</li>
+        <li><b>📞 Spam labels</b>Each calling number makes 50–100 calls a day. More calls means more numbers, never pushing one number harder.</li>
+      </ul>
+    </div>
+  </section>
+
+  <section id="bills" aria-labelledby="bills-h">
+    <h2 id="bills-h">💵 The monthly bills at full speed</h2>
+    <div class="engines">
+      <article class="eng de">
+        <p class="lbl">🧠 Data Engine</p>
+        <div class="lines">
+          <div class="line"><b>🔍 Skip trace · Tracerfy</b><em>$800–1,300</em><small>≈ 65,000 owners a month at 2¢ a hit; misses cost nothing</small></div>
+          <div class="line"><b>☎️ Calling minutes · SignalHouse</b><em>$240–480</em><small>≈ 21,000 calls ≈ 24,000 minutes at 1–2¢</small></div>
+          <div class="line"><b>🗄️ Your database · DigitalOcean</b><em>$61</em><small>Hosted and run by us</small></div>
+          <div class="line"><b>🔄 Listing re-checks · Apify</b><em>≈ $35</em><small>Weekly sweep for new expireds, sold and back on market</small></div>
+          <div class="line"><b>📞 Calling numbers</b><em>$12–23</em><small>10–20 numbers at $1.15</small></div>
+          <div class="line"><b>🛰️ Maps + street photos</b><em>$0</em><small>Inside Mapbox's monthly allowance</small></div>
+          <div class="line sum"><b>Data Engine</b><em>≈ $1,150–1,900</em></div>
+        </div>
+      </article>
+      <article class="eng ce">
+        <p class="lbl">🚀 Campaign Engine</p>
+        <div class="lines">
+          <div class="line"><b>💬 Texts · SignalHouse</b><em>≈ $525</em><small>50,000 at about 1¢ each, all-in</small></div>
+          <div class="line"><b>🙋 Replies + your answers</b><em>≈ $50–150</em><small>3,000–5,000 replies a month</small></div>
+          <div class="line"><b>📱 Texting numbers</b><em>$11.50</em><small>10 numbers at $1.15</small></div>
+          <div class="line"><b>📝 Texting campaign</b><em>$10</em><small>Monthly renewal</small></div>
+          <div class="line sum"><b>Campaign Engine</b><em>≈ $600–700</em></div>
+        </div>
+      </article>
+    </div>
+    <p class="total">Both engines: <b>≈ $1,750–2,600 a month</b></p>
+    <h3>Set-up, once</h3>
+    <div class="engines">
+      <article class="eng de">
+        <p class="lbl">🧠 Data Engine · ≈ $370–380</p>
+        <div class="lines">
+          <div class="line"><b>🗺️ Nassau parcel shapes</b><em>$250</em><small>Lot outlines and measured acres for the Nassau focus</small></div>
+          <div class="line"><b>📦 USBizData NY State bundle</b><em>$108</em><small>Residential, cell, email, business, 4 × $27</small></div>
+          <div class="line"><b>📞 Calling numbers</b><em>$10–20</em><small>10–20 numbers at $1</small></div>
+        </div>
+      </article>
+      <article class="eng ce">
+        <p class="lbl">🚀 Campaign Engine · ≈ $70</p>
+        <div class="lines">
+          <div class="line"><b>🏅 Brand vetting</b><em>$40</em><small>Raises how many texts the carriers allow a day</small></div>
+          <div class="line"><b>📝 Brand + campaign registration</b><em>$19.50</em><small>$4.50 + $15</small></div>
+          <div class="line"><b>📱 Texting numbers</b><em>$10</em><small>10 numbers at $1</small></div>
+        </div>
+      </article>
+    </div>
+    <p style="font-weight:600">Set-up total ≈ $440–450. Your first owners traced are in Month 1's bill.</p>
+  </section>
+
+  <section id="how" class="foot" aria-labelledby="how-h">
+    <h2 id="how-h">🧮 How it's figured</h2>
+    <ul>
+      <li>Texts ≈ 1¢ each, all-in (0.65¢ to SignalHouse plus the carrier's fee). Calls ≈ 1.15 billed minutes each at 1–2¢ a minute: an estimate until SignalHouse quotes voice.</li>
+      <li>Skip trace is 2¢ a hit on your key; misses cost nothing. Most of it feeds the texts, but phones and emails are data, so the bill sits in the Data Engine.</li>
+      <li>200 calls a day per caller is a planning number (150–250 on one line). A multi-line dialer would cut the number of callers, but it isn't built yet.</li>
+      <li>21 weekdays a month. Every call and text is checked against Do Not Call and STOP first. Nothing goes out until a person presses it.</li>
+      <li>Not in these bills: your callers and whoever answers replies (people), and OneKey and Follow Up Boss (your existing accounts). RealEstateAPI isn't needed for this plan.</li>
+      <li>Planning numbers, not a promise. Nextier's install and management fee is quoted by Thomas.</li>
+    </ul>
+    <div class="links">
+      <a href="paul-12-month-map.html">📅 12-Month Map</a>
+      <a href="paul-simulator.html">🎲 Lead Simulator</a>
+      <a href="paul-cheat-sheet.html#costs">📋 Cheat sheet · costs</a>
+    </div>
+  </section>
+</div>
+</body>
+</html>
