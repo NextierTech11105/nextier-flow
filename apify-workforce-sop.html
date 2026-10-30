@@ -1,0 +1,232 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<title>Apify Digital Workforce · SOP</title>
+<meta name="description" content="How to run Apify actors as a digital workforce inside Nextier: the roles, the run SOP, the rules, the checklists and the red flags.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@700;800&family=IBM+Plex+Sans:wght@500;600;700&display=swap">
+<style>
+:root{--bg:#000;--card:#0a0d12;--card2:#06080b;--line:#2a3442;--fg:#fff;--orange:#ff8a3d;--green:#12b76a;--blue:#4c8dff;--purple:#a78bfa;--teal:#2dd4bf;--yellow:#f5c84c;--red:#ff5d5d;--pink:#f472b6;color-scheme:dark}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--fg);font:500 17px/1.5 'IBM Plex Sans','Segoe UI',Arial,sans-serif}
+.wrap{max-width:1140px;margin:0 auto;padding:28px 16px 56px}
+.brand{font:800 15px 'Archivo',Arial,sans-serif;letter-spacing:.14em;text-transform:uppercase}
+.brand span{color:var(--orange)}
+h1{font:800 clamp(30px,4.4vw,52px)/1.05 'Archivo',Arial,sans-serif;margin:10px 0 8px}
+h1 em{font-style:normal;color:var(--green)}
+.lede{font-size:20px;font-weight:600;margin:0 0 18px;max-width:68ch}
+h2{font:800 25px 'Archivo',Arial,sans-serif;margin:0 0 6px}
+h3{font:800 19px 'Archivo',Arial,sans-serif;margin:0 0 6px}
+.sub{font-weight:600;margin:0 0 14px;max-width:74ch}
+b{color:#fff}
+.nav{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 22px}
+.nav a{color:#fff;text-decoration:none;font-weight:700;font-size:15px;padding:6px 12px;border:1px solid var(--line);border-radius:999px;background:var(--card2)}
+.nav a:hover{border-color:var(--blue)}
+section{margin:0 0 26px;scroll-margin-top:12px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:18px 20px}
+.big{font:800 clamp(20px,2.4vw,26px)/1.3 'Archivo',Arial,sans-serif;border:2px solid var(--green);border-radius:18px;padding:16px 20px;background:#04160d;margin:0 0 22px}
+.roles{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,250px),1fr));gap:10px}
+.role{border:1px solid var(--line);border-top:4px solid var(--c);border-radius:14px;padding:14px;background:var(--card2)}
+.role .ic{font-size:28px;line-height:1}
+.role h3{margin:8px 0 4px}
+.role p{margin:0 0 8px;font-weight:600;font-size:15px}
+.role ul{margin:0;padding-left:18px;font-size:15px;font-weight:500}
+.role li{margin:2px 0}
+.steps{display:grid;gap:10px;counter-reset:s}
+.step{counter-increment:s;display:grid;grid-template-columns:44px minmax(0,1fr);gap:12px;align-items:start;border:1px solid var(--line);border-radius:14px;padding:14px;background:var(--card2)}
+.step::before{content:counter(s);width:40px;height:40px;border-radius:50%;background:var(--orange);color:#000;font:800 20px/40px 'Archivo',Arial,sans-serif;text-align:center}
+.step b{display:block;font-size:19px;margin-bottom:2px}
+.step span{display:block;font-weight:500}
+.step .why{margin-top:6px;font-weight:700;font-size:15px;color:var(--yellow)}
+.rules{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,330px),1fr));gap:10px}
+.rule{border:1px solid var(--line);border-radius:14px;padding:12px 14px;background:var(--card2)}
+.rule b{display:block;font-size:18px;margin-bottom:2px}
+.rule span{font-weight:500}
+.tbl{width:100%;border-collapse:collapse;font-weight:600}
+.tbl th,.tbl td{text-align:left;padding:10px;border-bottom:1px solid var(--line);vertical-align:top}
+.tbl th{font:800 14px 'Archivo',Arial,sans-serif;letter-spacing:.06em;text-transform:uppercase;color:var(--teal)}
+.scroll{overflow-x:auto}
+.checks{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,300px),1fr));gap:10px}
+.chk{border:1px solid var(--line);border-radius:14px;padding:14px;background:var(--card2)}
+.chk h3{color:var(--teal)}
+.chk ul{margin:0;padding-left:0;list-style:none}
+.chk li{padding:5px 0 5px 30px;position:relative;font-weight:600}
+.chk li::before{content:"";position:absolute;left:0;top:7px;width:18px;height:18px;border:2px solid var(--teal);border-radius:5px}
+.receipt{font:600 16px/1.45 ui-monospace,Consolas,monospace;border:1px dashed var(--green);border-radius:14px;padding:14px 16px;background:#03140c;white-space:pre-wrap}
+.flags{display:grid;gap:8px}
+.flag{display:grid;grid-template-columns:30px minmax(0,1fr);gap:10px;align-items:start;border:1px solid #5a1d1d;border-radius:12px;padding:10px 12px;background:#170707;font-weight:600}
+.flag::before{content:"⛔";font-size:20px;line-height:1.2}
+.flag em{font-style:normal;font-weight:500;display:block}
+.note{font-weight:600;border-left:4px solid var(--orange);padding:4px 0 4px 12px;margin:14px 0 0}
+.setup{display:grid;gap:8px;counter-reset:k}
+.setup div{counter-increment:k;display:grid;grid-template-columns:34px minmax(0,1fr);gap:10px;align-items:center;border:1px solid var(--line);border-radius:12px;padding:10px 12px;background:var(--card2);font-weight:600}
+.setup div::before{content:counter(k);width:30px;height:30px;border-radius:50%;background:var(--blue);color:#000;font:800 17px/30px 'Archivo',Arial,sans-serif;text-align:center}
+footer{margin-top:30px;font-weight:600;font-size:15px}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<div class="brand">Nextier <span>Data Engine</span> · Operator SOP</div>
+<h1>The Apify <em>digital workforce.</em></h1>
+<p class="lede">Every Apify actor is a worker you hire by the job. It finds listings, reads public records, finds the person behind a name, or watches for change. This page covers how to hire them, how to run them, how to keep the bill and the data under control, and what to check before anyone picks up a phone.</p>
+
+<nav class="nav">
+  <a href="#roles">The roles</a>
+  <a href="#setup">Set up a workspace</a>
+  <a href="#run">Run SOP</a>
+  <a href="#hire">Hiring an actor</a>
+  <a href="#rules">Rules</a>
+  <a href="#who">Who does what</a>
+  <a href="#checks">Checklists</a>
+  <a href="#receipt">The receipt</a>
+  <a href="#flags">Red flags</a>
+</nav>
+
+<div class="big">One worker, one job, one budget, one receipt. Every result lands on a lead in the right workspace, the same run it's found.</div>
+
+<!-- ROLES -->
+<section id="roles" class="card">
+  <h2>The roles</h2>
+  <p class="sub">Five kinds of worker. Every actor we use fits one of them, and each role hands its work to the next one.</p>
+  <div class="roles">
+    <div class="role" style="--c:var(--green)"><div class="ic">🧲</div><h3>Sourcers</h3><p>Find new targets.</p><ul><li>For-sale-by-owner listings (ForSaleByOwner.com, FSBO.com, Zillow)</li><li>Craigslist by-owner and service ads (free read first)</li><li>OneKey expired and expiring listings (in-house)</li></ul></div>
+    <div class="role" style="--c:var(--blue)"><div class="ic">🏠</div><h3>Researchers</h3><p>Fill in the property.</p><ul><li>Owner, mailing address, loans, equity, adjustable rate (public property records)</li><li>Is it listed right now (Zillow, Redfin)</li><li>County assessor records outside New York</li></ul></div>
+    <div class="role" style="--c:var(--purple)"><div class="ic">🕵️</div><h3>Investigators</h3><p>Find the person behind the name.</p><ul><li>People search on skip-trace misses</li><li>State business records: who filed the LLC, officers</li><li>Decision makers at developers (LinkedIn)</li><li>Death notices for estates</li></ul></div>
+    <div class="role" style="--c:var(--yellow)"><div class="ic">📡</div><h3>Monitors</h3><p>Watch for change on a schedule.</p><ul><li>New listings only (monitoring mode)</li><li>Weekly listed-now check</li><li>Weekly death notices · monthly adjustable-rate radar</li></ul></div>
+    <div class="role" style="--c:var(--teal)"><div class="ic">🛠️</div><h3>In-house crew</h3><p>Actors we built ourselves.</p><ul><li>OneKey MLS scraper</li><li>NYC deed and LLC bridge, PLUTO discovery, lot change watcher</li><li>Court and auction watchers</li><li>Business directory scraper</li></ul></div>
+  </div>
+</section>
+
+<!-- SETUP -->
+<section id="setup" class="card">
+  <h2>Set up a new workspace</h2>
+  <p class="sub">Every workspace gets its own Apify account and key. The runs, the bill and the data stay with the workspace they belong to.</p>
+  <div class="setup">
+    <div>Create the Apify account in the client's name, with the client's card.</div>
+    <div>Set the monthly usage limit in Apify → Billing → Limits. Pick it on purpose. It's the ceiling for every run and every schedule on the account.</div>
+    <div>Copy the API token from Apify → Settings → API &amp; Integrations.</div>
+    <div>Paste it into the workspace's Connect Keys in Nextier. The Apify slot is being added; until it ships, keep the token in the Apify account. Never send it by text or email.</div>
+    <div>Run one small test job (50 rows) and check the receipt. Then the workspace is live.</div>
+  </div>
+</section>
+
+<!-- RUN SOP -->
+<section id="run" class="card">
+  <h2>The run SOP, every job, in this order</h2>
+  <div class="steps">
+    <div class="step"><div><b>Right workspace, right key</b><span>The job runs on the key of the workspace that will own the leads. A run bills whichever account starts it. A client's job never runs on Nextier's key, and the other way round.</span></div></div>
+    <div class="step"><div><b>Check the wallet</b><span>Open the usage page: spent this month against the limit. If this job could cross the limit, raise the limit first. Only the account owner does that.</span><span class="why">Why: when an account hits its limit, every run and every schedule on it stops until the next cycle. We had a daily schedule go dark for weeks this way.</span></div></div>
+    <div class="step"><div><b>Read the job description</b><span>Open the actor's input fields and its sample output before the first run. Confirm it returns the field you're paying for, usually the phone.</span><span class="why">Why: an actor quietly ignores fields it doesn't know. One of our daily jobs was wired with field names its actor doesn't read, and it never produced a row.</span></div></div>
+    <div class="step"><div><b>Count first</b><span>Get the size of the market before buying it: a free count where the site has one, or a sample of 50 to 500 rows.</span></div></div>
+    <div class="step"><div><b>Cap the pay and say the number</b><span>Every run gets a hard row cap, plus a maximum charge on actors that bill per event. Before pressing Run, say the dollar figure out loud: rows × price.</span></div></div>
+    <div class="step"><div><b>Run, then read the receipt</b><span>Only a run that SUCCEEDED gets loaded. FAILED, ABORTED and TIMED-OUT runs keep their receipt and load nothing.</span></div></div>
+    <div class="step"><div><b>Keep the raw data, then load</b><span>Save the raw results first. Then clean them up: one lead per phone, stable ids so a re-run never doubles anyone. Do a dry run, then apply, into the workspace that owns the job.</span><span class="why">Why: raw results on a basic plan are deleted after about a month. Anything worth keeping is saved or loaded inside that window.</span></div></div>
+    <div class="step"><div><b>Write it where it gets worked</b><span>Results go onto the lead in the same run, and the bucket shows the new count.</span><span class="why">Why: a phone that sits in a side file is invisible. It happened: five owners were traced, and nobody could see the phones until they were written onto the leads.</span></div></div>
+    <div class="step"><div><b>Check before anyone dials</b><span>Do Not Call check on every phone. Mobile first. Remove anything listed with an agent right now. Apply the client's own rules, like no foreclosure leads.</span></div></div>
+  </div>
+</section>
+
+<!-- HIRING -->
+<section id="hire" class="card">
+  <h2>Hiring an actor</h2>
+  <p class="sub">The Apify Store has thousands of actors, and many do the same job. Pick one with this scorecard, then test it before trusting it.</p>
+  <div class="scroll">
+  <table class="tbl">
+    <thead><tr><th>Check</th><th>Good sign</th><th>Walk away if</th></tr></thead>
+    <tbody>
+      <tr><td>Returns the field you need</td><td>The sample output has the phone, owner or date you're paying for</td><td>The field you need isn't in the output</td></tr>
+      <tr><td>Pays on hits</td><td>Charged per result found; empty lookups free</td><td>Charged per search whether or not it finds anything (and that's the bulk of the cost)</td></tr>
+      <tr><td>Used and rated</td><td>Hundreds of monthly users, rating 4+</td><td>Rated 1–2, or a handful of users with no rating</td></tr>
+      <tr><td>Maintained</td><td>Updated in the last few months</td><td>Marked deprecated, or untouched for a year</td></tr>
+      <tr><td>Price per 1,000</td><td>Fits the job: cents for listings, a few dollars for people</td><td>$50+ per 1,000 when a cheaper actor returns the same field</td></tr>
+      <tr><td>Test on 50</td><td>Hit rate and accuracy hold up on rows you can check by hand</td><td>Wrong people, wrong county, or empty rows</td></tr>
+    </tbody>
+  </table>
+  </div>
+  <p class="note">A free route beats a paid actor when the data is the same. Reading Craigslist ads directly found the same phones as the paid actor: on 2,609 ads, the actor's only extra numbers were 11 ZIP codes.</p>
+</section>
+
+<!-- RULES -->
+<section id="rules" class="card">
+  <h2>The rules</h2>
+  <div class="rules">
+    <div class="rule"><b>New only, every day</b><span>For daily feeds, use monitoring mode or a saved storage name, so each run returns only listings not seen before. Don't re-buy the whole market every morning.</span></div>
+    <div class="rule"><b>One catalog</b><span>Every actor in use is listed once, with its id, inputs, price, role and owner. Nobody hard-codes a new actor in a side script.</span></div>
+    <div class="rule"><b>Named schedules with owners</b><span>One schedule per job, named workspace · job · how often, with a person responsible. A schedule that stops running is the first sign the wallet is empty.</span></div>
+    <div class="rule"><b>No live listings in pursuit</b><span>Listing actors exist to remove what's on the market and to find what expired. A for-sale-by-owner listing has no agent and is the one exception.</span></div>
+    <div class="rule"><b>Found phones aren't verified phones</b><span>A phone from a people search or a list gets the Do Not Call check, is ranked mobile first, and moves to the next-best phone on a wrong number.</span></div>
+    <div class="rule"><b>Raw first</b><span>When an actor sends results into Nextier, the raw payload is stored before anything is parsed. If the raw is lost, the run is lost.</span></div>
+    <div class="rule"><b>Tenant walls</b><span>Leads load into the workspace that paid for the run, and only that workspace. Nothing is copied across.</span></div>
+    <div class="rule"><b>Tokens stay secret</b><span>A token never goes in a page, a script, a text or an email. It lives in Connect Keys.</span></div>
+    <div class="rule"><b>Pace the free reads</b><span>Reading a site directly is free but polite: about one request a second. A hard crawl gets the address blocked.</span></div>
+    <div class="rule"><b>Stop a runaway</b><span>Apify → Runs → Abort. Charges stop with the run. Then find out why before re-running.</span></div>
+    <div class="rule"><b>Volume isn't the limit</b><span>An account runs many jobs at once. What limits a workspace is its monthly limit, so set it on purpose and check it weekly.</span></div>
+    <div class="rule"><b>Leads in, sends gated</b><span>A run can find and load leads. Nothing gets texted or called in bulk without the owner's go.</span></div>
+  </div>
+</section>
+
+<!-- WHO -->
+<section id="who" class="card">
+  <h2>Who does what</h2>
+  <div class="scroll">
+  <table class="tbl">
+    <thead><tr><th>Who</th><th>Does</th><th>Never</th></tr></thead>
+    <tbody>
+      <tr><td><b>Workspace owner</b></td><td>Sets the monthly limit. Approves which jobs run and what gets loaded. Approves any send.</td><td>Shares the token</td></tr>
+      <tr><td><b>Operator</b></td><td>Runs approved jobs with this SOP, reads the receipts, works the bucket.</td><td>Raises the limit, or runs a job on another workspace's key</td></tr>
+      <tr><td><b>Nextier</b></td><td>Builds actors and loaders, keeps the catalog, watches the schedules, swaps out workers that slip.</td><td>Loads leads into the wrong workspace</td></tr>
+      <tr><td><b>Claude (AI)</b></td><td>Follows this SOP, says the dollar figure before a run, writes results onto leads, reports the receipt.</td><td>Raises a limit, or starts a send</td></tr>
+    </tbody>
+  </table>
+  </div>
+</section>
+
+<!-- CHECKLISTS -->
+<section id="checks" class="card">
+  <h2>Checklists</h2>
+  <div class="checks">
+    <div class="chk"><h3>Daily · 5 minutes</h3><ul><li>Every schedule ran on time</li><li>No FAILED or ABORTED runs left unexplained</li><li>New rows are on leads, and the bucket counts moved</li><li>Phones flagged Do Not Call are blanked</li></ul></div>
+    <div class="chk"><h3>Weekly · 15 minutes</h3><ul><li>Spent so far against the monthly limit</li><li>Cost per phone found, per actor</li><li>Hit rate per actor; one that's slipping gets tested against another</li><li>Listed-now check ran; live listings left pursuit</li></ul></div>
+    <div class="chk"><h3>Monthly · 30 minutes</h3><ul><li>Remove actors nobody used</li><li>Catalog matches what's running</li><li>Tracing sized to callers, not to the list</li><li>Limit set for next month, on purpose</li></ul></div>
+  </div>
+</section>
+
+<!-- RECEIPT -->
+<section id="receipt" class="card">
+  <h2>The receipt</h2>
+  <p class="sub">Every run ends with one. If you can't fill a line, the run isn't done.</p>
+  <div class="receipt">RUN       ForSaleByOwner · Suffolk + Nassau · new listings only
+WHO       operator · your workspace · its own key
+STATUS    SUCCEEDED · 4 min
+IN        cap 500 rows · stated cost ≤ $1.00
+OUT       212 listings · 151 with the owner's phone
+COST      $0.41 (on the workspace's Apify account)
+KEPT      raw saved · 212 rows
+LOADED    151 new leads · 0 duplicates · bucket "FSBO NY"
+CHECKED   Do Not Call: 9 blanked · listed with an agent: 0
+NEXT      142 ready to call</div>
+  <p class="note">Sample receipt. The numbers show the format, not a real run.</p>
+</section>
+
+<!-- FLAGS -->
+<section id="flags" class="card">
+  <h2>Red flags: stop and fix before the next run</h2>
+  <div class="flags">
+    <div class="flag"><div>A run SUCCEEDED with 0 rows<em>Usually wrong input field names. Read the job description again.</em></div></div>
+    <div class="flag"><div>The cost came in above the number you said<em>The cap was missing, or the actor charges per search. Fix the cap before the next run.</em></div></div>
+    <div class="flag"><div>A schedule's last run is older than its cadence<em>Check the wallet first. A limit hit stops everything on the account.</em></div></div>
+    <div class="flag"><div>Phones exist in a file but not on leads<em>Nobody can call them. Load them the same day.</em></div></div>
+    <div class="flag"><div>Rows from the wrong county or state<em>Matching crossed a line. Add the county check before loading.</em></div></div>
+    <div class="flag"><div>A property listed with an agent in a pursuit bucket<em>Take it out of pursuit and find out how it got in.</em></div></div>
+    <div class="flag"><div>The same person loaded twice<em>The ids aren't stable. Fix the dedupe before re-running.</em></div></div>
+  </div>
+</section>
+
+<footer>Nextier Data Engine · Apify Digital Workforce SOP · Updated October 30, 2026</footer>
+</div>
+</body>
+</html>
