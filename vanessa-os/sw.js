@@ -1,5 +1,5 @@
 /* Vanessa OS service worker — caches the app shell so the demo opens offline. */
-var CACHE = "vos-shell-v3";
+var CACHE = "vos-shell-v4";
 var SHELL = ["./", "index.html", "app.css", "app.js", "manifest.webmanifest", "icon.svg"];
 self.addEventListener("install", function (e) {
   e.waitUntil(caches.open(CACHE).then(function (c) { return c.addAll(SHELL); }).then(function () { return self.skipWaiting(); }));
@@ -11,7 +11,7 @@ self.addEventListener("fetch", function (e) {
   var req = e.request;
   if (req.method !== "GET" || new URL(req.url).origin !== location.origin) return;
   // network-first for the shell so updates land; cache fallback when offline
-  e.respondWith(fetch(req).then(function (res) {
+  e.respondWith(fetch(req, { cache: "no-cache" }).then(function (res) {
     var copy = res.clone(); caches.open(CACHE).then(function (c) { c.put(req, copy); }); return res;
   }).catch(function () { return caches.match(req).then(function (r) { return r || caches.match("index.html"); }); }));
 });
