@@ -9,176 +9,163 @@
 <link rel="icon" href="parcelvora-fox.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700;800&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400;1,6..72,500&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
+/* Parcelvora: mint + charcoal, serif headlines, outlined buttons, flat line art with coral and lime. */
 :root {
-  --bg: #000;
-  --card: #060a13;
-  --card2: #08101f;
-  --line: #1d2a44;
-  --line2: #2a3a5c;
-  --text: #ffffff;
-  --soft: #f2f4f7;
-  --blue: #4f9dff;
-  --blue-soft: #8fc1ff;
-  --gold: #d9a95f;
-  --fox: #f07a2a;
-  --green: #5fe3a1;
-  --green-b: #12b76a;
-  --amber: #f3c04e;
-  --display: "Barlow Condensed", "Arial Narrow", sans-serif;
-  --body: "Manrope", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --mint: #8bdad4;
+  --mint-soft: #c8ece8;
+  --mint-pale: #e8f7f5;
+  --white: #ffffff;
+  --ink: #333333;
+  --ink-2: #474747;
+  --line: #333333;
+  --coral: #ef7f7a;
+  --coral-pale: #fff3f2;
+  --pink: #f6a8a4;
+  --lime: #a8d26d;
+  --serif: "Newsreader", Georgia, "Times New Roman", serif;
+  --sans: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
 }
 * { box-sizing: border-box; }
 html { scroll-behavior: smooth; }
-body { margin: 0; background: var(--bg); color: var(--text); font-family: var(--body); font-size: 17px; line-height: 1.55; -webkit-font-smoothing: antialiased; overflow-x: hidden; }
+body { margin: 0; background: var(--white); color: var(--ink); font-family: var(--sans); font-size: 17px; line-height: 1.6; letter-spacing: -0.005em; -webkit-font-smoothing: antialiased; overflow-x: hidden; }
 a { color: inherit; text-decoration: none; }
-code { font-family: ui-monospace, "Cascadia Mono", Consolas, monospace; font-size: 15px; color: var(--blue-soft); word-break: break-all; }
-.wrap { max-width: 1152px; margin: 0 auto; padding: 0 16px; }
-@media (min-width: 768px) { .wrap { padding: 0 24px; } }
-section { scroll-margin-top: 80px; }
+.wrap { max-width: 1180px; margin: 0 auto; padding: 0 16px; }
+@media (min-width: 768px) { .wrap { padding: 0 32px; } }
+section { scroll-margin-top: 84px; padding: 56px 0; }
+@media (min-width: 768px) { section { padding: 80px 0; } }
+.mint { background: var(--mint); }
+.pale { background: var(--mint-pale); }
 
 /* Header */
-header { position: sticky; top: 0; z-index: 30; border-bottom: 1px solid var(--line); background: rgba(0,0,0,.86); backdrop-filter: blur(10px); }
-.bar { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding-top: 12px; padding-bottom: 12px; }
+header { position: sticky; top: 0; z-index: 30; background: var(--mint); border-bottom: 1px solid rgba(51,51,51,.18); }
+.bar { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding-top: 14px; padding-bottom: 14px; }
 .brand { display: flex; align-items: center; gap: 12px; }
-.mark { width: 42px; height: 42px; border-radius: 12px; overflow: hidden; flex-shrink: 0; background: #fdfcf8; box-shadow: 0 0 22px rgba(240,122,42,.35); }
+.mark { width: 46px; height: 46px; border-radius: 12px; overflow: hidden; flex-shrink: 0; background: #fdfcf8; border: 1.5px solid var(--line); }
 .mark img { width: 100%; height: 100%; display: block; }
-.word { font-family: var(--display); font-size: 27px; font-weight: 800; letter-spacing: .04em; line-height: 1; display: block; }
-.word b { color: var(--gold); font-weight: 800; }
-.sub { display: none; font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: .22em; color: var(--blue-soft); margin-top: 3px; white-space: nowrap; }
-@media (min-width: 640px) { .sub { display: block; } }
-nav.links { display: none; gap: 22px; font-size: 15px; font-weight: 700; white-space: nowrap; }
-nav.links a:hover { color: var(--blue-soft); }
-@media (min-width: 1100px) { nav.links { display: flex; } }
-.head-cta { display: flex; align-items: center; gap: 14px; }
-.head-cta .demo { font-size: 15px; font-weight: 800; white-space: nowrap; }
-.head-cta .demo:hover { color: var(--blue-soft); }
-.btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; border-radius: 12px; background: #e0661a; color: #fff; font-weight: 800; font-size: 17px; padding: 16px 24px; box-shadow: 0 0 34px rgba(240,122,42,.5); transition: background .15s; white-space: nowrap; }
-.btn:hover { background: var(--fox); }
-.btn.sm { font-size: 15px; padding: 10px 16px; display: none; }
-@media (min-width: 640px) { .btn.sm { display: inline-flex; } }
-.btn.ghost { background: var(--card2); border: 1px solid var(--line2); box-shadow: none; }
-.btn.ghost:hover { border-color: var(--blue); background: var(--card2); }
+.word { font-family: var(--serif); font-size: 32px; font-weight: 500; letter-spacing: -0.02em; line-height: 1; }
+nav.links { display: none; gap: 26px; font-size: 17px; white-space: nowrap; }
+nav.links a:hover { text-decoration: underline; text-decoration-color: var(--coral); text-decoration-thickness: 2px; text-underline-offset: 6px; }
+@media (min-width: 1080px) { nav.links { display: flex; } }
+
+/* Buttons + links */
+.btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; border: 2px solid var(--line); border-radius: 10px; padding: 16px 28px; font: 600 16px/1 var(--sans); letter-spacing: .06em; color: var(--ink); background: transparent; white-space: nowrap; transition: background .15s, color .15s; }
+.btn:hover { background: var(--ink); color: var(--mint); }
+.btn.sm { padding: 12px 18px; font-size: 15px; }
+.arrow { font-weight: 700; font-size: 17px; border-bottom: 2.5px solid var(--coral); padding-bottom: 2px; white-space: nowrap; }
+.arrow:hover { border-bottom-color: var(--ink); }
 
 /* Type */
-.grad { background-image: linear-gradient(90deg, var(--blue) 0%, var(--blue-soft) 30%, var(--gold) 68%, var(--fox) 100%); -webkit-background-clip: text; background-clip: text; color: transparent; }
-.eyebrow { font-size: 15px; font-weight: 800; text-transform: uppercase; letter-spacing: .2em; color: var(--blue-soft); margin: 0; }
-h1 { font-family: var(--display); font-weight: 800; font-size: 46px; line-height: .92; margin: 16px auto 0; max-width: 1000px; }
-@media (min-width: 768px) { h1 { font-size: 104px; } }
-h2 { font-family: var(--display); font-weight: 700; font-size: 44px; line-height: .98; margin: 12px 0 0; }
-@media (min-width: 768px) { h2 { font-size: 60px; } }
-.lede { font-size: 18px; color: var(--soft); max-width: 760px; margin: 16px 0 0; }
-.tag { display: flex; align-items: baseline; gap: 12px; }
-.tag .n { font-family: var(--display); font-size: 34px; font-weight: 800; line-height: 1; color: var(--gold); }
-.tag .l { font-size: 16px; font-weight: 800; text-transform: uppercase; letter-spacing: .16em; }
-.kicker { font-family: var(--display); font-size: 22px; font-weight: 700; text-transform: uppercase; letter-spacing: .12em; color: var(--fox); margin: 24px 0 0; }
-.label { font-size: 16px; font-weight: 800; text-transform: uppercase; letter-spacing: .16em; color: var(--blue-soft); margin: 40px 0 0; }
+.eyebrow { display: flex; align-items: center; gap: 10px; font: 700 15px/1.2 var(--sans); text-transform: uppercase; letter-spacing: .14em; margin: 0; }
+.eyebrow::before { content: ""; width: 11px; height: 11px; border-radius: 50%; background: var(--coral); border: 1.5px solid var(--line); flex-shrink: 0; }
+h1 { font-family: var(--serif); font-weight: 500; font-size: 48px; line-height: 1.02; letter-spacing: -0.025em; margin: 16px 0 0; }
+@media (min-width: 768px) { h1 { font-size: 72px; } }
+@media (min-width: 1100px) { h1 { font-size: 84px; } }
+h2 { font-family: var(--serif); font-weight: 500; font-size: 38px; line-height: 1.06; letter-spacing: -0.02em; margin: 12px 0 0; }
+@media (min-width: 768px) { h2 { font-size: 54px; } }
+h1 em, h2 em { font-style: italic; }
+.lede { font-size: 19px; color: var(--ink-2); max-width: 720px; margin: 18px 0 0; }
+@media (min-width: 768px) { .lede { font-size: 20px; } }
+.label { font: 700 15px/1.2 var(--sans); text-transform: uppercase; letter-spacing: .14em; margin: 44px 0 0; }
+.fine { font-size: 15px; color: var(--ink-2); margin: 18px 0 0; }
 
-/* Pieces */
-.chips { display: flex; flex-wrap: wrap; gap: 8px; }
-.chip { display: inline-flex; align-items: center; border-radius: 999px; border: 1px solid; padding: 6px 12px; font-size: 15px; font-weight: 800; text-transform: uppercase; letter-spacing: .03em; }
-.chip.blue { border-color: rgba(79,157,255,.7); background: rgba(79,157,255,.12); }
-.chip.good { border-color: rgba(18,183,106,.7); background: rgba(18,183,106,.15); }
-.chip.warn { border-color: rgba(243,192,78,.7); background: rgba(243,192,78,.12); }
-.chip.gold { border-color: rgba(217,169,95,.75); background: rgba(217,169,95,.13); }
-.chip.fox { border-color: rgba(240,122,42,.75); background: rgba(240,122,42,.14); }
-.glow { border-radius: 24px; border: 1px solid rgba(79,157,255,.35); background: var(--card); box-shadow: 0 0 60px rgba(79,157,255,.16), inset 0 0 0 1px rgba(255,255,255,.02); padding: 24px; }
-@media (min-width: 768px) { .glow { padding: 40px; } }
-.grid { display: grid; gap: 12px; }
-@media (min-width: 640px) { .g2 { grid-template-columns: repeat(2, 1fr); } .g4 { grid-template-columns: repeat(2, 1fr); } .g3 { grid-template-columns: repeat(2, 1fr); } }
-@media (min-width: 1024px) { .g4 { grid-template-columns: repeat(4, 1fr); } .g3 { grid-template-columns: repeat(3, 1fr); } }
-.card { border-radius: 16px; border: 1px solid var(--line); background: var(--card2); padding: 20px; }
-.card .ico { font-size: 30px; line-height: 1; }
-.card h3 { font-size: 19px; font-weight: 800; margin: 12px 0 0; }
-.card p { font-size: 16px; color: var(--soft); margin: 6px 0 0; }
-.stat { border-radius: 16px; border: 1px solid var(--line); background: var(--card2); padding: 20px; }
-.stat .v { font-family: var(--display); font-size: 46px; font-weight: 700; line-height: 1; color: #5aa0ff; }
-@media (min-width: 768px) { .stat .v { font-size: 54px; } }
-.stat.good { border-color: rgba(18,183,106,.7); background: rgba(18,183,106,.1); }
-.stat.good .v { color: var(--green); }
-.stat.gold { border-color: rgba(217,169,95,.6); background: rgba(217,169,95,.08); }
-.stat.gold .v { color: var(--gold); }
-.stat .k { font-size: 15px; font-weight: 800; text-transform: uppercase; letter-spacing: .04em; margin: 8px 0 0; }
-.stat .d { font-size: 15px; color: var(--soft); margin: 4px 0 0; }
-.pad { padding-bottom: 64px; }
+/* Pills */
+.pills { display: flex; flex-wrap: wrap; gap: 8px; }
+.pill { display: inline-flex; align-items: center; border: 1.5px solid var(--line); border-radius: 999px; padding: 5px 12px; font: 700 15px/1.2 var(--sans); letter-spacing: .03em; text-transform: uppercase; background: var(--white); white-space: nowrap; }
+.pill.coral { background: var(--coral); }
+.pill.pink { background: var(--pink); }
+.pill.lime { background: var(--lime); }
+.pill.mint { background: var(--mint-soft); }
+
+/* Grids */
+.grid { display: grid; gap: 16px; }
+@media (min-width: 640px) { .g2, .g3, .g4 { grid-template-columns: repeat(2, 1fr); } }
+@media (min-width: 1024px) { .g3 { grid-template-columns: repeat(3, 1fr); } .g4 { grid-template-columns: repeat(4, 1fr); } }
+.split { display: grid; gap: 40px; align-items: center; }
+@media (min-width: 960px) { .split { grid-template-columns: 1.05fr .95fr; } }
 
 /* Hero */
-.hero { position: relative; }
-.orb { position: absolute; pointer-events: none; border-radius: 999px; filter: blur(140px); }
-.orb.a { top: -190px; left: -15%; width: 680px; height: 560px; background: rgba(31,111,255,.25); }
-.orb.b { top: 40px; right: -15%; width: 600px; height: 480px; background: rgba(240,122,42,.2); }
-.parcels { position: absolute; inset: 0; pointer-events: none; opacity: .5;
-  background-image: linear-gradient(rgba(79,157,255,.07) 1px, transparent 1px), linear-gradient(90deg, rgba(79,157,255,.07) 1px, transparent 1px);
-  background-size: 64px 44px; -webkit-mask-image: radial-gradient(ellipse at 50% 30%, #000 20%, transparent 70%); mask-image: radial-gradient(ellipse at 50% 30%, #000 20%, transparent 70%); }
-.hero-in { position: relative; text-align: center; padding-top: 48px; padding-bottom: 56px; }
-@media (min-width: 768px) { .hero-in { padding-top: 64px; } }
-.hero-sub { font-size: 20px; font-weight: 800; margin: 20px 0 0; }
-@media (min-width: 768px) { .hero-sub { font-size: 24px; } }
-.hero .chips { justify-content: center; margin: 24px auto 0; max-width: 820px; }
-.split { display: grid; gap: 40px; }
-@media (min-width: 1024px) { .split { grid-template-columns: 1.05fr .95fr; align-items: center; } }
-.big { font-family: var(--display); font-weight: 700; font-size: 40px; line-height: .98; margin: 16px 0 0; }
-@media (min-width: 768px) { .big { font-size: 54px; } }
-.ctas { display: flex; flex-direction: column; gap: 12px; margin-top: 28px; }
-@media (min-width: 640px) { .ctas { flex-direction: row; } }
-.fine { font-size: 15px; color: var(--soft); margin: 16px 0 0; }
+.hero { padding-top: 40px; }
+@media (min-width: 768px) { .hero { padding-top: 64px; } }
+.hero .pills { margin-top: 24px; }
+.ctas { display: flex; flex-wrap: wrap; align-items: center; gap: 18px 28px; margin-top: 30px; }
+.hero-note { font-size: 17px; font-weight: 600; margin: 18px 0 0; }
+.art { width: 100%; max-width: 600px; height: auto; display: block; margin: 0 auto; }
 
-/* Profile mock */
-.profile { width: 100%; max-width: 420px; margin: 0 auto; border-radius: 28px; border: 2px solid var(--line2); background: #05080f; padding: 18px; box-shadow: 0 0 60px rgba(240,122,42,.25); }
-.p-head { display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--line); padding-bottom: 12px; }
+/* Cards */
+.card { background: var(--white); border: 1.5px solid var(--line); border-radius: 16px; padding: 22px; min-width: 0; }
+.ic { width: 54px; height: 54px; border-radius: 50%; border: 1.5px solid var(--line); background: var(--white); display: grid; place-items: center; font-size: 25px; line-height: 1; }
+.card h3 { font-family: var(--serif); font-weight: 600; font-size: 25px; line-height: 1.1; letter-spacing: -0.01em; margin: 14px 0 0; }
+.card p { font-size: 16px; color: var(--ink-2); margin: 6px 0 0; }
+.src .who { font: 700 15px/1.2 var(--sans); text-transform: uppercase; letter-spacing: .08em; }
+.src .who::before { content: ""; display: inline-block; width: 10px; height: 10px; border-radius: 50%; background: var(--lime); border: 1.5px solid var(--line); margin-right: 8px; vertical-align: -1px; }
+
+/* Stats */
+.stat { background: var(--white); border: 1.5px solid var(--line); border-top: 9px solid var(--mint); border-radius: 16px; padding: 18px 20px 20px; min-width: 0; }
+.grid > .stat:nth-child(4n+2) { border-top-color: var(--coral); }
+.grid > .stat:nth-child(4n+3) { border-top-color: var(--lime); }
+.grid > .stat:nth-child(4n+4) { border-top-color: var(--pink); }
+.stat .v { font-family: var(--serif); font-weight: 500; font-size: 44px; line-height: 1; letter-spacing: -0.02em; }
+@media (min-width: 768px) { .stat .v { font-size: 48px; } }
+.stat .k { font: 700 15px/1.3 var(--sans); text-transform: uppercase; letter-spacing: .05em; margin: 10px 0 0; }
+.stat .d { font-size: 16px; color: var(--ink-2); margin: 4px 0 0; }
+
+/* Steps */
+.steps { display: grid; gap: 14px; }
+@media (min-width: 640px) { .steps { grid-template-columns: repeat(2, 1fr); } }
+.steps .card h3 .n { color: var(--coral); }
+
+/* Example profile */
+.profile { width: 100%; max-width: 440px; margin: 0 auto; background: var(--white); border: 2px solid var(--line); border-radius: 22px; padding: 18px; box-shadow: 12px 12px 0 var(--mint); }
+.p-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; border-bottom: 1.5px solid var(--line); padding-bottom: 14px; }
 .p-head .who { display: flex; align-items: center; gap: 12px; }
-.p-head .mark { width: 36px; height: 36px; border-radius: 10px; }
-.p-head b { display: block; font-size: 16px; }
-.p-head span { font-size: 15px; color: var(--soft); }
-.ms { font-family: var(--display); font-size: 20px; font-weight: 700; color: var(--green); white-space: nowrap; }
-.p-row { border-radius: 14px; border: 1px solid var(--line); background: var(--card2); padding: 12px 14px; margin-top: 10px; }
-.p-row .k { font-size: 15px; font-weight: 800; text-transform: uppercase; letter-spacing: .05em; color: var(--blue-soft); }
-.p-row .v { font-size: 18px; font-weight: 800; margin-top: 2px; }
-.p-row .s { font-size: 15px; color: var(--soft); }
-.p-row .chips { margin: 8px 0 0; justify-content: flex-start; }
-.p-row.owner { border-color: rgba(217,169,95,.55); background: #120d06; }
-.p-row.owner .k { color: var(--gold); }
+.p-head .mark { width: 38px; height: 38px; border-radius: 10px; }
+.p-head b { display: block; font-size: 17px; }
+.p-head span { font-size: 15px; color: var(--ink-2); }
+.p-row { background: var(--mint-pale); border: 1.5px solid transparent; border-radius: 12px; padding: 12px 14px; margin-top: 10px; }
+.p-row .k { font: 700 15px/1.2 var(--sans); text-transform: uppercase; letter-spacing: .06em; }
+.p-row .v { font-family: var(--serif); font-size: 23px; font-weight: 600; line-height: 1.2; margin-top: 4px; }
+.p-row .s { font-size: 15px; color: var(--ink-2); }
+.p-row .pills { margin-top: 10px; }
+.p-row.owner { background: var(--coral-pale); border-color: var(--coral); }
 .p-two { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
 
 /* Add-ons */
-.addon { display: flex; flex-direction: column; border-radius: 18px; border: 1px solid var(--line); background: var(--card2); padding: 20px; }
-.addon.star { border-color: rgba(240,122,42,.8); background: #120a05; box-shadow: 0 0 34px rgba(240,122,42,.25); }
+.addon { display: flex; flex-direction: column; background: var(--white); border: 1.5px solid var(--line); border-radius: 18px; padding: 22px; min-width: 0; }
+.addon.star { background: var(--coral-pale); border: 2.5px solid var(--line); box-shadow: 10px 10px 0 var(--coral); }
 .a-top { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
-.a-top .ico { font-size: 30px; line-height: 1; }
-.addon h3 { font-family: var(--display); font-size: 30px; font-weight: 700; line-height: 1; margin: 14px 0 0; }
-.addon .what { font-size: 16px; color: var(--soft); margin: 8px 0 0; }
-.a-sec { margin-top: 14px; border-top: 1px solid var(--line); padding-top: 12px; }
-.a-sec .h { font-size: 15px; font-weight: 800; text-transform: uppercase; letter-spacing: .12em; color: var(--blue-soft); }
-.a-sec.cap .h { color: var(--gold); }
-.a-sec ul { margin: 6px 0 0; padding-left: 20px; font-size: 16px; }
-.a-sec li { margin: 2px 0; }
-.cap-n { font-family: var(--display); font-size: 40px; font-weight: 700; line-height: 1; color: var(--gold); margin-top: 6px; }
-.cap-t { font-size: 16px; color: var(--soft); margin: 4px 0 0; }
-.runs { margin-top: auto; padding-top: 14px; font-size: 15px; color: var(--soft); }
-.runs b { color: #fff; }
-.runs code { display: block; margin-top: 3px; }
-.how { counter-reset: s; display: grid; gap: 12px; }
-@media (min-width: 1024px) { .how { grid-template-columns: repeat(4, 1fr); } }
-@media (min-width: 640px) and (max-width: 1023px) { .how { grid-template-columns: repeat(2, 1fr); } }
-.how .card h3::before { counter-increment: s; content: counter(s) ". "; color: var(--fox); }
+.addon h3 { font-family: var(--serif); font-weight: 600; font-size: 28px; line-height: 1.05; letter-spacing: -0.015em; margin: 16px 0 0; }
+.addon .what { font-size: 16px; color: var(--ink-2); margin: 8px 0 0; }
+.a-sec { margin-top: 16px; border-top: 1.5px dashed rgba(51,51,51,.4); padding-top: 12px; }
+.a-sec .h { display: flex; align-items: center; gap: 8px; font: 700 15px/1.2 var(--sans); text-transform: uppercase; letter-spacing: .12em; }
+.a-sec .h::before { content: ""; width: 10px; height: 10px; border-radius: 50%; border: 1.5px solid var(--line); background: var(--mint); }
+.a-sec.cap .h::before { background: var(--lime); }
+.a-sec ul { margin: 8px 0 0; padding-left: 20px; font-size: 16px; }
+.a-sec li { margin: 3px 0; }
+.cap-n { font-family: var(--serif); font-weight: 500; font-size: 36px; line-height: 1; letter-spacing: -0.02em; margin-top: 8px; }
+.cap-t { font-size: 16px; color: var(--ink-2); margin: 6px 0 0; }
+.runs { margin-top: auto; padding-top: 18px; font-size: 15px; font-weight: 700; }
+.runs code { display: block; margin-top: 5px; background: var(--mint-pale); border: 1px solid var(--mint-soft); border-radius: 8px; padding: 4px 9px; font: 500 15px/1.4 ui-monospace, "Cascadia Mono", Consolas, monospace; color: var(--ink); overflow-wrap: anywhere; }
+.runs small { font-size: 15px; font-weight: 500; color: var(--ink-2); }
 
 /* Regions */
-.region h3 { font-family: var(--display); font-size: 34px; font-weight: 700; line-height: 1; margin: 0; }
-.region .total { font-family: var(--display); font-size: 52px; font-weight: 700; line-height: 1; margin-top: 10px; }
-.region .total small { font-family: var(--body); font-size: 15px; font-weight: 800; text-transform: uppercase; letter-spacing: .06em; margin-left: 6px; }
-.region ul { list-style: none; padding: 0; margin: 14px 0 0; }
-.region li { display: flex; justify-content: space-between; gap: 12px; border-top: 1px solid var(--line); padding: 8px 0; font-size: 16px; }
+.region h3 { margin: 0; }
+.region .total { font-family: var(--serif); font-weight: 500; font-size: 52px; line-height: 1; letter-spacing: -0.02em; margin-top: 12px; }
+.region .total small { font-family: var(--sans); font-size: 15px; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; margin-left: 8px; }
+.region ul { list-style: none; padding: 0; margin: 16px 0 0; }
+.region li { display: flex; justify-content: space-between; gap: 12px; border-top: 1.5px dashed rgba(51,51,51,.35); padding: 9px 0; font-size: 16px; }
 .region li b { white-space: nowrap; }
 
-/* Sources */
-.src .who { font-size: 15px; font-weight: 800; text-transform: uppercase; letter-spacing: .08em; color: var(--blue-soft); }
-
-/* CTA + footer */
+/* Final + footer */
 .final { text-align: center; }
+.final .eyebrow { justify-content: center; }
+.final .lede { margin-left: auto; margin-right: auto; }
 .final .ctas { justify-content: center; }
-footer { border-top: 1px solid var(--line); padding: 28px 0 40px; }
-.foot { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 14px; font-size: 15px; color: var(--soft); }
+footer { background: var(--ink); color: var(--white); padding: 30px 0 40px; }
+.foot { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 16px; font-size: 15px; }
+footer .mark { border-color: var(--white); width: 38px; height: 38px; border-radius: 10px; }
+footer .word { font-size: 26px; }
 </style>
 </head>
 <body>
@@ -187,10 +174,7 @@ footer { border-top: 1px solid var(--line); padding: 28px 0 40px; }
   <div class="wrap bar">
     <a href="#top" class="brand" aria-label="Parcelvora home">
       <span class="mark"><img src="parcelvora-fox.png" alt=""></span>
-      <span>
-        <span class="word">PARCEL<b>VORA</b></span>
-        <span class="sub">Foundational Intelligence</span>
-      </span>
+      <span class="word">Parcelvora</span>
     </a>
     <nav class="links" aria-label="Sections">
       <a href="#product">Product</a>
@@ -198,55 +182,139 @@ footer { border-top: 1px solid var(--line); padding: 28px 0 40px; }
       <a href="#addons">Add-ons</a>
       <a href="#coverage">Coverage</a>
       <a href="#next">What's next</a>
+      <a href="parcelvora-records.html">Try the records</a>
     </nav>
-    <div class="head-cta">
-      <a class="demo" href="parcelvora-records.html">Try the records</a>
-      <a class="btn sm" href="https://parcelvora.com">Get Early Access</a>
-    </div>
+    <a class="btn sm" href="https://parcelvora.com">Get Early Access</a>
   </div>
 </header>
 
 <main id="top">
 
   <!-- Hero -->
-  <section class="hero">
-    <div class="orb a" aria-hidden="true"></div>
-    <div class="orb b" aria-hidden="true"></div>
-    <div class="parcels" aria-hidden="true"></div>
-    <div class="wrap hero-in">
-      <p class="eyebrow">New York + Florida · Residential first</p>
-      <h1>Know Who Owns It.<br><span class="grad">In Milliseconds.</span></h1>
-      <p class="hero-sub">Foundational Intelligence ready Datalake for NY and FL.</p>
-      <div class="chips">
-        <span class="chip blue">🏠 4.2M properties</span>
-        <span class="chip blue">👤 Owner first + last</span>
-        <span class="chip blue">🧭 Absentee + homestead</span>
-        <span class="chip blue">🏢 The person behind the LLC</span>
-      </div>
-      <p class="kicker">Search · Map · Export</p>
-    </div>
-
-    <div class="wrap pad" style="position:relative">
-      <div class="glow split">
-        <div>
-          <div class="tag"><span class="n">01</span><span class="l">Home</span></div>
-          <p class="big">Every deal starts with an <span style="color:var(--fox)">owner.</span></p>
-          <p class="lede">Parcelvora is a property-intelligence data lake for New York and Florida. Each parcel comes with its owner, mailing address and value, plus the last sale where one is on record, ready to search, map and export.</p>
-          <p class="lede">No texting. No dialing. No mailers. Property data, and only data.</p>
-          <div class="ctas">
-            <a class="btn" href="https://parcelvora.com">Get Early Access</a>
-            <a class="btn ghost" href="parcelvora-records.html">Try the records</a>
-          </div>
-          <p class="fine">The records demo runs on a 5,578-property sample. The profile shown is an example; its name and address are made up.</p>
+  <section class="mint hero">
+    <div class="wrap split">
+      <div>
+        <p class="eyebrow">New York + Florida · Residential first</p>
+        <h1>Know Who Owns It. <em>In Milliseconds.</em></h1>
+        <p class="lede">Parcelvora is a property-intelligence data lake for New York and Florida. Each parcel comes with its owner, mailing address and value, plus the last sale where one is on record, ready to search, map and export.</p>
+        <div class="pills">
+          <span class="pill">4.2M properties</span>
+          <span class="pill lime">Owner first + last</span>
+          <span class="pill pink">Absentee + homestead</span>
+          <span class="pill">The person behind the LLC</span>
         </div>
+        <p class="hero-note">No texting. No dialing. No mailers. Property data, and only data.</p>
+        <div class="ctas">
+          <a class="btn" href="https://parcelvora.com">Get Early Access</a>
+          <a class="arrow" href="parcelvora-records.html">Try the records →</a>
+        </div>
+      </div>
 
+      <svg class="art" viewBox="0 0 640 470" role="img" aria-label="A parcel map under a magnifying glass, linked to an owner profile card" xmlns="http://www.w3.org/2000/svg">
+        <g stroke="#333" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round">
+          <!-- map frame -->
+          <rect x="12" y="96" width="374" height="346" rx="10" fill="none"/>
+          <!-- streets -->
+          <g stroke-width="1.6" stroke-dasharray="5 9" fill="none">
+            <path d="M139 108 V432"/><path d="M261 108 V432"/>
+            <path d="M24 213 H376"/><path d="M24 325 H376"/>
+          </g>
+          <!-- lots -->
+          <rect x="24" y="108" width="108" height="98" rx="4" fill="#fff"/>
+          <rect x="146" y="108" width="108" height="98" rx="4" fill="#c8ece8"/>
+          <rect x="268" y="108" width="108" height="98" rx="4" fill="#fff"/>
+          <rect x="24" y="220" width="108" height="98" rx="4" fill="#f6a8a4"/>
+          <rect x="146" y="220" width="108" height="98" rx="4" fill="#ef7f7a"/>
+          <rect x="268" y="220" width="108" height="98" rx="4" fill="#fff"/>
+          <rect x="24" y="332" width="108" height="98" rx="4" fill="#fff"/>
+          <rect x="146" y="332" width="108" height="98" rx="4" fill="#a8d26d"/>
+          <rect x="268" y="332" width="108" height="98" rx="4" fill="#c8ece8"/>
+          <!-- house footprints -->
+          <g stroke-width="2" fill="#fff">
+            <rect x="52" y="132" width="52" height="42"/><path d="M170 130 h60 v30 h-26 v18 h-34 z"/><rect x="296" y="134" width="50" height="46"/>
+            <rect x="50" y="246" width="56" height="44"/><rect x="296" y="244" width="52" height="40"/>
+            <path d="M48 356 h56 v50 h-24 v-22 h-32 z"/><rect x="172" y="356" width="54" height="44"/><rect x="294" y="358" width="54" height="42"/>
+          </g>
+          <!-- dotted link: map to profile -->
+          <path d="M268 262 C 318 262, 344 236, 394 236" fill="none" stroke-width="3" stroke-dasharray="0.5 9"/>
+          <!-- magnifier -->
+          <path d="M246 316 L294 364" stroke-width="14"/>
+          <circle cx="200" cy="270" r="64" fill="#fff" stroke-width="3"/>
+          <circle cx="200" cy="270" r="54" fill="none" stroke-width="1.6"/>
+          <path d="M166 278 L200 247 L234 278 Z" fill="#ef7f7a"/>
+          <rect x="174" y="276" width="52" height="38" fill="#ef7f7a"/>
+          <rect x="193" y="292" width="14" height="22" fill="#fff" stroke-width="2"/>
+          <!-- owners frame -->
+          <rect x="420" y="30" width="150" height="96" rx="6" fill="none"/>
+          <circle cx="470" cy="66" r="13" fill="#fff" stroke-width="2"/>
+          <path d="M446 108 Q470 80 494 108 Z" fill="#fff" stroke-width="2"/>
+          <circle cx="510" cy="72" r="11" fill="#fff" stroke-width="2"/>
+          <path d="M490 110 Q510 88 530 110 Z" fill="#fff" stroke-width="2"/>
+          <circle cx="534" cy="104" r="11" fill="#a8d26d" stroke-width="2"/>
+          <path d="M534 98 V110 M528 104 H540" stroke-width="2"/>
+          <path d="M570 78 H612 V140" fill="none"/>
+          <path d="M495 126 V196" fill="none" stroke-width="2"/>
+          <!-- profile card -->
+          <rect x="396" y="196" width="222" height="178" rx="16" fill="#fff"/>
+          <circle cx="434" cy="236" r="20" fill="#f6a8a4" stroke-width="2"/>
+          <circle cx="434" cy="231" r="7" fill="#fff" stroke-width="2"/>
+          <path d="M422 250 Q434 238 446 250" fill="#fff" stroke-width="2"/>
+          <rect x="466" y="224" width="128" height="10" rx="5" fill="#333" stroke="none"/>
+          <rect x="466" y="242" width="88" height="8" rx="4" fill="#8bdad4" stroke="none"/>
+          <rect x="416" y="272" width="84" height="26" rx="13" fill="#a8d26d" stroke-width="2"/>
+          <rect x="508" y="272" width="92" height="26" rx="13" fill="#ef7f7a" stroke-width="2"/>
+          <rect x="416" y="316" width="184" height="8" rx="4" fill="#333" stroke="none"/>
+          <rect x="416" y="334" width="132" height="8" rx="4" fill="#c8ece8" stroke="none"/>
+          <rect x="416" y="352" width="96" height="8" rx="4" fill="#c8ece8" stroke="none"/>
+        </g>
+        <g fill="#e8f7f5"><circle cx="612" cy="164" r="7"/><circle cx="612" cy="188" r="7"/><circle cx="612" cy="212" r="7"/></g>
+      </svg>
+    </div>
+  </section>
+
+  <!-- In the lake today -->
+  <section id="results">
+    <div class="wrap">
+      <p class="eyebrow">In the lake today</p>
+      <h2>Millions of owners. <em>Already named.</em></h2>
+      <p class="lede">Counted from the current build. Every number below is a row you can filter, map and export.</p>
+      <div class="grid g4" style="margin-top:32px">
+        <div class="stat"><div class="v">4,239,907</div><p class="k">Properties</p><p class="d">NYC, Long Island, Miami-Dade, Broward, Palm Beach</p></div>
+        <div class="stat"><div class="v">3,094,162</div><p class="k">Owners by first + last name</p><p class="d">Ready for a contact lookup</p></div>
+        <div class="stat"><div class="v">886,826</div><p class="k">Absentee owners</p><p class="d">The owner gets mail somewhere else</p></div>
+        <div class="stat"><div class="v">1,241,335</div><p class="k">Florida homesteads</p><p class="d">The owner lives there</p></div>
+        <div class="stat"><div class="v">217,864</div><p class="k">Out-of-state owners</p><p class="d">Florida homes, mail outside Florida</p></div>
+        <div class="stat"><div class="v">87,062</div><p class="k">NYC LLC buildings unmasked</p><p class="d">The registered person behind the LLC</p></div>
+        <div class="stat"><div class="v">213,107</div><p class="k">Priced sales</p><p class="d">With the price and when</p></div>
+        <div class="stat"><div class="v">3,783,661</div><p class="k">Properties on the map</p><p class="d">Pinned and filterable by owner type</p></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Product -->
+  <section id="product" class="pale">
+    <div class="wrap split">
+      <div>
+        <p class="eyebrow">The product</p>
+        <h2>One lookup. <em>The whole ownership story.</em></h2>
+        <p class="lede">Type an address or a parcel number and get the full profile back: the property, the owner, where the owner gets mail, what it's worth and when it last sold.</p>
+        <p class="label">How Parcelvora works</p>
+        <div class="steps" style="margin-top:16px">
+          <div class="card"><div class="ic">🔎</div><h3><span class="n">1.</span> Search</h3><p>An address, an NYC lot (BBL), a New York parcel ID or a Florida folio. One box takes all four.</p></div>
+          <div class="card"><div class="ic">🎛️</div><h3><span class="n">2.</span> Filter</h3><p>Town, ZIP, owner type, absentee, homestead, out of state, value, year built, size, units, sold in the last 12 months.</p></div>
+          <div class="card"><div class="ic">🗺️</div><h3><span class="n">3.</span> Map</h3><p>The table and the map side by side, always in sync, colored by who owns it.</p></div>
+          <div class="card"><div class="ic">📄</div><h3><span class="n">4.</span> Profile + export</h3><p>Open any property for its full ownership profile. Download what you filtered as a CSV, up to 5,000 rows at a time.</p></div>
+        </div>
+      </div>
+
+      <div>
         <div class="profile" aria-label="Example property profile">
           <div class="p-head">
             <div class="who">
               <span class="mark"><img src="parcelvora-fox.png" alt=""></span>
               <div><b>Property profile</b><span>Miami-Dade · example</span></div>
             </div>
-            <span class="ms">8 ms</span>
+            <span class="pill lime">8 ms</span>
           </div>
           <div class="p-row">
             <div class="k">Property</div>
@@ -257,10 +325,10 @@ footer { border-top: 1px solid var(--line); padding: 28px 0 40px; }
             <div class="k">Owner</div>
             <div class="v">Jane Doe</div>
             <div class="s">Mailing: 40 Example Ave, Atlanta GA</div>
-            <div class="chips">
-              <span class="chip warn">Absentee</span>
-              <span class="chip fox">Out of state</span>
-              <span class="chip gold">Individual</span>
+            <div class="pills">
+              <span class="pill coral">Absentee</span>
+              <span class="pill lime">Out of state</span>
+              <span class="pill">Individual</span>
             </div>
           </div>
           <div class="p-two">
@@ -268,54 +336,18 @@ footer { border-top: 1px solid var(--line); padding: 28px 0 40px; }
             <div class="p-row"><div class="k">Last sale</div><div class="v">$450,000</div><div class="s">June 2025</div></div>
           </div>
         </div>
+        <p class="fine" style="text-align:center">The profile shown is an example; its name and address are made up. The records demo runs on a 5,578-property sample.</p>
       </div>
     </div>
   </section>
 
-  <!-- In the lake -->
-  <section id="results">
-    <div class="wrap pad">
-      <p class="eyebrow" style="color:var(--fox)">In the lake today</p>
-      <h2>Millions of owners. <span class="grad">Already named.</span></h2>
-      <p class="lede">Counted from the current build. Every number below is a row you can filter, map and export.</p>
-      <div class="grid g4" style="margin-top:28px">
-        <div class="stat"><div class="v">4,239,907</div><p class="k">Properties</p><p class="d">NYC, Long Island, Miami-Dade, Broward, Palm Beach</p></div>
-        <div class="stat good"><div class="v">3,094,162</div><p class="k">Owners by first + last name</p><p class="d">Ready for a contact lookup</p></div>
-        <div class="stat"><div class="v">886,826</div><p class="k">Absentee owners</p><p class="d">The owner gets mail somewhere else</p></div>
-        <div class="stat"><div class="v">1,241,335</div><p class="k">Florida homesteads</p><p class="d">The owner lives there</p></div>
-        <div class="stat"><div class="v">217,864</div><p class="k">Out-of-state owners</p><p class="d">Florida homes, mail outside Florida</p></div>
-        <div class="stat gold"><div class="v">87,062</div><p class="k">NYC LLC buildings unmasked</p><p class="d">The registered person behind the LLC</p></div>
-        <div class="stat"><div class="v">213,107</div><p class="k">Priced sales</p><p class="d">With the price and when</p></div>
-        <div class="stat"><div class="v">3,783,661</div><p class="k">Properties on the map</p><p class="d">Pinned and filterable by owner type</p></div>
-      </div>
-    </div>
-  </section>
-
-  <!-- 02 Product -->
-  <section id="product">
-    <div class="wrap pad">
-      <div class="glow">
-        <div class="tag"><span class="n">02</span><span class="l">Product</span></div>
-        <h2>One lookup. <span class="grad">The whole ownership story.</span></h2>
-        <p class="lede">Type an address or a parcel number and get the full profile back: the property, the owner, where the owner gets mail, what it's worth and when it last sold.</p>
-        <p class="label">How Parcelvora works</p>
-        <div class="how" style="margin-top:16px">
-          <div class="card"><div class="ico">🔎</div><h3>Search</h3><p>An address, an NYC lot (BBL), a New York parcel ID or a Florida folio. One box takes all four.</p></div>
-          <div class="card"><div class="ico">🎛️</div><h3>Filter</h3><p>Town, ZIP, owner type, absentee, homestead, out of state, value, year built, size, units, sold in the last 12 months.</p></div>
-          <div class="card"><div class="ico">🗺️</div><h3>Map</h3><p>The table and the map side by side, always in sync. Green: the owner lives there. Amber: absentee. Blue: company-owned.</p></div>
-          <div class="card"><div class="ico">📄</div><h3>Profile + export</h3><p>Open any property for its full ownership profile. Download what you filtered as a CSV, up to 5,000 rows at a time.</p></div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- 03 Data -->
+  <!-- Data -->
   <section id="data">
-    <div class="wrap pad">
-      <div class="tag"><span class="n">03</span><span class="l">Data</span></div>
-      <h2>Built on <span class="grad">public record.</span></h2>
+    <div class="wrap">
+      <p class="eyebrow">The data</p>
+      <h2>Built on <em>public record.</em></h2>
       <p class="lede">Straight from New York City, New York State and the Florida Department of Revenue. Nothing guessed.</p>
-      <div class="grid g3" style="margin-top:28px">
+      <div class="grid g3" style="margin-top:32px">
         <div class="card src"><div class="who">NYC Open Data</div><h3>PLUTO</h3><p>Every NYC tax lot: owner, building class, units, year built, lot and building area, zoning, assessed value, location.</p></div>
         <div class="card src"><div class="who">NYC Open Data</div><h3>HPD registrations + contacts</h3><p>Which buildings are registered, and the people on each registration: head officer, owners, officers.</p></div>
         <div class="card src"><div class="who">NYC Open Data</div><h3>DOF rolling sales</h3><p>Every NYC sale in the last 12 months, with the price and what sold.</p></div>
@@ -326,135 +358,144 @@ footer { border-top: 1px solid var(--line); padding: 28px 0 40px; }
     </div>
   </section>
 
-  <!-- 04 Add-ons -->
-  <section id="addons">
-    <div class="wrap pad">
-      <div class="glow">
-        <div class="tag"><span class="n">04</span><span class="l">Add-ons</span></div>
-        <h2>Turn on more intelligence, <span class="grad">one layer at a time.</span></h2>
-        <p class="lede">Each add-on runs on Apify actors: cloud workers that do one job each, like finding the phone, reading the deed or checking the loan. Switch on the ones you need, and each one writes its answer back into the same property profile.</p>
+  <!-- Add-ons -->
+  <section id="addons" class="mint">
+    <div class="wrap">
+      <p class="eyebrow">Add-ons</p>
+      <h2>Turn on more intelligence, <em>one layer at a time.</em></h2>
+      <p class="lede" style="color:var(--ink)">Each add-on runs on Apify actors: cloud workers that do one job each, like finding the phone, reading the deed or checking the loan. Switch on the ones you need, and each one writes its answer back into the same property profile.</p>
 
-        <p class="label">What the add-ons add</p>
-        <div class="grid g4" style="margin-top:16px">
-          <div class="stat gold"><div class="v">3,094,162</div><p class="k">Owners to look up</p><p class="d">Named owners a phone + email lookup can run on</p></div>
-          <div class="stat gold"><div class="v">492,014</div><p class="k">Company owners to unmask</p><p class="d">87,062 NYC LLC buildings + 404,952 Florida company parcels</p></div>
-          <div class="stat"><div class="v">≤ 12 mo</div><p class="k">Loans coming due</p><p class="d">Maturity dates and adjustable-rate flags</p></div>
-          <div class="stat good"><div class="v">Before</div><p class="k">Every pursuit</p><p class="d">A listed check, so you don't chase a live listing</p></div>
-        </div>
-
-        <div class="grid g3" style="margin-top:28px">
-
-          <article class="addon star">
-            <div class="a-top"><span class="ico">🚦</span><span class="chip fox">Check first</span></div>
-            <h3>Listed Check</h3>
-            <p class="what">Before you go after a property, find out if it's on the market right now. Anything live gets marked "On the market · not in pursuit" and kept out of your list.</p>
-            <div class="a-sec"><div class="h">Capability</div>
-              <ul><li>Live for-sale-by-owner flag</li><li>Live agent-listing flag</li><li>Listing date and asking price</li><li>A re-check on a schedule, so a home that lists later drops out</li></ul></div>
-            <div class="a-sec cap"><div class="h">Capacity</div>
-              <div class="cap-n">Every list</div><p class="cap-t">Runs on every list before outreach starts. You keep the off-market owners nobody else is working.</p></div>
-            <p class="runs"><b>Apify actors:</b> <code>memo23/forsalebyowner-scraper</code><code>solidcode/fsbo-scraper</code><code>memo23/zillow-scraper-ppe</code></p>
-          </article>
-
-          <article class="addon">
-            <div class="a-top"><span class="ico">📱</span><span class="chip blue">Contacts</span></div>
-            <h3>Owner Contacts</h3>
-            <p class="what">The owner's mobile, landline and email, each with its line type and a confidence score on the match.</p>
-            <div class="a-sec"><div class="h">Capability</div>
-              <ul><li>Mobile and landline numbers</li><li>Line type on every number</li><li>Email addresses</li><li>Match confidence</li></ul></div>
-            <div class="a-sec cap"><div class="h">Capacity</div>
-              <div class="cap-n">3,094,162</div><p class="cap-t">named owners it can run on. You pay for hits, not misses.</p></div>
-            <p class="runs"><b>Apify actors:</b> <code>thermostatic/skiptrace</code><code>one-api/skip-trace</code></p>
-          </article>
-
-          <article class="addon">
-            <div class="a-top"><span class="ico">🔁</span><span class="chip blue">Contacts</span></div>
-            <h3>Second-Pass People Search</h3>
-            <p class="what">When the first lookup comes back empty, a second source tries again and brings back the owner's wider picture.</p>
-            <div class="a-sec"><div class="h">Capability</div>
-              <ul><li>Extra phone numbers</li><li>Age and relatives</li><li>Past addresses</li></ul></div>
-            <div class="a-sec cap"><div class="h">Capacity</div>
-              <div class="cap-n">2 tries</div><p class="cap-t">for every named owner. It runs only on the first pass's misses, so nothing is paid for twice.</p></div>
-            <p class="runs"><b>Apify actor:</b> <code>memo23/truepeoplesearch-people-search-scraper</code></p>
-          </article>
-
-          <article class="addon">
-            <div class="a-top"><span class="ico">🌴</span><span class="chip gold">Unmask</span></div>
-            <h3>Florida LLC Unmasking</h3>
-            <p class="what">For every Florida home owned by a company, the people on its state filing.</p>
-            <div class="a-sec"><div class="h">Capability</div>
-              <ul><li>Officers and managers</li><li>Registered agent</li><li>Company status and filing date</li><li>Principal and mailing address</li></ul></div>
-            <div class="a-sec cap"><div class="h">Capacity</div>
-              <div class="cap-n">404,952</div><p class="cap-t">company-owned parcels in Miami-Dade, Broward and Palm Beach.</p></div>
-            <p class="runs"><b>Apify actor:</b> <code>parseforge/sunbiz-florida-business-scraper</code></p>
-          </article>
-
-          <article class="addon">
-            <div class="a-top"><span class="ico">🗽</span><span class="chip gold">Unmask</span></div>
-            <h3>NYC Deed Bridge</h3>
-            <p class="what">For NYC lots owned by an LLC, it reads the city's deed records and pulls the people named on them.</p>
-            <div class="a-sec"><div class="h">Capability</div>
-              <ul><li>People named on the LLC's deeds</li><li>Who bought and who sold</li><li>Deed date and a link to the scanned document</li></ul></div>
-            <div class="a-sec cap"><div class="h">Capacity</div>
-              <div class="cap-n">+ LLC lots</div><p class="cap-t">with no HPD registration, beyond the 87,062 LLC buildings already unmasked.</p></div>
-            <p class="runs"><b>Apify actor:</b> <code>acris-llc-bridge</code> (Parcelvora's own)</p>
-          </article>
-
-          <article class="addon">
-            <div class="a-top"><span class="ico">🏛️</span><span class="chip gold">Unmask</span></div>
-            <h3>Entity &amp; Lien Check</h3>
-            <p class="what">For any company owner, its Secretary of State record, plus the liens filed against it.</p>
-            <div class="a-sec"><div class="h">Capability</div>
-              <ul><li>Active or dissolved, and the formation date</li><li>Registered agent</li><li>Liens and UCC filings</li></ul></div>
-            <div class="a-sec cap"><div class="h">Capacity</div>
-              <div class="cap-n">48 states + DC</div><p class="cap-t">Covers Long Island LLC owners, and out-of-state companies that own in New York or Florida.</p></div>
-            <p class="runs"><b>Apify actor:</b> <code>shelvick/business-entity-lien-search</code></p>
-          </article>
-
-          <article class="addon">
-            <div class="a-top"><span class="ico">📉</span><span class="chip fox">Signal</span></div>
-            <h3>Loan &amp; ARM Radar</h3>
-            <p class="what">The open mortgages on a property: who lent, how much, the rate type, and when the loan comes due.</p>
-            <div class="a-sec"><div class="h">Capability</div>
-              <ul><li>Lender and loan amount</li><li>Adjustable-rate flag and rate type</li><li>Maturity and recording dates</li><li>Lot size in acres</li></ul></div>
-            <div class="a-sec cap"><div class="h">Capacity</div>
-              <div class="cap-n">Whole counties</div><p class="cap-t">filtered by lot size. Loans maturing within 12 months are flagged exactly. 5-, 7- and 10-year reset points are labeled as estimates.</p></div>
-            <p class="runs"><b>Apify actor:</b> <code>solidcode/propwire-com-scraper</code></p>
-          </article>
-
-          <article class="addon">
-            <div class="a-top"><span class="ico">🕊️</span><span class="chip fox">Signal</span></div>
-            <h3>Estate Signals</h3>
-            <p class="what">Death notices matched to owner names, so you can tell when a home is about to pass to the family.</p>
-            <div class="a-sec"><div class="h">Capability</div>
-              <ul><li>Deceased-owner flag</li><li>Date of the notice</li><li>Survivors named in the notice</li></ul></div>
-            <div class="a-sec cap"><div class="h">Capacity</div>
-              <div class="cap-n">3,094,162</div><p class="cap-t">named owners in New York and Florida checked against new notices.</p></div>
-            <p class="runs"><b>Apify actor:</b> <code>jungle_synthesizer/legacy-com-obituary-death-notice-scraper</code></p>
-          </article>
-
-          <article class="addon">
-            <div class="a-top"><span class="ico">💼</span><span class="chip blue">People</span></div>
-            <h3>Decision Makers</h3>
-            <p class="what">The people at a company that owns property: who they are, their title and where to find them.</p>
-            <div class="a-sec"><div class="h">Capability</div>
-              <ul><li>Names and titles</li><li>Profile links</li><li>Company and location</li></ul></div>
-            <div class="a-sec cap"><div class="h">Capacity</div>
-              <div class="cap-n">492,014</div><p class="cap-t">company-owned NYC buildings and Florida parcels to work from.</p></div>
-            <p class="runs"><b>Apify actor:</b> <code>harvestapi/linkedin-profile-search</code></p>
-          </article>
-
-        </div>
-        <p class="fine">Add-ons are switched on per account and run on demand.</p>
+      <p class="label">What the add-ons add</p>
+      <div class="grid g4" style="margin-top:16px">
+        <div class="stat"><div class="v">3,094,162</div><p class="k">Owners to look up</p><p class="d">Named owners a phone + email lookup can run on</p></div>
+        <div class="stat"><div class="v">492,014</div><p class="k">Company owners to unmask</p><p class="d">87,062 NYC LLC buildings + 404,952 Florida company parcels</p></div>
+        <div class="stat"><div class="v">≤ 12 mo</div><p class="k">Loans coming due</p><p class="d">Maturity dates and adjustable-rate flags</p></div>
+        <div class="stat"><div class="v">Before</div><p class="k">Every pursuit</p><p class="d">A listed check, so you don't chase a home that already has an agent</p></div>
       </div>
+
+      <div class="grid g3" style="margin-top:32px">
+
+        <article class="addon star">
+          <div class="a-top"><span class="ic">🚦</span><span class="pill coral">Check first</span></div>
+          <h3>Listed Check</h3>
+          <p class="what">Before you go after a property, find out if it's listed with an agent right now. Anything listed, under contract or pending gets marked "On the market · not in pursuit" and kept out of your list.</p>
+          <div class="a-sec"><div class="h">Capability</div>
+            <ul><li>Listed-with-an-agent flag</li><li>Under contract and pending flags</li><li>Listing date and asking price</li><li>A re-check on a schedule, so a home that lists later drops out</li></ul></div>
+          <div class="a-sec cap"><div class="h">Capacity</div>
+            <div class="cap-n">Every list</div><p class="cap-t">Runs on every list before outreach starts. You keep the owners nobody else is working.</p></div>
+          <p class="runs">Apify actor<code>memo23/zillow-scraper-ppe</code></p>
+        </article>
+
+        <article class="addon">
+          <div class="a-top"><span class="ic">🏡</span><span class="pill lime">Pursue</span></div>
+          <h3>FSBO Finder</h3>
+          <p class="what">Owners selling their own home, with no agent. They have already decided to sell, and nobody is representing them.</p>
+          <div class="a-sec"><div class="h">Capability</div>
+            <ul><li>Address, asking price and listing date</li><li>The seller's phone from the listing</li><li>Drops any home that is also listed with an agent</li><li>New by-owner listings picked up as they post</li></ul></div>
+          <div class="a-sec cap"><div class="h">Capacity</div>
+            <div class="cap-n">4,395</div><p class="cap-t">by-owner real estate ads on Craigslist alone (NY 1,312 · FL 3,083, counted Oct 29), plus ForSaleByOwner.com and FSBO.com.</p></div>
+          <p class="runs">Apify actors<code>memo23/forsalebyowner-scraper</code><code>solidcode/fsbo-scraper</code></p>
+        </article>
+
+        <article class="addon">
+          <div class="a-top"><span class="ic">📱</span><span class="pill mint">Contacts</span></div>
+          <h3>Owner Contacts</h3>
+          <p class="what">The owner's mobile, landline and email, each with its line type and a confidence score on the match.</p>
+          <div class="a-sec"><div class="h">Capability</div>
+            <ul><li>Mobile and landline numbers</li><li>Line type on every number</li><li>Email addresses</li><li>Match confidence</li></ul></div>
+          <div class="a-sec cap"><div class="h">Capacity</div>
+            <div class="cap-n">3,094,162</div><p class="cap-t">named owners it can run on. You pay for hits, not misses.</p></div>
+          <p class="runs">Apify actors<code>thermostatic/skiptrace</code><code>one-api/skip-trace</code></p>
+        </article>
+
+        <article class="addon">
+          <div class="a-top"><span class="ic">🔁</span><span class="pill mint">Contacts</span></div>
+          <h3>Second-Pass People Search</h3>
+          <p class="what">When the first lookup comes back empty, a second source tries again and brings back the owner's wider picture.</p>
+          <div class="a-sec"><div class="h">Capability</div>
+            <ul><li>Extra phone numbers</li><li>Age and relatives</li><li>Past addresses</li></ul></div>
+          <div class="a-sec cap"><div class="h">Capacity</div>
+            <div class="cap-n">2 tries</div><p class="cap-t">for every named owner. It runs only on the first pass's misses, so nothing is paid for twice.</p></div>
+          <p class="runs">Apify actor<code>memo23/truepeoplesearch-people-search-scraper</code></p>
+        </article>
+
+        <article class="addon">
+          <div class="a-top"><span class="ic">🌴</span><span class="pill pink">Unmask</span></div>
+          <h3>Florida LLC Unmasking</h3>
+          <p class="what">For every Florida home owned by a company, the people on its state filing.</p>
+          <div class="a-sec"><div class="h">Capability</div>
+            <ul><li>Officers and managers</li><li>Registered agent</li><li>Company status and filing date</li><li>Principal and mailing address</li></ul></div>
+          <div class="a-sec cap"><div class="h">Capacity</div>
+            <div class="cap-n">404,952</div><p class="cap-t">company-owned parcels in Miami-Dade, Broward and Palm Beach.</p></div>
+          <p class="runs">Apify actor<code>parseforge/sunbiz-florida-business-scraper</code></p>
+        </article>
+
+        <article class="addon">
+          <div class="a-top"><span class="ic">🗽</span><span class="pill pink">Unmask</span></div>
+          <h3>NYC Deed Bridge</h3>
+          <p class="what">For NYC lots owned by an LLC, it reads the city's deed records and pulls the people named on them.</p>
+          <div class="a-sec"><div class="h">Capability</div>
+            <ul><li>People named on the LLC's deeds</li><li>Who bought and who sold</li><li>Deed date and a link to the scanned document</li></ul></div>
+          <div class="a-sec cap"><div class="h">Capacity</div>
+            <div class="cap-n">+ LLC lots</div><p class="cap-t">with no HPD registration, beyond the 87,062 LLC buildings already unmasked.</p></div>
+          <p class="runs">Apify actor<code>acris-llc-bridge</code><small>Parcelvora's own</small></p>
+        </article>
+
+        <article class="addon">
+          <div class="a-top"><span class="ic">🏛️</span><span class="pill pink">Unmask</span></div>
+          <h3>Entity &amp; Lien Check</h3>
+          <p class="what">For any company owner, its Secretary of State record, plus the liens filed against it.</p>
+          <div class="a-sec"><div class="h">Capability</div>
+            <ul><li>Active or dissolved, and the formation date</li><li>Registered agent</li><li>Liens and UCC filings</li></ul></div>
+          <div class="a-sec cap"><div class="h">Capacity</div>
+            <div class="cap-n">48 states + DC</div><p class="cap-t">Covers Long Island LLC owners, and out-of-state companies that own in New York or Florida.</p></div>
+          <p class="runs">Apify actor<code>shelvick/business-entity-lien-search</code></p>
+        </article>
+
+        <article class="addon">
+          <div class="a-top"><span class="ic">📉</span><span class="pill lime">Signal</span></div>
+          <h3>Loan &amp; ARM Radar</h3>
+          <p class="what">The open mortgages on a property: who lent, how much, the rate type, and when the loan comes due.</p>
+          <div class="a-sec"><div class="h">Capability</div>
+            <ul><li>Lender and loan amount</li><li>Adjustable-rate flag and rate type</li><li>Maturity and recording dates</li><li>Lot size in acres</li></ul></div>
+          <div class="a-sec cap"><div class="h">Capacity</div>
+            <div class="cap-n">Whole counties</div><p class="cap-t">filtered by lot size. Loans maturing within 12 months are flagged exactly. 5-, 7- and 10-year reset points are labeled as estimates.</p></div>
+          <p class="runs">Apify actor<code>solidcode/propwire-com-scraper</code></p>
+        </article>
+
+        <article class="addon">
+          <div class="a-top"><span class="ic">🕊️</span><span class="pill lime">Signal</span></div>
+          <h3>Estate Signals</h3>
+          <p class="what">Death notices matched to owner names, so you can tell when a home is about to pass to the family.</p>
+          <div class="a-sec"><div class="h">Capability</div>
+            <ul><li>Deceased-owner flag</li><li>Date of the notice</li><li>Survivors named in the notice</li></ul></div>
+          <div class="a-sec cap"><div class="h">Capacity</div>
+            <div class="cap-n">3,094,162</div><p class="cap-t">named owners in New York and Florida checked against new notices.</p></div>
+          <p class="runs">Apify actor<code>jungle_synthesizer/legacy-com-obituary-death-notice-scraper</code></p>
+        </article>
+
+        <article class="addon">
+          <div class="a-top"><span class="ic">💼</span><span class="pill">People</span></div>
+          <h3>Decision Makers</h3>
+          <p class="what">The people at a company that owns property: who they are, their title and where to find them.</p>
+          <div class="a-sec"><div class="h">Capability</div>
+            <ul><li>Names and titles</li><li>Profile links</li><li>Company and location</li></ul></div>
+          <div class="a-sec cap"><div class="h">Capacity</div>
+            <div class="cap-n">492,014</div><p class="cap-t">company-owned NYC buildings and Florida parcels to work from.</p></div>
+          <p class="runs">Apify actor<code>harvestapi/linkedin-profile-search</code></p>
+        </article>
+
+      </div>
+      <p class="fine" style="color:var(--ink)">Add-ons are switched on per account and run on demand.</p>
     </div>
   </section>
 
-  <!-- 05 Coverage -->
+  <!-- Coverage -->
   <section id="coverage">
-    <div class="wrap pad">
-      <div class="tag"><span class="n">05</span><span class="l">Coverage</span></div>
-      <h2>Three markets. <span class="grad">Parcel by parcel.</span></h2>
-      <div class="grid g3" style="margin-top:28px">
+    <div class="wrap">
+      <p class="eyebrow">Coverage</p>
+      <h2>Three markets. <em>Parcel by parcel.</em></h2>
+      <div class="grid g3" style="margin-top:32px">
         <div class="card region">
           <h3>New York City</h3>
           <div class="total">858,284<small>properties</small></div>
@@ -490,31 +531,29 @@ footer { border-top: 1px solid var(--line); padding: 28px 0 40px; }
     </div>
   </section>
 
-  <!-- 06 What's next -->
-  <section id="next">
-    <div class="wrap pad">
-      <div class="glow">
-        <div class="tag"><span class="n">06</span><span class="l">What's next</span></div>
-        <h2>The lake <span class="grad">keeps growing.</span></h2>
-        <div class="grid g4" style="margin-top:28px">
-          <div class="card"><div class="ico">🌎</div><h3>All 67 Florida counties</h3><p>Statewide Florida, from the same tax rolls.</p></div>
-          <div class="card"><div class="ico">⚖️</div><h3>Foreclosure + lis pendens</h3><p>Court filings on the property, when they're filed.</p></div>
-          <div class="card"><div class="ico">📜</div><h3>NYC deeds + mortgages</h3><p>Every recorded document, stored with the property.</p></div>
-          <div class="card"><div class="ico">🔄</div><h3>Weekly refresh</h3><p>The lake rebuilt from the source on a set schedule.</p></div>
-        </div>
+  <!-- What's next -->
+  <section id="next" class="pale">
+    <div class="wrap">
+      <p class="eyebrow">What's next</p>
+      <h2>The lake <em>keeps growing.</em></h2>
+      <div class="grid g4" style="margin-top:32px">
+        <div class="card"><div class="ic">🌎</div><h3>All 67 Florida counties</h3><p>Statewide Florida, from the same tax rolls.</p></div>
+        <div class="card"><div class="ic">⚖️</div><h3>Foreclosure + lis pendens</h3><p>Court filings on the property, when they're filed.</p></div>
+        <div class="card"><div class="ic">📜</div><h3>NYC deeds + mortgages</h3><p>Every recorded document, stored with the property.</p></div>
+        <div class="card"><div class="ic">🔄</div><h3>Weekly refresh</h3><p>The lake rebuilt from the source on a set schedule.</p></div>
       </div>
     </div>
   </section>
 
   <!-- Final CTA -->
-  <section>
-    <div class="wrap pad final">
+  <section class="mint final">
+    <div class="wrap">
       <p class="eyebrow">Parcelvora</p>
-      <h2>Property data, <span class="grad">and only data.</span></h2>
-      <p class="lede" style="margin-left:auto;margin-right:auto">New York and Florida. Every owner named. One lookup away.</p>
+      <h2>Property data, <em>and only data.</em></h2>
+      <p class="lede" style="color:var(--ink)">New York and Florida. Owners named. One lookup away.</p>
       <div class="ctas">
         <a class="btn" href="https://parcelvora.com">Get Early Access</a>
-        <a class="btn ghost" href="parcelvora-records.html">Try the records</a>
+        <a class="arrow" href="parcelvora-records.html">Try the records →</a>
       </div>
     </div>
   </section>
@@ -524,8 +563,8 @@ footer { border-top: 1px solid var(--line); padding: 28px 0 40px; }
 <footer>
   <div class="wrap foot">
     <a href="#top" class="brand">
-      <span class="mark" style="width:34px;height:34px;border-radius:10px"><img src="parcelvora-fox.png" alt=""></span>
-      <span class="word" style="font-size:22px">PARCEL<b>VORA</b></span>
+      <span class="mark"><img src="parcelvora-fox.png" alt=""></span>
+      <span class="word">Parcelvora</span>
     </a>
     <span>© 2026 Parcelvora · Foundational Intelligence ready Datalake for NY and FL</span>
   </div>
