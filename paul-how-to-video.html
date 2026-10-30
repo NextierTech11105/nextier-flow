@@ -1,0 +1,522 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<title>Data Engine How-To</title>
+<meta name="description" content="A slow, step-by-step video of the Team Musso Data Engine: a pointer shows every click, a caption says what to do.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@700;800&family=IBM+Plex+Sans:wght@500;600;700&display=swap">
+<style>
+:root{--bg:#000;--card:#0a0d12;--line:#2a3442;--fg:#fff;--orange:#ff8a3d;--green:#12b76a;--blue:#4c8dff;--amber:#ffb020;color-scheme:dark}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html,body{margin:0;background:var(--bg);color:var(--fg);font:500 17px/1.5 'IBM Plex Sans','Segoe UI',Arial,sans-serif}
+.wrap{max-width:1180px;margin:0 auto;padding:22px 16px 48px}
+.brand{font:800 15px 'Archivo',Arial,sans-serif;letter-spacing:.14em;text-transform:uppercase}
+.brand span{color:var(--orange)}
+h1{font:800 clamp(28px,4vw,46px)/1.05 'Archivo',Arial,sans-serif;margin:8px 0 6px}
+h1 em{font-style:normal;color:var(--green)}
+.lede{font-size:19px;font-weight:600;margin:0 0 16px}
+
+/* ── player ── */
+.player{background:#000;border:1px solid var(--line);border-radius:18px;overflow:hidden}
+.player:fullscreen{border:0;border-radius:0;display:flex;flex-direction:column;justify-content:center;height:100vh}
+.vp{position:relative;width:100%;aspect-ratio:1600/956;overflow:hidden;background:#05070a}
+.player:fullscreen .vp{width:min(100vw,calc((100vh - 250px) * 1600 / 956));margin:0 auto}
+#stage{position:absolute;left:0;top:0;width:1600px;height:956px;transform-origin:0 0}
+.screen{position:absolute;inset:0}
+.sample{position:absolute;right:18px;top:14px;z-index:5;font:800 15px 'Archivo',Arial,sans-serif;letter-spacing:.08em;color:#fff;background:#1d2633;border:1px solid #3b4a5e;border-radius:999px;padding:5px 12px}
+
+/* pointer · spotlight · click ring */
+#spot{position:absolute;z-index:20;border:4px solid var(--amber);border-radius:12px;box-shadow:0 0 0 4000px rgba(0,0,0,.5),0 0 26px rgba(255,176,32,.85);transition:all 1.1s cubic-bezier(.4,0,.2,1);pointer-events:none}
+#spot.hit{border-color:var(--green);box-shadow:0 0 0 4000px rgba(0,0,0,.5),0 0 34px rgba(18,183,106,.95)}
+#ptr{position:absolute;z-index:30;left:800px;top:600px;width:46px;height:46px;transition:left 1.3s cubic-bezier(.4,0,.2,1),top 1.3s cubic-bezier(.4,0,.2,1),transform .18s;pointer-events:none;filter:drop-shadow(0 4px 8px rgba(0,0,0,.8))}
+#ptr.down{transform:scale(.82)}
+#ring{position:absolute;z-index:29;width:20px;height:20px;margin:-10px 0 0 -10px;border-radius:50%;border:5px solid var(--orange);opacity:0;pointer-events:none}
+#ring.go{animation:ring .9s ease-out}
+@keyframes ring{0%{opacity:1;transform:scale(.4)}100%{opacity:0;transform:scale(4.2)}}
+@media (prefers-reduced-motion:reduce){#ptr,#spot{transition:none}#ring.go{animation:none}}
+
+/* title + end */
+.titlecard{display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;background:radial-gradient(ellipse at 50% 30%,#0f2347 0%,#000 70%)}
+.titlecard .big{font:800 92px/1 'Archivo',Arial,sans-serif;margin:0 0 18px}
+.titlecard .big em{font-style:normal;color:var(--green)}
+.titlecard .sub{font:600 32px/1.4 'IBM Plex Sans',Arial,sans-serif;margin:0 0 40px}
+.playbig{width:150px;height:150px;border-radius:50%;border:0;background:var(--orange);color:#000;font:800 64px/1 Arial;cursor:pointer;display:grid;place-items:center;padding-left:12px}
+.flow{display:flex;gap:14px;align-items:center;font:800 34px 'Archivo',Arial,sans-serif;margin:0 0 30px}
+.flow b{padding:12px 26px;border:3px solid var(--blue);border-radius:999px;background:#0f2347}
+.flow b.go{border-color:var(--green);background:#0b3322}
+.flow i{font-style:normal;color:var(--orange)}
+
+/* phone */
+.phonebg{background:#0b0f15;display:grid;place-items:center}
+.phone{width:440px;height:860px;border-radius:56px;border:10px solid #2b313b;background:#000;padding:70px 26px;position:relative}
+.phone .who{font:700 26px 'IBM Plex Sans',Arial;text-align:center;margin:0 0 30px}
+.bubble{background:#26292e;border-radius:26px;padding:22px 24px;font:600 26px/1.4 'IBM Plex Sans',Arial;margin:0 0 14px}
+.linkpill{display:inline-block;color:#6fa8ff;text-decoration:underline;font-weight:700}
+
+/* auth pages (join + sign in) */
+.auth{background:#000;display:grid;place-items:center}
+.authcard{width:640px;background:#0b0d10;border:1px solid #262b33;border-radius:20px;padding:44px 48px}
+.authcard h2{font:800 46px 'Archivo',Arial,sans-serif;margin:0 0 10px}
+.authcard p{font:600 22px/1.45 'IBM Plex Sans',Arial;margin:0 0 18px}
+.fld{display:block;font:700 22px 'IBM Plex Sans',Arial;margin:16px 0 0;color:#e8e8e8}
+.inp{margin-top:8px;height:58px;border-radius:12px;border:1px solid #3a414c;background:#14181e;font:600 24px/58px 'IBM Plex Sans',Arial;padding:0 18px;color:#fff;white-space:nowrap;overflow:hidden}
+.inp:empty::before{content:attr(data-ph);color:#8a93a0}
+.primary{margin-top:26px;height:66px;border-radius:14px;background:var(--orange);color:#000;font:800 26px/66px 'Archivo',Arial;text-align:center}
+.ghost{margin-top:14px;height:58px;border-radius:14px;border:1px solid #3a414c;font:700 22px/58px 'IBM Plex Sans',Arial;text-align:center}
+
+/* app frame */
+.rail{position:absolute;left:0;top:0;width:160px;height:956px;background:#07090c;border-right:1px solid #1f2630;padding:14px 10px}
+.rail .nx{font:800 17px 'IBM Plex Sans',Arial;margin:4px 6px 16px}
+.rail .it{display:flex;align-items:center;justify-content:space-between;gap:6px;font:600 16px/1.25 'IBM Plex Sans',Arial;padding:10px 8px;border-radius:10px;margin:0 0 6px;background:#0d1117}
+.rail .note{font:600 13.5px/1.4 'IBM Plex Sans',Arial;margin:14px 6px 0;color:#ffd9a8}
+.topnav{position:absolute;left:160px;top:0;width:1440px;height:56px;background:#05070a;border-bottom:1px solid #1f2630;display:flex;align-items:center;gap:6px;padding:0 14px}
+.topnav .tm{font:800 18px 'Archivo',Arial;margin-right:14px}
+.topnav .tab{font:700 16px 'IBM Plex Sans',Arial;padding:8px 14px;border-radius:999px;border:1px solid transparent}
+.topnav .tab.on{background:#0f2347;border-color:var(--blue)}
+.pane{position:absolute;left:160px;top:56px;width:1440px;height:900px;overflow:hidden;background:#000}
+.pane img{display:block;width:1440px;height:900px}
+.ov{position:absolute;z-index:4}
+.ovq{left:58px;top:80px;width:740px;height:36px;background:#0c1322;font:600 18px/36px 'IBM Plex Sans',Arial;color:#fff}
+.ovc{left:191px;top:392px;width:142px;height:37px;background:#0a0a0a;border-radius:6px;font:600 15px/37px 'IBM Plex Sans',Arial;padding-left:14px;color:#fff}
+.ovbar{left:16px;top:436px;width:808px;height:58px;background:#06080b;border:1px solid #3b4a5e;border-radius:12px;display:flex;align-items:center;gap:10px;padding:0 12px}
+.b{display:inline-block;font:800 16px 'IBM Plex Sans',Arial;padding:8px 14px;border-radius:9px;border:1px solid #fff;background:#111;white-space:nowrap}
+.b.bl{border-color:var(--blue);background:#0f2347}
+.b.gr{border-color:var(--green);background:#0b3322}
+
+/* property search mock */
+.ods{padding:30px 40px;background:#000;height:900px}
+.ods h3{font:800 34px 'Archivo',Arial;margin:0 0 20px}
+.row{display:flex;gap:14px;align-items:flex-end;flex-wrap:wrap;margin:0 0 18px}
+.sel{min-width:200px}
+.sel .l{font:700 16px 'IBM Plex Sans',Arial;margin:0 0 6px}
+.sel .v{height:50px;border:1px solid #3a414c;border-radius:10px;background:#14181e;font:600 19px/50px 'IBM Plex Sans',Arial;padding:0 14px}
+.chip{font:800 18px 'IBM Plex Sans',Arial;padding:11px 18px;border-radius:999px;border:1px solid #3a414c;background:#0d1117}
+.chip.on{border-color:var(--green);background:#0b3322}
+.go{font:800 22px 'Archivo',Arial;padding:12px 30px;border-radius:12px;background:var(--orange);color:#000}
+.res{border-top:1px solid #222a35;padding:16px 0;display:flex;justify-content:space-between;align-items:center;gap:16px}
+.res .a{font:800 22px 'IBM Plex Sans',Arial}
+.res .m{font:600 18px 'IBM Plex Sans',Arial;margin-top:4px}
+.tag{display:inline-block;font:800 16px 'IBM Plex Sans',Arial;padding:4px 12px;border-radius:999px;background:#fff;color:#000;margin-top:8px}
+.showcase{padding:60px;display:flex;flex-direction:column;justify-content:center;height:900px;background:repeating-linear-gradient(135deg,#05070a 0 22px,#080b10 22px 44px)}
+.showcase .k{font:800 22px 'Archivo',Arial;letter-spacing:.14em;color:var(--amber);margin:0 0 12px}
+.showcase .t{font:800 54px/1.1 'Archivo',Arial;margin:0 0 16px}
+.showcase .p{font:600 26px/1.45 'IBM Plex Sans',Arial;max-width:900px}
+
+/* caption + controls */
+.cap{padding:18px 22px 6px;border-top:1px solid var(--line);min-height:150px}
+.stepno{font:800 15px 'Archivo',Arial,sans-serif;letter-spacing:.14em;text-transform:uppercase;color:var(--orange);margin:0 0 4px}
+.do{font:800 clamp(22px,2.6vw,30px)/1.25 'Archivo',Arial,sans-serif;margin:0 0 6px}
+.why{font:600 19px/1.45 'IBM Plex Sans',Arial,sans-serif;margin:0}
+.why .off{display:inline-block;margin-top:4px;font-weight:800;color:#ffd9a8}
+.ctl{display:flex;flex-wrap:wrap;align-items:center;gap:10px;padding:12px 22px 16px}
+.ctl button{min-height:48px;font:800 17px 'IBM Plex Sans',Arial;color:#fff;background:#0d1117;border:1px solid #3b4a5e;border-radius:12px;padding:0 16px;cursor:pointer}
+.ctl button.main{background:var(--orange);color:#000;border-color:var(--orange);min-width:130px}
+.ctl button[aria-pressed=true]{background:#0b3322;border-color:var(--green)}
+.ctl .sp{flex:1}
+.prog{display:flex;gap:4px;padding:0 22px 18px}
+.prog button{flex:1;height:10px;border:0;border-radius:6px;background:#2a3442;cursor:pointer;padding:0}
+.prog button.done{background:#8a5a33}
+.prog button.cur{background:var(--orange)}
+.after{margin-top:18px;font-size:17px;font-weight:600}
+.after a{color:#8cb6ff;font-weight:700}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="brand">Team Musso <span>·</span> Nextier Data Engine</div>
+  <h1>Watch it. <em>Then do it.</em></h1>
+  <p class="lede">A slow video of every click. The arrow shows you where, the yellow box shows you what, and the words underneath tell you what to do.</p>
+
+  <div class="player" id="player">
+    <div class="vp" id="vp">
+      <div id="stage">
+
+        <!-- TITLE -->
+        <div class="screen titlecard" data-s="title">
+          <div class="big">Your <em>Data Engine</em></div>
+          <div class="sub">24 short steps · about 4 minutes · go slow</div>
+          <button class="playbig" id="bigplay" aria-label="Play">▶</button>
+        </div>
+
+        <!-- PHONE: the text from Thomas -->
+        <div class="screen phonebg" data-s="phone" hidden>
+          <div class="sample">Sample screen</div>
+          <div class="phone">
+            <div class="who">Thomas</div>
+            <div class="bubble">Paul, here's your Nextier login 👇 Tap it and fill in 4 boxes.</div>
+            <div class="bubble"><span class="linkpill" id="ph-link">www.nxtier.ai/join/…</span></div>
+          </div>
+        </div>
+
+        <!-- JOIN -->
+        <div class="screen auth" data-s="join" hidden>
+          <div class="sample">Sample screen</div>
+          <div class="authcard">
+            <h2>Join Team Musso</h2>
+            <p>One minute. Then you're set up to build your farm and start dialing today.</p>
+            <label class="fld">Your name<div class="inp" id="j-name" data-ph=""></div></label>
+            <label class="fld">Email<div class="inp" id="j-email" data-ph=""></div></label>
+            <label class="fld">Your mobile — calls ring here<div class="inp" id="j-phone" data-ph="+1 516 555 0100"></div></label>
+            <label class="fld">Choose a password<div class="inp" id="j-pw" data-ph=""></div></label>
+            <div class="primary" id="j-go">Join and get set up</div>
+          </div>
+        </div>
+
+        <!-- SIGN IN -->
+        <div class="screen auth" data-s="login" hidden>
+          <div class="sample">Sample screen</div>
+          <div class="authcard">
+            <h2>NEXTIER</h2>
+            <p>Sign in to your account</p>
+            <label class="fld">Email<div class="inp" id="l-email" data-ph=""></div></label>
+            <label class="fld">Password<div class="inp" id="l-pw" data-ph="••••••••"></div></label>
+            <div class="primary" id="l-go">Sign in</div>
+            <div class="ghost">Continue with Google</div>
+          </div>
+        </div>
+
+        <!-- THE APP -->
+        <div class="screen" data-s="app" hidden>
+          <nav class="rail" id="rail">
+            <div class="nx">Nextier</div>
+            <div class="it">Initial SMS Launch <span>🔒</span></div>
+            <div class="it">Outreach Terminal <span>🔒</span></div>
+            <div class="it">Contact Center <span>🔒</span></div>
+            <div class="note">Showcase — see how it works on your Data Engine. Unlocks when you add the Execution Terminal.</div>
+          </nav>
+          <div class="topnav" id="topnav">
+            <span class="tm">Team Musso</span>
+            <span class="tab" id="tab-hunt">Data Engine</span>
+            <span class="tab" id="tab-territory">Territory Intelligence</span>
+            <span class="tab" id="tab-news">News Feed</span>
+            <span class="tab" id="tab-search">Property Search</span>
+            <span class="tab" id="tab-mls">MLS Pull</span>
+            <span class="tab" id="tab-report">Property Report</span>
+          </div>
+
+          <div class="pane" data-p="list" hidden>
+            <img src="img/sop/data-engine-list.png" alt="The Data Engine list: search box, filters, and the lots on the left; the satellite map on the right">
+            <div class="ov ovq" id="ov-q" hidden></div>
+            <div class="ov ovc" id="ov-county" hidden>Suffolk ▾</div>
+            <div class="ov ovbar" id="ov-bar" hidden>
+              <span class="b bl" id="bar-pull">Pull</span>
+              <span class="b bl" id="bar-trace">Trace phones + emails</span>
+              <span class="b" id="bar-check">Check trace results</span>
+              <span class="b" id="bar-dl">Download this list</span>
+            </div>
+          </div>
+          <div class="pane" data-p="detail" hidden>
+            <img src="img/sop/data-engine-detail.png" alt="One lot opened: address, bullets, loud tags, Click to call, Story mode and the lot boxes">
+          </div>
+          <div class="pane" data-p="territory" hidden>
+            <img src="img/sop/territory.png" alt="Territory Intelligence: the headline numbers and the territory map">
+          </div>
+          <div class="pane" data-p="search" hidden>
+            <div class="ods">
+              <div class="sample">Sample screen</div>
+              <h3>Property Search · all of New York</h3>
+              <div class="row">
+                <div class="sel"><div class="l">County</div><div class="v" id="q-county">Pick a county ▾</div></div>
+                <div class="sel"><div class="l">Property type</div><div class="v" id="q-type">Any type ▾</div></div>
+                <span class="chip" id="q-half">½ acre +</span>
+                <span class="chip" id="q-1ac">1 acre +</span>
+                <div class="sel"><div class="l">Near</div><div class="v" style="min-width:260px">an address · 2 mi ▾</div></div>
+                <span class="go" id="q-go">Search</span>
+              </div>
+              <div class="row">
+                <span class="chip" id="q-likely">Most likely first</span>
+                <span class="chip">Group by: Town ▾</span>
+                <span class="chip">List · Map</span>
+                <span class="chip" id="q-csv" style="border-color:var(--green)">⬇ CSV blocks</span>
+              </div>
+              <div id="q-results" hidden>
+                <div class="res"><div><div class="a">Vacant land · Riverhead · 2.1 acres</div><span class="tag">Trust · mails out of state (FL)</span></div><span class="b bl" id="q-full">Full report</span></div>
+                <div class="res"><div><div class="a">Vacant land · Southold · 1.6 acres</div><span class="tag">Individual · absentee</span></div><span class="b bl">Full report</span></div>
+                <div class="res"><div><div class="a">Vacant land · Brookhaven · 1.2 acres</div><span class="tag">Individual · lives there</span></div><span class="b bl">Full report</span></div>
+              </div>
+            </div>
+          </div>
+          <div class="pane" data-p="showcase" hidden>
+            <div class="showcase">
+              <div class="k">SHOWCASE · SAMPLE DATA</div>
+              <div class="t">See how texting and the call center will work.</div>
+              <div class="p">Every button here is locked. Nothing sends, nothing calls. It opens up only when you add the Execution Terminal.</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- END -->
+        <div class="screen titlecard" data-s="end" hidden>
+          <div class="flow"><b>Find</b><i>→</i><b>Open</b><i>→</i><b>Pull</b><i>→</i><b>Trace</b><i>→</i><b class="go">☎ Call</b></div>
+          <div class="big" style="font-size:72px">That's the whole job.</div>
+          <div class="sub">Something look off? Take a screenshot and text it to Thomas.</div>
+        </div>
+
+        <div id="spot" hidden></div>
+        <div id="ring"></div>
+        <svg id="ptr" viewBox="0 0 32 32" aria-hidden="true"><path d="M3 2 L3 26 L9.5 20 L14 30 L18.5 28 L14 18.5 L23 18.5 Z" fill="#fff" stroke="#000" stroke-width="2" stroke-linejoin="round"/></svg>
+      </div>
+    </div>
+
+    <div class="cap" aria-live="polite">
+      <div class="stepno" id="stepno">Step 1 of 24</div>
+      <div class="do" id="do"></div>
+      <p class="why" id="why"></p>
+    </div>
+    <div class="ctl">
+      <button id="back" aria-label="Back one step">◀ Back</button>
+      <button id="play" class="main">▶ Play</button>
+      <button id="next" aria-label="Next step">Next ▶</button>
+      <span class="sp"></span>
+      <button id="slow" aria-pressed="true">Slow</button>
+      <button id="slower" aria-pressed="false">Slower</button>
+      <button id="voice" aria-pressed="false">🔊 Read it to me</button>
+      <button id="fs">⛶ Full screen</button>
+    </div>
+    <div class="prog" id="prog"></div>
+  </div>
+
+  <p class="after">Want it written down? <a href="paul-data-engine-sop.html">The step-by-step guide</a> has every click on one page.</p>
+</div>
+
+<script>
+(() => {
+  const SX = 160, SY = 56, W = 1600;           // app frame: rail 160 wide, top bar 56 tall
+  const $ = (s) => document.querySelector(s);
+  const stage = $("#stage"), vp = $("#vp"), ptr = $("#ptr"), spot = $("#spot"), ring = $("#ring");
+  let k = 1;
+
+  // a box on a screenshot (1440×900, inside the frame) → stage px
+  const shot = (x1, y1, x2, y2) => ({ x: SX + x1, y: SY + y1, w: x2 - x1, h: y2 - y1 });
+  const boxOf = (sel) => {
+    const el = $(sel);
+    if (!el) return null;
+    const r = el.getBoundingClientRect(), s = stage.getBoundingClientRect();
+    return { x: (r.left - s.left) / k, y: (r.top - s.top) / k, w: r.width / k, h: r.height / k };
+  };
+
+  const OFF = (t) => `<span class="off">${t}</span>`;
+
+  // ── THE SCRIPT ── one instruction per step; beats = where the arrow goes
+  const SCENES = [
+    { s: "title", say: "Press ▶ Play and watch. One step at a time.", why: "Pause any time. Back and Next move one step. Turn on 🔊 to hear it.", beats: [], dur: 6000 },
+    { s: "phone", say: "Open the text from Thomas and tap the link.", why: "It is your own private sign-up link. Don't forward it to anyone.",
+      beats: [{ t: 1200, sel: "#ph-link", click: true }] },
+    { s: "join", say: "Type your name, your email, your mobile and a password.", why: "Your mobile is where your calls will ring. The password needs 8 or more characters.",
+      beats: [
+        { t: 600, sel: "#j-name", type: ["#j-name", "Paul Musso"] },
+        { t: 3600, sel: "#j-email", type: ["#j-email", "you@youremail.com"] },
+        { t: 7000, sel: "#j-phone", type: ["#j-phone", "+1 631 555 0100"] },
+        { t: 10200, sel: "#j-pw", type: ["#j-pw", "••••••••••"] },
+      ], dur: 13500 },
+    { s: "join", init: () => { $("#j-name").textContent = "Paul Musso"; $("#j-email").textContent = "you@youremail.com"; $("#j-phone").textContent = "+1 631 555 0100"; $("#j-pw").textContent = "••••••••••"; },
+      say: "Press Join and get set up.", why: "That's it. You're in. You only do this once.",
+      beats: [{ t: 900, sel: "#j-go", click: true }] },
+    { s: "app", p: "list", tab: "hunt", say: "This is home: your Data Engine.", why: "Every lot in New York with its owner. Everything you need is in the tabs across the top.",
+      beats: [{ t: 900, sel: "#tab-hunt" }, { t: 3600, sel: "#topnav" }], dur: 9000 },
+    { s: "app", p: "list", tab: "hunt", say: "Type a town, ZIP, address or owner in the big search box.", why: "The list and the map narrow down as you type.",
+      beats: [{ t: 900, box: shot(18, 74, 822, 122), aim: "left", type: ["#ov-q", "Mattituck"], show: ["#ov-q"] }] },
+    { s: "app", p: "list", tab: "hunt", say: "Or tap a filter. Start with “Zoning allows a split”.", why: "Those are lots big enough to divide into more lots.",
+      beats: [{ t: 900, box: shot(18, 263, 176, 291), click: true }] },
+    { s: "app", p: "list", tab: "hunt", say: "Pick a county. Start with Suffolk, then Nassau.", why: "The box says “All of New York” until you pick one.",
+      beats: [{ t: 900, box: shot(190, 391, 334, 430), click: true, after: () => ($("#ov-county").hidden = false) }] },
+    { s: "app", p: "list", tab: "hunt", show: ["#ov-county"], say: "Read the count.", why: "It tells you how many lots match, out of your whole book.",
+      beats: [{ t: 900, box: shot(616, 397, 796, 424) }] },
+    { s: "app", p: "list", tab: "hunt", show: ["#ov-county"], say: "Click the eye 👁 to open a lot.", why: "Number 1 is the best lot in your list. Start at the top.",
+      beats: [{ t: 900, box: shot(28, 555, 72, 597), click: true }] },
+    { s: "app", p: "detail", tab: "hunt", say: "Read the loud tags first.", why: "They tell you why this lot, in one look: how long it's been off the market, how many lots it splits into, who owns it.",
+      beats: [{ t: 900, box: shot(116, 578, 968, 614), aim: "left" }], dur: 9500 },
+    { s: "app", p: "detail", tab: "hunt", say: "Press ▶ Story mode and let it walk you through the lot.", why: "It tells the lot's story one chapter at a time.",
+      beats: [{ t: 900, box: shot(621, 629, 745, 671), click: true }] },
+    { s: "app", p: "detail", tab: "hunt", say: "Scroll down to “Owner & how to reach them”.", why: "The owner's name and mailing address are here. Phones and emails land here after a trace.",
+      beats: [{ t: 900, box: shot(118, 862, 345, 900), aim: "left" }] },
+    { s: "app", p: "detail", tab: "hunt", say: "Press ← Property Book to go back to your list.", why: "You land right where you were.",
+      beats: [{ t: 900, box: shot(117, 81, 262, 123), click: true }] },
+    { s: "app", p: "list", tab: "hunt", show: ["#ov-bar"], say: "Press Pull.", why: "The lots in your list become owners in your workspace, up to 2,000 at a time.",
+      beats: [{ t: 900, sel: "#bar-pull", click: true }] },
+    { s: "app", p: "list", tab: "hunt", show: ["#ov-bar"], say: "Press Trace phones + emails.", why: "It shows you the cost BEFORE it runs: about 2¢ an owner, on your own Tracerfy account. " + OFF("Turns on when your Tracerfy account is connected."),
+      beats: [{ t: 900, sel: "#bar-trace", click: true }], dur: 10000 },
+    { s: "app", p: "list", tab: "hunt", show: ["#ov-bar"], say: "A few minutes later, press Check trace results.", why: "Every phone lands on its lot with its line type (mobile or landline) and a DNC flag if it has one.",
+      beats: [{ t: 900, sel: "#bar-check", click: true }], dur: 9500 },
+    { s: "app", p: "detail", tab: "hunt", say: "Open a traced lot and press ☎ Click to call.", why: "Your mobile rings first, then you're connected to the owner. Skip any number marked DNC. " + OFF("Turns on when your SignalHouse.io line is connected."),
+      beats: [{ t: 900, box: shot(117, 629, 249, 671), click: true }], dur: 10500 },
+    { s: "app", p: "territory", tab: "territory", say: "Tap Territory Intelligence for the big picture.", why: "Where the opportunity is, before you dig in. News Feed, next to it, shows what's moving in your market.",
+      beats: [{ t: 900, sel: "#tab-territory", click: true }, { t: 4200, box: shot(14, 360, 430, 545) }], dur: 9500 },
+    { s: "app", p: "search", tab: "search", say: "Property Search: pick a county, a property type and a lot size. Press Search.", why: "Any lot in New York, straight from the state's own records.",
+      beats: [
+        { t: 900, sel: "#q-county", click: true, after: () => ($("#q-county").textContent = "Suffolk ▾") },
+        { t: 3700, sel: "#q-type", click: true, after: () => ($("#q-type").textContent = "Vacant land ▾") },
+        { t: 6500, sel: "#q-1ac", click: true, after: () => $("#q-1ac").classList.add("on") },
+        { t: 9200, sel: "#q-go", click: true, after: () => ($("#q-results").hidden = false) },
+      ], dur: 13500 },
+    { s: "app", p: "search", tab: "search", init: () => { $("#q-county").textContent = "Suffolk ▾"; $("#q-type").textContent = "Vacant land ▾"; $("#q-1ac").classList.add("on"); $("#q-results").hidden = false; },
+      say: "Press Most likely first, then ⬇ CSV blocks.", why: "Estates and out-of-state owners go to the top. CSV blocks downloads them in blocks of 2,000, best first.",
+      beats: [
+        { t: 900, sel: "#q-likely", click: true, after: () => $("#q-likely").classList.add("on") },
+        { t: 4200, sel: "#q-csv", click: true },
+      ], dur: 10000 },
+    { s: "app", p: "showcase", tab: "", say: "The 3 items on the left are a demo.", why: "Initial SMS Launch, Outreach Terminal and Contact Center show sample data. Nothing sends. They unlock when you add them.",
+      beats: [{ t: 900, sel: "#rail" }], dur: 9500 },
+    { s: "login", say: "Next time: go to nxtier.ai and sign in.", why: "Same email and password every time. You land on your Data Engine.",
+      beats: [
+        { t: 600, sel: "#l-email", type: ["#l-email", "you@youremail.com"] },
+        { t: 4000, sel: "#l-pw", type: ["#l-pw", "••••••••••"] },
+        { t: 7000, sel: "#l-go", click: true },
+      ], dur: 10500 },
+    { s: "end", say: "Find → Open → Pull → Trace → Call. That's the whole job.", why: "Something look off? Take a screenshot and text it to Thomas.", beats: [], dur: 8000 },
+  ];
+
+  // ── engine ──
+  let cur = 0, playing = false, timers = [], factor = 1, voiceOn = false, speechDone = true;
+  const later = (ms, fn) => timers.push(setTimeout(fn, ms));
+  const clearTimers = () => { timers.forEach(clearTimeout); timers = []; };
+
+  function fit() { k = vp.clientWidth / W; stage.style.transform = `scale(${k})`; }
+  addEventListener("resize", fit);
+  document.addEventListener("fullscreenchange", () => setTimeout(fit, 60));
+
+  const TYPED = ["#j-name", "#j-email", "#j-phone", "#j-pw", "#l-email", "#l-pw", "#ov-q"];
+  function resetAll() {
+    TYPED.forEach((s) => ($(s).textContent = ""));
+    ["#ov-q", "#ov-county", "#ov-bar", "#q-results"].forEach((s) => ($(s).hidden = true));
+    $("#q-county").textContent = "Pick a county ▾";
+    $("#q-type").textContent = "Any type ▾";
+    ["#q-1ac", "#q-likely"].forEach((s) => $(s).classList.remove("on"));
+  }
+
+  function showScene(sc) {
+    document.querySelectorAll(".screen").forEach((el) => (el.hidden = el.dataset.s !== sc.s));
+    if (sc.s === "app") {
+      document.querySelectorAll(".pane").forEach((el) => (el.hidden = el.dataset.p !== sc.p));
+      document.querySelectorAll(".topnav .tab").forEach((el) => el.classList.toggle("on", el.id === "tab-" + sc.tab));
+    }
+  }
+
+  function aimAt(b, aim) {
+    const x = aim === "left" ? b.x + Math.min(70, b.w / 3) : b.x + b.w / 2;
+    const y = b.y + b.h / 2;
+    ptr.style.left = x + "px"; ptr.style.top = y + "px";
+    return { x, y };
+  }
+  function spotOn(b) {
+    const pad = 8;
+    Object.assign(spot.style, { left: b.x - pad + "px", top: b.y - pad + "px", width: b.w + pad * 2 + "px", height: b.h + pad * 2 + "px" });
+    spot.classList.remove("hit");
+    spot.hidden = false;
+  }
+  function press(at) {
+    ptr.classList.add("down");
+    ring.style.left = at.x + "px"; ring.style.top = at.y + "px";
+    ring.classList.remove("go"); void ring.offsetWidth; ring.classList.add("go");
+    spot.classList.add("hit");
+    setTimeout(() => ptr.classList.remove("down"), 220);
+  }
+  function typeInto(sel, text) {
+    const el = $(sel); el.textContent = "";
+    [...text].forEach((ch, i) => later(i * 110 * factor, () => (el.textContent += ch)));
+  }
+
+  function beat(b) {
+    (b.show || []).forEach((s) => ($(s).hidden = false));
+    const box = b.box || (b.sel && boxOf(b.sel));
+    if (!box) return;
+    spotOn(box);
+    const at = aimAt(box, b.aim);
+    if (b.click) later(1500 * factor, () => { press(at); if (b.after) later(250, b.after); });
+    if (b.type) later(1400 * factor, () => typeInto(b.type[0], b.type[1]));
+  }
+
+  function speak(sc) {
+    if (!voiceOn || !("speechSynthesis" in window)) { speechDone = true; return; }
+    speechSynthesis.cancel();
+    const txt = (sc.say + " " + sc.why.replace(/<[^>]+>/g, "")).replace(/[▶←☎⬇👁🔊“”]/g, "");
+    const u = new SpeechSynthesisUtterance(txt);
+    u.rate = factor > 1 ? 0.82 : 0.92;
+    speechDone = false;
+    u.onend = u.onerror = () => { speechDone = true; };
+    speechSynthesis.speak(u);
+  }
+
+  function go(i) {
+    clearTimers();
+    cur = Math.max(0, Math.min(SCENES.length - 1, i));
+    const sc = SCENES[cur];
+    resetAll();
+    (sc.show || []).forEach((s) => ($(s).hidden = false));
+    if (sc.init) sc.init();
+    showScene(sc);
+    spot.hidden = true;
+    ptr.style.opacity = sc.beats.length ? "1" : "0";
+    $("#stepno").textContent = `Step ${cur + 1} of ${SCENES.length}`;
+    $("#do").textContent = sc.say;
+    $("#why").innerHTML = sc.why;
+    paintProgress();
+    try { history.replaceState(null, "", "#" + (cur + 1)); } catch (e) {}
+    requestAnimationFrame(() => sc.beats.forEach((b) => later(b.t * factor, () => beat(b))));
+    speak(sc);
+    if (playing) {
+      const dur = (sc.dur || 8500) * factor;
+      later(dur, function tryNext() {
+        if (!playing) return;
+        if (!speechDone) return later(400, tryNext);
+        if (cur < SCENES.length - 1) go(cur + 1); else setPlaying(false);
+      });
+    }
+  }
+
+  function setPlaying(on) {
+    playing = on;
+    $("#play").textContent = on ? "❚❚ Pause" : "▶ Play";
+    if (!on && "speechSynthesis" in window) speechSynthesis.cancel();
+  }
+
+  const prog = $("#prog");
+  SCENES.forEach((_, i) => {
+    const b = document.createElement("button");
+    b.setAttribute("aria-label", "Go to step " + (i + 1));
+    b.onclick = () => go(i);
+    prog.appendChild(b);
+  });
+  function paintProgress() {
+    [...prog.children].forEach((b, i) => { b.className = i < cur ? "done" : i === cur ? "cur" : ""; });
+  }
+
+  const start = () => { setPlaying(true); go(cur === SCENES.length - 1 ? 0 : cur === 0 ? 1 : cur); };
+  $("#bigplay").onclick = start;
+  $("#play").onclick = () => (playing ? (setPlaying(false), clearTimers()) : start());
+  $("#next").onclick = () => go(cur + 1);
+  $("#back").onclick = () => go(cur - 1);
+  const speed = (f) => {
+    factor = f;
+    $("#slow").setAttribute("aria-pressed", String(f === 1));
+    $("#slower").setAttribute("aria-pressed", String(f > 1));
+    go(cur);
+  };
+  $("#slow").onclick = () => speed(1);
+  $("#slower").onclick = () => speed(1.5);
+  $("#voice").onclick = () => {
+    voiceOn = !voiceOn;
+    $("#voice").setAttribute("aria-pressed", String(voiceOn));
+    if (!voiceOn && "speechSynthesis" in window) speechSynthesis.cancel(); else speak(SCENES[cur]);
+  };
+  $("#fs").onclick = () => {
+    const p = $("#player");
+    if (document.fullscreenElement) document.exitFullscreen(); else if (p.requestFullscreen) p.requestFullscreen();
+  };
+  addEventListener("keydown", (e) => {
+    if (e.key === " ") { e.preventDefault(); $("#play").click(); }
+    else if (e.key === "ArrowRight") go(cur + 1);
+    else if (e.key === "ArrowLeft") go(cur - 1);
+  });
+
+  fit();
+  const h = parseInt(location.hash.slice(1), 10);
+  go(h >= 1 && h <= SCENES.length ? h - 1 : 0);
+})();
+</script>
+</body>
+</html>
