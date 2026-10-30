@@ -987,7 +987,7 @@ const STEPS = [
   ["Split candidates + sites", "Room to split, or zoning to build", T.length, true],
   ["Aged 91 days to 2 years", "The owner already tried to sell", T.filter((r) => r.win === "aged" || r.win === "deep").length, true],
   ["Individual owners", "Called first", T.filter((r) => r.k === "Individual").length, true],
-  ["Verified by right", `Suffolk zoning + septic · ${S.suffolkByRight.researched} researched`, R.filter((r) => r.sg === "verified").length, true],
+  ["Can split today · zoning allows it", `Checked against Suffolk zoning + the septic rule · ${S.suffolkByRight.researched} researched`, R.filter((r) => r.sg === "verified").length, true],
 ];
 const mx = F.expired;
 $("#streambars").innerHTML = STEPS.map(([name, sub, v, g]) => `<div class="srow"><div class="name">${name}<small>${sub}</small></div><div class="sbar ${g ? "g" : ""}"><i style="width:${Math.max(1.5, (v / mx) * 100).toFixed(2)}%"></i><b>${n0(v)}</b></div></div>`).join("");
