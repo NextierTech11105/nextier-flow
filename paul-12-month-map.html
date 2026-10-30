@@ -9,9 +9,14 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@700;800&family=IBM+Plex+Sans:wght@500;600;700&display=swap">
 <style>
-/* Layout: the two options side by side, a sticky Texts first / Calls first switch,
-   then 12 month cards that redraw for the chosen option. */
-:root{--bg:#000;--card:#0a0d12;--line:#2a3442;--fg:#fff;--orange:#ff8a3d;--green:#12b76a;--blue:#4c8dff;color-scheme:dark}
+/* Layout: the two options side by side, one control row (option · view · start month),
+   then either the year as 12 real calendar months or the 12 month cards. */
+:root{
+  --bg:#000;--card:#0a0d12;--cell:#111823;--line:#2a3442;--fg:#fff;--orange:#ff8a3d;--green:#12b76a;--blue:#4c8dff;--dash:#8a97a8;
+  /* Calendar markers, validated all-pairs on the dark surface (CVD ΔE 9.4, normal 20.9).
+     Follow-ups are a white ring, not a fourth hue, so no two markers can be confused. */
+  --c-reply:#199e70;--c-send:#d95926;--c-call:#3987e5;
+  color-scheme:dark}
 *{box-sizing:border-box}
 body{margin:0;background:var(--bg);color:var(--fg);font:500 17px/1.55 "IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif}
 .wrap{max-width:1000px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:36px 64px;display:flex;flex-direction:column;gap:34px}
@@ -20,6 +25,7 @@ h1{font-size:clamp(32px,6vw,48px);font-weight:800;line-height:1.05}
 h2{font-size:26px;font-weight:800}
 h3{font-size:21px;font-weight:800}
 p{margin:0}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
 .eyebrow{font-size:15px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--orange)}
 .lede{font-size:19px;max-width:62ch}
 .lede b{color:var(--green)}
@@ -38,24 +44,70 @@ p{margin:0}
 .both{background:var(--card);border:1px solid var(--line);border-left:4px solid var(--green);border-radius:10px;padding:16px;font-weight:600}
 .both b{color:var(--green)}
 
-/* The switch */
-.switch{position:sticky;top:0;z-index:5;background:var(--bg);border-bottom:1px solid var(--line);padding:12px 0;display:flex;flex-wrap:wrap;gap:8px;align-items:center}
-.switch p{font-weight:700;margin-right:4px}
+/* The control row */
+.switch{background:var(--bg);border-bottom:1px solid var(--line);padding:12px 0;display:flex;flex-wrap:wrap;gap:10px 18px;align-items:center}
+@media (min-width:700px){.switch{position:sticky;top:0;z-index:5}}
+.seg{display:flex;flex-wrap:wrap;gap:6px}
 .switch button{font:700 16px "IBM Plex Sans",sans-serif;color:var(--fg);background:var(--card);border:1px solid var(--line);border-radius:999px;padding:10px 18px;cursor:pointer}
-.switch button[aria-pressed="true"]{background:var(--orange);border-color:var(--orange);color:#000}
+.switch button[aria-pressed="true"]{background:var(--fg);border-color:var(--fg);color:#000}
+.switch button[data-set="sms"][aria-pressed="true"]{background:var(--orange);border-color:var(--orange)}
 .switch button[data-set="calls"][aria-pressed="true"]{background:var(--blue);border-color:var(--blue)}
-.switch button:focus-visible{outline:3px solid var(--fg);outline-offset:2px}
+.switch button:focus-visible,.start select:focus-visible{outline:3px solid var(--fg);outline-offset:2px}
+.start{display:flex;align-items:center;gap:8px;font-weight:700}
+.start select{font:600 16px "IBM Plex Sans",sans-serif;color:var(--fg);background:var(--card);border:1px solid var(--line);border-radius:8px;padding:8px 10px}
 
-/* One option shows at a time */
+/* One option and one view show at a time */
 body[data-mode="sms"] .only-c,body[data-mode="calls"] .only-s{display:none}
+body[data-view="cal"] .view-cards,body[data-view="cards"] .view-cal{display:none}
 
 .mix{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:18px;display:flex;flex-direction:column;gap:10px}
 .mix ul{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:8px}
 .mix li{display:flex;gap:12px;align-items:baseline}
 .mix li b{font-family:Archivo,sans-serif;font-size:22px;font-weight:800;min-width:96px;font-variant-numeric:tabular-nums}
 .mix .sum{border-top:1px solid var(--line);padding-top:10px;font-weight:700}
+
+/* Calendar view */
+.calview{display:flex;flex-direction:column;gap:14px}
+.legend{display:flex;flex-wrap:wrap;gap:10px 22px;font-size:15px;font-weight:600}
+.legend .k{display:inline-flex;align-items:center;gap:8px}
+.sw{display:inline-block;flex:none;width:10px;height:10px;border-radius:50%}
+.sw.a,.cal i.a{background:var(--c-reply)}
+.sw.o,.cal i.o{background:var(--c-send)}
+.sw.b,.cal i.b{background:var(--c-call)}
+.sw.v,.cal i.v{box-shadow:inset 0 0 0 2px var(--fg)}
+.sw.st{width:14px;height:14px;border-radius:3px;box-shadow:inset 0 0 0 2px var(--fg)}
+.sw.hl{width:14px;height:14px;border-radius:3px;border:1px dashed var(--dash)}
+.year{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:14px}
+.cal-month{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:14px;display:flex;flex-direction:column;gap:6px;min-width:0}
+.cm-head{display:flex;justify-content:space-between;align-items:baseline;gap:8px}
+.cm-head .n{font-size:15px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--orange)}
+.cm-head .when{font-weight:700}
+.cm-num{font-family:Archivo,sans-serif;font-size:24px;font-weight:800;font-variant-numeric:tabular-nums}
+.cm-num span{font-family:"IBM Plex Sans",sans-serif;font-size:15px;font-weight:600}
+.cm-num.full{color:var(--green)}
+.cm-count{font-size:15px;font-weight:600}
+.cal{width:100%;table-layout:fixed;border-collapse:separate;border-spacing:2px;margin-top:4px}
+.cal th{font-size:14px;font-weight:700;padding:2px 0;text-align:center}
+.cal td{position:relative;height:46px;padding:4px 3px;vertical-align:top;background:var(--cell);border-radius:6px}
+.cal td.e{background:transparent}
+.cal td.ms{box-shadow:inset 0 0 0 2px var(--fg)}
+.cal td.hol{background:transparent;outline:1px dashed var(--dash);outline-offset:-1px}
+.cal .dn{display:block;font-size:15px;font-weight:600;line-height:1.1}
+.cal .star{position:absolute;top:4px;right:4px;font-size:12px;line-height:1}
+.cal .dots{display:flex;gap:2px;margin-top:7px}
+.cal i{display:block;flex:none;width:8px;height:8px;border-radius:50%}
+.cm-notes{list-style:none;margin:4px 0 0;padding:0;display:flex;flex-direction:column;gap:4px;font-size:15px;font-weight:600}
+.cm-notes li{display:flex;gap:8px;align-items:baseline}
+.nk{flex:none;width:14px;text-align:center}
+.nk.hk{height:12px;border:1px dashed var(--dash);border-radius:3px;align-self:center}
+.tip{position:fixed;z-index:20;max-width:270px;background:#131b27;border:1px solid var(--line);border-radius:8px;padding:10px 12px;font-size:15px;line-height:1.4;pointer-events:none;box-shadow:0 8px 24px rgba(0,0,0,.5)}
+.tip b{display:block;margin-bottom:2px}
+.tip[hidden]{display:none}
+
+/* Month cards view */
 .phase{display:flex;flex-direction:column;gap:14px}
 .phase>h2 span{color:var(--green)}
+.view-cards{display:flex;flex-direction:column;gap:34px}
 .months{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:14px}
 .month{background:var(--card);border:1px solid var(--line);border-left:4px solid var(--blue);border-radius:10px;padding:16px;display:flex;flex-direction:column;gap:8px;min-width:0}
 body[data-mode="sms"] .month.fs,body[data-mode="calls"] .month.fc{border-left-color:var(--green)}
@@ -74,7 +126,7 @@ body[data-mode="sms"] .month.fs .tx,body[data-mode="calls"] .month.fc .tx{color:
 a{color:var(--fg)}
 </style>
 </head>
-<body data-mode="sms">
+<body data-mode="sms" data-view="cards">
 <div class="wrap">
   <header style="display:flex;flex-direction:column;gap:10px">
     <p class="eyebrow">Team Musso · the year, month by month</p>
@@ -112,10 +164,25 @@ a{color:var(--fg)}
     <p class="both"><b>Both:</b> text first, then your callers call everyone who got the text but didn't reply. Or call first, then text the owners you couldn't reach. Nothing goes out until a person presses it.</p>
   </section>
 
-  <div class="switch" role="group" aria-label="Show the year for">
-    <p>Show the year for:</p>
-    <button type="button" data-set="sms" aria-pressed="true">Texts first</button>
-    <button type="button" data-set="calls" aria-pressed="false">Calls first</button>
+  <div class="switch">
+    <div class="seg" role="group" aria-label="Option">
+      <button type="button" data-set="sms" aria-pressed="true">Texts first</button>
+      <button type="button" data-set="calls" aria-pressed="false">Calls first</button>
+    </div>
+    <div class="seg" role="group" aria-label="View">
+      <button type="button" data-view-set="cal" aria-pressed="false">Calendar</button>
+      <button type="button" data-view-set="cards" aria-pressed="true">Month by month</button>
+    </div>
+    <label class="start view-cal">Start
+      <select id="start">
+        <option value="2026-10">November 2026</option>
+        <option value="2026-11">December 2026</option>
+        <option value="2027-0">January 2027</option>
+        <option value="2027-1">February 2027</option>
+        <option value="2027-2">March 2027</option>
+        <option value="2027-3">April 2027</option>
+      </select>
+    </label>
   </div>
 
   <section class="mix only-s" aria-labelledby="mix-s">
@@ -137,6 +204,26 @@ a{color:var(--fg)}
     <p class="sum">Each caller you add: about 4,000 more calls a month.</p>
   </section>
 
+  <section class="calview view-cal" aria-labelledby="cal-h">
+    <h2 id="cal-h">The year on a calendar</h2>
+    <div class="legend only-s">
+      <span class="k"><span class="sw a"></span>Work replies, the morning after a send</span>
+      <span class="k"><span class="sw v"></span>Follow-ups go out, weekdays from month 3 (500 a day, automatic)</span>
+      <span class="k"><span class="sw o"></span>Send at 5 PM, Wednesday to Saturday</span>
+      <span class="k"><span class="sw b"></span>Calls from blocks, month 1</span>
+      <span class="k"><span class="sw st"></span>Milestone</span>
+      <span class="k"><span class="sw hl"></span>Holiday, off</span>
+    </div>
+    <div class="legend only-c">
+      <span class="k"><span class="sw b"></span>Call day, weekdays (about 200 calls per caller)</span>
+      <span class="k"><span class="sw st"></span>Milestone</span>
+      <span class="k"><span class="sw hl"></span>Holiday, off</span>
+    </div>
+    <p style="font-weight:600">Month 1 is the month you start. Hover or tap a day to see what happens.</p>
+    <div class="year" id="year"></div>
+  </section>
+
+  <div class="view-cards">
   <section class="phase" aria-labelledby="p1">
     <h2 id="p1">Months 1–3 · <span class="only-s">Set up and hit 50,000</span><span class="only-c">Set up and full speed</span></h2>
     <div class="months">
@@ -157,10 +244,10 @@ a{color:var(--fg)}
       </article>
       <article class="month fc">
         <p class="n">Month 2</p><h3><span class="only-s">First texts</span><span class="only-c">Full speed</span></h3>
-        <p class="tx only-s">~20,000 <span>texted</span></p>
+        <p class="tx only-s">~40,000 <span>texted</span></p>
         <p class="tx only-c">~12,000 <span>calls</span></p>
         <ul>
-          <li class="only-s">Wednesday to Saturday, press Send at 5 PM.</li>
+          <li class="only-s">Wednesday to Saturday, press Send at 5 PM: about 2,500 an evening.</li>
           <li class="only-s">Numbers warm up: 250 → 400 → 500 a day each, full speed by day 4.</li>
           <li class="only-s">Replies come in the next morning. Answer every one.</li>
           <li class="only-s">65,000 more owners traced.</li>
@@ -297,8 +384,8 @@ a{color:var(--fg)}
         <p class="tx only-s">50,000 <span>texted</span></p>
         <p class="tx only-c">12,000 <span>calls</span></p>
         <ul>
-          <li class="only-s">About 500,000 texts sent.</li>
-          <li class="only-s">About 400,000 owners reached.</li>
+          <li class="only-s">About 550,000 texts sent.</li>
+          <li class="only-s">About 450,000 owners reached.</li>
           <li class="only-c">About 140,000 calls made.</li>
           <li>Set year two's number.</li>
         </ul>
@@ -307,32 +394,222 @@ a{color:var(--fg)}
       </article>
     </div>
   </section>
+  </div>
 
   <footer class="foot">
     <p>Every call and text is checked against Do Not Call and STOP first. Follow-up texts stop when an owner replies or says STOP.</p>
     <p>Each texting number can take up to 2,000 texts a day (the carrier's limit). We run them at 500 so the carriers don't start filtering. More texts means more numbers, never pushing one number harder.</p>
+    <p>Holidays are off: New Year's Day, Memorial Day, the Fourth of July, Labor Day, Thanksgiving, and Christmas.</p>
     <p>These are planning numbers, not a promise. Calls assume about 200 a day per caller with click to call. The <a href="paul-simulator.html">simulator</a> assumes 5,000 new owners a month, which comes to about $31K in a normal month. Run it again once real numbers are in.</p>
   </footer>
 </div>
+<div class="tip" id="tip" hidden aria-hidden="true"></div>
 <script>
-// Texts first / Calls first switch. #calls in the link opens straight to Calls first.
+// Option switch (Texts first / Calls first), view switch (Calendar / Month by month),
+// and the calendar: 12 real months from the chosen start, each day marked with its job.
+// #calls in the link opens straight to Calls first.
 (function () {
   var body = document.body;
-  var buttons = document.querySelectorAll(".switch [data-set]");
-  function show(mode) {
-    body.setAttribute("data-mode", mode);
-    for (var i = 0; i < buttons.length; i++) {
-      buttons[i].setAttribute("aria-pressed", String(buttons[i].getAttribute("data-set") === mode));
-    }
+  var MONTHS = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+  var MON = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+  var DAY = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+  var HEAD = [["Su", "Sunday"], ["Mo", "Monday"], ["Tu", "Tuesday"], ["We", "Wednesday"], ["Th", "Thursday"], ["Fr", "Friday"], ["Sa", "Saturday"]];
+
+  // Titles and headline numbers: the same as the Month by month cards.
+  var TITLE = {
+    sms: ["Set up", "First texts", "50,000 a month", "Replies are the job", "Weekly refresh", "Half-year check", "“Not now” comes back", "Want more?", "Referrals", "Cut and double down", "New ground", "The year in numbers"],
+    calls: ["Set up", "Full speed", "Second try", "Callbacks are the job", "Weekly refresh", "Half-year check", "“Not now” comes back", "Want more?", "Referrals", "Cut and double down", "New ground", "The year in numbers"]
+  };
+  var NUM = { sms: [["0", "texts"], ["~40,000", "texted"], ["~50,000", "texted"]], calls: [["~8,000", "calls"], ["~12,000", "calls"], ["~12,000", "calls"]] };
+  for (var f = 3; f < 12; f++) { NUM.sms.push(["50,000", "texted"]); NUM.calls.push(["12,000", "calls"]); }
+
+  function esc(s) { return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;"); }
+  function dkey(d) { return d.getFullYear() + "-" + d.getMonth() + "-" + d.getDate(); }
+  function addDays(d, n) { return new Date(d.getFullYear(), d.getMonth(), d.getDate() + n); }
+  function nthDow(y, m, dow, fromDay) { var x = new Date(y, m, fromDay); while (x.getDay() !== dow) x = addDays(x, 1); return x; }
+  function lastDow(y, m, dow) { var x = new Date(y, m + 1, 0); while (x.getDay() !== dow) x = addDays(x, -1); return x; }
+  function fmt(d) { return DAY[d.getDay()] + " " + MON[d.getMonth()] + " " + d.getDate(); }
+
+  function holidays(years) {
+    var h = {};
+    years.forEach(function (y) {
+      h[dkey(new Date(y, 0, 1))] = "New Year’s Day";
+      h[dkey(lastDow(y, 4, 1))] = "Memorial Day";
+      h[dkey(new Date(y, 6, 4))] = "Fourth of July";
+      h[dkey(nthDow(y, 8, 1, 1))] = "Labor Day";
+      h[dkey(nthDow(y, 10, 4, 22))] = "Thanksgiving";
+      h[dkey(new Date(y, 11, 25))] = "Christmas";
+    });
+    return h;
   }
-  for (var i = 0; i < buttons.length; i++) {
-    buttons[i].addEventListener("click", function () {
+
+  // The plan's dates for a start month: first texts on month 2's first Wednesday,
+  // follow-ups 30 days later, calls from week 2 of month 1. Holidays never get work.
+  function buildPlan(sy, sm) {
+    var hol = holidays([sy, sy + 1, sy + 2]);
+    var p = {
+      off: function (d) { return hol[dkey(d)] || ""; },
+      weekday: function (d) { var w = d.getDay(); return w >= 1 && w <= 5; },
+      sendDay: function (d) { var w = d.getDay(); return w >= 3 && w <= 6 && !hol[dkey(d)]; },
+      workday: function (d) { while (!p.weekday(d) || p.off(d)) d = addDays(d, 1); return d; }
+    };
+    p.month2 = new Date(sy, sm + 1, 1);
+    p.firstSend = nthDow(p.month2.getFullYear(), p.month2.getMonth(), 3, 1);
+    while (!p.sendDay(p.firstSend)) p.firstSend = addDays(p.firstSend, 1);
+    p.followOn = p.workday(addDays(p.firstSend, 30));
+    p.callsOn = p.workday(nthDow(sy, sm, 1, 8));
+    return p;
+  }
+
+  function dayInfo(p, mode, d) {
+    var t = d.getTime(), info = { hol: p.off(d), send: false, reply: false, follow: false, call: false };
+    if (info.hol) return info;
+    if (mode === "sms") {
+      var prev = addDays(d, -1);
+      info.send = t >= p.firstSend.getTime() && p.sendDay(d);
+      info.reply = prev.getTime() >= p.firstSend.getTime() && p.sendDay(prev);
+      info.follow = t >= p.followOn.getTime() && p.weekday(d);
+      info.call = t >= p.callsOn.getTime() && t < p.month2.getTime() && p.weekday(d);
+    } else {
+      info.call = t >= p.callsOn.getTime() && p.weekday(d);
+    }
+    return info;
+  }
+
+  function milestones(p, mode, sy, sm) {
+    var s = mode === "sms", list = [];
+    function firstMon(i) { var d = new Date(sy, sm + i, 1); return p.workday(nthDow(d.getFullYear(), d.getMonth(), 1, 1)); }
+    var last = new Date(sy, sm + 11, 1);
+    list.push([p.workday(new Date(sy, sm, 1)), "Set up starts"]);
+    list.push([p.callsOn, "Calls from blocks start"]);
+    if (s) {
+      list.push([p.firstSend, "First texts at 5 PM"]);
+      list.push([p.followOn, "Follow-ups switch on"]);
+    } else {
+      list.push([firstMon(1), "Full speed: 200 calls a day each"]);
+      list.push([firstMon(2), "Second try on every no-answer"]);
+    }
+    list.push([firstMon(3), s ? "Every good reply gets a call the same day" : "Callbacks on the day they asked"]);
+    list.push([firstMon(4), "Weekly refresh: new owners every Monday"]);
+    list.push([firstMon(5), "Half-year check"]);
+    list.push([firstMon(6), s ? "Text the “not now” group" : "“Not now” to the top of the call list"]);
+    list.push([firstMon(7), s ? "Room for more? Add numbers toward 20" : "Room for more? Each caller adds about 4,000 a month"]);
+    list.push([firstMon(8), "Referral asks to every closed seller"]);
+    list.push([firstMon(9), "Cut and double down on lists"]);
+    list.push([firstMon(10), "Pick next year’s area"]);
+    list.push([p.workday(lastDow(last.getFullYear(), last.getMonth(), 1)), "Year review: set year two’s number"]);
+    var byDay = {};
+    list.forEach(function (x) { var k = dkey(x[0]); (byDay[k] = byDay[k] || []).push(x[1]); });
+    return byDay;
+  }
+
+  function describe(info, mode, labels) {
+    var t = (labels || []).map(function (l) { return "★ " + l; });
+    if (info.hol) { t.push(info.hol + ": off"); return t; }
+    if (info.reply) t.push("Morning: work replies");
+    if (info.call) t.push(mode === "sms" ? "Calls from blocks" : "Calls: about 200 per caller");
+    if (info.follow) t.push("Follow-ups go out (500)");
+    if (info.send) t.push("5 PM: send about 2,500 first texts");
+    if (!t.length) t.push("Nothing scheduled");
+    return t;
+  }
+
+  var yearEl = document.getElementById("year");
+  var startSel = document.getElementById("start");
+
+  function render() {
+    var mode = body.getAttribute("data-mode");
+    var parts = startSel.value.split("-"), sy = +parts[0], sm = +parts[1];
+    var p = buildPlan(sy, sm), ms = milestones(p, mode, sy, sm), html = "";
+    for (var i = 0; i < 12; i++) {
+      var first = new Date(sy, sm + i, 1), y = first.getFullYear(), m = first.getMonth();
+      var days = new Date(y, m + 1, 0).getDate(), cells = [], notes = [], sends = 0, calls = 0, follows = 0;
+      for (var b = 0; b < first.getDay(); b++) cells.push('<td class="e"></td>');
+      for (var dd = 1; dd <= days; dd++) {
+        var d = new Date(y, m, dd), info = dayInfo(p, mode, d), labels = ms[dkey(d)], text = describe(info, mode, labels);
+        if (info.send) sends++;
+        if (info.call) calls++;
+        if (info.follow) follows++;
+        var dots = '<i class="' + (info.reply ? "a" : "") + '"></i><i class="' + (info.call ? "b" : info.follow ? "v" : "") + '"></i><i class="' + (info.send ? "o" : "") + '"></i>';
+        cells.push('<td class="d' + (labels ? " ms" : "") + (info.hol ? " hol" : "") + '" data-tip="' + esc(fmt(d) + "|" + text.join("|")) + '">'
+          + '<span class="dn">' + dd + '</span>'
+          + (labels ? '<span class="star" aria-hidden="true">★</span>' : "")
+          + '<span class="dots" aria-hidden="true">' + dots + '</span>'
+          + '<span class="sr">' + esc(text.join(". ")) + '</span></td>');
+        if (labels) labels.forEach(function (l) { notes.push('<li><span class="nk" aria-hidden="true">★</span>' + esc(fmt(d) + " · " + l) + "</li>"); });
+        if (info.hol) notes.push('<li><span class="nk hk" aria-hidden="true"></span>' + esc(fmt(d) + " · " + info.hol + ", off") + "</li>");
+      }
+      while (cells.length % 7) cells.push('<td class="e"></td>');
+      var rows = "";
+      for (var r = 0; r < cells.length; r += 7) rows += "<tr>" + cells.slice(r, r + 7).join("") + "</tr>";
+      var count = mode === "sms"
+        ? (sends ? sends + " send evenings" + (follows ? " · follow-ups every weekday" : "") : "Calls only. Texting waits on the carriers.")
+        : calls + " call days";
+      var num = NUM[mode][i], full = mode === "sms" ? i >= 2 : i >= 1;
+      html += '<article class="cal-month">'
+        + '<div class="cm-head"><p class="n">Month ' + (i + 1) + '</p><p class="when">' + MONTHS[m] + " " + y + "</p></div>"
+        + "<h3>" + esc(TITLE[mode][i]) + "</h3>"
+        + '<p class="cm-num' + (full ? " full" : "") + '">' + num[0] + " <span>" + num[1] + "</span></p>"
+        + '<p class="cm-count">' + count + "</p>"
+        + '<table class="cal"><caption class="sr">' + MONTHS[m] + " " + y + ", day by day</caption><thead><tr>"
+        + HEAD.map(function (h) { return '<th scope="col" abbr="' + h[1] + '">' + h[0] + "</th>"; }).join("")
+        + "</tr></thead><tbody>" + rows + "</tbody></table>"
+        + (notes.length ? '<ul class="cm-notes">' + notes.join("") + "</ul>" : "")
+        + "</article>";
+    }
+    yearEl.innerHTML = html;
+    hideTip();
+  }
+
+  // Hover (mouse) or tap shows a day's jobs. The same text is in each cell for screen
+  // readers, and the legend and month notes carry it without hovering.
+  var tip = document.getElementById("tip");
+  function showTip(td) {
+    var parts = td.getAttribute("data-tip").split("|");
+    tip.innerHTML = "<b>" + esc(parts[0]) + "</b>" + parts.slice(1).map(function (l) { return "<div>" + esc(l) + "</div>"; }).join("");
+    tip.hidden = false;
+    var rc = td.getBoundingClientRect(), w = tip.offsetWidth, h = tip.offsetHeight;
+    var x = Math.min(Math.max(8, rc.left + rc.width / 2 - w / 2), window.innerWidth - w - 8);
+    var y = rc.top - h - 8;
+    if (y < 8) y = rc.bottom + 8;
+    tip.style.left = x + "px";
+    tip.style.top = y + "px";
+  }
+  function hideTip() { tip.hidden = true; }
+  yearEl.addEventListener("pointerover", function (e) {
+    if (e.pointerType !== "mouse") return;
+    var td = e.target.closest("td.d");
+    if (td) showTip(td); else hideTip();
+  });
+  yearEl.addEventListener("pointerleave", hideTip);
+  yearEl.addEventListener("click", function (e) {
+    var td = e.target.closest("td.d");
+    if (td) { showTip(td); e.stopPropagation(); }
+  });
+  document.addEventListener("click", hideTip);
+  window.addEventListener("scroll", hideTip, { passive: true });
+  document.addEventListener("keydown", function (e) { if (e.key === "Escape") hideTip(); });
+
+  var modeBtns = document.querySelectorAll("[data-set]"), viewBtns = document.querySelectorAll("[data-view-set]");
+  function press(btns, attr, val) {
+    for (var i = 0; i < btns.length; i++) btns[i].setAttribute("aria-pressed", String(btns[i].getAttribute(attr) === val));
+  }
+  function setMode(mode) { body.setAttribute("data-mode", mode); press(modeBtns, "data-set", mode); render(); }
+  function setView(view) { body.setAttribute("data-view", view); press(viewBtns, "data-view-set", view); hideTip(); }
+  for (var i = 0; i < modeBtns.length; i++) {
+    modeBtns[i].addEventListener("click", function () {
       var mode = this.getAttribute("data-set");
-      show(mode);
+      setMode(mode);
       try { history.replaceState(null, "", mode === "calls" ? "#calls" : "#texts"); } catch (e) {}
     });
   }
-  if (location.hash === "#calls") show("calls");
+  for (var j = 0; j < viewBtns.length; j++) {
+    viewBtns[j].addEventListener("click", function () { setView(this.getAttribute("data-view-set")); });
+  }
+  startSel.addEventListener("change", render);
+
+  setView("cal");
+  setMode(location.hash === "#calls" ? "calls" : "sms");
 })();
 </script>
 </body>
