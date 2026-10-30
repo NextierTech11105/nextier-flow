@@ -1,0 +1,324 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<title>Team Musso · Enrichment Map</title>
+<meta name="description" content="Every enrichment step in the Team Musso Data Engine: the New York state file, people, companies that own land, estates, the property and adjustable-rate loans on big lots. What runs, on whose key, what it costs, and where the answer lands.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@700;800&family=IBM+Plex+Sans:wght@500;600;700&display=swap">
+<style>
+:root{--bg:#000;--card:#0a0d12;--card2:#06080b;--line:#2a3442;--fg:#fff;--orange:#ff8a3d;--green:#12b76a;--blue:#4c8dff;--purple:#a78bfa;--teal:#2dd4bf;--yellow:#f5c84c;--red:#ff5d5d;--pink:#f472b6;color-scheme:dark}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--fg);font:500 17px/1.5 'IBM Plex Sans','Segoe UI',Arial,sans-serif}
+.wrap{max-width:1140px;margin:0 auto;padding:28px 16px 56px}
+.brand{font:800 15px 'Archivo',Arial,sans-serif;letter-spacing:.14em;text-transform:uppercase}
+.brand span{color:var(--orange)}
+h1{font:800 clamp(30px,4.4vw,52px)/1.05 'Archivo',Arial,sans-serif;margin:10px 0 8px}
+h1 em{font-style:normal;color:var(--green)}
+.lede{font-size:20px;font-weight:600;margin:0 0 18px;max-width:66ch}
+h2{font:800 25px 'Archivo',Arial,sans-serif;margin:0 0 6px}
+h2 .n{display:inline-block;min-width:34px;height:34px;border-radius:50%;background:var(--c,var(--orange));color:#000;text-align:center;font:800 19px/34px 'Archivo',Arial,sans-serif;margin-right:8px}
+.sub{font-weight:600;margin:0 0 14px;max-width:72ch}
+b{color:#fff}
+.nav{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 20px}
+.nav a{color:#fff;text-decoration:none;font-weight:700;font-size:15px;padding:6px 12px;border:1px solid var(--line);border-radius:999px;background:var(--card2)}
+.nav a:hover{border-color:var(--blue)}
+section{margin:0 0 26px;scroll-margin-top:12px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:18px 20px}
+.tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,170px),1fr));gap:10px;margin:0 0 22px}
+.tile{border:1px solid var(--line);border-radius:14px;padding:12px 14px;background:var(--card2)}
+.tile b{display:block;font:800 32px/1.05 'Archivo',Arial,sans-serif;margin:0 0 4px}
+.tile span{font-weight:600;font-size:15px}
+.chip{display:inline-block;font:800 12px/1 'Archivo',Arial,sans-serif;letter-spacing:.08em;text-transform:uppercase;padding:6px 9px;border-radius:999px;white-space:nowrap}
+.chip.live{background:#0b3322;border:1px solid var(--green);color:#fff}
+.chip.key{background:#0f2347;border:1px solid var(--blue);color:#fff}
+.chip.build{background:#4a2309;border:1px solid var(--orange);color:#fff}
+.chip.off{background:#3a0f0f;border:1px solid var(--red);color:#fff}
+.legend{display:flex;flex-wrap:wrap;gap:14px;align-items:center;font-weight:600;margin:0 0 22px}
+.legend div{display:flex;gap:8px;align-items:center}
+.layers{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,230px),1fr));gap:10px}
+.layer{border:1px solid var(--line);border-radius:16px;padding:14px;background:var(--card2);position:relative}
+.layer .k{font:800 13px 'Archivo',Arial,sans-serif;letter-spacing:.1em;text-transform:uppercase;color:var(--teal)}
+.layer h3{font:800 19px 'Archivo',Arial,sans-serif;margin:4px 0 6px}
+.layer p{margin:0 0 10px;font-weight:600;font-size:15px}
+.layer.here{border:2px solid var(--orange);background:#140b04}
+.path{border-radius:18px;padding:18px 20px;background:var(--card);border:2px solid var(--c,var(--blue))}
+.path h2{color:#fff}
+.steps{display:grid;gap:8px;margin:12px 0 0}
+.step{display:grid;grid-template-columns:40px minmax(0,1fr) auto;gap:12px;align-items:start;border:1px solid var(--line);border-radius:14px;padding:12px 14px;background:var(--card2)}
+.step .ic{font-size:26px;line-height:1.1;text-align:center}
+.step b{display:block;font-size:18px}
+.step .how{font-weight:500;display:block}
+.step .lands{display:block;margin-top:6px;font-weight:700;font-size:15px;color:var(--teal)}
+.step .side{display:grid;gap:6px;justify-items:end;text-align:right}
+.step .cost{font:800 15px 'Archivo',Arial,sans-serif}
+.arrow{text-align:center;font:800 15px 'Archivo',Arial,sans-serif;color:var(--c,var(--blue));letter-spacing:.08em}
+@media (max-width:620px){.step{grid-template-columns:32px minmax(0,1fr)}.step .side{grid-column:2;justify-items:start;text-align:left;grid-auto-flow:column;justify-content:start;align-items:center}}
+.note{font-weight:600;border-left:4px solid var(--orange);padding:4px 0 4px 12px;margin:14px 0 0}
+.note.g{border-color:var(--green)}
+.files{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,200px),1fr));gap:10px;margin:12px 0 4px}
+.file{border:1px solid var(--teal);border-radius:14px;padding:12px 14px;background:#062421}
+.file b{display:block;font:800 26px/1.1 'Archivo',Arial,sans-serif}
+.file span{font-weight:600;font-size:15px}
+.reach{display:grid;gap:8px;margin-top:12px}
+.rr{display:grid;grid-template-columns:54px minmax(0,1fr);gap:12px;align-items:start;border:1px solid var(--line);border-radius:14px;padding:12px 14px;background:var(--card2)}
+.rr .tag{font:800 20px/40px 'Archivo',Arial,sans-serif;text-align:center;border-radius:12px;background:var(--t,var(--green));color:#000;height:40px}
+.rr b{display:block;font-size:18px}
+.rr span{font-weight:500}
+.rr .lands{display:block;margin-top:6px;font-weight:700;font-size:15px;color:var(--teal)}
+.tbl{width:100%;border-collapse:collapse;font-weight:600}
+.tbl th,.tbl td{text-align:left;padding:10px;border-bottom:1px solid var(--line);vertical-align:top}
+.tbl th{font:800 14px 'Archivo',Arial,sans-serif;letter-spacing:.06em;text-transform:uppercase;color:var(--teal)}
+.tbl td.r,.tbl th.r{text-align:right;white-space:nowrap}
+.scroll{overflow-x:auto}
+.receipt{font:600 16px/1.45 ui-monospace,Consolas,monospace;border:1px dashed var(--green);border-radius:14px;padding:14px 16px;background:#03140c;white-space:pre-wrap}
+.keys{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,250px),1fr));gap:10px}
+.keyc{border:1px solid var(--line);border-radius:14px;padding:12px 14px;background:var(--card2)}
+.keyc b{display:flex;justify-content:space-between;gap:8px;align-items:center;font-size:18px;margin-bottom:4px}
+.keyc span{font-weight:600;font-size:15px}
+.num-list{display:grid;gap:8px;counter-reset:n}
+.num-list div{counter-increment:n;display:grid;grid-template-columns:34px minmax(0,1fr);gap:10px;align-items:center;border:1px solid var(--line);border-radius:12px;padding:10px 12px;background:var(--card2);font-weight:600}
+.num-list div::before{content:counter(n);width:30px;height:30px;border-radius:50%;background:var(--orange);color:#000;font:800 17px/30px 'Archivo',Arial,sans-serif;text-align:center}
+footer{margin-top:30px;font-weight:600;font-size:15px}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<div class="brand">Nextier <span>Data Engine</span> · Team Musso</div>
+<h1>Every owner, <em>filled in.</em><br>Every step on screen.</h1>
+<p class="lede">Your book holds the parcel and the owner's name. Enrichment turns that name into a person you can call: a homeowner, the family behind an estate, or the people behind a company that owns land. It also flags the owners with a reason to move now, like an adjustable-rate loan about to reset on a big lot. Each step below shows what runs, whose key it runs on, what it costs, and where the answer lands on the lead.</p>
+
+<nav class="nav">
+  <a href="#layers">Where it sits</a>
+  <a href="#statefile">NY state file</a>
+  <a href="#person">Person</a>
+  <a href="#company">Company owners</a>
+  <a href="#estate">Estates</a>
+  <a href="#property">The property</a>
+  <a href="#arm">Adjustable rate</a>
+  <a href="#visible">What you see</a>
+  <a href="#cost">Cost</a>
+  <a href="#keys">Your keys</a>
+  <a href="#next">What turns on next</a>
+  <a href="paul-cheat-sheet.html">Cheat sheet</a>
+  <a href="paul-universal-lead.html">Lead card</a>
+</nav>
+
+<div class="tiles">
+  <div class="tile"><b>19,419</b><span>lots in your book</span></div>
+  <div class="tile"><b>18,315</b><span>owners of record (NYS tax roll)</span></div>
+  <div class="tile"><b>33.7M</b><span>records in the New York state file, ready to match</span></div>
+  <div class="tile"><b>5</b><span>owners traced so far, phones on the lead</span></div>
+</div>
+
+<div class="legend">
+  <div><span class="chip live">Live</span> working in your engine now</div>
+  <div><span class="chip key">Your key</span> works once your key is connected</div>
+  <div><span class="chip build">Wiring in</span> the tool exists; we connect it to your book</div>
+  <div><span class="chip off">Off</span> left out by your choice</div>
+</div>
+
+<!-- LAYERS -->
+<section id="layers" class="card">
+  <h2>Where enrichment sits in your engine</h2>
+  <p class="sub">Four layers, always in this order. The state file reaches most owners. Enrichment fills only what the core and the state file can't.</p>
+  <div class="layers">
+    <div class="layer">
+      <div class="k">Layer 1</div>
+      <h3>Core database</h3>
+      <p>Every parcel, owner of record, acres, zoning math, listing history, permit pulse.</p>
+      <span class="chip live">Live · 19,419 lots</span>
+    </div>
+    <div class="layer here">
+      <div class="k">Layer 2</div>
+      <h3>New York state file</h3>
+      <p>USBizData's New York records: residential, cell, email and business, matched onto your owners.</p>
+      <span class="chip build">Ready to install</span>
+    </div>
+    <div class="layer here">
+      <div class="k">Layer 3</div>
+      <h3>Enrichment</h3>
+      <p>Skip trace plus Apify tools: the person, the phone, the company's decision maker, the family.</p>
+      <span class="chip build">Wiring in</span>
+    </div>
+    <div class="layer here">
+      <div class="k">Layer 4</div>
+      <h3>Events + tracking</h3>
+      <p>Adjustable rate resetting, sold, relisted, expiring, permits, a death in the family. Why now.</p>
+      <span class="chip build">Partly live</span>
+    </div>
+  </div>
+</section>
+
+<!-- STATE FILE -->
+<section id="statefile" class="path" style="--c:var(--teal)">
+  <h2><span class="n">0</span>The New York state file goes first</h2>
+  <p class="sub">Four USBizData New York files, bought once and kept in your own database. Every owner in your book is matched against them before anything is traced. Each owner the file reaches is one less trace to pay for.</p>
+  <div class="files">
+    <div class="file"><b>15,801,605</b><span>Residential: name, address, phone, age, years at address</span></div>
+    <div class="file"><b>5,141,785</b><span>Cell phones</span></div>
+    <div class="file"><b>7,297,939</b><span>Personal email</span></div>
+    <div class="file"><b>5,514,091</b><span>Business: company, contact, title, direct phone, email</span></div>
+  </div>
+  <p class="sub" style="margin-top:14px">Each owner gets one of four reach codes. The code decides the next step:</p>
+  <div class="reach">
+    <div class="rr" style="--t:var(--green)"><div class="tag">R1</div><div><b>The owner, found by name</b><span>Matched at the address the tax bill goes to (or at the property, for owners who live there). Phone, cell, email, age and years at the address come straight from the file.</span><span class="lands">Lands in: Mobile 1–3 · Landline · Email 1–3 · Age · Years owned → ready to call</span></div></div>
+    <div class="rr" style="--t:var(--yellow)"><div class="tag">R2</div><div><b>Someone in the owner's household</b><span>A different name at the same address has a phone. Kept as a lead to the household, and the owner is also skip traced.</span><span class="lands">Lands in: Household contact · then Path A, Pass 1</span></div></div>
+    <div class="rr" style="--t:var(--orange)"><div class="tag">R3</div><div><b>The file can't reach them</b><span>A person, trust or estate that isn't in the file. Goes straight to skip trace on your key.</span><span class="lands">Next: Path A, Pass 1 (or Path C for an estate)</span></div></div>
+    <div class="rr" style="--t:var(--purple)"><div class="tag">R4</div><div><b>A company owns it</b><span>Matched against the business file by company name and mailing address: contact name, title, direct phone, email.</span><span class="lands">Next: Path B</span></div></div>
+  </div>
+  <p class="note">The file's phones are not verified. They get the same Do Not Call check as every other phone, and a wrong number moves the lead to its next-best phone. Once a traced owner gets a phone, they move from R3 up to R1.</p>
+</section>
+
+<!-- PATH A: PERSON -->
+<section id="person" class="path" style="--c:var(--green)">
+  <h2><span class="n">A</span>The owner is a person</h2>
+  <p class="sub">For owners the state file couldn't reach (R2, R3). Two passes: skip trace first, then a people search on anyone it missed.</p>
+  <div class="steps">
+    <div class="step"><div class="ic">📄</div><div><b>Owner of record</b><span class="how">Name and mailing address straight off the NYS tax roll.</span><span class="lands">Lands in: owner name · mailing address</span></div><div class="side"><span class="chip live">Live</span><span class="cost">$0</span></div></div>
+    <div class="arrow">▼</div>
+    <div class="step"><div class="ic">🔎</div><div><b>Pass 1 · Skip trace (Tracerfy)</b><span class="how">Name and address in. Phones and emails out, each phone with its line type, carrier, Do Not Call, TCPA and litigator flags. You pay only when it finds someone.</span><span class="lands">Lands in: Mobile 1–3 · Landline · Email 1–3 · Line type · Carrier · DNC · TCPA</span></div><div class="side"><span class="chip key">Your key</span><span class="cost">2¢ a hit</span></div></div>
+    <div class="arrow">▼ only the owners it missed</div>
+    <div class="step"><div class="ic">🧭</div><div><b>Pass 2 · People search (Apify)</b><span class="how">Runs on Pass 1's misses only. Searches public people-search sites by name and town: ranked phones with line type and a confidence score, emails, past addresses, relatives. Charged only when it finds someone.</span><span class="lands">Lands in: the same phone and email fields, marked "Pass 2"</span></div><div class="side"><span class="chip build">Wiring in</span><span class="cost">≈ $6.50 / 1,000 found</span></div></div>
+    <div class="arrow">▼</div>
+    <div class="step"><div class="ic">📶</div><div><b>Rank the phones</b><span class="how">A mobile number goes first. Anything on Do Not Call is blanked before anyone sees it. A wrong number moves the lead to the next-best phone.</span><span class="lands">Lands in: Call + email card, best phone on top</span></div><div class="side"><span class="chip live">Live</span><span class="cost">$0</span></div></div>
+    <div class="arrow">▼</div>
+    <div class="step"><div class="ic">☎️</div><div><b>Click to call</b><span class="how">One press from the lead. The outcome is saved to notes.</span><span class="lands">Lands in: notes + call outcome</span></div><div class="side"><span class="chip key">Your key</span><span class="cost">per minute</span></div></div>
+  </div>
+</section>
+
+<!-- PATH B: COMPANY -->
+<section id="company" class="path" style="--c:var(--purple)">
+  <h2><span class="n">B</span>The owner is a company</h2>
+  <p class="sub">LLCs, corporations, trusts, holding companies (R4). A company can't answer the phone, so the job is to find the person behind it, then run Path A on that person.</p>
+  <div class="steps">
+    <div class="step"><div class="ic">🏷️</div><div><b>Spot the company owner</b><span class="how">Owner names with LLC, Inc, Corp, Trust, Holdings, Realty and similar words are tagged as company-owned.</span><span class="lands">Lands in: owner type</span></div><div class="side"><span class="chip live">Live</span><span class="cost">$0</span></div></div>
+    <div class="arrow">▼</div>
+    <div class="step"><div class="ic">🗂️</div><div><b>Everything else it owns</b><span class="how">Every other parcel on the tax roll under the same owner name or mailing address. A company holding 6 lots is one conversation, not six.</span><span class="lands">Lands in: Portfolio (other parcels owned)</span></div><div class="side"><span class="chip live">Live</span><span class="cost">$0</span></div></div>
+    <div class="arrow">▼ find the people behind it, four ways</div>
+    <div class="step"><div class="ic">📇</div><div><b>1 · The state business file</b><span class="how">Company name and mailing address matched against the New York business file: contact name, title, direct phone, email.</span><span class="lands">Lands in: Decision maker · Title · Direct phone · Email</span></div><div class="side"><span class="chip build">With the state file</span><span class="cost">in the file</span></div></div>
+    <div class="step"><div class="ic">🏛️</div><div><b>2 · State business record (Apify)</b><span class="how">Department of State records in 48 states and DC: who filed it, the registered agent, the address for legal papers, status. Florida also lists officers and managers. New York does not publish who owns an LLC, so here this usually gives a filer or an address, not the owner.</span><span class="lands">Lands in: Company · Status · Filer / agent · Officers (where published)</span></div><div class="side"><span class="chip build">Wiring in</span><span class="cost">≈ $2–5 / 1,000</span></div></div>
+    <div class="step"><div class="ic">✍️</div><div><b>3 · Who signed the deed (NYC lots)</b><span class="how">The deed and mortgage on file name the person who signed for the company. In New York this is the most reliable way to get a real name. Our in-house tool does this for NYC.</span><span class="lands">Lands in: Decision maker · Title (from the signature block)</span></div><div class="side"><span class="chip build">Wiring in</span><span class="cost">$0</span></div></div>
+    <div class="step"><div class="ic">🧑‍💼</div><div><b>4 · Decision makers at developers (Apify)</b><span class="how">For builders and developers already on deals in your towns: the principals and acquisition people, found by company name on public LinkedIn profiles.</span><span class="lands">Lands in: Decision maker · Title · Company</span></div><div class="side"><span class="chip build">Wiring in</span><span class="cost">≈ $4 / 1,000</span></div></div>
+    <div class="arrow">▼ person found</div>
+    <div class="step"><div class="ic">🔁</div><div><b>Run Path A on that person</b><span class="how">Skip trace, then people search, then rank and call. The lead keeps the company and the person side by side.</span><span class="lands">Lands in: Call + email card, under the company name</span></div><div class="side"><span class="chip key">Your key</span><span class="cost">2¢ a hit</span></div></div>
+  </div>
+</section>
+
+<!-- PATH C: ESTATE -->
+<section id="estate" class="path" style="--c:var(--yellow)">
+  <h2><span class="n">C</span>The owner has passed away</h2>
+  <p class="sub">Inherited land is some of the most likely land to sell, and the name on the tax roll can't pick up. This path finds the family.</p>
+  <div class="steps">
+    <div class="step"><div class="ic">🕯️</div><div><b>Weekly death-notice match (Apify)</b><span class="how">New death notices for Suffolk and Nassau, matched to your owners of record by name and town. A match is a signal, not a fact. A person confirms it before anyone calls.</span><span class="lands">Lands in: Estate flag · Date of notice · Source link</span></div><div class="side"><span class="chip build">Wiring in</span><span class="cost">≈ $3 / 1,000 notices</span></div></div>
+    <div class="arrow">▼</div>
+    <div class="step"><div class="ic">👪</div><div><b>Find the family at the property</b><span class="how">Household lookup on the property: the surviving spouse first, then heirs, then relatives at that address.</span><span class="lands">Lands in: Decision maker (family) · phones · relationship</span></div><div class="side"><span class="chip key">Your key</span><span class="cost">per hit</span></div></div>
+  </div>
+  <p class="note">Already happened once: lot #4 in your book. The owner on the roll had passed, and the trace found the family member who holds it now.</p>
+</section>
+
+<!-- PATH D: PROPERTY -->
+<section id="property" class="path" style="--c:var(--blue)">
+  <h2><span class="n">D</span>The property itself</h2>
+  <p class="sub">What the tax roll doesn't say: is it on the market, what's owed on it, what changed this week.</p>
+  <div class="steps">
+    <div class="step"><div class="ic">🗺️</div><div><b>Lot facts, zoning math, deal persona</b><span class="how">Acres, zoning where the town publishes it, permit pulse by town, subdivide / redevelop / builder-lot tags.</span><span class="lands">Lands in: Parcel record · Deal persona · Deal potential</span></div><div class="side"><span class="chip live">Live</span><span class="cost">$0</span></div></div>
+    <div class="step"><div class="ic">🚫</div><div><b>Is it listed right now? (Apify)</b><span class="how">A weekly check of Zillow and Redfin listings in your towns. Anything live with an agent comes out of pursuit and is counted as "on the market, not in pursuit".</span><span class="lands">Lands in: Listed now · Removed from pursuit</span></div><div class="side"><span class="chip build">Wiring in</span><span class="cost">≈ $0.50–2 / 1,000</span></div></div>
+    <div class="step"><div class="ic">🏦</div><div><b>Loan, equity, last sale (Apify)</b><span class="how">Open mortgages (lender, amount, rate type, term, maturity date), estimated equity, last sale price and date, all from public property records. No RealEstateAPI needed.</span><span class="lands">Lands in: Loans · Equity · Last sale</span></div><div class="side"><span class="chip build">Wiring in</span><span class="cost">≈ $1.47 / 1,000</span></div></div>
+    <div class="step"><div class="ic">🔄</div><div><b>Sold · relisted · expiring (OneKey, weekly)</b><span class="how">Your MLS login, swept weekly for land: what sold, what came back on, what expires in the next 6–12 months.</span><span class="lands">Lands in: Listing history · Month Out radar</span></div><div class="side"><span class="chip build">Wiring in</span><span class="cost">≈ 3¢ a run</span></div></div>
+    <div class="step"><div class="ic">⛔</div><div><b>Foreclosure, pre-foreclosure, auction</b><span class="how">Left out at your request. The tools exist; they are not pointed at your book.</span><span class="lands">Lands in: nothing</span></div><div class="side"><span class="chip off">Off</span><span class="cost">$0</span></div></div>
+  </div>
+</section>
+
+<!-- PATH E: ARM -->
+<section id="arm" class="path" style="--c:var(--pink)">
+  <h2><span class="n">E</span>Adjustable rate resetting within 12 months, on big lots</h2>
+  <p class="sub">An owner sitting on a big lot whose loan payment is about to jump has a reason to sell or split now. This radar finds them across Suffolk and Nassau, including lots that aren't in your book yet.</p>
+  <div class="steps">
+    <div class="step"><div class="ic">📐</div><div><b>Pull the big lots with their loans (Apify)</b><span class="how">Every property in Suffolk and Nassau on 1.9 acres or more (the line the engine already uses for split candidates; change it any time), with its open mortgages. The first run is a count.</span><span class="lands">Lands in: Parcel · Acres · Loans</span></div><div class="side"><span class="chip build">Wiring in</span><span class="cost">≈ $1.47 / 1,000</span></div></div>
+    <div class="arrow">▼</div>
+    <div class="step"><div class="ic">📈</div><div><b>Keep the adjustable loans</b><span class="how">Only open mortgages recorded as adjustable rate.</span><span class="lands">Lands in: Loan type · Lender · Amount · Recorded</span></div><div class="side"><span class="chip build">Wiring in</span><span class="cost">$0</span></div></div>
+    <div class="arrow">▼</div>
+    <div class="step"><div class="ic">📅</div><div><b>Due inside 12 months</b><span class="how">Two tests. <b>Matures within 12 months:</b> exact, from the recorded maturity date. <b>Hits its 5-, 7- or 10-year mark within 12 months:</b> the usual points where an adjustable rate resets, counted from the recording date. That one is an estimate and is marked as one.</span><span class="lands">Lands in: Event · "Adjustable rate · resets ~month/year" · exact or estimate</span></div><div class="side"><span class="chip build">Wiring in</span><span class="cost">$0</span></div></div>
+    <div class="arrow">▼</div>
+    <div class="step"><div class="ic">🧹</div><div><b>Take out what you don't pursue</b><span class="how">Anything listed right now, and anything in foreclosure (your choice).</span><span class="lands">Lands in: removed, counted</span></div><div class="side"><span class="chip build">Wiring in</span><span class="cost">$0</span></div></div>
+    <div class="arrow">▼</div>
+    <div class="step"><div class="ic">🎯</div><div><b>Into your book, then find the owner</b><span class="how">Each match becomes an event on the lot, then runs the state file match and Path A or B for a phone. Re-run monthly; only new matches are added.</span><span class="lands">Lands in: Event signals · Call + email card</span></div><div class="side"><span class="chip build">Wiring in</span><span class="cost">see Paths 0, A, B</span></div></div>
+  </div>
+  <p class="note">Public mortgage records show whether a loan is adjustable, when it was recorded, its term and its maturity date. They don't show the exact reset date. That's why the 5-, 7- and 10-year test is labeled an estimate. No RealEstateAPI needed; the whole radar runs on your Apify key.</p>
+</section>
+
+<!-- VISIBLE -->
+<section id="visible" class="card">
+  <h2>What you see while it runs</h2>
+  <p class="sub">Every run leaves a receipt on the screen before you need it: what went in, what came back, what it cost, which leads changed. A phone that lands only in a side file is invisible, so every answer is written onto the lead in the same run.</p>
+  <div class="receipt">RUN · Pass 2 people search · Suffolk · Thu 7:02 AM
+In            412 owners Pass 1 missed
+Found         173 people · 151 with a mobile
+Blocked        19 phones on Do Not Call (blanked)
+Cost        $1.12 on your Apify account
+Written      151 leads updated · Call + email card
+Next         151 ready to call · top of the list</div>
+  <p class="note">Sample receipt. The numbers show the format, not a real run.</p>
+</section>
+
+<!-- COST -->
+<section id="cost" class="card">
+  <h2>Cost, at cost on your own accounts</h2>
+  <p class="sub">Most of these charge only when they find something. Tracing is sized to your callers, about 2,000 new owners per caller per month.</p>
+  <div class="scroll">
+  <table class="tbl">
+    <thead><tr><th>Step</th><th>Charged on</th><th class="r">Price</th></tr></thead>
+    <tbody>
+      <tr><td>New York state file (4 files)</td><td>one time</td><td class="r">$108</td></tr>
+      <tr><td>Skip trace (Pass 1)</td><td>hits only</td><td class="r">$20 / 1,000</td></tr>
+      <tr><td>People search (Pass 2)</td><td>people found</td><td class="r">≈ $6.50 / 1,000</td></tr>
+      <tr><td>State business records</td><td>records found</td><td class="r">≈ $2–5 / 1,000</td></tr>
+      <tr><td>Developer decision makers</td><td>profiles</td><td class="r">≈ $4 / 1,000</td></tr>
+      <tr><td>Death notices</td><td>notices read</td><td class="r">≈ $3 / 1,000</td></tr>
+      <tr><td>Listed-now check</td><td>listings read</td><td class="r">≈ $0.50–2 / 1,000</td></tr>
+      <tr><td>Loans, equity, adjustable-rate radar</td><td>properties</td><td class="r">≈ $1.47 / 1,000</td></tr>
+      <tr><td>State file match, deed signer (NYC), lot facts, ranking</td><td>—</td><td class="r">$0</td></tr>
+    </tbody>
+  </table>
+  </div>
+  <p class="note g">A month at 2,000 new owners: about <b>$40–60</b> for every step on this page together, plus the state file once. Estimate; the first real runs replace it.</p>
+</section>
+
+<!-- KEYS -->
+<section id="keys" class="card">
+  <h2>Your keys, your bills</h2>
+  <p class="sub">Every workspace runs on its own accounts. Vendor bills come in your name, at cost. Every new workspace gets its own Apify key.</p>
+  <div class="keys">
+    <div class="keyc"><b>Apify <span class="chip build">Adding the slot</span></b><span>People search, company records, decision makers, death notices, listed check, loans and the adjustable-rate radar, OneKey sweep.</span></div>
+    <div class="keyc"><b>USBizData <span class="chip key">Your purchase</span></b><span>The four New York state files, bought once, kept in your database.</span></div>
+    <div class="keyc"><b>Tracerfy <span class="chip key">Your key</span></b><span>Skip trace, household lookup, line type, Do Not Call, litigator flags.</span></div>
+    <div class="keyc"><b>SignalHouse <span class="chip key">Your key</span></b><span>Click to call from your own numbers.</span></div>
+    <div class="keyc"><b>OneKey MLS <span class="chip key">Your login</span></b><span>Listing history and the weekly land sweep.</span></div>
+  </div>
+  <p class="note g">No RealEstateAPI subscription. Loans, equity and the adjustable-rate radar run on public property records through your Apify key, at about $1.47 per 1,000 properties.</p>
+</section>
+
+<!-- NEXT -->
+<section id="next" class="card">
+  <h2>What turns on next, in order</h2>
+  <div class="num-list">
+    <div>An Apify key slot for every workspace, so each run bills your own account.</div>
+    <div>Install the New York state file and run the match: every owner gets R1, R2, R3 or R4.</div>
+    <div>Pass 2 people search on skip-trace misses, written straight onto the lead.</div>
+    <div>The adjustable-rate radar on big lots: count first, then monthly.</div>
+    <div>Company owners: business file, state record, NYC deed signer and developer decision makers, side by side on the lead.</div>
+    <div>Weekly death-notice match for Suffolk and Nassau, confirmed by a person before any call.</div>
+    <div>Weekly listed-now check and OneKey land sweep.</div>
+    <div>A run receipt on screen for every step: in, found, cost, leads written.</div>
+  </div>
+  <p class="note">Every phone gets a Do Not Call check before anyone dials it, whichever step found it.</p>
+</section>
+
+<footer>Nextier Data Engine · Team Musso · Enrichment Map · Updated October 30, 2026</footer>
+</div>
+</body>
+</html>
