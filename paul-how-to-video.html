@@ -121,6 +121,25 @@ h1 em{font-style:normal;color:var(--green)}
 .prog button{flex:1;height:10px;border:0;border-radius:6px;background:#2a3442;cursor:pointer;padding:0}
 .prog button.done{background:#8a5a33}
 .prog button.cur{background:var(--orange)}
+/* record mode (Thomas's own link: #record) */
+.recpanel{border-top:2px solid #e5484d;background:#12060a;padding:16px 22px 18px}
+.recpanel .rtop{display:flex;justify-content:space-between;flex-wrap:wrap;gap:10px;font:800 15px 'Archivo',Arial,sans-serif;letter-spacing:.12em;color:#ff9a9a}
+.recpanel #reccount{color:#fff;letter-spacing:0;font:700 17px 'IBM Plex Sans',Arial}
+.rsay{font:700 17px 'IBM Plex Sans',Arial;margin:10px 0 6px}
+.rline{font:700 clamp(21px,2.5vw,30px)/1.4 'IBM Plex Sans',Arial;background:#000;border:1px solid #3b4a5e;border-radius:12px;padding:14px 18px}
+.rbtns{display:flex;flex-wrap:wrap;gap:10px;margin:14px 0 8px;align-items:center}
+.rbtns button{min-height:52px;font:800 18px 'IBM Plex Sans',Arial;color:#fff;background:#0d1117;border:1px solid #3b4a5e;border-radius:12px;padding:0 18px;cursor:pointer}
+.rbtns button:disabled{opacity:.45;cursor:not-allowed}
+.rbtns .recb{background:#e5484d;border-color:#e5484d;min-width:200px}
+.rbtns .recb.live{animation:pulse 1s infinite}
+@keyframes pulse{50%{box-shadow:0 0 0 9px rgba(229,72,77,.35)}}
+.rbtns .main{background:var(--orange);color:#000;border-color:var(--orange)}
+.rbtns .sp{flex:1}
+.rmsg{font:700 18px/1.45 'IBM Plex Sans',Arial}
+.rdots{display:flex;gap:4px;margin-top:12px}
+.rdots button{flex:1;height:14px;border:0;border-radius:4px;background:#2a3442;padding:0;cursor:pointer}
+.rdots button.ok{background:var(--green)}
+.rdots button.cur{outline:3px solid var(--orange);outline-offset:1px}
 .after{margin-top:18px;font-size:17px;font-weight:600}
 .after a{color:#8cb6ff;font-weight:700}
 </style>
@@ -278,6 +297,22 @@ h1 em{font-style:normal;color:var(--green)}
       <button id="fs">⛶ Full screen</button>
     </div>
     <div class="prog" id="prog"></div>
+
+    <div class="recpanel" id="recpanel" hidden>
+      <div class="rtop"><span>🎙 RECORD YOUR VOICE</span><span id="reccount">0 of 24 recorded</span></div>
+      <div class="rsay">Read this out loud, slow, like you're talking to Paul:</div>
+      <div class="rline" id="recline"></div>
+      <div class="rbtns">
+        <button id="r-back">◀ Back</button>
+        <button id="r-rec" class="recb">● Record</button>
+        <button id="r-hear" disabled>▶ Hear it back</button>
+        <button id="r-next">Next ▶</button>
+        <span class="sp"></span>
+        <button id="r-save" class="main">⬇ Save all to my computer</button>
+      </div>
+      <div class="rmsg" id="recmsg">Press ● Record, read the line, press ■ Stop. It moves to the next step on its own. The first time, your browser asks to use the microphone: press Allow.</div>
+      <div class="rdots" id="recdots"></div>
+    </div>
   </div>
 
   <p class="after">Want it written down? <a href="paul-data-engine-sop.html">The step-by-step guide</a> has every click on one page.</p>
@@ -372,6 +407,11 @@ h1 em{font-style:normal;color:var(--green)}
 
   // ── engine ──
   let cur = 0, playing = false, timers = [], factor = 1, voiceOn = false, speechDone = true;
+  // Thomas's own recordings, once they are in the repo: audio/thomas-voice/manifest.json
+  // = { "files": { "1": "step-01.m4a", … } }. Missing file → the browser voice reads it.
+  let myVoice = null;
+  const vo = new Audio();
+  const rec = { on: false, blobs: {}, mr: null, stream: null };
   const later = (ms, fn) => timers.push(setTimeout(fn, ms));
   const clearTimers = () => { timers.forEach(clearTimeout); timers = []; };
 
@@ -431,8 +471,18 @@ h1 em{font-style:normal;color:var(--green)}
   }
 
   function speak(sc) {
-    if (!voiceOn || !("speechSynthesis" in window)) { speechDone = true; return; }
-    speechSynthesis.cancel();
+    vo.pause();
+    if ("speechSynthesis" in window) speechSynthesis.cancel();
+    if (!voiceOn || rec.on) { speechDone = true; return; }
+    const mine = myVoice && myVoice.files && myVoice.files[String(cur + 1)];
+    if (mine) {
+      speechDone = false;
+      vo.src = "audio/thomas-voice/" + mine;
+      vo.onended = vo.onerror = () => { speechDone = true; };
+      vo.play().catch(() => { speechDone = true; });
+      return;
+    }
+    if (!("speechSynthesis" in window)) { speechDone = true; return; }
     const txt = (sc.say + " " + sc.why.replace(/<[^>]+>/g, "")).replace(/[▶←☎⬇👁🔊“”]/g, "");
     const u = new SpeechSynthesisUtterance(txt);
     u.rate = factor > 1 ? 0.82 : 0.92;
@@ -442,6 +492,7 @@ h1 em{font-style:normal;color:var(--green)}
   }
 
   function go(i) {
+    if (rec.mr && rec.mr.state === "recording") rec.mr.stop();
     clearTimers();
     cur = Math.max(0, Math.min(SCENES.length - 1, i));
     const sc = SCENES[cur];
@@ -455,7 +506,8 @@ h1 em{font-style:normal;color:var(--green)}
     $("#do").textContent = sc.say;
     $("#why").innerHTML = sc.why;
     paintProgress();
-    try { history.replaceState(null, "", "#" + (cur + 1)); } catch (e) {}
+    if (rec.on) paintRec();
+    else try { history.replaceState(null, "", "#" + (cur + 1)); } catch (e) {}
     requestAnimationFrame(() => sc.beats.forEach((b) => later(b.t * factor, () => beat(b))));
     speak(sc);
     if (playing) {
@@ -471,7 +523,7 @@ h1 em{font-style:normal;color:var(--green)}
   function setPlaying(on) {
     playing = on;
     $("#play").textContent = on ? "❚❚ Pause" : "▶ Play";
-    if (!on && "speechSynthesis" in window) speechSynthesis.cancel();
+    if (!on) { vo.pause(); if ("speechSynthesis" in window) speechSynthesis.cancel(); }
   }
 
   const prog = $("#prog");
@@ -501,21 +553,162 @@ h1 em{font-style:normal;color:var(--green)}
   $("#voice").onclick = () => {
     voiceOn = !voiceOn;
     $("#voice").setAttribute("aria-pressed", String(voiceOn));
-    if (!voiceOn && "speechSynthesis" in window) speechSynthesis.cancel(); else speak(SCENES[cur]);
+    if (!voiceOn) { vo.pause(); if ("speechSynthesis" in window) speechSynthesis.cancel(); } else speak(SCENES[cur]);
   };
   $("#fs").onclick = () => {
     const p = $("#player");
     if (document.fullscreenElement) document.exitFullscreen(); else if (p.requestFullscreen) p.requestFullscreen();
   };
   addEventListener("keydown", (e) => {
-    if (e.key === " ") { e.preventDefault(); $("#play").click(); }
+    if (e.key === " ") { e.preventDefault(); (rec.on ? $("#r-rec") : $("#play")).click(); }
     else if (e.key === "ArrowRight") go(cur + 1);
     else if (e.key === "ArrowLeft") go(cur - 1);
   });
 
+  // ── RECORD MODE — Thomas reads each step; one clip per step ──
+  const recText = (i) => (SCENES[i].say + " " + SCENES[i].why.replace(/<[^>]+>/g, "")).replace(/\s+/g, " ").trim();
+  const setRecMsg = (t) => ($("#recmsg").textContent = t);
+  const isRecording = () => !!(rec.mr && rec.mr.state === "recording");
+
+  // Clips survive a closed tab: kept in this browser until saved.
+  function idb() {
+    return new Promise((res, rej) => {
+      try {
+        const r = indexedDB.open("paul-video-voice", 1);
+        r.onupgradeneeded = () => r.result.createObjectStore("clips");
+        r.onsuccess = () => res(r.result);
+        r.onerror = () => rej(r.error);
+      } catch (e) { rej(e); }
+    });
+  }
+  async function keepClip(i, blob) {
+    try { (await idb()).transaction("clips", "readwrite").objectStore("clips").put(blob, i); } catch (e) {}
+  }
+  async function loadClips() {
+    try {
+      const st = (await idb()).transaction("clips").objectStore("clips");
+      await new Promise((res) => {
+        const c = st.openCursor();
+        c.onsuccess = () => { const x = c.result; if (x) { rec.blobs[x.key] = x.value; x.continue(); } else res(); };
+        c.onerror = () => res();
+      });
+    } catch (e) {}
+  }
+
+  const dots = $("#recdots");
+  SCENES.forEach((_, i) => {
+    const b = document.createElement("button");
+    b.setAttribute("aria-label", "Record step " + (i + 1));
+    b.onclick = () => go(i);
+    dots.appendChild(b);
+  });
+
+  function paintRec() {
+    const live = isRecording();
+    $("#recline").textContent = recText(cur);
+    $("#reccount").textContent = `Step ${cur + 1} · ${Object.keys(rec.blobs).length} of ${SCENES.length} recorded`;
+    const r = $("#r-rec");
+    r.textContent = live ? "■ Stop" : rec.blobs[cur] ? "● Record again" : "● Record";
+    r.classList.toggle("live", live);
+    $("#r-hear").disabled = live || !rec.blobs[cur];
+    [...dots.children].forEach((b, i) => { b.className = (rec.blobs[i] ? "ok" : "") + (i === cur ? " cur" : ""); });
+  }
+
+  async function startRec() {
+    if (!rec.stream) {
+      try {
+        rec.stream = await navigator.mediaDevices.getUserMedia({ audio: { echoCancellation: true, noiseSuppression: true } });
+      } catch (e) {
+        setRecMsg("The microphone is blocked. Click the lock next to the web address, allow the microphone, then press Record again.");
+        return;
+      }
+    }
+    const type = ["audio/webm;codecs=opus", "audio/webm", "audio/mp4"].find((t) => window.MediaRecorder && MediaRecorder.isTypeSupported(t)) || "";
+    const idx = cur, chunks = [];
+    rec.mr = new MediaRecorder(rec.stream, type ? { mimeType: type } : undefined);
+    rec.mr.ondataavailable = (e) => e.data.size && chunks.push(e.data);
+    rec.mr.onstop = () => {
+      const blob = new Blob(chunks, { type: rec.mr.mimeType || type || "audio/webm" });
+      rec.blobs[idx] = blob;
+      keepClip(idx, blob);
+      paintRec();
+      if (idx === SCENES.length - 1) {
+        setRecMsg("That's the last one. Press ⬇ Save all to my computer.");
+      } else {
+        setRecMsg(`Got step ${idx + 1}. Moving to the next one…`);
+        setTimeout(() => { if (rec.on && cur === idx && !isRecording()) go(idx + 1); }, 1300);
+      }
+    };
+    rec.mr.start();
+    setRecMsg("Recording… read the line, then press ■ Stop (or the space bar).");
+    paintRec();
+  }
+
+  const extOf = (b) => (/mp4|m4a|aac/.test(b.type) ? "m4a" : /ogg/.test(b.type) ? "ogg" : "webm");
+  function download(blob, name) {
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = name;
+    document.body.appendChild(a);
+    a.click();
+    setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 4000);
+  }
+  async function saveAll() {
+    const ids = Object.keys(rec.blobs).map(Number).sort((a, b) => a - b);
+    if (!ids.length) return setRecMsg("Nothing recorded yet. Press ● Record first.");
+    const name = (i) => `step-${String(i + 1).padStart(2, "0")}.${extOf(rec.blobs[i])}`;
+    setRecMsg("Packing your recordings…");
+    try {
+      if (!window.JSZip) {
+        await new Promise((res, rej) => {
+          const s = document.createElement("script");
+          s.src = "https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js";
+          s.onload = res; s.onerror = rej;
+          document.head.appendChild(s);
+        });
+      }
+      const zip = new window.JSZip();
+      ids.forEach((i) => zip.file(name(i), rec.blobs[i]));
+      download(await zip.generateAsync({ type: "blob" }), "thomas-voice.zip");
+      setRecMsg(`Saved thomas-voice.zip (${ids.length} of ${SCENES.length} steps) to your Downloads folder. Now tell Claude "done".`);
+    } catch (e) {
+      ids.forEach((i, n) => setTimeout(() => download(rec.blobs[i], name(i)), n * 450));
+      setRecMsg(`Saving ${ids.length} files to your Downloads folder. If the browser asks to download several files, press Allow. Then tell Claude "done".`);
+    }
+  }
+
+  $("#r-rec").onclick = () => (isRecording() ? rec.mr.stop() : startRec());
+  $("#r-hear").onclick = () => { const b = rec.blobs[cur]; if (b) { vo.pause(); new Audio(URL.createObjectURL(b)).play(); } };
+  $("#r-next").onclick = () => go(cur + 1);
+  $("#r-back").onclick = () => go(cur - 1);
+  $("#r-save").onclick = saveAll;
+
+  async function enterRecordMode() {
+    rec.on = true;
+    setPlaying(false);
+    $("#recpanel").hidden = false;
+    await loadClips();
+    go(0);
+  }
+
+  // His recordings, once committed, become the video's voice (on by default).
+  fetch("audio/thomas-voice/manifest.json", { cache: "no-store" })
+    .then((r) => (r.ok ? r.json() : null))
+    .then((j) => {
+      if (!j || !j.files) return;
+      myVoice = j;
+      voiceOn = true;
+      $("#voice").textContent = "🔊 Thomas's voice";
+      $("#voice").setAttribute("aria-pressed", "true");
+    })
+    .catch(() => {});
+
   fit();
-  const h = parseInt(location.hash.slice(1), 10);
-  go(h >= 1 && h <= SCENES.length ? h - 1 : 0);
+  if (location.hash === "#record") enterRecordMode();
+  else {
+    const h = parseInt(location.hash.slice(1), 10);
+    go(h >= 1 && h <= SCENES.length ? h - 1 : 0);
+  }
 })();
 </script>
 </body>
