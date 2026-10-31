@@ -97,8 +97,9 @@ h1 { font-family: var(--serif); font-weight: 500; font-size: 40px; line-height: 
 .lot p { font-size: 15px; margin: 8px 0 0; }
 
 .start { position: fixed; z-index: 30; left: 0; right: 0; bottom: 0; top: var(--bar-h, 64px); display: grid; place-items: center; padding: 16px; background: rgba(139, 218, 212, .62); backdrop-filter: blur(3px); }
-.start-card { width: min(560px, 100%); background: var(--white); border: 2px solid var(--line); border-radius: 22px; box-shadow: 12px 12px 0 var(--coral); padding: 28px; text-align: center; }
-.start-card .mark { width: 72px; height: 72px; border-radius: 18px; margin: 0 auto 14px; }
+.start-card { width: min(560px, 100%); max-height: calc(100vh - var(--bar-h, 64px) - 32px); overflow-y: auto; background: var(--white); border: 2px solid var(--line); border-radius: 22px; box-shadow: 12px 12px 0 var(--coral); padding: 28px; text-align: center; }
+/* The tile is a span: it needs display:block, or its size is ignored and the fox fills the whole card. */
+.start-card .mark { display: block; width: 72px; height: 72px; border-radius: 18px; margin: 0 auto 14px; }
 .start-card .eyebrow { justify-content: center; }
 .start-card h2 { font-family: var(--serif); font-weight: 500; font-size: 44px; line-height: 1.05; letter-spacing: -0.02em; margin: 12px 0 0; }
 .start-card p { font-size: 18px; color: var(--ink-2); margin: 10px 0 0; }
