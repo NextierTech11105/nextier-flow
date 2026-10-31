@@ -96,11 +96,52 @@
   }
   const key = (s) => String(s || "").toUpperCase().replace(/[^0-9A-Z]/g, "");
 
+  // /api/detail: one parcel in RealEstateAPI's Property Detail shape, the same fields gold.property_detail() fills on the
+  // server (lake/sql/30_property_detail.sql), from the sample row. linked_n / linked_value were counted on the full lake.
+  const PTYPE = (u) => (u === "one_family" ? "SFR" : ["two_family", "three_family", "multifamily_small", "multifamily"].includes(u) ? "MFR"
+    : ["condo", "coop"].includes(u) ? "CONDO" : u === "mobile_home" ? "MOBILE" : String(u || "").startsWith("vacant") ? "LAND" : "OTHER");
+  const OTYPE = { individual: "Individual", entity: "Company", trust: "Trust", estate: "Estate", public: "Government" };
+  const monthsSince = (d) => { const t = new Date(String(d).slice(0, 10) + "T12:00:00"), n = new Date(); return isNaN(t) ? null : (n.getFullYear() - t.getFullYear()) * 12 + (n.getMonth() - t.getMonth()); };
+  function detail(r) {
+    const st = r.region === "FL" ? "FL" : "NY";
+    const mail = [r.mail_addr, r.mail_city, [r.mail_state, r.mail_zip].filter(has).join(" ")].filter(has).join(", ");
+    return {
+      id: r.id, propertyType: PTYPE(r.use),
+      absenteeOwner: has(r.absentee) ? r.absentee : null, outOfStateAbsenteeOwner: has(r.out_of_state) ? r.out_of_state : null,
+      ownerOccupied: has(r.owner_occupied) ? r.owner_occupied : null, corporateOwned: r.owner_type === "entity",
+      death: r.owner_type === "estate" ? true : null, vacant: String(r.use || "").startsWith("vacant"),
+      lastSaleDate: r.sale_date || null, lastSalePrice: has(r.sale_price) ? Number(r.sale_price) : null,
+      lien: r.region === "NYC" ? r.lien === true : null,
+      estimatedValue: ["just_value", "full_market_value"].includes(r.value_basis) ? Number(r.value) : null,
+      preForeclosure: null, freeClear: null, estimatedEquity: null, loanMaturityDate: null, loanMaturityWithin12Months: null,
+      ownerInfo: { owner1FirstName: r.owner_first || null, owner1LastName: r.owner_last || null, owner1FullName: r.owner_name || null,
+        owner1Type: OTYPE[r.owner_type] || null, owner2FullName: r.owner2 || null, ownershipLength: r.sale_date ? monthsSince(r.sale_date) : null,
+        mailAddress: mail ? { address: r.mail_addr || null, city: r.mail_city || null, state: r.mail_state || null, zip: r.mail_zip || null, label: mail } : null },
+      propertyInfo: { address: { address: r.address || null, city: r.town || null, county: r.county, state: st, zip: r.zip || null,
+        label: [r.address, r.town, [st, r.zip].filter(has).join(" ")].filter(has).join(", ") },
+        latitude: r.lat, longitude: r.lon, buildingSquareFeet: has(r.sqft) ? Number(r.sqft) : null, yearBuilt: r.year_built || null,
+        unitsCount: r.units || null, propertyUse: r.class_desc || r.use, bedrooms: null, bathrooms: null },
+      lotInfo: { apn: r.id, lotAcres: has(r.acres) ? Number(r.acres) : null, lotSquareFeet: Number(r.acres) > 0 ? Math.round(Number(r.acres) * 43560) : null,
+        zoning: r.zoning || null, propertyClass: r.class || null },
+      taxInfo: { assessedValue: r.value_basis === "assessed_total" ? Number(r.value) : null,
+        marketValue: ["just_value", "full_market_value"].includes(r.value_basis) ? Number(r.value) : null },
+      linkedProperties: Number(r.linked_n) > 0 ? { totalOwned: Number(r.linked_n) + 1, totalValue: (Number(r.linked_value) || 0) + (Number(r.value) || 0) } : null,
+      parcelvora: { region: r.region, county: r.county, town: r.town, useClass: r.use, valueBasis: r.value_basis, heldSince2021: r.held_since_2021 === true,
+        unbuiltFarSqft: has(r.unbuilt) ? Number(r.unbuilt) : null,
+        registeredContact: has(r.officer_name) ? { name: r.officer_name, role: String(r.officer_type || "").replace(/([a-z])([A-Z])/g, "$1 $2"), company: r.officer_company || null } : null,
+        lienSaleList: r.lien ? { listMonth: "2025-06-01" } : null },
+    };
+  }
+
   window.fetch = async (input, init) => {
     const url = new URL(typeof input === "string" ? input : input.url, location.href);
-    const route = /\/api\/(records|map|lookup|counties|ids)$/.exec(url.pathname);
+    const route = /\/api\/(records|map|lookup|counties|ids|detail)$/.exec(url.pathname);
     if (!route) return realFetch(input, init);
     const d = await ready, q = url.searchParams;
+    if (route[1] === "detail") {
+      const r = d.rows.find((x) => x.id === q.get("id") && (!q.get("county") || x.county === q.get("county")));
+      return r ? reply({ input: { id: q.get("id"), county: q.get("county") }, data: detail(r) }) : reply({ error: "no such parcel" }, 404);
+    }
     if (route[1] === "ids") {
       const all = d.rows.filter(matcher(q));
       return reply({ total: Math.min(all.length, 10000), capped: all.length > 10000, ids: all.slice(0, 10000).map((r) => r.id + "|" + r.county) });
@@ -296,6 +337,34 @@
   .rec .done { color: var(--green); font-weight: 800; }
   .src { font-size: 15px; color: var(--soft); margin-top: 8px; }
   .lien-on { color: var(--red); font-weight: 800; }
+  /* Lead card: who, loud tags, talking points, facts as bullets, the contact card and the actions. */
+  .lc { background: var(--card); border: 1px solid var(--line); border-radius: 14px; box-shadow: var(--shadow); padding: 14px; display: grid; gap: 12px; }
+  .lc-top { display: grid; grid-template-columns: 170px 1fr; gap: 14px; align-items: start; }
+  .lc-photo { width: 100%; height: auto; border-radius: 10px; display: block; }
+  .lc-k { font: 800 13px var(--display); letter-spacing: .1em; text-transform: uppercase; color: var(--blue); }
+  .lc h2 { font: 800 26px/1.1 var(--display); margin: 2px 0 4px; }
+  .lc-rc, .lc-addr { font-size: 15px; margin-top: 4px; }
+  .lc-addr { font-weight: 700; }
+  .lc-tags { margin-top: 0; }
+  .lc-tags .tag { font-size: 14px; padding: 7px 10px; }
+  .t-est { background: #7c3aed; } .t-trust { background: var(--slate); } .t-held { background: #1e3a5f; } .t-lien { background: var(--red); }
+  .t-open { background: #b45309; } .t-fc { background: var(--green); } .t-mat { background: #c2410c; } .t-port { background: #1d4ed8; } .t-room { background: #0f766e; }
+  .lc-talk { background: var(--card-2); border: 1px solid var(--line); border-left: 4px solid var(--blue); border-radius: 10px; padding: 10px 12px; }
+  .lc-talk b { font: 800 13px var(--display); letter-spacing: .08em; text-transform: uppercase; color: var(--blue); }
+  .lc-talk p { margin: 4px 0 0; font-size: 16px; font-weight: 600; }
+  .lc-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .lc ul { margin: 0; padding-left: 18px; display: grid; gap: 3px; font-size: 15px; }
+  .lc-contact { border: 1px dashed var(--line); border-radius: 10px; padding: 10px 12px; }
+  .lc-contact p { margin: 2px 0 8px; font-size: 15px; color: var(--soft); }
+  .lc-actions { display: flex; flex-wrap: wrap; gap: 8px; }
+  @media (max-width: 520px) { .lc-top, .lc-grid { grid-template-columns: 1fr; } }
+  /* Print / PDF: the open profile only, lead card first. */
+  @media print {
+    body * { visibility: hidden; }
+    #drawer, #drawer * { visibility: visible; }
+    #drawer { position: absolute; inset: 0 auto auto 0; width: 100%; border: 0; box-shadow: none; overflow: visible; }
+    #drawer .dtop, .lc-actions, .lc-contact .btn, #recRetry { display: none !important; }
+  }
   /* One-click lead lists above the filters. */
   .leads { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin: 0 0 14px; }
   .leads-l { font: 800 15px var(--display); letter-spacing: 0.06em; text-transform: uppercase; color: var(--soft); margin-right: 4px; }
@@ -351,6 +420,7 @@
         <button type="button" data-view="table" aria-pressed="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M3 5h18M3 12h18M3 19h18"/></svg>Table</button>
         <button type="button" data-view="map" aria-pressed="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M9 4 3 6v14l6-2 6 2 6-2V4l-6 2-6-2zM9 4v14M15 6v14"/></svg>Map</button>
       </div>
+      <a class="btn" id="storyBtn" href="https://nextiertech11105.github.io/nextier-flow/parcelvora-story.html" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg><span>Story Mode</span></a>
       <button type="button" class="btn" id="savedBtn" aria-expanded="false" aria-controls="savedPanel"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M6 3h12v18l-6-4-6 4z"/></svg><span>Saved searches</span></button>
       <a class="btn" id="download" href="/api/records.csv"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 4v11m0 0-4-4m4 4 4-4M4 19h16"/></svg>Download</a>
       <button type="button" class="btn" id="toggleFilters" aria-expanded="true" aria-controls="filters"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M3 5h18l-7 8v6l-4 2v-8L3 5z"/></svg><span>Hide Filters</span></button>
@@ -1045,6 +1115,22 @@
       const more = (list, n) => (list.length > n ? `<li class="l2">…and ${list.length - n} more on ACRIS.</li>` : "");
       const v = val[0], lr = lien[0];
       const onLatest = lr && latestList && String(lr.month).slice(0, 7) === String(latestList).slice(0, 7);
+      // Hand the live facts to the lead card: the latest deed, each open mortgage with an estimated maturity (30-year
+      // term) and any 5/7/10-year mark (where adjustable rates reset) in the next 12 months, or all mortgages satisfied.
+      const now = new Date();
+      const openLoans = loans.filter(isLoan).filter((d) => !closedBy(d, isSat).length).map((d) => {
+        const rec = new Date(String(d.when).slice(0, 10) + "T12:00:00");
+        const est = isNaN(rec) ? null : new Date(rec.getFullYear() + 30, rec.getMonth(), rec.getDate());
+        const monthsTo = est ? (est.getFullYear() - now.getFullYear()) * 12 + (est.getMonth() - now.getMonth()) : null;
+        const mark = isNaN(rec) ? null : [5, 7, 10].map((y) => ({ y, m: (rec.getFullYear() + y - now.getFullYear()) * 12 + (rec.getMonth() - now.getMonth()) }))
+          .find((x) => x.m >= 0 && x.m <= 12) || null;
+        return { when: d.when, amount: d.amount, lender: d.p2.join(", "), estMaturity: est, matSoon: monthsTo != null && monthsTo >= 0 && monthsTo <= 12, mark };
+      });
+      if (leadCtx && leadCtx.id === bbl) {
+        leadCtx.nyc = { lastDeed: deeds[0] || null, openLoans, mortgages: loans.filter(isLoan).length,
+          freeClear: loans.filter(isLoan).length > 0 && !openLoans.length, onLien: !!onLatest };
+        paintLeadCard();
+      }
       const today = new Date().toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
       box.innerHTML = `
         <div class="box"><h3>Deed chain · ${deeds.length} recorded</h3>
@@ -1092,6 +1178,152 @@
     if (win) { e.preventDefault(); win.focus(); }
   });
 
+  // ── lead card: the top of every profile — who, the situation as loud tags, talking points, facts as bullets, the
+  //    contact card and the actions. Built from the Property Detail object (/api/detail), plus the live NYC record. ─
+  let leadCtx = null;
+  const STORY_BASE = "https://nextiertech11105.github.io/nextier-flow/parcelvora-story.html";
+  const monthsSince = (s) => { const t = new Date(String(s).slice(0, 10) + "T12:00:00"), n = new Date(); return isNaN(t) ? null : (n.getFullYear() - t.getFullYear()) * 12 + (n.getMonth() - t.getMonth()); };
+  const ownedFor = (m) => (m == null ? "" : m >= 24 ? `${Math.floor(m / 12)} years` : `${m} months`);
+  function storyFor(d) {
+    const a = (d.propertyInfo && d.propertyInfo.address) || {}, town = String((d.parcelvora || {}).town || "").toUpperCase();
+    if ((d.parcelvora || {}).region === "NYC" && a.zip === "11215") return [STORY_BASE + "?n=park-slope", "Park Slope story"];
+    if (town === "EAST HAMPTON") return [STORY_BASE + "?n=east-hampton", "East Hampton story"];
+    if (town === "CORAL GABLES") return [STORY_BASE + "?n=coral-gables", "Coral Gables story"];
+    return [STORY_BASE, "Story Mode"];
+  }
+  // When /api/detail is not there (an older server), the lookup profile stands in.
+  function detFromProfile(p) {
+    const o = p.owner || {}, pr = p.property || {}, pa = p.parcel || {}, ls = p.last_sale, rc = p.registered_contact;
+    return { id: pa.id, absenteeOwner: o.absentee ?? null, outOfStateAbsenteeOwner: o.out_of_state ?? null, ownerOccupied: o.owner_occupied ?? null,
+      lastSaleDate: ls ? ls.date || ls.month || null : null, lastSalePrice: ls ? ls.price_usd : null, lien: null, vacant: String(pr.use || "").startsWith("vacant"),
+      estimatedValue: ["just_value", "full_market_value"].includes(pr.value_basis) ? pr.value_usd : null,
+      ownerInfo: { owner1FirstName: o.first_name, owner1LastName: o.last_name, owner1FullName: o.name,
+        owner1Type: { individual: "Individual", entity: "Company", trust: "Trust", estate: "Estate", public: "Government" }[o.type] || null,
+        mailAddress: o.mailing_address ? { label: o.mailing_address } : null },
+      propertyInfo: { address: { label: [pa.address, title(pa.town || ""), pa.zip].filter(Boolean).join(", "), zip: pa.zip }, latitude: pa.lat, longitude: pa.lon,
+        yearBuilt: pr.year_built, buildingSquareFeet: pr.building_sqft, unitsCount: pr.residential_units },
+      lotInfo: { apn: pa.id, lotAcres: pr.lot_acres, zoning: pr.zoning },
+      taxInfo: { assessedValue: pr.value_basis === "assessed_total" ? pr.value_usd : null }, linkedProperties: null,
+      parcelvora: { region: pa.region, county: pa.county, town: pa.town, useClass: pr.use, heldSince2021: !!o.held_since_2021,
+        registeredContact: rc ? { name: rc.name, role: rc.role, company: rc.company } : null } };
+  }
+  // Facts only: one line to read before the call.
+  function talkingPoints(d, nyc) {
+    const o = d.ownerInfo || {}, p = d.propertyInfo || {}, pv = d.parcelvora || {}, lk = d.linkedProperties || {}, m = o.mailAddress || {};
+    const name = [o.owner1FirstName, o.owner1LastName].filter(Boolean).join(" "), full = title(o.owner1FullName || ""), rc = pv.registeredContact;
+    const bits = [];
+    if (o.owner1Type === "Company") bits.push(`Owned by ${full}` + (rc && rc.name ? `; the person on file is ${title(rc.name)}${rc.role ? " (" + rc.role + ")" : ""}` : ""));
+    else if (o.owner1Type === "Estate") bits.push(`Held by an estate (${full}): the family decides`);
+    else if (o.owner1Type === "Trust") bits.push(`Held in a trust (${full})`);
+    else if (name) bits.push(`Owner: ${name}`); else if (full) bits.push(`Owner on record: ${full}`);
+    if (d.ownerOccupied) bits.push("lives there");
+    else if (d.outOfStateAbsenteeOwner) bits.push(`absentee, out of state (mail goes to ${title(m.city || "")}${m.state ? ", " + title(m.state) : ""})`);
+    else if (d.absenteeOwner) bits.push(`absentee (mail goes to ${title(m.city || "")})`);
+    const ld = nyc && nyc.lastDeed;
+    if (d.lastSaleDate) bits.push(`bought ${String(d.lastSaleDate).slice(0, 4)}${d.lastSalePrice ? " for " + money(d.lastSalePrice) : ""}`);
+    else if (ld && ld.when) bits.push(`deed recorded ${String(ld.when).slice(0, 4)}${ld.amount ? " for " + money(ld.amount) : ""}`);
+    else if (pv.heldSince2021) bits.push("same owner since at least 2021");
+    if (d.lien || (nyc && nyc.onLien)) bits.push("on NYC's June 2025 lien sale list: behind on city charges");
+    if (nyc && nyc.openLoans.length) {
+      const L = nyc.openLoans.find((x) => x.amount > 0) || nyc.openLoans[0];
+      bits.push(`open mortgage${L.amount ? " " + money(L.amount) : ""}${L.lender ? " from " + title(L.lender) : ""} (${String(L.when).slice(0, 4)})` + (L.mark ? `; its ${L.mark.y}-year mark is ${L.mark.m} months out (estimate)` : ""));
+    } else if (nyc && nyc.freeClear) bits.push("every recorded mortgage is satisfied");
+    if ((lk.totalOwned || 0) >= 2) bits.push(`owns ${lk.totalOwned} properties on record worth ${money(lk.totalValue)}`);
+    const kind = { one_family: "single-family home", two_family: "two-family", three_family: "three-family", multifamily_small: "small apartment building",
+      multifamily: "apartment building", condo: "condo", coop: "co-op", mobile_home: "mobile home", vacant_res: "vacant lot" }[pv.useClass] || "property";
+    const what = [(p.unitsCount || 0) > 1 ? `${p.unitsCount}-unit` : "", kind].filter(Boolean).join(" ");
+    bits.push([what, p.yearBuilt ? `built ${p.yearBuilt}` : "", p.buildingSquareFeet ? `${int(Number(p.buildingSquareFeet))} sq ft` : ""].filter(Boolean).join(", "));
+    if (d.estimatedValue) bits.push(`market value ${money(d.estimatedValue)}`);
+    else if (d.taxInfo && d.taxInfo.assessedValue) bits.push(`assessed ${money(d.taxInfo.assessedValue)} (NYC)`);
+    if ((pv.unbuiltFarSqft || 0) > 1000) bits.push(`zoning allows about ${int(Number(pv.unbuiltFarSqft))} more sq ft`);
+    const s = bits.filter(Boolean).join("; ");
+    return s.charAt(0).toUpperCase() + s.slice(1) + ".";
+  }
+  function leadTags(d, nyc) {
+    const o = d.ownerInfo || {}, pv = d.parcelvora || {}, lk = d.linkedProperties || {}, t = [];
+    const tag = (cls, text) => t.push(`<span class="tag ${cls}">${esc(text)}</span>`);
+    if (d.ownerOccupied) tag("t-home", "Lives there");
+    if (d.absenteeOwner) tag("t-abs", "Absentee");
+    if (d.outOfStateAbsenteeOwner) tag("t-oos", "Out of state");
+    if (o.owner1Type === "Company") tag("t-llc", "LLC / company");
+    if (o.owner1Type === "Estate") tag("t-est", "Estate");
+    if (o.owner1Type === "Trust") tag("t-trust", "Trust");
+    if (pv.heldSince2021) tag("t-held", "Same owner since 2021");
+    if (d.lien || (nyc && nyc.onLien)) tag("t-lien", "On the lien sale list");
+    if (nyc && nyc.openLoans.length) tag("t-open", nyc.openLoans.length > 1 ? `${nyc.openLoans.length} mortgages, no satisfaction` : "No satisfaction recorded");
+    if (nyc && nyc.freeClear) tag("t-fc", "All mortgages satisfied");
+    if (nyc && nyc.openLoans.some((l) => l.matSoon || l.mark)) tag("t-mat", "Loan date within 12 months (est.)");
+    if ((lk.totalOwned || 0) >= 2) tag("t-port", `Owns ${lk.totalOwned} properties`);
+    if ((pv.unbuiltFarSqft || 0) > 1000) tag("t-room", "Room to build");
+    if (d.vacant) tag("t-other", "Vacant lot");
+    return t.join("");
+  }
+  function leadFacts(d, nyc) {
+    const p = d.propertyInfo || {}, l = d.lotInfo || {}, pv = d.parcelvora || {}, lk = d.linkedProperties || {}, o = d.ownerInfo || {}, ld = nyc && nyc.lastDeed;
+    const prop = [li("Type", USE[pv.useClass] || pv.useClass), li("Units", (p.unitsCount || 0) > 1 ? p.unitsCount : ""), li("Built", p.yearBuilt),
+      li("Building", p.buildingSquareFeet ? int(Number(p.buildingSquareFeet)) + " sq ft" : ""),
+      li("Lot", l.lotSquareFeet ? int(Number(l.lotSquareFeet)) + " sq ft" : l.lotAcres ? l.lotAcres + " acres" : ""), li("Zoning", l.zoning),
+      li("Room to build", (pv.unbuiltFarSqft || 0) > 1000 ? "about " + int(Number(pv.unbuiltFarSqft)) + " sq ft more" : ""), li("Parcel", l.apn)].join("");
+    const loans = !nyc ? "" : nyc.openLoans.length ? nyc.openLoans.slice(0, 2).map((L) => `<li>Mortgage, no satisfaction recorded: <b>${L.amount ? money(L.amount) : "amount not stated"}</b>${L.lender ? " from " + esc(title(L.lender)) : ""}, ${esc(day(L.when))}`
+      + (L.estMaturity ? `; matures about ${L.estMaturity.getFullYear()} (est., 30-year term)` : "") + (L.mark ? `; ${L.mark.y}-year mark in ${L.mark.m} months (est.)` : "") + "</li>").join("")
+      : nyc.mortgages ? "<li><b>Every recorded mortgage is satisfied</b></li>" : "<li>No mortgage on record</li>";
+    const money_ = [
+      li(d.estimatedValue ? "Market value" : "Assessed value (NYC)", d.estimatedValue ? money(d.estimatedValue) : d.taxInfo && d.taxInfo.assessedValue ? money(d.taxInfo.assessedValue) : ""),
+      li("Last sale", d.lastSaleDate ? `${day(d.lastSaleDate)}${d.lastSalePrice ? " · " + money(d.lastSalePrice) : ""}` : ld && ld.when ? `${day(ld.when)}${ld.amount ? " · " + money(ld.amount) : ""} (deed)` : ""),
+      li("Owned", o.ownershipLength != null ? ownedFor(o.ownershipLength) : ld && ld.when ? ownedFor(monthsSince(ld.when)) : pv.heldSince2021 ? "since at least 2021" : ""),
+      li("Portfolio", (lk.totalOwned || 0) >= 2 ? `${lk.totalOwned} properties · ${money(lk.totalValue)}` : ""),
+      loans, d.lien || (nyc && nyc.onLien) ? "<li><b>On the city's June 2025 lien sale list</b></li>" : ""].join("");
+    return [prop, money_];
+  }
+  function leadCardHtml(ctx) {
+    const d = ctx.det || detFromProfile(ctx.p), nyc = ctx.nyc, o = d.ownerInfo || {}, p = d.propertyInfo || {}, pv = d.parcelvora || {}, rc = pv.registeredContact;
+    const first = [o.owner1FirstName, o.owner1LastName].filter(Boolean).join(" "), name = first || title(o.owner1FullName || "Owner not on record");
+    const lat = Number(p.latitude), lon = Number(p.longitude);
+    const photo = TOKEN && lat && lon ? `https://api.mapbox.com/styles/v1/mapbox/satellite-v9/static/pin-s+e5484d(${lon},${lat})/${lon},${lat},18.2,0/360x240@2x?access_token=${encodeURIComponent(TOKEN)}` : "";
+    const [storyHref, storyLabel] = storyFor(d), [prop, mon] = leadFacts(d, nyc);
+    return `<section class="lc" aria-label="Lead card">
+      <div class="lc-top">
+        ${photo ? `<img class="lc-photo" src="${photo}" width="360" height="240" alt="Satellite photo of the lot">` : ""}
+        <div class="lc-who">
+          <span class="lc-k">Lead card</span>
+          <h2>${esc(name)}</h2>
+          ${first && o.owner1FullName ? `<div class="sm">On record: ${esc(o.owner1FullName)}</div>` : ""}
+          ${rc && rc.name ? `<div class="lc-rc">Person behind it: <b>${esc(title(rc.name))}</b>${rc.role ? " · " + esc(rc.role) : ""}</div>` : ""}
+          <div class="lc-addr">${esc((p.address && p.address.label) || "")}</div>
+          ${o.mailAddress && o.mailAddress.label ? `<div class="sm">Mail: ${esc(o.mailAddress.label)}</div>` : ""}
+        </div>
+      </div>
+      <div class="tags lc-tags">${leadTags(d, nyc)}</div>
+      <div class="lc-talk"><b>Talking points</b><p id="lcTalk">${esc(talkingPoints(d, nyc))}</p></div>
+      <div class="lc-grid"><div><h3>Property</h3><ul>${prop}</ul></div><div><h3>Money &amp; timing</h3><ul>${mon || "<li>Not on record</li>"}</ul></div></div>
+      <div class="lc-contact"><h3>Call + email</h3><p>Phones and emails come from the Owner Contacts add-on: you pay only on a match, and every number is screened against the Do Not Call registry.</p>
+        <button type="button" class="btn" disabled>Run Owner Contacts · coming</button></div>
+      <div class="lc-actions">
+        <button type="button" class="btn primary" data-lc="talk">Copy talking points</button>
+        <button type="button" class="btn" data-lc="card">Copy lead card</button>
+        <button type="button" class="btn" data-lc="print">Print / PDF</button>
+        <a class="btn" href="${storyHref}" target="_blank" rel="noopener">${esc(storyLabel)}</a>
+      </div>
+      <div class="sm" id="lcMsg" aria-live="polite"></div>
+    </section>`;
+  }
+  function paintLeadCard() { const el = $("leadCard"); if (el && leadCtx) el.innerHTML = leadCardHtml(leadCtx); }
+  function leadCardText() {
+    const el = $("leadCard"); if (!el) return "";
+    const lis = (sel) => [...el.querySelectorAll(sel)].map((x) => "• " + x.textContent.replace(/\s+/g, " ").trim());
+    return [el.querySelector("h2") && el.querySelector("h2").textContent, el.querySelector(".lc-addr") && el.querySelector(".lc-addr").textContent,
+      [...el.querySelectorAll(".lc-tags .tag")].map((t) => t.textContent).join(" · "), "",
+      "Talking points: " + ($("lcTalk") ? $("lcTalk").textContent : ""), "", "Property:", ...lis(".lc-grid > div:first-child li"), "", "Money & timing:", ...lis(".lc-grid > div:last-child li")]
+      .filter((x) => x != null).join("\n");
+  }
+  document.addEventListener("click", async (e) => {
+    const b = e.target.closest("[data-lc]"); if (!b || !leadCtx) return;
+    if (b.dataset.lc === "print") { window.print(); return; }
+    const msg = $("lcMsg"), text = b.dataset.lc === "talk" ? ($("lcTalk") ? $("lcTalk").textContent : "") : leadCardText();
+    try { await navigator.clipboard.writeText(text); if (msg) msg.textContent = b.dataset.lc === "talk" ? "Talking points copied." : "Lead card copied."; }
+    catch (err) { if (msg) msg.textContent = "Copying is blocked here; select the text and copy it."; }
+  });
+
   // ── detail drawer ──────────────────────────────────────────────────────────────────────────────────────────────
   let lastFocus = null;
   function closeDetail() {
@@ -1105,26 +1337,27 @@
     $("drawer").hidden = false; $("scrim").hidden = false;
     $("drawer").innerHTML = '<div class="dtop"><span></span><button type="button" class="btn" id="close">Close</button></div><div class="box">Loading the full profile…</div>';
     $("close").onclick = closeDetail; $("close").focus();
-    let p = null;
+    let p = null, det = null;
+    const q = `id=${encodeURIComponent(id)}${county ? "&county=" + encodeURIComponent(county) : ""}`;
     try {
-      const j = await (await fetch(`/api/lookup?id=${encodeURIComponent(id)}${county ? "&county=" + encodeURIComponent(county) : ""}`)).json();
-      p = (j.results || [])[0];
+      const [j, dj] = await Promise.all([
+        fetch(`/api/lookup?${q}`).then((r) => r.json()),
+        fetch(`/api/detail?${q}`).then((r) => (r.ok ? r.json() : null)).catch(() => null),
+      ]);
+      p = (j.results || [])[0]; det = dj && dj.data;
     } catch (e) {}
     if ($("drawer").hidden) return;
     if (!p) { $("drawer").querySelector(".box").textContent = "No profile found for this property."; return; }
     const o = p.owner || {}, pr = p.property || {}, pa = p.parcel || {}, rc = p.registered_contact, ls = p.last_sale;
     if (pa.lat != null) { selected = { id: pa.id, lat: pa.lat, lon: pa.lon }; mark(selected); }
     const li = (label, v) => (v == null || v === "" ? "" : `<li>${label}: <b>${esc(v)}</b></li>`);
+    leadCtx = { id: String(pa.id), det, p, nyc: null };
     $("drawer").innerHTML = `
       <div class="dtop">
         ${pa.lat != null ? '<button type="button" class="btn" id="onMap">Show on map</button>' : "<span></span>"}
         <button type="button" class="btn" id="close">Close</button>
       </div>
-      <div>
-        <h2>${esc(o.first_name || o.last_name ? [o.first_name, o.last_name].filter(Boolean).join(" ") : title(o.name || "Owner not on record"))}</h2>
-        <div class="sm">${esc(pa.address || "")}${pa.town ? " · " + esc(title(pa.town)) : ""}${pa.zip ? " " + esc(pa.zip) : ""}</div>
-        <div class="tags">${tags(o)}</div>
-      </div>
+      <div id="leadCard">${leadCardHtml(leadCtx)}</div>
       <div class="box"><h3>Owner</h3><ul>
         ${li("First name", o.first_name)}${li("Last name", o.last_name)}${li("Name on record", o.name)}${li("Second owner", o.second_owner)}${li("Owner type", o.type)}
         ${li("Mailing address", o.mailing_address)}${o.held_since_2021 ? "<li><b>Same owner since at least 2021</b></li>" : ""}
