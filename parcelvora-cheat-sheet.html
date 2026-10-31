@@ -25,11 +25,11 @@
   .box { overflow-x: auto; }
   table { border-collapse: collapse; width: 100%; font-size: 16px; }
   th, td { text-align: left; padding: 8px 10px; border-bottom: 1px solid var(--line); vertical-align: top; }
-  th { color: var(--soft); font-size: 14px; letter-spacing: 0.04em; text-transform: uppercase; }
-  .tag { display: inline-block; font-size: 13px; font-weight: 700; padding: 2px 8px; white-space: nowrap; }
+  th { color: var(--soft); font-size: 15px; letter-spacing: 0.04em; text-transform: uppercase; }
+  .tag { display: inline-block; font-size: 15px; font-weight: 700; padding: 2px 8px; white-space: nowrap; }
   .done { background: var(--green-bg); color: var(--green); }
   .wait { background: var(--amber-bg); color: var(--amber); }
-  code { font: 14px ui-monospace, Consolas, Menlo, monospace; background: #05070a; border: 1px solid var(--line); padding: 1px 6px; overflow-wrap: anywhere; }
+  code { font: 15px ui-monospace, Consolas, Menlo, monospace; background: #05070a; border: 1px solid var(--line); padding: 1px 6px; overflow-wrap: anywhere; }
   footer { color: var(--soft); text-align: center; font-size: 15px; }
 </style>
 </head>
@@ -37,7 +37,7 @@
 <div class="wrap">
   <header style="display:grid;gap:10px">
     <h1>Parcelvora Cheat Sheet</h1>
-    <p class="lede">Everything about Parcelvora in one place. Updated October 28, 2026.</p>
+    <p class="lede">Everything about Parcelvora in one place. Updated October 31, 2026.</p>
   </header>
 
   <section class="card">
@@ -54,6 +54,10 @@
     <h2>Links</h2>
     <div class="box"><table>
       <tr><th>What</th><th>Link</th></tr>
+      <tr><td><b>Landing page</b></td><td><a href="parcelvora-landing.html">parcelvora-landing.html</a></td></tr>
+      <tr><td><b>Story Mode</b> (3D neighborhoods, walk-through, voice)</td><td><a href="parcelvora-story.html">parcelvora-story.html</a></td></tr>
+      <tr><td>Records page (sample of 5,578 properties)</td><td><a href="parcelvora-records.html">parcelvora-records.html</a></td></tr>
+      <tr><td>Silvia's branch</td><td><a href="https://github.com/Parcelavora/parcelvora/tree/silvia/work" target="_blank" rel="noopener">silvia/work</a> · <a href="https://github.com/Parcelavora/parcelvora/pull/new/silvia/work" target="_blank" rel="noopener">open a pull request</a></td></tr>
       <tr><td>One-page plan</td><td><a href="parcelvora-plan.html">parcelvora-plan.html</a></td></tr>
       <tr><td>NY Open Data Inventory (every dataset)</td><td><a href="ny-open-data-inventory.html">ny-open-data-inventory.html</a></td></tr>
       <tr><td>Silvia's setup steps</td><td><a href="silvia-setup.html">silvia-setup.html</a></td></tr>
@@ -84,13 +88,21 @@
       <tr><td>All 67 Florida counties: one setting, <code>FL_COUNTIES=all</code></td><td><span class="tag done">Ready</span></td></tr>
       <tr><td>Person behind the LLC: 87,062 NYC buildings</td><td><span class="tag done">Done</span></td></tr>
       <tr><td>README with setup, fields, sources and limits</td><td><span class="tag done">Done</span></td></tr>
-      <tr><td>Screens: list builder, report page, map</td><td><span class="tag wait">Next</span></td></tr>
+      <tr><td>Florida map points: 2,346,143 parcels pinned</td><td><span class="tag done">Done</span></td></tr>
+      <tr><td>Records page: table + map side by side, filters, profile, CSV (public preview runs on a sample)</td><td><span class="tag done">Done</span></td></tr>
+      <tr><td>Landing page: mint design, 10 Apify add-ons with capability + capacity (FSBO Finder, Listed Check first)</td><td><span class="tag done">Done</span></td></tr>
+      <tr><td>Story Mode: Park Slope, East Hampton, Coral Gables on a 3D Mapbox map · street-level walk-through · voice · 5 audiences · ways to add value · new businesses · the Dataverse (3,441 tables, 8.85B rows)</td><td><span class="tag done">Done</span></td></tr>
+      <tr><td>Add-ons wired into the app (they're on the page, not running yet)</td><td><span class="tag wait">Next</span></td></tr>
+      <tr><td>Story Mode for any neighborhood you pick (today: 3 built)</td><td><span class="tag wait">Next</span></td></tr>
+      <tr><td>The live app on a public address (runs only on the dev box today)</td><td><span class="tag wait">Next</span></td></tr>
     </table></div>
   </section>
 
   <section class="card">
     <h2>Waiting on you</h2>
     <ul>
+      <li><b>Upload the fox picture</b> as the GitHub org photo: <code>parcelvora-avatar-fox.png</code> on your Desktop → github.com/organizations/Parcelavora/settings/profile.</li>
+      <li><b>Send Silvia</b> the branch message: her branch is <code>silvia/work</code>.</li>
       <li><b>Say go</b> to create Parcelvora's database: one Postgres cluster at <b>$15.15/mo</b> on the Nextier DigitalOcean account. The lake builds on the dev box (about 40 minutes) and only the lookup-ready part (2.3 GB) is copied in, so the small plan is enough.</li>
       <li><b>Rename the GitHub org</b> from "Parcelavora" to <code>parcelvora</code>: org Settings → Rename organization. Silvia can do it too.</li>
       <li><b>Create the <code>ehoa-advisors</code> GitHub org</b> and invite Silvia as Owner. Then I move in the EHOA slideshow repo and her haas app.</li>    </ul>
@@ -103,6 +115,18 @@
       <li>She uses <b>Perplexity, not Claude</b>. That's fine. If you want Claude later, Team is $25/seat (standard) or $125 (premium) a month, one bill.</li>
       <li>RealEstateAPI in Perplexity works through RealEstateAPI's connector, with her own key. Every lookup spends her credits.</li>
       <li>Never give her your GitHub login. She gets her own repos only.</li>
+      <li><b>Her branch:</b> <code>silvia/work</code>. Easiest way, no install: open the file on github.com, click the pencil, change it, then <b>Commit changes</b> to <code>silvia/work</code>. When she's ready, she opens a pull request and you merge it.</li>
+    </ul>
+  </section>
+
+  <section class="card">
+    <h2>Working together</h2>
+    <ul>
+      <li><b>Split by folder:</b> Silvia = the website and the plan (<code>site/</code>, <code>docs/</code>). You + Claude = the data and the app (<code>lake/</code>, <code>sources/</code>, <code>app/</code>).</li>
+      <li><b>The real version changes only through a pull request</b> from her branch.</li>
+      <li><b>Requests go in GitHub Issues,</b> one per ask, not texts.</li>
+      <li><b>Say "publish Parcelvora"</b> after a merge and Claude puts it on the preview links.</li>
+      <li><b>Name, brand and words: Silvia has the last word.</b> It's spelled PARCELVORA.</li>
     </ul>
   </section>
 
@@ -139,7 +163,9 @@
       <li>Some feeds are stale: tax lien list (330 days), HPD registrations (76 days).</li>
       <li>177,081 NYC owners have no first/last split (no comma in the record). The full name still shows.</li>
       <li>No phones or emails in public data. That's the paid skip-trace step.</li>
-      <li>Florida: no map coordinates yet, and no person behind Florida LLCs yet. Sunbiz's free quarterly file of every Florida company's officers is the next layer. Sales are month-precise.</li>
+      <li>Florida: no person behind Florida LLCs yet. Sunbiz's free quarterly file of every Florida company's officers is the next layer. Sales are month-precise.</li>
+      <li>East Hampton: year built and values aren't on its roll yet. Its story runs on ownership and land use.</li>
+      <li>NYC values on the roll are assessed values, not market. Story Mode uses real sales for NYC price.</li>
     </ul>
   </section>
 
