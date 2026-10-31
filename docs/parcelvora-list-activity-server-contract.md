@@ -1,6 +1,6 @@
 # Parcelvora — list activity calendar server contract
 
-Status: **demo implemented** on `parcelvora-records.html`. This document specifies production integration, which is **not implemented here** because the application server resides in a separate repository.
+Status: **server implemented** in the Parcelvora application source (`parcelavora/app/server.mjs`, branch `feature/records-export-ledger`), with the static demo answering the same routes from the browser (`app/static/static-api.js`). `parcelvora-records.html` here is now built from that source by `app/static/build.mjs`, so a rebuild keeps everything in this PR.
 
 ## Meaning of a list pull
 
@@ -31,15 +31,18 @@ Use the current spec's `gold.exports` table and `gold.export_items` / `gold.expo
 
 The initial ledger write must precede the file response or webhook side effect; use DB transactions/locking and idempotency tokens so concurrent downloads, retries and multiple sessions cannot circumvent quota or double-debit. Do not treat browser localStorage as authoritative.
 
-## API
+## API (as implemented)
 
-`GET /api/exports?from=YYYY-MM-DD&to=YYYY-MM-DD` returns `{ "exports": [...] }` with account-scoped, newest-first ledger rows. Pagination is required for larger histories; date ranges use America/New_York boundaries but timestamps are ISO8601 UTC.
-
-`GET /api/export/preview` returns `{ matched, already, fresh, leftToday, limit }`.
-
-`GET /api/export?format=csv|json&new_only=1&name=...` returns downloadable records, creates a ledger row, and enforces 5,000 **new unique records per day** across downloads and pushes. Existing exports may be re-downloaded without consuming the new-record allowance; logged redownload counts remain distinct. List-based exports use `list=<id>`, and the server derives the list name from account-scoped data rather than trusting an arbitrary client-provided name.
-
-Guard access by account/role. Never reveal other accounts' list names, filters, parcel identifiers, or download history.
+- `POST /api/exports/preview {params}` → `{ matched, capped, owned, fresh, sentHere, leftToday, limit, cap }`.
+- `POST /api/exports {params, mode: "new"|"all", format: "csv"|"json", name, idempotency_key}` → `{ repeated, export, leftToday, overLimit, capped }`.
+  One transaction under a per-account advisory lock; a repeated idempotency key returns the first export. New records are
+  admitted only up to what is left of the account's daily allowance (`DAILY_EXPORT_LIMIT`, default 5,000, Eastern day).
+  `gold.acquired` records ownership once per account (it is what the allowance counts); `gold.deliveries` records each
+  channel separately; `gold.export_items` keeps the exact rows and their content. Failed attempts are logged as `failed`.
+- `GET /api/exports/:id/file` → the original rows again; never counts toward the allowance.
+- `GET /api/exports?from=YYYY-MM-DD&to=YYYY-MM-DD&page=` → `{ exports, more, page }`, newest first, Eastern dates.
+- `/api/records.csv` runs through the same ledger. Accounts sign in with their own keys (`app/accounts.mjs`); account B
+  never sees account A's exports or files.
 
 ## Demo limitations
 

@@ -139,56 +139,68 @@
 
   window.fetch = async (input, init) => {
     const url = new URL(typeof input === "string" ? input : input.url, location.href);
-    const route = /\/api\/(records|map|lookup|counties|ids|detail|skiptrace|comps|export(?:\/preview)?|exports)$/.exec(url.pathname);
+    const route = /\/api\/(records|map|lookup|counties|ids|detail|skiptrace|comps|exports(?:\/preview|\/\d+\/file)?)$/.exec(url.pathname);
     if (!route) return realFetch(input, init);
     // Skip tracing spends Tracerfy credits, so it runs only on Parcelvora's server, where the key lives.
     if (route[1] === "skiptrace") return reply({ error: "demo", message: "Skip tracing runs on Parcelvora's server, where the Tracerfy key lives. This preview has no server, so nothing runs or is charged here." }, 503);
     const d = await ready, q = url.searchParams;
 
-    // Sample-only export ledger: persists in this browser, not an account-wide server quota.
-    if (route[1] === "exports" || route[1].startsWith("export")) {
+    // Exports, kept in this browser: the same routes and answers as the server, so the page runs the same on both. What
+    // a browser holds is not an account: other browsers and devices don't share it, and clearing site data resets it.
+    if (route[1].startsWith("exports")) {
       const read = (key, fallback) => { try { return JSON.parse(localStorage.getItem(key) || "null") || fallback; } catch (_) { return fallback; } };
-      const ledger = read("pv-exports", []), exported = read("pv-exported", {});
+      const ledger = read("pv-exports", []).filter((e) => e && e.id && e.created_at), acquired = read("pv-acquired", {});
       const dayKey = (date) => {
         const parts = new Intl.DateTimeFormat("en-US", { timeZone: "America/New_York", year: "numeric", month: "2-digit", day: "2-digit" }).formatToParts(date);
         const val = (type) => parts.find((part) => part.type === type).value;
         return val("year") + "-" + val("month") + "-" + val("day");
       };
-      if (route[1] === "exports") return reply({ exports: ledger });
-      const today = dayKey(new Date()), limit = 5000;
-      const used = ledger.filter((e) => dayKey(new Date(e.created_at)) === today).reduce((n, e) => n + (Number(e.new_count) || 0), 0);
-      const leftToday = Math.max(0, limit - used);
-      const all = select(d.rows, q).slice(0, 5000);
-      const keyOf = (row) => row.region + "|" + row.county + "|" + row.id;
-      const fresh = all.filter((row) => !exported[keyOf(row)]).length;
-      if (route[1] === "export/preview") return reply({ matched: all.length, already: all.length - fresh, fresh, leftToday, limit });
-      const newOnly = q.get("new_only") !== "0", fmt = q.get("format") === "json" ? "json" : "csv";
-      const deliveredRows = [];
-      let newCount = 0, redownloaded = 0;
-      for (const row of all) {
-        const had = !!exported[keyOf(row)];
-        if (had && newOnly) continue;
-        if (!had && newCount >= leftToday) continue;
-        if (deliveredRows.length >= 5000) break;
-        deliveredRows.push(row);
-        if (had) redownloaded++; else newCount++;
+      const LIMIT = 5000, CAP = 5000, keyOf = (r) => r.id + "|" + r.county, today = dayKey(new Date());
+      const left = Math.max(0, LIMIT - Object.values(acquired).filter((a) => a && dayKey(new Date(a.t)) === today).length);
+      const pub = (e) => { const { keys, key, ...rest } = e; return rest; };
+      const body = (() => { try { return JSON.parse((init && init.body) || "{}"); } catch (_) { return {}; } })();
+      if (route[1] === "exports" && (!init || !init.method || init.method === "GET")) return reply({ exports: ledger.map(pub), more: false, page: 0 });
+      const file = /^exports\/(\d+)\/file$/.exec(route[1]);
+      if (file) {
+        const e = ledger.find((x) => String(x.id) === file[1]);
+        if (!e) return reply({ error: "no such export" }, 404);
+        if (!e.keys) return reply({ error: "This export is too old for this browser to keep its rows." }, 410);
+        const byKey = new Map(d.rows.map((r) => [keyOf(r), r])), rows = e.keys.map((k) => byKey.get(k)).filter(Boolean);
+        const text = e.format === "json" ? JSON.stringify(rows.map((r) => Object.fromEntries(CSV_COLS.map((c) => [c, r[c] ?? null]))), null, 2)
+          : [CSV_COLS.join(","), ...rows.map((r) => CSV_COLS.map((c) => cell(r[c])).join(","))].join("\n");
+        return new Response(text, { status: 200, headers: { "content-type": e.format === "json" ? "application/json" : "text/csv",
+          "content-disposition": `attachment; filename="parcelvora-export-${e.id}.${e.format}"` } });
       }
-      const entry = { id: String(Date.now()) + "-" + Math.random().toString(36).slice(2, 8), created_at: new Date().toISOString(),
-        channel: "download", format: fmt, list_name: String(q.get("name") || "Records").slice(0, 120),
-        matched: all.length, delivered: deliveredRows.length, new_count: newCount,
-        already: all.length - fresh, skipped: all.length - deliveredRows.length,
-        redownloaded, status: deliveredRows.length ? "done" : "empty" };
-      // Ledger first, then file response. The production server must do this atomically.
+      const all = select(d.rows, new URLSearchParams(String(body.params || "")));
+      const owned = all.filter((r) => acquired[keyOf(r)]).length;
+      if (route[1] === "exports/preview") return reply({ matched: all.length, capped: false, owned, fresh: all.length - owned, sentHere: owned, leftToday: left, limit: LIMIT, cap: CAP });
+      // create: a repeated key returns the first export
+      const key = String(body.idempotency_key || "").slice(0, 80);
+      const prior = key && ledger.find((x) => x.key === key);
+      if (prior) return reply({ repeated: true, export: pub(prior) });
+      const mode = body.mode === "all" ? "all" : "new", fmt = body.format === "json" ? "json" : "csv";
+      const rows = mode === "new" ? all.filter((r) => !acquired[keyOf(r)]).slice(0, Math.min(CAP, left)) : all.slice(0, CAP);
+      const take = []; let fresh = 0, overLimit = 0;
+      for (const r of rows) {
+        const isNew = !acquired[keyOf(r)];
+        if (isNew && fresh >= left) { overLimit++; continue; }
+        if (isNew) fresh++;
+        take.push(r);
+      }
+      const id = Date.now(), now = new Date().toISOString();
+      const entry = { id, key: key || null, created_at: now, completed_at: now, channel: "download", format: fmt,
+        list_name: String(body.name || "Records").slice(0, 120), status: "completed", matched: all.length, selected: rows.length,
+        delivered: take.length, new_count: fresh, already: take.length - fresh, skipped: rows.length - take.length,
+        remaining: mode === "new" ? Math.max(0, all.length - owned - fresh) : Math.max(0, all.length - take.length), error: null,
+        file: `/api/exports/${id}/file`, keys: take.map(keyOf) };
+      // The newest 50 exports keep their rows for "download again"; older ones keep only their totals.
+      const next = [entry, ...ledger].slice(0, 500).map((e, k) => (k < 50 ? e : pub(e)));
       try {
-        localStorage.setItem("pv-exports", JSON.stringify([entry, ...ledger].slice(0, 2000)));
-        for (const row of deliveredRows) if (!exported[keyOf(row)]) exported[keyOf(row)] = entry.id;
-        localStorage.setItem("pv-exported", JSON.stringify(exported));
-      } catch (_) { return reply({ error: "Export history could not be saved in this browser. No file delivered." }, 507); }
-      const body = fmt === "json"
-        ? JSON.stringify(deliveredRows.map((row) => Object.fromEntries(CSV_COLS.map((c) => [c, row[c] ?? null]))), null, 2)
-        : [CSV_COLS.join(","), ...deliveredRows.map((row) => CSV_COLS.map((c) => cell(row[c])).join(","))].join("\n");
-      return new Response(body, { status: 200, headers: { "content-type": fmt === "json" ? "application/json" : "text/csv",
-        "X-Parcelvora-Export-Id": entry.id, "X-Parcelvora-New-Count": String(newCount), "X-Parcelvora-Delivered": String(deliveredRows.length) } });
+        localStorage.setItem("pv-exports", JSON.stringify(next));
+        for (const r of take) if (!acquired[keyOf(r)]) acquired[keyOf(r)] = { e: id, t: now };
+        localStorage.setItem("pv-acquired", JSON.stringify(acquired));
+      } catch (_) { return reply({ error: "This browser could not save the export history, so nothing was delivered." }, 507); }
+      return reply({ repeated: false, export: pub(entry), leftToday: Math.max(0, left - fresh), overLimit, capped: false });
     }
     if (route[1] === "detail") {
       const r = d.rows.find((x) => x.id === q.get("id") && (!q.get("county") || x.county === q.get("county")));
@@ -547,7 +559,7 @@
         <button type="button" data-view="map" aria-pressed="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M9 4 3 6v14l6-2 6 2 6-2V4l-6 2-6-2zM9 4v14M15 6v14"/></svg>Map</button>
       </div>
       <a class="btn" id="storyBtn" href="https://nextiertech11105.github.io/nextier-flow/parcelvora-story.html" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg><span>Story Mode</span></a>
-      <button type="button" class="btn" id="activityBtn" aria-controls="activityPanel" aria-expanded="false">List Activity</button>
+      <button type="button" class="btn" id="activityBtn" aria-controls="activityPanel" aria-expanded="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg><span>List Activity</span></button>
       <button type="button" class="btn" id="savedBtn" aria-expanded="false" aria-controls="savedPanel"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M6 3h12v18l-6-4-6 4z"/></svg><span>Saved searches</span></button>
       <button type="button" class="btn" id="compsBtn" aria-controls="comps"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg><span>Comps</span><b class="cnt" id="compsCount"></b></button>
       <a class="btn" id="download" href="/api/records.csv"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 4v11m0 0-4-4m4 4 4-4M4 19h16"/></svg>Download</a>
@@ -1160,13 +1172,13 @@
   function pullsIn(from, to) {
     return activityEntries.filter((e) => {
       const date = exportDayKey(new Date(e.created_at));
-      return date >= from && date <= to && e.status === "done" && Number(e.delivered) > 0;
+      return date >= from && date <= to && e.status === "completed" && Number(e.delivered) > 0;
     });
   }
   const sumKey = (a, key) => a.reduce((n, x) => n + (Number(x[key]) || 0), 0);
   const activityStat = (title, entries) =>
     '<div class="activity-stat"><span>' + title + '</span><strong>' + int(entries.length) +
-    ' pulls</strong><small>' + int(sumKey(entries, "new_count")) + ' new records · ' +
+    (entries.length === 1 ? ' pull' : ' pulls') + '</strong><small>' + int(sumKey(entries, "new_count")) + ' new records · ' +
     int(sumKey(entries, "delivered")) + ' delivered</small></div>';
   function renderActivity() {
     const today = todayKey(), weekday = new Date(today + "T12:00:00Z").getUTCDay();
@@ -1187,17 +1199,18 @@
       const sel = day === activityDate ? " selected" : "";
       return '<button type="button" class="activity-day' + m + n + sel + '" data-day="' + day + '" aria-pressed="' + (day === activityDate) + '">' +
         '<span class="ad-num">' + Number(day.slice(8)) + '</span>' +
-        (entries.length ? '<span class="ad-pulls">' + int(entries.length) + ' pulls</span><span class="ad-rows">' + int(sumKey(entries, "new_count")) + ' new</span>' : '') +
+        (entries.length ? '<span class="ad-pulls">' + int(entries.length) + (entries.length === 1 ? ' pull' : ' pulls') + '</span><span class="ad-rows">' + int(sumKey(entries, "new_count")) + ' new</span>' : '') +
         '</button>';
     }).join("");
     const onDay = activityEntries.filter((e) => exportDayKey(new Date(e.created_at)) === activityDate);
-    $("activityDayTitle").textContent = new Date(activityDate + "T12:00:00Z").toLocaleDateString("en-US", { timeZone: "UTC", weekday: "long", month: "long", day: "numeric", year: "numeric" }) + " · " + onDay.filter((e) => e.status === "done" && Number(e.delivered) > 0).length + " list pulls";
+    $("activityDayTitle").textContent = new Date(activityDate + "T12:00:00Z").toLocaleDateString("en-US", { timeZone: "UTC", weekday: "long", month: "long", day: "numeric", year: "numeric" }) + " · " + ((n) => n + (n === 1 ? " list pull" : " list pulls"))(onDay.filter((e) => e.status === "completed" && Number(e.delivered) > 0).length);
     $("activityLog").innerHTML = onDay.length ? onDay.map((e) =>
       '<div class="activity-entry"><div><strong>' + esc(e.list_name || "Records") + '</strong><div class="sm">' +
       esc(new Date(e.created_at).toLocaleTimeString("en-US", { timeZone: "America/New_York", hour: "numeric", minute: "2-digit" })) +
-      ' ET · ' + esc((e.format || "csv").toUpperCase()) + ' · ' + esc(e.channel || "download") + ' · ' + esc(e.status || "done") +
+      ' ET · ' + esc((e.format || "csv").toUpperCase()) + ' · ' + esc(e.channel || "download") + ' · ' + esc(e.status || "completed") +
       '</div></div><div><b>' + int(e.delivered) + ' delivered</b><div class="sm">' + int(e.new_count) + ' new · ' +
-      int(e.already) + ' previously exported · ' + int(e.skipped) + ' not delivered</div></div></div>').join("")
+      int(e.already) + ' previously exported · ' + int(e.skipped) + ' not delivered</div>' +
+      (Number(e.delivered) > 0 && e.file ? '<button type="button" class="btn" data-redl="' + esc(e.file) + '">Download again</button>' : '') + '</div></div>').join("")
       : '<p class="sm">No exports recorded on this date.</p>';
     $("activityNotice").textContent = location.hostname.endsWith("github.io")
       ? "Demo activity is saved in this browser only. Other browsers, accounts, or devices will not share this history."
@@ -1233,22 +1246,43 @@
   $("activityNext").onclick = () => moveActivityMonth(1);
   $("activityToday").onclick = () => { activityMonth = currentMonth(); activityDate = todayKey(); renderActivity(); };
   $("activityRefresh").onclick = fetchActivity;
+  // An earlier export, downloaded again: the same rows, and it doesn't count toward today's allowance.
+  async function saveExportFile(href, fallbackName) {
+    const r = await fetch(href);
+    if (!r.ok) { let m = r.status; try { m = (await r.json()).error || m; } catch (_) {} throw Error(m); }
+    const name = (/filename="([^"]+)"/.exec(r.headers.get("content-disposition") || "") || [])[1] || fallbackName;
+    const url = URL.createObjectURL(await r.blob()), link = document.createElement("a");
+    link.href = url; link.download = name; document.body.append(link); link.click(); link.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 10000);
+    return name;
+  }
+  $("activityLog").addEventListener("click", async (e) => {
+    const b = e.target.closest("[data-redl]"); if (!b) return;
+    b.disabled = true;
+    try { const n = await saveExportFile(b.dataset.redl, "parcelvora-export.csv"); $("activityNotice").textContent = n + " downloaded again. It doesn't count toward today's allowance."; }
+    catch (err) { $("activityNotice").textContent = "Could not download it again: " + err.message; }
+    b.disabled = false;
+  });
 
-  // Export with a preview, saved history, repeat protection and a daily quota (the demo emulates server routes).
+  // Export with a preview, a permanent history, repeat protection and a daily allowance. One key per dialog, so a
+  // double press or a retry makes one export, not two (the demo answers the same routes from this browser).
+  let exportKey = "";
+  const newKey = () => (window.crypto && crypto.randomUUID ? crypto.randomUUID() : Date.now() + "-" + Math.random().toString(36).slice(2));
+  const postJson = (u, body) => fetch(u, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(body) });
   async function previewExport() {
     $("exportPreview").textContent = "Checking records…";
-    const p = new URLSearchParams(exportQuery);
     try {
-      const r = await fetch("/api/export/preview?" + p), j = await r.json();
+      const r = await postJson("/api/exports/preview", { params: exportQuery }), j = await r.json();
       if (!r.ok) throw Error(j.error || r.status);
-      $("exportPreview").textContent = int(j.matched) + " match · " + int(j.already) + " already exported · " +
-        int(j.fresh) + " new · " + int(j.leftToday) + " of " + int(j.limit || 5000) + " new records left today";
+      $("exportPreview").textContent = int(j.matched) + (j.capped ? "+" : "") + " match · " + int(j.owned) + " already yours · " +
+        (j.fresh == null ? "many" : int(j.fresh)) + " new · " + int(j.leftToday) + " of " + int(j.limit) + " new records left today. " +
+        "One download takes up to " + int(j.cap) + " records in the current sort order; the rest stay for the next one.";
       $("exportConfirm").disabled = !j.matched;
     } catch (_) { $("exportPreview").textContent = "Preview not available on this server."; $("exportConfirm").disabled = true; }
   }
   $("download").addEventListener("click", (e) => {
     e.preventDefault();
-    exportQuery = tableParams().toString();
+    exportQuery = tableParams().toString(); exportKey = newKey();
     $("exportDialog").hidden = false; document.body.classList.add("comps-on");
     $("exportNote").textContent = "";
     document.querySelector('input[name="exportMode"][value="new"]').checked = true;
@@ -1259,18 +1293,18 @@
   $("exportHistory").onclick = () => { closeExport(); openActivity(); $("activityPanel").scrollIntoView({block:"start"}); };
   $("exportConfirm").onclick = async () => {
     const b = $("exportConfirm"); b.disabled = true; $("exportNote").textContent = "Preparing export…";
-    const p = new URLSearchParams(exportQuery), chosen = document.querySelector('input[name="exportMode"]:checked');
-    p.set("new_only", chosen && chosen.value === "all" ? "0" : "1");
-    p.set("format", $("exportFormat").value);
-    p.set("name", describeSearch());
+    const chosen = document.querySelector('input[name="exportMode"]:checked'), fmt = $("exportFormat").value;
     try {
-      const r = await fetch("/api/export?" + p);
-      if (!r.ok) { const j = await r.json(); throw Error(j.error || r.status); }
-      const body = await r.blob(), fmt = p.get("format"), filename = "parcelvora-list-" + todayKey() + "." + fmt;
-      const link = document.createElement("a"), url = URL.createObjectURL(body);
-      link.href = url; link.download = filename; document.body.append(link); link.click(); link.remove();
-      setTimeout(() => URL.revokeObjectURL(url), 10000);
-      $("exportNote").textContent = "Export logged and " + filename + " prepared. New-only exports skip previously delivered records.";
+      const r = await postJson("/api/exports", { params: exportQuery, mode: chosen && chosen.value === "all" ? "all" : "new", format: fmt,
+        name: describeSearch(), idempotency_key: exportKey }), j = await r.json();
+      if (!r.ok) throw Error(j.error || r.status);
+      const x = j.export, more = Number(x.remaining) || 0;
+      if (x.delivered) await saveExportFile(x.file, "parcelvora-export-" + x.id + "." + fmt);
+      $("exportNote").textContent = (j.repeated ? "Already done: " : "") +
+        (x.delivered ? int(x.delivered) + " records delivered (" + int(x.new_count) + " new, " + int(x.already) + " already yours)." : "Nothing new to deliver for this search.") +
+        (j.overLimit ? " " + int(j.overLimit) + " new records wait for tomorrow's allowance." : "") +
+        (more ? " " + int(more) + " more matching record" + (more === 1 ? " stays" : "s stay") + " for a next download." : "") + " Logged in List Activity.";
+      exportKey = newKey();
       previewExport(); if (!$("activityPanel").hidden) fetchActivity();
     } catch (err) { $("exportNote").textContent = "Could not export: " + err.message; }
     b.disabled = false;
