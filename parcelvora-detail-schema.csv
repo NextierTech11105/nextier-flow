@@ -1,0 +1,38 @@
+column,label,why it matters,New York source,Florida source,filled NYC %,filled Long Island %,filled Florida %,example
+lotInfo.apn,Parcel ID,"Pull any record on the parcel: NYC BBL, NY SWIS + print key, Florida folio.",PLUTO / NYS roll,FL DOR roll,100,100,100,3038840333
+parcelvora.region,Market,"NYC, Long Island or Florida.",Lake,Lake,100,100,100,NYC
+propertyInfo.address.label,Property address,What you're calling about.,PLUTO / NYS roll,FL DOR roll,100,100,100,"19 CROSBY AVENUE, Brooklyn, NY 11207"
+ownerInfo.owner1FullName,Owner on record,"The name on the tax roll, exactly as recorded.",PLUTO / NYS roll,FL DOR roll,100,100,100,"NAULA, SEGUNDO R"
+ownerInfo.owner1FirstName,Owner first name,Greet them by name.,Lake (parsed),Lake (parsed),50,81,80,Segundo R
+ownerInfo.owner1LastName,Owner last name,Greet them by name.,Lake (parsed),Lake (parsed),50,82,79,Naula
+ownerInfo.owner1Type,Owner type,"Individual, Company, Trust, Estate or Government: who decides.",Lake,Lake,100,100,100,Individual
+parcelvora.registeredContact.name,Person behind the LLC,The human to ask for when a company owns it.,HPD registrations (NYC),Sunbiz add-on,21,0,0,Roger Tran
+parcelvora.registeredContact.role,Their role,"Head officer, managing agent, owner…",HPD registrations (NYC),Sunbiz add-on,21,0,0,IndividualOwner
+ownerInfo.mailAddress.label,Owner mailing address,Where the owner actually is.,NYS roll / PLUTO,FL DOR roll,0,100,100,"3525 STEPHAN LN, WANTAGH, NY 11793"
+ownerOccupied,Owner lives there,"Talk home and family, not investment.",NYS roll (Long Island),Homestead exemption,0,100,100,True
+absenteeOwner,Absentee owner,Not watching the property day to day.,Mailing vs site (LI),Mailing vs site,0,85,93,True
+outOfStateAbsenteeOwner,Owner out of state,Managing from far away.,Mailing state,Mailing state,0,100,100,True
+ownerInfo.ownershipLength,Months owned,How long since they bought (from the last recorded sale).,DOF sales (12 mo),FL roll sales,4,0,8,2
+parcelvora.heldSince2021,Same owner since 2021,Long hold: equity and a life change are likely.,NYS rolls 2021 + 2025,—,0,96,0,True
+death,Held by an estate,The family decides what happens next.,Owner name (ESTATE OF),Owner name,0,0,0,
+lien,On NYC's lien sale list,Behind on city charges: a real reason to talk.,DOF lien sale list,—,100,0,0,True
+parcelvora.lienSaleList.listMonth,Lien list date,Which list it was on.,DOF lien sale list,—,0,0,0,2025-06-01
+preForeclosure,Pre-foreclosure,Lis pendens or default on file.,RealEstateAPI,RealEstateAPI,0,0,0,
+loanMaturityWithin12Months,Loan matures within 12 months,A refinance or sale decision is coming.,RealEstateAPI / Propwire; ACRIS estimate in app,RealEstateAPI / Propwire,0,0,0,
+loanMaturityDate,Loan maturity date,When the loan comes due.,RealEstateAPI / Propwire,RealEstateAPI / Propwire,0,0,0,
+freeClear,Free and clear,No open mortgage: full equity.,ACRIS (live in app) / RealEstateAPI,RealEstateAPI,0,0,0,
+estimatedEquity,Estimated equity,What they'd walk away with.,RealEstateAPI,RealEstateAPI,0,0,0,
+propertyType,Property type,"SFR, MFR, CONDO, MOBILE, LAND.",Lake,Lake,100,100,100,MFR
+propertyInfo.unitsCount,Units,Rent roll and how many tenants.,PLUTO / NYS roll,FL DOR roll,100,0,91,2
+propertyInfo.yearBuilt,Year built,"Age, condition and renovation talk.",PLUTO / NYS parcels,FL DOR roll,95,7,94,1920
+propertyInfo.buildingSquareFeet,Building sq ft,Size of what's standing.,PLUTO / NYS parcels,FL DOR roll,100,7,94,2390
+lotInfo.lotSquareFeet,Lot sq ft,"Land, room to expand.",PLUTO / NYS parcels,FL DOR roll,100,57,67,6142
+lotInfo.zoning,Zoning,What can be built.,PLUTO,—,100,0,0,R3-1
+parcelvora.unbuiltFarSqft,Room to build (sq ft),Zoning allows more than what stands: development value.,PLUTO (FAR),—,100,0,0,3736
+estimatedValue,Market value,"The county's market value (Florida just value, NY full market value).",NYS roll,FL DOR just value,0,100,100,576000
+taxInfo.assessedValue,Assessed value (NYC),"NYC publishes assessed, not market, value.",PLUTO,—,100,0,0,53400.0
+lastSaleDate,Last sale date,When it last changed hands.,DOF sales (12 mo),FL roll sales,4,0,8,2026-08-21
+lastSalePrice,Last sale price,What they paid.,DOF sales (12 mo),FL roll sales,4,0,8,695000
+linkedProperties.totalOwned,Properties they own,One home or a portfolio (same name + mailing address).,Lake,Lake,24,15,17,2
+linkedProperties.totalValue,Portfolio value,How big a player they are.,Lake,Lake,24,15,17,118320.0
+talkingPoints,Talking points,"One factual line to read before the call, built from the columns above.",Built,Built,100,100,100,"Owner: Segundo R Naula; 2-unit multifamily, built 1920, 2,390 sq ft; assessed $53,400 (NYC); zoning allows about 3,736 more sq ft."
