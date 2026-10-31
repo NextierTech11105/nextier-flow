@@ -171,6 +171,33 @@ h1 { font-weight: 400; font-size: 46px; line-height: 1.02; letter-spacing: -0.01
 .start-btns button.ghost { background: transparent; color: var(--ink); border-color: var(--ink); }
 .start-btns button:hover { background: #e9a35a; border-color: #e9a35a; color: var(--navy); }
 @media (max-width: 860px) { .panel { box-shadow: 0 12px 30px rgba(10,26,47,.2); } }
+.find { display: flex; gap: 6px; flex: 1 1 300px; max-width: 540px; margin-left: auto; }
+.find input { flex: 1; min-width: 0; font: inherit; font-size: 15px; padding: 9px 12px; border: 1px solid rgba(239,233,222,.45); border-radius: 4px; background: #fbf8f2; color: var(--ink); }
+.find button { font: inherit; font-size: 15px; font-weight: 600; padding: 9px 14px; border: 2px solid #d9771f; background: #d9771f; color: var(--navy); border-radius: 4px; cursor: pointer; white-space: nowrap; }
+.find button:disabled { opacity: .7; cursor: wait; }
+.pin { display: flex; flex-direction: column; align-items: center; pointer-events: none; }
+.pin span { background: var(--navy); color: #fbf8f2; font: 600 13px/1.3 var(--sans); padding: 5px 9px; border-radius: 4px; max-width: 220px; text-align: center; box-shadow: 0 6px 16px rgba(0,0,0,.28); }
+.pin i { width: 2px; height: 22px; background: var(--navy); }
+.pin.home span { background: #d9771f; color: var(--navy); }
+.pin.home i { background: #d9771f; }
+.tlist { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+.tlist li { display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: 10px; padding: 8px 10px; background: #fbf8f2; border: 1px solid var(--line); border-radius: 6px; font-size: 15px; }
+.tlist .tn { min-width: 0; overflow-wrap: anywhere; }
+.tlist b { font-family: var(--mono); font-weight: 500; color: var(--orange); white-space: nowrap; }
+.rt { display: inline-grid; place-items: center; min-width: 24px; height: 24px; padding: 0 4px; margin-right: 3px; border-radius: 12px; font: 700 13px/1 var(--sans); }
+.rt.k { border-radius: 4px; padding: 0 7px; background: var(--navy); color: #f4efe6; font-weight: 600; }
+.src a { color: inherit; }
+.make { position: fixed; inset: 0; z-index: 40; display: grid; place-items: center; padding: 16px; background: rgba(15,28,45,.62); }
+.make[hidden] { display: none; }
+.make-card { position: relative; width: min(680px, 100%); max-height: calc(100vh - 32px); overflow-y: auto; background: #fbf8f2; border-radius: 10px; box-shadow: 0 30px 80px rgba(0,0,0,.4); padding: 26px; }
+.make-card h2 { font-family: var(--serif); font-weight: 400; font-size: 36px; margin: 4px 0 14px; color: var(--ink); }
+.make-card .x { position: absolute; top: 12px; right: 14px; border: 0; background: none; font-size: 28px; cursor: pointer; color: var(--ink); }
+.make-tabs { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 10px; }
+.make-tabs button, .make-btns button { font: inherit; font-size: 15px; font-weight: 600; padding: 8px 14px; border: 1px solid #cfc6b5; background: #f4efe6; color: var(--ink); border-radius: 4px; cursor: pointer; }
+.make-tabs button[aria-selected="true"], .make-btns button:hover { background: var(--navy); color: #e9a35a; border-color: var(--navy); }
+.make textarea { width: 100%; font: 15px/1.5 var(--sans); color: var(--ink); background: #fff; border: 1px solid var(--line); border-radius: 6px; padding: 12px; resize: vertical; }
+.make-btns { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+@media (max-width: 860px) { .find { margin-left: 0; max-width: none; } }
 </style>
 </head>
 <body>
@@ -181,7 +208,7 @@ h1 { font-weight: 400; font-size: 46px; line-height: 1.02; letter-spacing: -0.01
     <span class="word">Parcel<b>vora</b><small>Story Mode</small></span>
   </a>
   <div class="seg" id="nbSeg" role="group" aria-label="Neighborhood"><span class="lbl">Place</span></div>
-  <div class="seg" id="audSeg" role="group" aria-label="Audience"><span class="lbl">For</span></div>
+  <form class="find" id="find" role="search"><input id="findQ" type="search" placeholder="Any address or neighborhood in NY or FL" aria-label="Find any address or neighborhood" autocomplete="off"><button type="submit" id="findBtn">Tell its story</button></form>
 </div>
 
 <div id="map" aria-label="3D map of the neighborhood"></div>
@@ -194,10 +221,9 @@ h1 { font-weight: 400; font-size: 46px; line-height: 1.02; letter-spacing: -0.01
     <p class="line" id="line"></p>
     <div class="leg" id="leg"></div>
     <div class="chart" id="chart"></div>
-    <div id="why"></div>
     <div class="legend" id="legend"></div>
     <p class="src" id="src"></p>
-    <p class="tip">Tap anywhere on the map for that lot's story.</p>
+    <p class="tip" id="tip">Tap anywhere on the map for that lot's story.</p>
     <div id="cta"></div>
   </div>
   <div class="p-ctl">
@@ -209,6 +235,7 @@ h1 { font-weight: 400; font-size: 46px; line-height: 1.02; letter-spacing: -0.01
         <button id="next" aria-label="Next chapter">▶</button>
         <button id="voice" aria-pressed="false" aria-label="Narration">🔊 Voice</button>
         <button id="music" aria-pressed="true" aria-label="Music">🎵 Music</button>
+        <button id="make" aria-label="Create content">✎ Create content</button>
       </div>
       <div class="dots" id="dots"></div>
     </div>
@@ -229,7 +256,19 @@ h1 { font-weight: 400; font-size: 46px; line-height: 1.02; letter-spacing: -0.01
       <button id="go" type="button">▶ Play with music</button>
       <button id="goVoice" class="ghost" type="button">▶ Music + narrator</button>
     </div>
-    <p class="start-note">Pick another place or who it's for at the top, any time.</p>
+    <p class="start-note">Search any address or neighborhood at the top, any time.</p>
+  </div>
+</div>
+
+<div class="make" id="makeBox" role="dialog" aria-labelledby="makeTitle" hidden>
+  <div class="make-card">
+    <button class="x" id="makeX" type="button" aria-label="Close">×</button>
+    <p class="eyebrow">Create content</p>
+    <h2 id="makeTitle">This story</h2>
+    <div class="make-tabs" id="makeTabs" role="tablist"><button type="button" data-k="article" aria-selected="true">Article</button><button type="button" data-k="script" aria-selected="false">Video script</button><button type="button" data-k="post" aria-selected="false">Social post</button></div>
+    <textarea id="makeText" rows="14" aria-label="The content"></textarea>
+    <div class="make-btns"><button type="button" id="makeCopy">Copy</button><button type="button" id="makeSave">Download</button><button type="button" id="makeAi" hidden>Write it with AI</button></div>
+    <p class="start-note" id="makeNote"></p>
   </div>
 </div>
 
@@ -242,8 +281,9 @@ h1 { font-weight: 400; font-size: 46px; line-height: 1.02; letter-spacing: -0.01
     "east-hampton": { label: "East Hampton", radius: 380, maxH: 2200, zoom: 11.0, pitch: 50, cell: 0.02,   walkZoom: 15.4 },
     "coral-gables": { label: "Coral Gables", radius: 110, maxH: 650,  zoom: 13.0, pitch: 55, cell: 0.007,  walkZoom: 16.4 },
   };
-  const AUD = { all: "Everyone", edu: "Education", re: "Real estate", biz: "Business brokers", open: "Opening a business" };
-  const WHY_LABEL = { edu: "For classrooms", re: "For real estate", biz: "For business brokers", open: "For opening a business" };
+  // AI narration runs on the Parcelvora server (the key never reaches the page); a static copy tells the story without it.
+  const AI_URL = /github\.io$/.test(location.hostname) ? null : "/api/story-ai";
+  const RECORDS = "parcelvora-records.html";
   const USE = { one_family: "Single-family", two_family: "Two-family", three_family: "Three-family", multifamily: "Apartment buildings",
     multifamily_small: "Small apartment bldgs", mixed_use: "Mixed use", condo: "Condos", coop: "Co-ops", commercial: "Commercial",
     industrial: "Industrial", vacant_res: "Empty lots", vacant_other: "Other vacant", vacant_commercial: "Vacant commercial",
@@ -251,19 +291,15 @@ h1 { font-weight: 400; font-size: 46px; line-height: 1.02; letter-spacing: -0.01
     agricultural: "Farms", government: "Government", other: "Other", marina: "Marinas", golf: "Golf", strip_center: "Shopping centers",
     recreation: "Recreation", nursery: "Nurseries", seasonal: "Seasonal", rural_estate: "Rural estates", camp_rv: "Camps + RV",
     bar_nightclub: "Bars", car_lot: "Car lots", multi_structure_res: "Multi-house lots", residential_other: "Other residential", mobile_home: "Mobile homes" };
-  const OWN = { individual: "Individuals", entity: "Companies (LLC, corp)", trust: "Trusts", estate: "Estates", public: "Public", unknown: "Unknown" };
   const GROUP = { 1: ["Houses", [38, 64, 95]], 2: ["Condos + co-ops", [120, 145, 175]], 3: ["Apartments", [150, 112, 74]], 4: ["Mixed use", [217, 119, 31]],
     5: ["Commercial", [15, 28, 45]], 6: ["Industrial", [128, 124, 116]], 7: ["Vacant", [214, 172, 92]], 8: ["Public + parks", [104, 150, 110]], 9: ["Other", [205, 198, 185]] };
   const RAMP = [[233, 226, 212], [200, 190, 169], [143, 160, 180], [38, 64, 95], [233, 163, 90], [192, 97, 26]];
-  const VALUE_BASIS = { assessed_total: "assessed value", full_market_value: "market value", just_value: "market value" };
 
   const fmt = (n) => (n == null ? "—" : Number(n).toLocaleString("en-US"));
-  const money = (n) => n == null ? "—" : n >= 1e9 ? "$" + (n / 1e9).toFixed(1) + " billion" : n >= 1e6 ? "$" + (n / 1e6).toFixed(n >= 1e7 ? 1 : 2) + " million" : "$" + fmt(Math.round(n));
   const short = (n) => n >= 1e9 ? (n / 1e9).toFixed(2) + "B" : n >= 1e6 ? (n / 1e6).toFixed(1) + "M" : n >= 1e4 ? Math.round(n / 1e3) + "K" : fmt(n);
   const pct = (a, b) => (b ? Math.round((a / b) * 100) : 0);
   const esc = (s) => String(s ?? "").replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
   const num = (x) => Number(x) || 0;
-  const monthName = (ym) => { const [y, m] = ym.split("-").map(Number); return new Date(y, m - 1, 1).toLocaleString("en-US", { month: "long", year: "numeric" }); };
   const peak = (obj) => Object.entries(obj || {}).reduce((best, [k, v]) => (v > best[1] ? [k, v] : best), ["", -1]);
   const series = (rows) => (rows || []).filter((r) => r && r.y).map((r) => [r.y, num(r.n)]);
   const qs = new URLSearchParams(location.search);
@@ -286,31 +322,31 @@ h1 { font-weight: 400; font-size: 46px; line-height: 1.02; letter-spacing: -0.01
     return { at: [best[0] / best[2], best[1] / best[2]], n: best[2] };
   }
 
+  // Story Mode tells history: facts and stories, entertainment with education. Money, values and what a property
+  // could become never appear here; they live in Research and the report. The three prepared neighborhoods read from
+  // the lake; any other address or place is told live from public sources (Wikipedia, NYC Open Data, MTA, the 2020
+  // Census, Mapbox / OpenStreetMap). Every chapter names its source.
   function walkLegs(key, d) {
     const pts = d.points || [], cfg = NB[key], legs = [{ at: d.center, label: "Start", text: `We start in the middle of ${cfg.label}.` }];
     const add = (spot, label, text) => { if (spot) legs.push({ at: spot.at, label, text }); };
-    const biz = pts.filter((p) => p[3] >= 4 && p[3] <= 6), vac = pts.filter((p) => p[3] === 7);
     const dated = pts.filter((p) => p[2] > 0).sort((a, b) => a[2] - b[2]);
     if (dated.length > 200) {
-      const old = dated.slice(0, Math.floor(dated.length * 0.08)), s = hotSpot(old, cfg.cell);
-      const y = Math.min(...old.map((p) => p[2]));
-      add(s, "The oldest blocks", `Here are the oldest blocks: the earliest buildings around here go back to ${y}.`);
+      const old = dated.slice(0, Math.floor(dated.length * 0.08));
+      add(hotSpot(old, cfg.cell), "The oldest blocks", `Here are the oldest blocks: the earliest buildings around here go back to ${Math.min(...old.map((p) => p[2]))}.`);
     }
-    add(hotSpot(biz, cfg.cell), "Where business happens", key === "park-slope" ? "Now the shops: storefronts below, homes above, on the busiest business blocks." : "Now the commercial core, where most business parcels cluster.");
-    if (key === "park-slope") add(hotSpot(pts.filter((p) => p[5] & 32), cfg.cell), "Room to grow", "These blocks hold lots that zoning would let build bigger than they stand today.");
-    if (key === "coral-gables") { const rich = pts.filter((p) => p[4] > 0).sort((a, b) => b[4] - a[4]); add(hotSpot(rich.slice(0, Math.floor(rich.length * 0.05)), cfg.cell), "The highest values", "And here, the highest values in the city sit side by side."); }
-    if (key === "east-hampton") { add(hotSpot(vac, cfg.cell), "Open land", "Open land: this is where empty lots cluster, waiting for their next use."); add(hotSpot(pts.filter((p) => p[5] & 64), cfg.cell * 2), "Estates", "And here, homes held by estates, where a family decides what happens next."); }
+    add(hotSpot(pts.filter((p) => p[3] >= 4 && p[3] <= 6), cfg.cell), "Main street", key === "park-slope" ? "Now the avenues: storefronts below, homes above." : "Now the center of town, where the shops and restaurants cluster.");
+    (d.stops || []).slice(0, 3).forEach((s) => legs.push({ at: s.at, label: s.title, text: s.text }));
     return legs;
   }
 
   function chaptersFor(key, d, dv) {
-    const u = d.uses || {}, o = d.owners || {}, ch = [];
+    const u = d.uses || {}, ch = [], B = d.business || {}, cfg = NB[key];
     const decades = Object.entries(d.decades || {}).map(([k, v]) => [k + "s", v]);
     const [peakDec, peakDecN] = peak(d.decades);
-    const cfg = NB[key];
-    const walk = { aud: "all", eyebrow: "Walk through", title: `Walk ${cfg.label} with me.`, line: "A street-level pass through the spots the data says matter most.", walk: walkLegs(key, d), map: { mode: "walk" }, legend: "use", src: "Path built from the lake: the densest clusters of old buildings, businesses and opportunity." };
-    const finale = dataverseChapter(dv);
-    const B = d.business || {};
+    const corp = series(B.corp_by_year), corpLast = corp.find((r) => r[0] === "2025"), corpMax = corp.reduce((b, r) => (r[1] > b[1] ? r : b), ["", 0]);
+    const walk = { eyebrow: "Walk through", title: `Walk ${cfg.label} with me.`, line: "A street-level pass through its oldest blocks, its main street and the places with a story.",
+      walk: walkLegs(key, d), map: { mode: "walk" }, legend: "use", src: "Path built from the lake (oldest buildings, main street) and Wikipedia (places nearby)." };
+    const tales = d.tales || [], facts = didYouKnow(d.stops || [], tales);
 
     if (key === "park-slope") {
       const H = d.history || {};
@@ -318,129 +354,386 @@ h1 { font-weight: 400; font-size: 46px; line-height: 1.02; letter-spacing: -0.01
       const brown = num((H.lm_mat || []).find((r) => r.mat_prim === "Brownstone")?.n);
       const styles = (H.lm_style || []).filter((r) => r.style_prim !== "Not determined");
       const arch = (H.lm_arch || [])[0] || {};
-      const hpd = series(H.hpd_viol_by_year), hpdMax = hpd.reduce((b, r) => (r[1] > b[1] ? r : b), ["", 0]);
-      const c311 = (H.c311_top || []).map((r) => [r.complaint_type.replace(/^HEAT\/HOT WATER$/, "Heat / hot water"), num(r.n)]);
       const trees = num(H.trees_total?.[0]?.n), species = (H.trees || []).map((r) => [r.spc_common.replace(/^./, (c) => c.toUpperCase()), num(r.n)]);
       const stations = new Set((H.subway || []).map((s) => s.stop_name)).size, entrances = (H.subway || []).length;
-      const ent = o.entity || 0, sales = d.nyc_sales || {};
-      const [pm, pmN] = peak(sales.by_month);
-      const biz = d.biz || {}, bizN = Object.values(biz).reduce((s, v) => s + v[0], 0);
-      const corp = series(B.corp_by_year), corpLast = corp.find((r) => r[0] === "2025"), corpNow = corp.find((r) => r[0] === "2026"), corpMax = corp.reduce((b, r) => (r[1] > b[1] ? r : b), ["", 0]);
       const cats = (B.lic_cats || []).map((r) => [r.business_category, num(r.n)]);
-      ch.push({ aud: "all", eyebrow: "Brooklyn · ZIP 11215", title: "Park Slope", line: `${fmt(d.n)} lots. ${fmt(d.units)} homes. ${fmt(lmTotal)} landmarked buildings. This is its story, told by public record.`,
+      ch.push({ eyebrow: "Brooklyn · ZIP 11215", title: "Park Slope", line: `${fmt(d.n)} lots. ${fmt(d.units)} homes. ${fmt(lmTotal)} landmarked buildings. This is its story, told by public record.`,
         chart: stats([[fmt(d.n), "lots"], [fmt(d.units), "homes"], [fmt(lmTotal), "landmarked"]]), map: { mode: "count", bearing: -20 },
-        src: "Sources in this story: NYC PLUTO · Landmarks Preservation Commission · HPD · Dept. of Finance sales · 311 · Street Tree Census · MTA · NYS corporations · NYC licensed businesses" });
-      ch.push(walk);
-      ch.push({ aud: "edu re", eyebrow: "Origins", title: `Built around ${Math.round(d.median_year)}.`, line: `Half of Park Slope's buildings went up before ${Math.round(d.median_year)}. ${fmt(peakDecN)} still standing date to the ${peakDec}s, the busiest decade on record here.`,
-        chart: cols(decades.filter((r) => parseInt(r[0]) >= 1850), peakDec + "s"), map: { mode: "year", bearing: 15 }, legend: "year",
-        why: { edu: "A street-by-street timeline of how Brooklyn grew, from data anyone can open.", re: "Pre-war stock dominates: renovation, permits and landmark rules shape every deal here." }, src: "Source: NYC PLUTO · year built" });
-      ch.push({ aud: "edu re", eyebrow: "Landmarks", title: `${fmt(brown)} brownstones, protected.`, line: `${fmt(lmTotal)} buildings sit inside the Park Slope Historic Districts. The most common style is ${styles[0]?.style_prim} (${fmt(styles[0]?.n)}), then ${styles[1]?.style_prim}. ${arch.arch_build} designed or built ${fmt(arch.n)} of them.`,
-        chart: bars(styles.slice(0, 6).map((r) => [r.style_prim, num(r.n)])), map: { mode: "year", bearing: 55, pitch: 64 }, legend: "year",
-        why: { edu: "Architecture history you can map: styles, builders and materials, building by building.", re: "Landmarked blocks: exterior changes need Landmarks Preservation Commission approval." }, src: "Source: NYC Landmarks Preservation Commission · Building Database" });
-      ch.push({ aud: "edu biz open", eyebrow: "What's here", title: "Two-families and walk-ups.", line: `${fmt(u.two_family)} two-family houses and ${fmt(u.multifamily)} apartment buildings make up most of the neighborhood. ${fmt(u.mixed_use)} more put shops below and homes above.`,
-        chart: bars(topEntries(u, 7, USE)), map: { mode: "use", bearing: 90 }, legend: "use",
-        why: { edu: "How a neighborhood is used, lot by lot.", biz: "Mixed-use corridors are where storefront businesses live.", open: "Mixed-use blocks are where a storefront fits the neighborhood." }, src: "Source: NYC PLUTO · building class" });
-      ch.push({ aud: "re biz", eyebrow: "Who owns it", title: `1 in ${Math.round(d.n / Math.max(ent, 1))} lots is owned by a company.`, line: `${fmt(ent)} lots are owned by an LLC or corporation, and ${fmt(o.trust)} by a trust. For ${fmt(d.llc_with_person)} of the company-owned buildings, the person behind the LLC is on file with the city.`,
-        chart: bars(topEntries(o, 5, OWN, ["unknown"])), map: { mode: "owner", bearing: 130 }, legend: "share:Share owned by a company",
-        why: { re: "Company owners are reachable: the registered person is the decision maker.", biz: "Know who controls the buildings your clients want to lease or buy." }, src: "Sources: NYC PLUTO · HPD Registration Contacts" });
-      ch.push({ aud: "re biz", eyebrow: "What's moving", title: `${fmt(sales.n)} sales in 12 months.`, line: `The median sale was ${money(sales.median)}. ${pm ? monthName(pm) : ""} was the busiest month, with ${fmt(pmN)} closings.`,
-        chart: cols(Object.entries(sales.by_month || {}), pm), map: { mode: "count", bearing: 170 }, legend: "count",
-        why: { re: "Velocity and price in one view: pricing a listing or an offer starts here.", biz: "Steady turnover signals a liquid market for your clients." }, src: "Source: NYC Department of Finance · Rolling Sales" });
-      ch.push({ aud: "open biz edu", eyebrow: "New businesses", title: `${fmt(corpLast?.[1])} new companies in 2025.`, line: `That many companies listed a filing address in ZIP 11215 last year, and ${fmt(corpNow?.[1])} so far this year. ${fmt((B.lic_points || []).length)} city-licensed storefront businesses are active here, led by ${(cats[0]?.[0] || "").toLowerCase()} and ${(cats[1]?.[0] || "").toLowerCase()}.`,
-        chart: cols(corp, corpMax[0]), map: { mode: "licenses", bearing: 200 }, legend: "licenses",
-        why: { open: "See who opened nearby, and when: competition and demand on one map.", biz: "New-company filings show where entrepreneurs are betting.", edu: "Entrepreneurship, measured year by year." }, src: "Sources: NYS Department of State · corporations · NYC Dept. of Consumer and Worker Protection · licensed businesses" });
-      ch.push({ aud: "edu re open", eyebrow: "Living here", title: "What neighbors call about.", line: `${c311[0]?.[0]} leads 311 calls since last October (${fmt(c311[0]?.[1])}), then ${(c311[1]?.[0] || "").toLowerCase()} and ${(c311[2]?.[0] || "").toLowerCase()}. Housing inspectors logged ${fmt(hpdMax[1])} violations here in ${hpdMax[0]}, the most of any year on record.`,
-        chart: bars(c311.slice(0, 6)), map: { mode: "count", bearing: 230 }, legend: "count",
-        why: { edu: "Civic data in action: what a community reports, and how it changes year to year.", re: "Heat and hot water complaints point to buildings that need work.", open: "Parking and noise complaints tell you what a new business will be up against." }, src: "Sources: NYC 311 · HPD Housing Maintenance Code Violations (back to 1968)" });
-      ch.push({ aud: "edu biz open", eyebrow: "Green + transit", title: `${fmt(trees)} street trees. ${stations} subway stations.`, line: `${species[0]?.[0]}s (${fmt(species[0]?.[1])}) and ${(species[1]?.[0] || "").toLowerCase()}s (${fmt(species[1]?.[1])}) line the streets. ${fmt(entrances)} subway entrances serve the neighborhood and its edges.`,
-        chart: bars(species.slice(0, 5)), map: { mode: "transit", bearing: 260, pitch: 50 }, legend: "transit",
-        why: { edu: "Urban ecology and transit on one map.", biz: "Foot traffic follows the trains: entrances mark the strongest storefront blocks.", open: "Pick a spot near the entrances: that's where the foot traffic is." }, src: "Sources: 2015 Street Tree Census · MTA Subway Entrances and Exits" });
-      ch.push({ aud: "biz open", eyebrow: "Business view", title: `${fmt(bizN)} business lots.`, line: `${fmt(biz.mixed_use?.[0])} mixed-use, ${fmt(biz.commercial?.[0])} commercial, ${fmt(biz.industrial?.[0])} industrial and ${fmt(biz.parking?.[0])} parking lots, assessed at ${money(d.biz_value)} together.`,
-        chart: bars(Object.entries(biz).map(([k, v]) => [USE[k] || k, v[0]])), map: { mode: "biz", bearing: 290 }, legend: "use",
-        why: { biz: "A ready prospect list: every business lot, its owner and its building.", open: "Every space a business could go, and who owns it." }, src: "Source: NYC PLUTO · building class and assessed value" });
-      ch.push({ aud: "re biz open edu", eyebrow: "Ways to add value", title: `${fmt(d.unbuilt_lots)} lots could build bigger.`, line: `On paper, current zoning leaves ${fmt(d.unbuilt_sqft)} square feet unbuilt across those lots; landmark rules still apply. Add ${fmt(u.vacant_res)} empty lots, ${fmt(u.parking)} parking lots, and ${fmt(d.llc_with_person)} company owners whose decision maker is on file.`,
-        chart: bars([["Room to build 1,000+ sq ft", d.unbuilt_lots], ["Homes built before 1960", d.pre1960_res], ["LLC owner, person on file", d.llc_with_person], ["Parking lots", u.parking || 0], ["Empty lots", u.vacant_res || 0]]),
-        map: { mode: "valueadd", bearing: 320 }, legend: "valueadd",
-        why: { re: "Unused zoning and underbuilt lots are where development value hides.", biz: "Parking and underbuilt lots are where a client's next location gets built.", open: "Underused lots and parking are where a new business can go up.", edu: "Zoning in action: what the rules allow versus what stands today." }, src: "Sources: NYC PLUTO · zoning floor area · HPD Registration Contacts" });
+        src: "Sources in this story: Wikipedia · NYC PLUTO · Landmarks Preservation Commission · Street Tree Census · MTA · NYS corporations · NYC licensed businesses" });
+      ch.push(...tales);
+      ch.push({ eyebrow: "Origins", title: `Built around ${Math.round(d.median_year)}.`, line: `Half of Park Slope's buildings went up before ${Math.round(d.median_year)}. ${fmt(peakDecN)} still standing date to the ${peakDec}s, the busiest decade on record here.`,
+        chart: cols(decades.filter((r) => parseInt(r[0]) >= 1850), peakDec + "s"), map: { mode: "year", bearing: 15 }, legend: "year", src: "Source: NYC PLUTO · year built" });
+      ch.push({ eyebrow: "Landmarks", title: `${fmt(brown)} brownstones, protected.`, line: `${fmt(lmTotal)} buildings sit inside the Park Slope Historic Districts. The most common style is ${styles[0]?.style_prim} (${fmt(styles[0]?.n)}), then ${styles[1]?.style_prim}. ${arch.arch_build} designed or built ${fmt(arch.n)} of them.`,
+        chart: bars(styles.slice(0, 6).map((r) => [r.style_prim, num(r.n)])), map: { mode: "year", bearing: 55, pitch: 64 }, legend: "year", src: "Source: NYC Landmarks Preservation Commission · Building Database" });
+      ch.push(...facts.slice(0, 2));
+      ch.push({ eyebrow: "What's here", title: "Two-families and walk-ups.", line: `${fmt(u.two_family)} two-family houses and ${fmt(u.multifamily)} apartment buildings make up most of the neighborhood. ${fmt(u.mixed_use)} more put shops below and homes above.`,
+        chart: bars(topEntries(u, 7, USE)), map: { mode: "use", bearing: 90 }, legend: "use", src: "Source: NYC PLUTO · building class" });
+      ch.push({ eyebrow: "Main street", title: `${fmt((B.lic_points || []).length)} storefront businesses.`, line: `City-licensed businesses line the avenues, led by ${(cats[0]?.[0] || "").toLowerCase()} and ${(cats[1]?.[0] || "").toLowerCase()}. ${fmt(corpLast?.[1])} new companies listed an address in ZIP 11215 last year; the busiest year on record was ${corpMax[0]}.`,
+        chart: cols(corp, corpMax[0]), map: { mode: "licenses", bearing: 200 }, legend: "licenses", src: "Sources: NYC Dept. of Consumer and Worker Protection · licensed businesses · NYS Department of State · corporations" });
+      ch.push({ eyebrow: "Green + transit", title: `${fmt(trees)} street trees. ${stations} subway stations.`, line: `${species[0]?.[0]}s (${fmt(species[0]?.[1])}) and ${(species[1]?.[0] || "").toLowerCase()}s (${fmt(species[1]?.[1])}) line the streets. ${fmt(entrances)} subway entrances serve the neighborhood and its edges.`,
+        chart: bars(species.slice(0, 5)), map: { mode: "transit", bearing: 260, pitch: 50 }, legend: "transit", src: "Sources: 2015 Street Tree Census · MTA Subway Entrances and Exits" });
     }
 
     if (key === "east-hampton") {
-      const held = d.held_since_2021, hk = d.held_known, homes = (d.groups || {})[1] || 0, biz = d.biz || {};
-      const corp = series(B.corp_by_year), corpLast = corp.find((r) => r[0] === "2025"), corpMax = corp.reduce((b, r) => (r[1] > b[1] ? r : b), ["", 0]);
-      const t1 = (B.corp_types || [])[0]?.entity_type || "";
-      ch.push({ aud: "all", eyebrow: "Suffolk County · Long Island", title: "East Hampton", line: `${fmt(d.n)} parcels across ${fmt(Math.round(d.acres))} acres. A resort town's story, told by its assessment roll.`,
-        chart: stats([[fmt(d.n), "parcels"], [fmt(Math.round(d.acres)), "acres"], [pct(held, hk) + "%", "same owner since 2021"]]), map: { mode: "count", bearing: -15 },
-        src: "Sources in this story: NYS assessment rolls 2025 + 2021 · NYS tax parcels · NYS corporations. Year built and values are not published for East Hampton on this roll yet." });
-      ch.push(walk);
-      ch.push({ aud: "edu biz open", eyebrow: "What's here", title: `${fmt(u.one_family)} homes. ${fmt(u.vacant_res)} open lots.`, line: `Single-family houses make up ${pct(u.one_family, d.n)}% of the town. Add ${fmt(u.motel_hotel)} hotels and motels, ${fmt(u.marina)} marinas and ${fmt(u.golf)} golf courses.`,
-        chart: bars(topEntries(u, 7, USE)), map: { mode: "use", bearing: 25 }, legend: "use",
-        why: { edu: "A resort economy, read straight from land use.", biz: "Hospitality, marine and retail parcels, each with its owner on the roll.", open: "A seasonal market: hospitality and services follow the summer crowd." }, src: "Source: NYS assessment roll 2025 · property class" });
-      ch.push({ aud: "re edu", eyebrow: "Staying power", title: `${pct(held, hk)}% haven't changed hands since 2021.`, line: `${fmt(held)} of ${fmt(hk)} parcels show the same owner on both the 2021 and the 2025 roll.`,
-        chart: bars([["Same owner since 2021", held], ["Changed hands", hk - held]]), map: { mode: "held", bearing: 70 }, legend: "share:Share held since 2021",
-        why: { edu: "Turnover measured, not guessed: two public rolls, four years apart.", re: "The parcels that changed hands show where the market moved. The long holds are the owners to know before they sell." }, src: "Source: NYS assessment rolls 2021 + 2025" });
-      ch.push({ aud: "re biz", eyebrow: "Who owns it", title: `${fmt(o.trust)} trusts. ${fmt(o.entity)} companies.`, line: `Individuals own ${fmt(o.individual)} parcels. ${fmt(o.estate)} are held by an estate, where the next decision belongs to the family.`,
-        chart: bars(topEntries(o, 5, OWN, ["unknown"])), map: { mode: "owner", bearing: 115 }, legend: "share:Share owned by a company",
-        why: { re: "Trusts and estates are where planning and probate meet real estate.", biz: "Company-held parcels point to investors and operators." }, src: "Source: NYS assessment roll 2025 · owner names" });
-      ch.push({ aud: "re edu", eyebrow: "Who lives here", title: `About 1 in ${Math.round(homes / Math.max(d.occupied, 1))} homes shows the owner living there.`, line: `${fmt(d.occupied)} parcels carry an owner-lives-here mark on the roll, out of ${fmt(homes)} houses.`,
-        chart: bars([["Owner lives there", d.occupied], ["Not marked", Math.max(homes - d.occupied, 0)]]), map: { mode: "occupied", bearing: 160 }, legend: "share:Share where the owner lives there",
-        why: { re: "In a second-home market, the owner is often somewhere else. The mailing address says where.", edu: "How a seasonal town differs from a year-round neighborhood." }, src: "Source: NYS assessment roll 2025" });
-      ch.push({ aud: "open biz edu", eyebrow: "New businesses", title: `${fmt(corpLast?.[1])} new companies in 2025.`, line: `Companies with an East Hampton filing address: ${fmt(corpMax[1])} in ${corpMax[0]}, the busiest year since 2000. Most are ${t1.toLowerCase().replace("domestic ", "New York ")}s.`,
-        chart: cols(corp, corpMax[0]), map: { mode: "biz", bearing: 190 }, legend: "use",
-        why: { open: "New filings show how many people are starting something here, and when.", biz: "A rising count of new companies means more buyers for your clients' businesses.", edu: "Entrepreneurship, measured year by year." }, src: "Source: NYS Department of State · active corporations" });
-      ch.push({ aud: "biz open", eyebrow: "Business view", title: "The business of a resort town.", line: `${fmt(biz.commercial?.[0])} commercial parcels, ${fmt(biz.motel_hotel?.[0])} hotels and motels, ${fmt(biz.marina?.[0])} marinas, ${fmt(biz.golf?.[0])} golf courses and ${fmt(biz.strip_center?.[0])} shopping centers.`,
-        chart: bars(Object.entries(biz).map(([k, v]) => [USE[k] || k, v[0]]).slice(0, 8)), map: { mode: "biz", bearing: 220 }, legend: "use",
-        why: { biz: "Every hospitality and marine business parcel, with its owner, ready to work.", open: "Where the existing businesses are, so you can find the gap." }, src: "Source: NYS assessment roll 2025 · property class" });
-      ch.push({ aud: "re biz open edu", eyebrow: "Ways to add value", title: `${fmt(u.vacant_res)} empty home lots.`, line: `Plus ${fmt(u.vacant_other)} other vacant parcels and ${fmt(u.vacant_commercial)} vacant commercial ones. ${fmt(o.estate)} estate-held homes and ${fmt(o.trust)} trusts are where the next owner gets decided.`,
-        chart: bars([["Empty home lots", u.vacant_res || 0], ["Trust-owned", o.trust || 0], ["Other vacant", u.vacant_other || 0], ["Estate-held", o.estate || 0], ["Vacant commercial", u.vacant_commercial || 0]]),
-        map: { mode: "valueadd", bearing: 300 }, legend: "valueadd",
-        why: { re: "Empty lots to build on, and estates and trusts where a sale often follows.", biz: "Vacant commercial parcels are a client's next location.", open: "Vacant commercial land is where something new can open.", edu: "How land waits for its next use." }, src: "Source: NYS assessment roll 2025" });
+      ch.push({ eyebrow: "Suffolk County · Long Island", title: "East Hampton", line: `${fmt(d.n)} parcels across ${fmt(Math.round(d.acres))} acres on the South Fork of Long Island. This is its story, told by public record.`,
+        chart: stats([[fmt(d.n), "parcels"], [fmt(Math.round(d.acres)), "acres"], [fmt(u.one_family), "houses"]]), map: { mode: "count", bearing: -15 },
+        src: "Sources in this story: Wikipedia · NYS assessment roll 2025 · NYS tax parcels · NYS corporations" });
+      ch.push(...tales);
+      ch.push(...facts.slice(0, 2));
+      ch.push({ eyebrow: "What's here", title: `${fmt(u.one_family)} houses. ${fmt(u.marina)} marinas.`, line: `Single-family houses make up ${pct(u.one_family, d.n)}% of the town, alongside ${fmt(u.motel_hotel)} hotels and motels${u.golf ? ` and ${fmt(u.golf)} golf courses` : ""}${u.agricultural ? `, plus ${fmt(u.agricultural)} farms` : ""}.`,
+        chart: bars(topEntries(u, 7, USE)), map: { mode: "use", bearing: 25 }, legend: "use", src: "Source: NYS assessment roll 2025 · property class" });
+      ch.push({ eyebrow: "Main street", title: `${fmt(corpLast?.[1])} new companies in 2025.`, line: `Companies with an East Hampton address: ${fmt(corpMax[1])} in ${corpMax[0]}, the busiest year since 2000.`,
+        chart: cols(corp, corpMax[0]), map: { mode: "biz", bearing: 190 }, legend: "use", src: "Source: NYS Department of State · active corporations" });
     }
 
     if (key === "coral-gables") {
-      const s = d.fl_sales || {}, [pm, pmN] = peak(s.by_month), months = Object.keys(s.by_month || {}).sort();
-      const vb = d.value_buckets || {}, biz = d.biz || {};
-      ch.push({ aud: "all", eyebrow: "Miami-Dade County · Florida", title: "Coral Gables", line: `${fmt(d.n)} parcels worth ${money(d.total_value)} on the county roll. This is its story, told by public record.`,
-        chart: stats([[fmt(d.n), "parcels"], [money(d.total_value).replace(" billion", "B"), "market value"], [fmt(d.occupied), "homesteads"]]), map: { mode: "count", bearing: -25 },
-        src: "Sources in this story: Florida Department of Revenue tax roll · Florida parcel map" });
-      ch.push(walk);
-      ch.push({ aud: "edu re", eyebrow: "Origins", title: `${fmt(d.decades?.["1920"])} buildings from the 1920s still stand.`, line: `The oldest dates to ${d.oldest}. The biggest building wave came in the ${peakDec}s, with ${fmt(peakDecN)}.`,
-        chart: cols(decades, peakDec + "s"), map: { mode: "year", bearing: 20 }, legend: "year",
-        why: { edu: "A city's founding decade, still standing in its buildings.", re: "The age mix shows where renovation and new construction meet." }, src: "Source: Florida Department of Revenue · year built" });
-      ch.push({ aud: "edu biz open", eyebrow: "What's here", title: `${fmt(u.one_family)} houses. ${fmt(u.condo)} condos.`, line: `${fmt(u.commercial)} commercial parcels and ${fmt(num(u.multifamily_small) + num(u.multifamily))} apartment buildings round it out.`,
-        chart: bars(topEntries(u, 7, USE)), map: { mode: "use", bearing: 65 }, legend: "use",
-        why: { edu: "How a planned city is used today, parcel by parcel.", biz: "Commercial corridors and their owners, on one map.", open: "Condo towers and houses nearby: the customers a new business would serve." }, src: "Source: Florida Department of Revenue · land use code" });
-      ch.push({ aud: "re edu", eyebrow: "Who lives here", title: `${fmt(d.occupied)} homesteads.`, line: `The owner lives there in ${pct(d.occupied, d.n)}% of parcels. ${fmt(d.absentee)} owners get their mail somewhere else, and ${fmt(d.out_of_state)} live outside Florida.`,
-        chart: bars([["Homestead (owner lives there)", d.occupied], ["Absentee owner", d.absentee], ["Out-of-state owner", d.out_of_state]]), map: { mode: "occupied", bearing: 110 }, legend: "share:Share where the owner lives there",
-        why: { re: "Absentee and out-of-state owners: sellers who aren't watching the market every day.", edu: "Who lives in a city, versus who owns it." }, src: "Source: Florida Department of Revenue · homestead exemption and mailing address" });
-      ch.push({ aud: "re biz", eyebrow: "Who owns it", title: `${pct(o.entity, d.n)}% owned by companies.`, line: `${fmt(o.entity)} parcels belong to an LLC or corporation, ${fmt(o.trust)} to trusts and ${fmt(o.estate)} to estates.`,
-        chart: bars(topEntries(o, 5, OWN, ["unknown"])), map: { mode: "owner", bearing: 150 }, legend: "share:Share owned by a company",
-        why: { re: "Company owners can be unmasked: the add-on finds the officers behind each one.", biz: "Know which operators and investors already hold the corridor." }, src: "Source: Florida Department of Revenue · owner names" });
-      ch.push({ aud: "re", eyebrow: "What it's worth", title: `Median home: ${money(d.res_median_value)}.`, line: `${fmt(vb["f5M+"])} homes are valued over $5 million, and ${fmt(vb["e2-5M"])} more between $2 and $5 million.`,
-        chart: bars([["Under $250K", vb["a<250K"] || 0], ["$250K–500K", vb["b250-500K"] || 0], ["$500K–1M", vb["c500K-1M"] || 0], ["$1–2M", vb["d1-2M"] || 0], ["$2–5M", vb["e2-5M"] || 0], ["$5M+", vb["f5M+"] || 0]]),
-        map: { mode: "value", bearing: 195, pitch: 62 }, legend: "value", why: { re: "Where the money is, block by block." }, src: "Source: Florida Department of Revenue · just (market) value" });
-      ch.push({ aud: "re biz", eyebrow: "What's moving", title: `${fmt(s.n)} sales since ${months[0] ? monthName(months[0]) : ""}.`, line: `The median sale was ${money(s.median)}. ${pm ? monthName(pm) : ""} was the busiest month, with ${fmt(pmN)}.`,
-        chart: cols(months.map((k) => [k, s.by_month[k]]), pm), map: { mode: "count", bearing: 235 }, legend: "count",
-        why: { re: "Velocity and price: the market's pulse in one chart.", biz: "Active turnover means buyers are already in the market." }, src: "Source: Florida Department of Revenue · sales on the roll" });
-      ch.push({ aud: "biz open", eyebrow: "Business view", title: `${fmt(biz.commercial?.[0])} commercial parcels.`, line: `Worth ${money(biz.commercial?.[1])} together, plus ${fmt(biz.motel_hotel?.[0])} hotels and ${fmt(biz.parking?.[0])} parking parcels. All business parcels: ${money(d.biz_value)}.`,
-        chart: bars(Object.entries(biz).map(([k, v]) => [USE[k] || k, v[0]])), map: { mode: "biz", bearing: 280 }, legend: "use",
-        why: { biz: "Every commercial parcel, its value and its owner: a prospect list for your clients.", open: "Every commercial space in town, and who owns it." }, src: "Source: Florida Department of Revenue · land use and just value" });
-      ch.push({ aud: "re biz open edu", eyebrow: "Ways to add value", title: `${fmt(d.pre1960_res)} homes built before 1960.`, line: `Older homes are renovation and rebuild candidates. ${fmt(u.vacant_res)} empty home lots and ${fmt(u.vacant_commercial)} vacant commercial parcels are ready to build. ${fmt(d.absentee)} absentee owners and ${fmt(d.entity_with_mail_elsewhere)} companies mailing from elsewhere are the owners to approach.`,
-        chart: bars([["Homes built before 1960", d.pre1960_res], ["Absentee owners", d.absentee], ["Companies mailing elsewhere", d.entity_with_mail_elsewhere], ["Empty home lots", u.vacant_res || 0], ["Vacant commercial", u.vacant_commercial || 0]]),
-        map: { mode: "valueadd", bearing: 330 }, legend: "valueadd",
-        why: { re: "Renovate, rebuild or buy from an owner who isn't watching: three ways in.", biz: "Vacant commercial parcels are a client's next location.", open: "Vacant commercial land is where something new can open.", edu: "How a city renews itself, house by house." }, src: "Source: Florida Department of Revenue · year built, land use, mailing address" });
+      ch.push({ eyebrow: "Miami-Dade County · Florida", title: "Coral Gables", line: `${fmt(d.n)} parcels. ${fmt(d.decades?.["1920"])} buildings from the 1920s still stand, the oldest from ${d.oldest}. This is its story, told by public record.`,
+        chart: stats([[fmt(d.n), "parcels"], [fmt(d.decades?.["1920"]), "from the 1920s"], [String(d.oldest || "—"), "oldest"]]), map: { mode: "count", bearing: -25 },
+        src: "Sources in this story: Wikipedia · Florida Department of Revenue tax roll · Florida parcel map" });
+      ch.push(...tales);
+      ch.push({ eyebrow: "Origins", title: `The ${peakDec}s built the most.`, line: `${fmt(peakDecN)} of today's buildings went up in the ${peakDec}s, the biggest building wave on record here.`,
+        chart: cols(decades, peakDec + "s"), map: { mode: "year", bearing: 20 }, legend: "year", src: "Source: Florida Department of Revenue · year built" });
+      ch.push(...facts.slice(0, 2));
+      ch.push({ eyebrow: "What's here", title: `${fmt(u.one_family)} houses. ${fmt(u.condo)} condos.`, line: `${fmt(u.commercial)} commercial parcels and ${fmt(num(u.multifamily_small) + num(u.multifamily))} apartment buildings round it out.`,
+        chart: bars(topEntries(u, 7, USE)), map: { mode: "use", bearing: 65 }, legend: "use", src: "Source: Florida Department of Revenue · land use code" });
     }
-    ch.push(finale);
+    ch.push(walk);
+    ch.push(dataverseChapter(dv));
     return ch;
   }
 
   function dataverseChapter(dv) {
     const tables = dv.reduce((s, c) => s + c.tables, 0), rows = dv.reduce((s, c) => s + c.rows, 0), geo = dv.reduce((s, c) => s + c.geo, 0), parcel = dv.reduce((s, c) => s + c.parcel, 0);
     const top = dv.slice().sort((a, b) => b.rows - a.rows).slice(0, 9).map((c) => [`${c.portal} ${c.cat}`, c.rows, short(c.rows)]);
-    return { aud: "all", eyebrow: "The Dataverse", title: "Every neighborhood. All the data.", final: true,
+    return { eyebrow: "The Dataverse", title: "Every neighborhood. All the data.", final: true,
       line: `NYC and New York State Open Data hold ${fmt(tables)} tables and ${(rows / 1e9).toFixed(2)} billion rows: transportation, housing, safety, health, schools, business and the environment. ${fmt(geo)} of them can be placed on a map, and ${fmt(parcel)} tie straight to a lot. Florida adds the county tax roll for every parcel.`,
       chart: bars(top), map: { mode: "count", bearing: 0, pitch: 35, zoomOut: 1.4 }, legend: "count",
-      why: { edu: "Every NY dataset, sorted by subject: a data-literacy lab built on real places.", re: "Every parcel's full history, one click away.", biz: "Business, licenses, foot traffic and transit, mapped for your clients.", open: "Find the block, the building and the owner before you sign a lease." },
       src: "Source: NYC + NYS Open Data inventory (Oct 27, 2026) · Florida Department of Revenue" };
+  }
+
+  // ── History, from Wikipedia ─────────────────────────────
+  // The neighborhood's own article gives the History chapters, in order; the articles nearby give the stops and the
+  // "did you know" stories. Sentences about money are left out on purpose.
+  const WIKI = "https://en.wikipedia.org/w/api.php";
+  const BROAD = /^(Long Island|New York( City| \(state\))?|Florida|Brooklyn|Queens|Manhattan|The Bronx|Staten Island|.+ County, (New York|Florida)|.+ \(town\), New York)$/;
+  const WIKI_TITLE = { "park-slope": "Park Slope", "east-hampton": "East Hampton, New York", "coral-gables": "Coral Gables, Florida" };
+  const MONEY = /\$|\bdollars?\b|\bprices?d?\b|\bincomes?\b|\brents?\b|\brental\b|\bvalued?\b|\bvalues\b|\bworth\b|\bcosts?\b|\bsold for\b|\bmortgages?\b|\baffordab|\bwealth|\bpoverty\b|\breal estate\b|\binvest|\bmillions? of\b|\bbillions?\b|\btax(es)?\b|\brealt(or|y)|\blandlord|\bgentrif|\bevict|\bspeculat|\bforeclos/i;
+  const YEAR = new Date().getFullYear();
+  const wikiGet = (params) => fetch(WIKI + "?" + new URLSearchParams({ format: "json", origin: "*", ...params })).then((r) => r.json());
+  const withTimeout = (p, ms) => Promise.race([p, new Promise((r) => setTimeout(() => r(null), ms))]);
+  const meters = (a, b) => { const k = Math.PI / 180, x = Math.sin(((b[1] - a[1]) * k) / 2) ** 2 + Math.cos(a[1] * k) * Math.cos(b[1] * k) * Math.sin(((b[0] - a[0]) * k) / 2) ** 2; return 12742000 * Math.asin(Math.sqrt(x)); };
+  const walkMin = (m) => Math.max(1, Math.round(m / 80));   // about 80 m a minute
+  const mins = (m) => (walkMin(m) === 1 ? "a minute" : walkMin(m) + " minutes");
+  const titleCase = (s) => String(s || "").toLowerCase().replace(/\b([a-z])/g, (c) => c.toUpperCase()).replace(/\b(\d+)(St|Nd|Rd|Th)\b/g, (m, n, x) => n + x.toLowerCase());
+  const firstSentence = (t) => (sentences(t)[0] || t || "");
+
+  function sentences(t) {
+    const clean = String(t || "").replace(/\s*\([^()]*(\/|listen|pronounc|IPA|born )[^()]*\)/g, "").replace(/\s*\((b|d|c)\.\s[^()]*\)/g, "")
+      .replace(/\s+/g, " ").replace(/\s+,/g, ",").replace(/,(\s*,)+/g, ",").trim();
+    return (clean.match(/[^.!?]+[.!?]+["”)]?(?=\s+[A-Z0-9"“(]|\s*$)/g) || []).map((s) => s.trim().replace(/^[,;:]\s*/, ""));
+  }
+  function clip(t, words = 70) {
+    const out = []; let n = 0;
+    for (const s of sentences(t)) {
+      const w = s.split(" ").length;
+      if (MONEY.test(s) || w < 4 || /^[a-z]/.test(s)) continue;   // money stays out; so do fragments like "m." from a split "a.m."
+      if (n && n + w > words) break;
+      out.push(s); n += w;
+    }
+    return out.join(" ");
+  }
+  async function wikiPage(title) {
+    if (!title) return null;
+    const r = await wikiGet({ action: "query", prop: "extracts|coordinates|info", inprop: "url", explaintext: "1", exsectionformat: "wiki", redirects: "1", titles: title }).catch(() => null);
+    const p = r && r.query && Object.values(r.query.pages || {})[0];
+    if (!p || p.missing !== undefined || !p.extract) return null;
+    const c = (p.coordinates || [])[0];
+    return { title: p.title, url: p.fullurl || "https://en.wikipedia.org/wiki/" + encodeURIComponent(p.title.replace(/ /g, "_")), at: c ? [c.lon, c.lat] : null, text: p.extract };
+  }
+  // Search by name, then make sure the article is about this place: its own coordinates must sit within 30 km.
+  async function wikiHistory(names, center) {
+    for (const q of names.filter(Boolean)) {
+      const r = await wikiGet({ action: "query", list: "search", srsearch: q, srlimit: "5", srnamespace: "0" }).catch(() => null);
+      const want = q.split(",")[0].trim().toLowerCase();
+      for (const s of ((r && r.query && r.query.search) || []).filter((s) => s.title.toLowerCase().startsWith(want)).slice(0, 2)) {
+        const page = await wikiPage(s.title);
+        if (page && page.at && meters(page.at, center) < 30000) return page;
+      }
+    }
+    return null;
+  }
+  function historyParts(text) {
+    const re = /\n(={2,})\s*([^=\n]+?)\s*\1\n/g, heads = []; let m;
+    while ((m = re.exec(text))) heads.push({ level: m[1].length, title: m[2], start: m.index, body: re.lastIndex });
+    const sec = heads.map((h, k) => ({ ...h, text: text.slice(h.body, k + 1 < heads.length ? heads[k + 1].start : text.length).trim() }));
+    const intro = text.slice(0, heads.length ? heads[0].start : text.length).trim();
+    const hi = sec.findIndex((s) => s.level === 2 && /^(history|early history|origins|historical)/i.test(s.title));
+    if (hi < 0) return intro ? [{ title: "", text: intro }] : [];
+    const out = sec[hi].text ? [{ title: "", text: sec[hi].text }] : [];
+    for (let k = hi + 1; k < sec.length && sec[k].level > 2; k++) if (sec[k].text) out.push({ title: sec[k].title, text: sec[k].text });
+    return out;
+  }
+  const STOP_WORDS = /^(the|saint|st\.?|church|street|avenue|school|park|house|building|station|public|first|new|old|north|south|east|west)$/i;
+  function pickStop(stops, text, used) {
+    const low = text.toLowerCase();
+    let s = stops.find((x) => {
+      if (used.has(x.title)) return false;
+      const base = x.title.replace(/ \(.*\)$/, "").split(",")[0], word = base.split(" ").find((w) => w.length >= 6 && !STOP_WORDS.test(w));
+      return low.includes(base.toLowerCase()) || (word && low.includes(word.toLowerCase()));
+    });
+    if (!s) s = stops.find((x) => !used.has(x.title));
+    if (s) used.add(s.title);
+    return s || null;
+  }
+  function talesFrom(page, stops) {
+    if (!page) return [];
+    let parts = historyParts(page.text);
+    if (parts.length === 1) {
+      const paras = [];
+      for (const line of parts[0].text.split(/\n+/).map((x) => x.trim()).filter(Boolean)) {
+        if (paras.length && (!/[.!?]["”)]?$/.test(paras[paras.length - 1]) || /^[a-z]/.test(line))) paras[paras.length - 1] += " " + line; else paras.push(line);
+      }
+      parts = paras.filter((x) => x.split(" ").length > 25).map((t) => ({ title: "", text: t }));
+    }
+    const used = new Set();
+    const ready = parts.map((p) => ({ title: p.title, line: clip(p.text) })).filter((p) => p.line.split(" ").length >= 12).slice(0, 5);
+    return ready.map((p, k) => {
+      const year = (p.line.match(/\b(1[5-9]\d\d|20[0-2]\d)\b/) || [])[1];
+      const head = p.title ? p.title.replace(/^(\d)/, "The $1").replace(/^./, (c) => c.toUpperCase()) + "." : year ? `Around ${year}.` : k === 0 ? "How it began." : "What came next.";
+      const stop = pickStop(stops, p.line, used);
+      return { eyebrow: `History · ${k + 1} of ${ready.length}`, title: head, line: p.line, at: stop ? stop.at : null, zoom: 16, pitch: 62, bearing: 30 + k * 40,
+        pins: stop ? [{ at: stop.at, label: stop.title }] : [], map: { mode: "none" }, src: `Source: Wikipedia, “${page.title}” (CC BY-SA)`, srcUrl: page.url, stopTitle: stop ? stop.title : null };
+    });
+  }
+  // A "did you know" for each place nearby the history did not already visit.
+  function didYouKnow(stops, tales) {
+    const seen = new Set(tales.map((t) => t.stopTitle).filter(Boolean));
+    return stops.filter((s) => !seen.has(s.title)).slice(0, 3).map((s, k) => ({ eyebrow: "Did you know?", title: s.title + ".", line: s.text, at: s.at, zoom: 16.6, pitch: 64, bearing: 120 + k * 50,
+      pins: [{ at: s.at, label: s.title }], map: { mode: "none" }, src: `Source: Wikipedia, “${s.title}” (CC BY-SA)`, srcUrl: "https://en.wikipedia.org/wiki/" + encodeURIComponent(s.title.replace(/ /g, "_")) }));
+  }
+  // Places with a Wikipedia article near a point, nearest first, each with its first sentences as the story.
+  async function storiesNear(center, radius) {
+    const r = await wikiGet({ action: "query", list: "geosearch", gscoord: `${center[1]}|${center[0]}`, gsradius: String(Math.min(10000, radius)), gslimit: "30" }).catch(() => null);
+    // a whole island, county or borough has its pin somewhere in the middle; it is not a place nearby
+    const near = ((r && r.query && r.query.geosearch) || []).filter((g) => !/^(List of|Template:|Category:)/.test(g.title) && !BROAD.test(g.title)).slice(0, 14);
+    if (!near.length) return [];
+    const ex = await wikiGet({ action: "query", prop: "extracts", exintro: "1", explaintext: "1", exsentences: "3", exlimit: "20", titles: near.map((g) => g.title).join("|") }).catch(() => null);
+    const byTitle = new Map(Object.values((ex && ex.query && ex.query.pages) || {}).map((p) => [p.title, p.extract || ""]));
+    return near.map((g) => ({ title: g.title, at: [g.lon, g.lat], d: g.dist, text: clip(byTitle.get(g.title) || "", 48) })).filter((s) => s.text.split(" ").length >= 8);
+  }
+
+  // ── Live stories: any address or place in NY or FL ──────
+  const NYC_OD = "data.cityofnewyork.us", BORO_PL = { 1: "MN", 2: "BX", 3: "BK", 4: "QN", 5: "SI" };
+  const ROUTE_COLOR = { A: "#0039A6", C: "#0039A6", E: "#0039A6", B: "#FF6319", D: "#FF6319", F: "#FF6319", M: "#FF6319", G: "#6CBE45",
+    J: "#996633", Z: "#996633", L: "#A7A9AC", N: "#FCCC0A", Q: "#FCCC0A", R: "#FCCC0A", W: "#FCCC0A", 1: "#EE352E", 2: "#EE352E", 3: "#EE352E",
+    4: "#00933C", 5: "#00933C", 6: "#00933C", 7: "#B933AD", S: "#808183", SIR: "#0039A6" };
+  const routeBadge = (r) => `<span class="rt" style="background:${ROUTE_COLOR[r] || "#808183"};color:${"NQRW".includes(r) && r.length === 1 ? "#000" : "#fff"}">${esc(r)}</span>`;
+  const BIZ = { food_and_drink: "Restaurants and cafes", food_and_drink_stores: "Food shops", store_like: "Shops", commercial_services: "Services", lodging: "Hotels", arts_and_entertainment: "Arts and entertainment", medical: "Health care" };
+  const soda = (host, id, q) => fetch(`https://${host}/resource/${id}.json?` + new URLSearchParams(q)).then((r) => { if (!r.ok) throw new Error(id + " " + r.status); return r.json(); });
+  const tilequery = (at, layer, radius) => fetch(`https://api.mapbox.com/v4/mapbox.mapbox-streets-v8/tilequery/${at[0]},${at[1]}.json?` + new URLSearchParams({ radius: String(radius), limit: "50", layers: layer, access_token: MAPBOX_TOKEN }))
+    .then((r) => r.json()).then((d) => d.features || []).catch(() => []);
+  const tlist = (rows) => `<ul class="tlist">${rows.map(([badge, name, right]) => `<li><span class="tb">${badge}</span><span class="tn">${esc(name)}</span><b>${esc(right)}</b></li>`).join("")}</ul>`;
+
+  async function reverse(at, types = "neighborhood,locality,place,district,region") {
+    const r = await fetch("https://api.mapbox.com/search/geocode/v6/reverse?" + new URLSearchParams({ longitude: String(at[0]), latitude: String(at[1]), types, access_token: MAPBOX_TOKEN })).then((x) => x.json()).catch(() => null);
+    const g = {}; for (const f of (r && r.features) || []) g[f.properties.feature_type] = g[f.properties.feature_type] || f.properties.name;
+    return g;
+  }
+  let docCodes = null;
+  async function nycDeeds(b, block, lot) {
+    if (!docCodes) docCodes = soda(NYC_OD, "7isb-wh4c", { $limit: "500" }).then((rows) => new Map(rows.map((r) => [String(r.doc__type).trim(), r]))).catch(() => { docCodes = null; return new Map(); });
+    const legals = await soda(NYC_OD, "8h5j-fqxa", { $where: `borough='${b}' AND block='${block}' AND lot='${lot}'`, $select: "document_id", $limit: "1500" });
+    const ids = [...new Set(legals.map((l) => String(l.document_id)))].slice(0, 400);
+    if (!ids.length) return null;
+    const parts = []; for (let i = 0; i < ids.length; i += 100) parts.push(ids.slice(i, i + 100));
+    const [master, codes] = await Promise.all([Promise.all(parts.map((c) => soda(NYC_OD, "bnx9-e6tj", { $where: `document_id in(${c.map((x) => `'${x}'`).join(",")})`,
+      $select: "doc_type,document_date,recorded_datetime", $limit: "1000" }))).then((a) => a.flat()), docCodes]);
+    // a deed changes the owner; leases and easements are conveyances too, but they don't
+    const years = master.filter((m) => { const c = codes.get(String(m.doc_type || "").trim()) || {}; return c.class_code_description === "DEEDS AND OTHER CONVEYANCES" && /deed/i.test(c.doc__type_description || m.doc_type || ""); })
+      .map((m) => Number(String(m.recorded_datetime || m.document_date || "").slice(0, 4))).filter((y) => y > 1900).sort((a, b) => a - b);
+    return years.length ? { n: years.length, first: years[0], last: years[years.length - 1] } : null;
+  }
+  async function nycBuilding(bbl) {
+    const b = bbl[0], block = String(parseInt(bbl.slice(1, 6), 10)), lot = String(parseInt(bbl.slice(6), 10));
+    const [pl, blk, lpc, deeds] = await Promise.all([
+      soda(NYC_OD, "64uk-42ks", { $where: `borough='${BORO_PL[b]}' AND block='${block}' AND lot='${lot}'`, $limit: "1" }).then((r) => r[0] || null).catch(() => null),
+      soda(NYC_OD, "64uk-42ks", { $where: `borough='${BORO_PL[b]}' AND block='${block}'`, $select: "yearbuilt,landmark,histdist", $limit: "600" }).catch(() => []),
+      soda(NYC_OD, "gpmc-yuvp", { $where: `bbl='${bbl}'`, $select: "style_prim,arch_build,date_combo,use_orig,hist_dist,mat_prim", $limit: "1" }).then((r) => r[0] || null).catch(() => null),
+      nycDeeds(b, block, lot).catch(() => null),
+    ]);
+    return { pl, blk, lpc, deeds };
+  }
+  // A searched NYC address has no BBL yet: the nearest PLUTO lot within 60 m stands in.
+  async function nycLotAt(at) {
+    const r = await soda(NYC_OD, "64uk-42ks", { $where: `latitude between ${at[1] - 0.0007} and ${at[1] + 0.0007} AND longitude between ${at[0] - 0.0009} and ${at[0] + 0.0009}`,
+      $select: "bbl,yearbuilt,latitude,longitude", $limit: "200" }).catch(() => []);
+    let best = null, bd = 1e9;
+    for (const x of r) { const dd = meters(at, [+x.longitude, +x.latitude]); if (dd < bd) { bd = dd; best = x; } }
+    return best && bd < 60 ? { bbl: String(best.bbl).split(".")[0], yb: best.yearbuilt } : null;
+  }
+  let railP = null, subwayP = null;
+  const railKind = (s) => /long island rail/i.test(s.net) || /^LIRR$/i.test(s.net) ? "LIRR" : /metro-north/i.test(s.net) ? "Metro-North" : /tri-?rail/i.test(s.net) ? "Tri-Rail"
+    : /metrorail|miami-dade|^MDT$/i.test(s.net) ? "Metrorail" : /metromover/i.test(s.net) ? "Metromover" : /brightline/i.test(s.net) ? "Brightline" : /sunrail/i.test(s.net) ? "SunRail"
+    : /amtrak/i.test(s.net) ? "Amtrak" : /nj ?transit/i.test(s.net) ? "NJ Transit" : /^PATH$/i.test(s.net) ? "PATH" : /staten island/i.test(s.net) ? "Staten Island Railway"
+    : /^NFTA$/i.test(s.net) ? "Metro Rail" : s.net && s.net.length < 30 ? s.net : "Train";
+  async function transitNear(at, region) {
+    if (!railP) railP = fetch("parcelvora-rail.json").then((r) => r.json()).catch(() => { railP = null; return []; });
+    if (region === "NYC" && !subwayP) subwayP = fetch("https://data.ny.gov/resource/39hk-dx4f.json?" + new URLSearchParams({ $select: "stop_name,daytime_routes,gtfs_latitude,gtfs_longitude", $limit: "1000" }))
+      .then((r) => r.json()).catch(() => { subwayP = null; return []; });
+    const [rail, subway, tq] = await Promise.all([railP, region === "NYC" ? subwayP : [], tilequery(at, "transit_stop_label", 600)]);
+    const out = [], seen = new Set();
+    for (const s of subway || []) { const p = [+s.gtfs_longitude, +s.gtfs_latitude], d = meters(at, p); if (d < 1600) out.push({ kind: "Subway", name: s.stop_name, lines: String(s.daytime_routes || "").split(/\s+/).filter(Boolean), at: p, d }); }
+    for (const s of rail || []) { const p = [s.o, s.a], d = meters(at, p); if (d < 8000) out.push({ kind: railKind(s), name: s.n, lines: [], at: p, d }); }
+    for (const f of tq) {
+      const p = f.properties, kind = p.mode === "bus" ? "Bus" : p.mode === "ferry" ? "Ferry" : p.mode === "bicycle" ? "Bike share" : null;
+      if (!kind || !p.name || seen.has(kind + p.name)) continue;
+      seen.add(kind + p.name); out.push({ kind, name: String(p.name).replace(/^Citi Bike [–-] /, ""), lines: [], at: f.geometry.coordinates, d: p.tilequery.distance });
+    }
+    return out.sort((a, b) => a.d - b.d);
+  }
+  async function poisNear(at) {
+    const close = await tilequery(at, "poi_label", 450);
+    // in the suburbs main street is often a drive away: look within a mile when nothing is within a 5-minute walk
+    return (close.filter((f) => BIZ[f.properties.class]).length >= 3 ? close : await tilequery(at, "poi_label", 1600)).filter((f) => f.properties.name).map((f) => ({ name: f.properties.name, cls: f.properties.class, at: f.geometry.coordinates, d: f.properties.tilequery.distance }));
+  }
+  async function tract(at) {
+    const r = await fetch("https://tigerweb.geo.census.gov/arcgis/rest/services/TIGERweb/tigerWMS_Census2020/MapServer/6/query?" + new URLSearchParams({ geometry: `${at[0]},${at[1]}`,
+      geometryType: "esriGeometryPoint", inSR: "4326", spatialRel: "esriSpatialRelIntersects", outFields: "NAME,POP100,HU100,AREALAND", returnGeometry: "false", f: "json" })).then((x) => x.json()).catch(() => null);
+    return (r && r.features && r.features[0] && r.features[0].attributes) || null;
+  }
+  // NYC business improvement districts: the one this address sits in, or the closest ones.
+  async function bidNear(at) {
+    const pt = `POINT (${at[0]} ${at[1]})`, dx = 0.014, dy = 0.011;
+    const box = `POLYGON ((${at[0] - dx} ${at[1] - dy}, ${at[0] + dx} ${at[1] - dy}, ${at[0] + dx} ${at[1] + dy}, ${at[0] - dx} ${at[1] + dy}, ${at[0] - dx} ${at[1] - dy}))`;
+    const pick = (r) => r.map((b) => ({ name: b.f_all_bi_2, year: b.year_found }));
+    const [inside, near] = await Promise.all([
+      soda(NYC_OD, "7jdm-inj8", { $where: `intersects(the_geom, '${pt}')`, $select: "f_all_bi_2,year_found", $limit: "1" }).then(pick).catch(() => []),
+      soda(NYC_OD, "7jdm-inj8", { $where: `intersects(the_geom, '${box}')`, $select: "f_all_bi_2,year_found", $limit: "5" }).then(pick).catch(() => []),
+    ]);
+    return inside.length || near.length ? { inside: inside[0] || null, near: near.filter((b) => !inside[0] || b.name !== inside[0].name) } : null;
+  }
+  // Visit stops in walking order: always the closest one not yet seen.
+  function walkOrder(start, stops) {
+    const left = stops.slice(), out = []; let here = start;
+    while (left.length) { left.sort((a, b) => meters(here, a.at) - meters(here, b.at)); const s = left.shift(); out.push(s); here = s.at; }
+    return out;
+  }
+
+  async function buildLive(L) {
+    const at = [L.lon, L.lat], isProp = L.kind !== "place", safe = (p) => Promise.resolve(p).catch(() => null);
+    const g = await reverse(at);
+    if (!L.region) L.region = g.place === "New York" ? "NYC" : g.region === "Florida" ? "FL" : "NY";
+    if (isProp && L.region === "NYC" && !/^\d{10}$/.test(L.id || "")) { const lot = await safe(nycLotAt(at)); if (lot) { L.id = lot.bbl; L.yb = L.yb || lot.yb; } }
+    const hood = isProp ? g.neighborhood || g.locality || g.place || titleCase(L.town) : L.place || g.neighborhood || g.locality || g.place;
+    const city = g.locality && g.locality !== hood ? g.locality : g.place && g.place !== hood ? g.place : "";
+    const where = [city || g.district, g.region].filter(Boolean).join(", ");
+    NB.live = { label: hood || "this place", radius: 40, maxH: 200, zoom: isProp ? 16.8 : 14.6, pitch: 60, cell: 0.003, walkZoom: 17.4 };
+    const names = isProp ? [hood && `${hood}, ${city || g.region || ""}`, city && `${city}, ${g.region || ""}`] : [L.place, hood && `${hood}, ${where}`];
+    const [bld, page, stops0, transit, pois, people, bids] = await Promise.all([
+      safe(isProp && L.region === "NYC" && /^\d{10}$/.test(L.id || "") ? nycBuilding(L.id) : null),
+      safe(wikiHistory(names, at)), safe(storiesNear(at, isProp ? 1500 : 3000)), safe(transitNear(at, L.region)),
+      safe(poisNear(at)), safe(tract(at)), safe(L.region === "NYC" ? bidNear(at) : null),
+    ]);
+    const stops = (stops0 || []).filter((s) => !page || s.title !== page.title);
+    const addr = titleCase(L.addr), home = { at, label: isProp ? addr || "Here" : hood };
+    const ch = [], src0 = "Sources in this story: Wikipedia · NYC and NYS Open Data · MTA · US Census Bureau · Mapbox / OpenStreetMap";
+
+    // 1 · where we are
+    const yb = Number(L.yb) || Number(bld && bld.pl && bld.pl.yearbuilt) || 0;
+    if (isProp) ch.push({ eyebrow: [hood, where].filter(Boolean).join(" · "), title: addr || hood, line: `${yb ? `Built in ${yb}, ${YEAR - yb} years ago` : "Built before the records begin"}${L.use ? `: ${String(L.use).toLowerCase()}` : ""}. This is its story, and ${hood ? hood + "'s" : "its neighborhood's"}, told by public record.`,
+      chart: yb ? stats([[String(yb), "built"], [String(YEAR - yb), "years ago"]]) : "", at, zoom: 17.2, pitch: 64, bearing: -25, pins: [home], src: src0 });
+    else ch.push({ eyebrow: where || "New York · Florida", title: hood, line: `This is ${hood}'s story, told by public record: its history, the places with a story, how people get around and who lives here today.`,
+      at, zoom: 14.2, pitch: 55, bearing: -20, pins: [], src: src0 });
+
+    // 2 · the building (NYC: PLUTO + the Landmarks file)
+    if (bld && bld.pl) {
+      const P = bld.pl, lpc = bld.lpc || {}, floors = Number(P.numfloors) || 0, units = Number(P.unitsres) || 0;
+      const style = lpc.style_prim && lpc.style_prim !== "Not determined" ? lpc.style_prim : "", archi = lpc.arch_build && lpc.arch_build !== "Not determined" ? lpc.arch_build : "";
+      const bits = [];
+      if (style || archi) bits.push(`The Landmarks Preservation Commission files it as ${style ? (/^[aeiou]/i.test(style) ? "an " : "a ") + style + " building" : "a building"}${archi ? ` by ${archi}` : ""}${lpc.mat_prim ? `, in ${lpc.mat_prim.toLowerCase()}` : ""}${lpc.use_orig ? `, first built as ${lpc.use_orig.toLowerCase()}` : ""}.`);
+      if (floors) bits.push(`${floors} ${floors === 1 ? "floor" : "floors"}${units ? ` and ${units} ${units === 1 ? "home" : "homes"}` : ""}${yb ? `, standing since ${yb}` : ""}.`);
+      if (P.histdist) bits.push(`It stands in the ${P.histdist}.`); else if (P.landmark) bits.push(`It is an individual city landmark: ${titleCase(P.landmark)}.`);
+      if (bits.length) ch.push({ eyebrow: "The building", title: style ? `${style}${yb ? `, ${yb}` : ""}.` : `${floors} ${floors === 1 ? "floor" : "floors"}${yb ? `, since ${yb}` : ""}.`, line: bits.join(" "),
+        at, zoom: 18, pitch: 72, bearing: 35, pins: [home], src: "Sources: NYC PLUTO · Landmarks Preservation Commission building database" });
+    }
+    // 3 · its paper trail: dates only, never names or amounts
+    const dd = bld && bld.deeds;
+    if (dd) ch.push({ eyebrow: "Its paper trail", title: dd.n > 1 ? `${dd.n} deeds since ${dd.first}.` : `On the record since ${dd.first}.`,
+      line: `The city register's online records, which begin in 1966, hold ${dd.n === 1 ? "one deed" : dd.n + " deeds"} for this lot: the first recorded in ${dd.first}${dd.n > 1 ? `, the latest in ${dd.last}` : ""}. Each one opens in the records app.`,
+      at, zoom: 17.6, pitch: 66, bearing: 80, pins: [home], src: "Source: NYC Department of Finance · ACRIS (Automated City Register Information System)" });
+    else if (isProp && /^(19|20)\d\d$/.test(String(L.ls || ""))) ch.push({ eyebrow: "Its paper trail", title: `Last changed hands in ${L.ls}.`, line: `The tax roll records its most recent sale in ${L.ls}. The full record opens in the records app.`,
+      at, zoom: 17.6, pitch: 66, bearing: 80, pins: [home], src: L.region === "FL" ? "Source: Florida Department of Revenue tax roll" : "Source: NYC Department of Finance" });
+    // 4 · the block (NYC)
+    const yrs = ((bld && bld.blk) || []).map((x) => Number(x.yearbuilt)).filter((y) => y > 1700).sort((a, b) => a - b);
+    if (yrs.length > 3) {
+      const dec = {}; yrs.forEach((y) => { const k = Math.floor(y / 10) * 10 + "s"; dec[k] = (dec[k] || 0) + 1; });
+      const [pk] = peak(dec), lm = bld.blk.filter((x) => x.landmark || x.histdist).length;
+      ch.push({ eyebrow: "The block", title: `Built mostly in the ${pk}.`, line: `${yrs.length} lots share this block. The oldest building on it dates to ${yrs[0]}, and half went up by ${yrs[Math.floor(yrs.length / 2)]}.${lm ? ` ${lm} ${lm === 1 ? "is" : "are"} landmarked or inside a historic district.` : ""}`,
+        chart: cols(Object.entries(dec), pk), at, zoom: 16.8, pitch: 58, bearing: 120, pins: [home], src: "Source: NYC PLUTO · year built, landmarks, historic districts" });
+    }
+    // 5 · the neighborhood's history, then the places nearby with a story
+    const tales = talesFrom(page, stops);
+    ch.push(...tales, ...didYouKnow(stops, tales));
+    // 6 · getting around: the closest transportation, in walking minutes
+    const tr = transit || [], pick = [];
+    for (const t of tr) {
+      if (pick.length >= 6) break;
+      if (t.kind === "Bus" && pick.filter((x) => x.kind === "Bus").length >= 2) continue;
+      if (t.kind === "Bike share" && pick.some((x) => x.kind === "Bike share")) continue;
+      if (!["Subway", "Bus", "Bike share", "Ferry"].includes(t.kind) && pick.filter((x) => !["Subway", "Bus", "Bike share", "Ferry"].includes(x.kind)).length >= 2) continue;
+      if (pick.some((x) => x.kind === t.kind && x.name === t.name)) continue;
+      pick.push(t);
+    }
+    const isTrain = (t) => !["Subway", "Bus", "Bike share", "Ferry"].includes(t.kind);
+    const rail = tr.find((t) => t.kind === "Subway") || tr.find(isTrain), train = rail && rail.kind === "Subway" ? tr.find((t) => isTrain(t) && t.d < 1600) : null;
+    const bus = pick.find((t) => t.kind === "Bus"), bike = pick.find((t) => t.kind === "Bike share");
+    if (pick.length) {
+      const lead = rail || pick[0], minLabel = (t) => (t.d <= 2400 ? `${walkMin(t.d)} min` : `${(t.d / 1609).toFixed(1)} mi`);
+      const lines = rail && rail.lines.length ? rail.lines.join(", ") : "";
+      const said = [rail ? `${rail.kind === "Subway" ? `The ${lines || "subway"} ${rail.lines.length > 1 ? "trains stop" : "train stops"}` : `The ${rail.kind === "Train" ? "train" : rail.kind} stops`} at ${rail.name}, ${mins(rail.d)} on foot.` : "",
+        train ? `The ${train.kind === "Train" ? "train" : train.kind} stops at ${train.name}, ${mins(train.d)} away.` : "",
+        bus ? `The nearest bus stop, ${bus.name}, is ${mins(bus.d)} away.` : "", bike ? `A bike-share dock is ${mins(bike.d)} away.` : ""].filter(Boolean).join(" ");
+      const Mins = (m) => mins(m).replace(/^a/, "A");
+      ch.push({ eyebrow: "Getting around", title: rail ? `${Mins(rail.d)} to ${rail.kind === "Subway" ? "the subway" : "the train"}.` : `${Mins(lead.d)} to the nearest stop.`, line: said,
+        chart: tlist(pick.map((t) => [t.lines.length ? t.lines.map(routeBadge).join("") : `<span class="rt k">${esc(t.kind)}</span>`, t.name, minLabel(t)])),
+        at: lead.d < 2500 ? lead.at : at, zoom: lead.d < 2500 ? 16.2 : 15, pitch: 58, bearing: 160, pins: [home, ...pick.slice(0, 5).map((t) => ({ at: t.at, label: `${t.kind}: ${t.name}` }))],
+        src: "Sources: MTA subway stations (NY State Open Data) · train stations, bus stops and docks: Mapbox / OpenStreetMap. Walk times are straight-line estimates." });
+    }
+    // 7 · main street
+    const pp = (pois || []).filter((p) => BIZ[p.cls]);
+    let mainAt = null;
+    if (pp.length >= 3 || (bids && (bids.inside || bids.near.length))) {
+      const byCat = {}; pp.forEach((p) => { byCat[BIZ[p.cls]] = (byCat[BIZ[p.cls]] || 0) + 1; });
+      const cats = Object.entries(byCat).sort((a, b) => b[1] - a[1]);
+      mainAt = pp.length ? [pp.reduce((s, p) => s + p.at[0], 0) / pp.length, pp.reduce((s, p) => s + p.at[1], 0) / pp.length] : at;
+      const street = pp.length ? (await safe(reverse(mainAt, "street")) || {}).street : "";
+      const bidLine = bids && bids.inside ? ` It sits inside the ${bids.inside.name} business improvement district${bids.inside.year ? `, founded in ${bids.inside.year}` : ""}.`
+        : bids && bids.near.length ? ` The closest business improvement district${bids.near.length > 1 ? "s are" : " is"} ${bids.near.slice(0, 2).map((b) => b.name).join(" and ")}.` : "";
+      const far = pp.some((p) => p.d > 450);
+      ch.push({ eyebrow: "Main street", title: pp.length ? `${pp.length >= 50 ? "50+" : pp.length} places within ${far ? "a mile" : "a 5-minute walk"}.` : "The business district.",
+        line: `${pp.length ? `${cats.slice(0, 3).map(([k, v]) => `${v} ${k.toLowerCase()}`).join(", ")}${street ? `, centered on ${street}` : ""}.` : ""}${bidLine}`.trim(),
+        chart: cats.length ? bars(cats.slice(0, 6)) : "", at: mainAt, zoom: 17, pitch: 64, bearing: 200, pins: [home, ...pp.slice(0, 6).map((p) => ({ at: p.at, label: p.name }))],
+        src: `Sources: places from Mapbox / OpenStreetMap${bids ? " · NYC Small Business Services, business improvement districts" : ""}` });
+    }
+    // 8 · who lives here (people, never money)
+    if (people && people.POP100) {
+      const sqmi = (people.AREALAND || 0) / 2589988.11, dens = sqmi ? Math.round(people.POP100 / sqmi) : 0;
+      ch.push({ eyebrow: "Who lives here", title: `${fmt(people.POP100)} neighbors.`, line: `About ${fmt(people.POP100)} people live in the census tract around ${isProp ? "this address" : "here"}, in ${fmt(people.HU100)} homes${dens ? `: about ${fmt(dens)} people per square mile` : ""}.`,
+        chart: stats([[fmt(people.POP100), "people"], [fmt(people.HU100), "homes"], [dens ? fmt(dens) : "—", "per sq mi"]]), at, zoom: 14.6, pitch: 45, bearing: 250, pins: [home],
+        src: `Source: US Census Bureau, 2020 Census · ${people.NAME || "census tract"}` });
+    }
+    // 9 · the walk: past the places with a story, down main street, to the train
+    const legs = [{ at, label: "Start", text: isProp ? `We start at ${addr || "the front door"}.` : `We start in the middle of ${hood}.` }];
+    walkOrder(at, stops.slice(0, 3)).forEach((s) => legs.push({ at: s.at, label: s.title, text: s.text }));
+    if (mainAt) legs.push({ at: mainAt, label: "Main street", text: "Now main street, where the shops and restaurants cluster." });
+    if (rail && rail.d < 3000) legs.push({ at: rail.at, label: rail.name, text: `And here's the ${rail.kind === "Subway" ? "subway" : "train"} at ${rail.name}, ${mins(rail.d)} from where we started.` });
+    if (legs.length > 2) ch.push({ eyebrow: "Walk through", title: `Walk ${hood || "the block"} with me.`, line: "A street-level pass past the places with a story, down main street and to the train.",
+      walk: legs, map: { mode: "walk" }, src: "Stops: Wikipedia · Mapbox / OpenStreetMap · MTA" });
+    // 10 · the end card
+    ch.push({ eyebrow: "Parcelvora Story Mode", title: isProp ? "Every property has a story." : "Every neighborhood has a story.", final: true, at, zoom: 15.2, pitch: 50, bearing: 0, pins: [home],
+      line: "Search any address or neighborhood in New York or Florida at the top. Or turn this story into an article, a video script or a social post.", src: "" });
+    state.live.where = where; state.live.hood = hood;
+    return ch;
   }
 
   // ── Map ────────────────────────────────────────────────
@@ -469,41 +762,23 @@ h1 { font-weight: 400; font-size: 46px; line-height: 1.02; letter-spacing: -0.01
     mapMsg("The 3D map needs WebGL. The story still plays.");
   }
 
-  const weight = {
-    year: (p) => (p[2] > 0 ? 2030 - p[2] : 0),
-    owner: (p) => ((p[5] & 8) ? 1 : 0),
-    occupied: (p) => ((p[5] & 1) ? 1 : 0),
-    held: (p) => ((p[5] & 16) ? 1 : 0),
-    value: (p) => p[4],
-  };
-
-  function isValueAdd(key, p) {
-    if (p[3] === 7) return "gold";
-    if (key === "park-slope" && (p[5] & 32)) return "coral";
-    if (key === "coral-gables" && p[2] > 0 && p[2] < 1960 && p[3] === 1) return "coral";
-    if (key === "east-hampton" && (p[5] & 64)) return "coral";
-    return null;
-  }
+  const weight = { year: (p) => (p[2] > 0 ? 2030 - p[2] : 0) };
 
   function layersFor(chapter) {
     const m = chapter.map || {}, cfg = NB[state.nb], d = state.data[state.nb], pts = d.points || [], H = d.history || {}, B = d.business || {};
+    if (!m.mode || m.mode === "none" || state.nb === "live") return [];
     const dots = (id, data, color, radius, minPx, line) => new deck.ScatterplotLayer({ id, data, getPosition: (p) => [p[0], p[1]], getFillColor: color,
       getRadius: radius, radiusMinPixels: minPx, stroked: !!line, getLineColor: [19, 32, 47], lineWidthMinPixels: line || 0, opacity: 0.95, updateTriggers: { getFillColor: m.mode } });
     if (m.mode === "use") return [dots("pv-dots", pts, (p) => GROUP[p[3]][1], cfg.radius * 0.2, 1.5, 0)];
     if (m.mode === "biz") return [dots("pv-dots", pts.filter((p) => p[3] >= 4 && p[3] <= 6), (p) => GROUP[p[3]][1], cfg.radius * 0.32, 3, 0.75)];
     if (m.mode === "licenses") return [dots("pv-faint", pts, [222, 214, 198], cfg.radius * 0.25, 1, 0),
       dots("pv-lic", B.lic_points || [], [217, 119, 31], cfg.radius * 0.6, 5, 1.5)];
-    if (m.mode === "valueadd") {
-      const tag = (p) => isValueAdd(state.nb, p);
-      return [dots("pv-faint", pts.filter((p) => !tag(p)), [222, 214, 198], cfg.radius * 0.16, 1, 0),
-        dots("pv-va", pts.filter(tag), (p) => (tag(p) === "gold" ? [38, 64, 95] : [217, 119, 31]), cfg.radius * 0.24, 2, 0.5)];
-    }
-    const data = m.mode === "year" ? pts.filter((p) => p[2] > 0) : m.mode === "value" ? pts.filter((p) => p[4] > 0) : pts;
+    const data = m.mode === "year" ? pts.filter((p) => p[2] > 0) : pts;
     const w = weight[m.mode];
     const L = [new deck.HexagonLayer({ id: "pv-hex", data, getPosition: (p) => [p[0], p[1]], radius: cfg.radius, coverage: 0.86, extruded: true,
       elevationRange: [0, cfg.maxH], elevationScale: 1, upperPercentile: 99, colorRange: RAMP,
       getColorWeight: w || (() => 1), colorAggregation: w ? "MEAN" : "SUM",
-      getElevationWeight: m.mode === "value" ? weight.value : () => 1, elevationAggregation: m.mode === "value" ? "MEAN" : "SUM",
+      getElevationWeight: () => 1, elevationAggregation: "SUM",
       material: { ambient: 0.65, diffuse: 0.5, shininess: 20 }, opacity: 0.9,
       updateTriggers: { getColorWeight: m.mode, getElevationWeight: m.mode }, transitions: { elevationScale: 1200 } })];
     if (m.mode === "transit" && H.subway) L.push(new deck.ScatterplotLayer({ id: "pv-subway", data: H.subway, getPosition: (s) => [Number(s.entrance_longitude), Number(s.entrance_latitude)],
@@ -523,8 +798,9 @@ h1 { font-weight: 400; font-size: 46px; line-height: 1.02; letter-spacing: -0.01
     clearCam();
     const d = state.data[state.nb], cfg = NB[state.nb], m = chapter.map || {};
     if (chapter.walk) return walk(chapter.walk);
-    const zoom = cfg.zoom - (m.zoomOut || 0), bearing = m.bearing ?? 0, pitch = m.pitch ?? cfg.pitch;
-    map.flyTo({ center: d.center, zoom, pitch, bearing, padding: pad(), duration: reduceMotion ? 0 : 2400, essential: true });
+    // a chapter about one place (a landmark, the station, main street) flies there; the rest frame the neighborhood
+    const center = chapter.at || d.center, zoom = chapter.zoom ?? cfg.zoom - (m.zoomOut || 0), bearing = chapter.bearing ?? m.bearing ?? 0, pitch = chapter.pitch ?? m.pitch ?? cfg.pitch;
+    map.flyTo({ center, zoom, pitch, bearing, padding: pad(), duration: reduceMotion ? 0 : 2400, essential: true });
     if (!reduceMotion && state.playing) camTimers.push(setTimeout(() => map.easeTo({ bearing: bearing + 14, duration: PACE - 2600, easing: (t) => t }), 2500));
   }
 
@@ -536,6 +812,7 @@ h1 { font-weight: 400; font-size: 46px; line-height: 1.02; letter-spacing: -0.01
         const prev = legs[Math.max(0, k - 1)].at, next = legs[Math.min(legs.length - 1, k + 1)].at;
         const bearing = k === 0 ? bearingTo(leg.at, next) : bearingTo(prev, leg.at);
         legEl.innerHTML = `<b>${k + 1} / ${legs.length} · ${esc(leg.label)}</b>${esc(leg.text)}`;
+        setPins({ pins: [{ at: leg.at, label: leg.label }] });
         if (map) map.flyTo({ center: leg.at, zoom: cfg.walkZoom, pitch: 76, bearing, padding: pad(), duration: reduceMotion ? 0 : LEG - 900, curve: 1.2, essential: true });
         if (state.voice) speak(leg.text);
       }, k * LEG));
@@ -576,70 +853,76 @@ h1 { font-weight: 400; font-size: 46px; line-height: 1.02; letter-spacing: -0.01
 
   // ── Lot story (tap the map) ────────────────────────────
   function showLot(ll) {
-    const d = state.data[state.nb]; if (!d) return;
+    const d = state.data[state.nb]; if (!d || !d.points || !d.points.length) return;
     let best = null, bd = Infinity; const cos = Math.cos((ll.lat * Math.PI) / 180);
     for (const p of d.points) { const dx = (p[0] - ll.lng) * cos, dy = p[1] - ll.lat, dd = dx * dx + dy * dy; if (dd < bd) { bd = dd; best = p; } }
     const el = document.getElementById("lot");
     if (!best || Math.sqrt(bd) > 0.0015) { el.style.display = "none"; return; }
-    const tags = [];
-    if (best[5] & 1) tags.push("Owner lives there"); if (best[5] & 2) tags.push("Absentee owner"); if (best[5] & 4) tags.push("Out of state");
-    if (best[5] & 8) tags.push("Company-owned"); if (best[5] & 64) tags.push("Estate"); if (best[5] & 16) tags.push("Same owner since 2021"); if (best[5] & 32) tags.push("Room to build bigger");
-    const basis = VALUE_BASIS[d.value_basis] || "value";
     el.innerHTML = `<button class="x" aria-label="Close">×</button><h2>This lot's story</h2><ul>
-      <li>${best[2] > 0 ? `Built in <b>${best[2]}</b>, ${new Date().getFullYear() - best[2]} years ago` : "Year built not on record"}</li>
-      <li>${esc(GROUP[best[3]][0])}</li>
-      ${best[4] > 0 ? `<li>${esc(money(best[4] * 1000))} ${esc(basis)}</li>` : ""}</ul>
-      ${tags.length ? `<div class="tags">${tags.map((t) => `<span>${esc(t)}</span>`).join("")}</div>` : ""}
-      <p>The owner, sales and full history open in the records app.</p>`;
+      <li>${best[2] > 0 ? `Built in <b>${best[2]}</b>, ${YEAR - best[2]} years ago` : "Year built not on record"}</li>
+      <li>${esc(GROUP[best[3]][0])}</li></ul>
+      <p>Its full record opens in the records app.</p>`;
     el.style.display = "block";
     el.querySelector(".x").onclick = () => (el.style.display = "none");
   }
 
   // ── Story state ────────────────────────────────────────
-  const state = { nb: NB[qs.get("n")] ? qs.get("n") : "park-slope", aud: AUD[qs.get("a")] ? qs.get("a") : "all", i: 0, playing: false, voice: false, music: true, data: {}, dv: null, list: [] };
+  const state = { nb: NB[qs.get("n")] ? qs.get("n") : "park-slope", i: 0, playing: false, voice: false, music: true, data: {}, dv: null, list: [], live: null };
   const $ = (id) => document.getElementById(id);
 
   function legendHtml(kind) {
     if (!kind) return "";
     if (kind === "use") return Object.values(GROUP).slice(0, 8).map(([l, c]) => `<span><i style="background:rgb(${c})"></i>${esc(l)}</span>`).join("");
     if (kind === "year") return `<span>Column height = buildings · color: newer</span><span class="ramp"></span><span>older</span>`;
-    if (kind === "value") return `<span>Height + color = average value: lower</span><span class="ramp"></span><span>higher</span>`;
     if (kind === "transit") return `<span><i style="background:#d9771f"></i>Subway entrance</span><span>Columns = parcels</span>`;
     if (kind === "licenses") return `<span><i style="background:#d9771f"></i>Licensed business</span><span><i style="background:#ded6c6"></i>Every lot</span>`;
-    if (kind === "valueadd") return `<span><i style="background:#d9771f"></i>${state.nb === "park-slope" ? "Room to build bigger" : state.nb === "coral-gables" ? "House built before 1960" : "Estate-held"}</span><span><i style="background:#26405f"></i>Vacant</span>`;
     if (kind === "count") return `<span>Column height = parcels · color: fewer</span><span class="ramp"></span><span>more</span>`;
-    if (kind.startsWith("share:")) return `<span>${esc(kind.slice(6))}: low</span><span class="ramp"></span><span>high</span>`;
     return "";
+  }
+
+  // Pins name the places a chapter is about; the first pin of a live story is the property itself.
+  let pinMarkers = [];
+  function setPins(c) {
+    pinMarkers.forEach((m) => m.remove()); pinMarkers = [];
+    if (!map || !window.mapboxgl) return;
+    (c.pins || []).forEach((p, k) => {
+      if (!p || !p.at) return;
+      const el = document.createElement("div");
+      el.className = "pin" + (k === 0 && state.nb === "live" && !c.walk && p.label === (state.live && state.live.homeLabel) ? " home" : "");
+      el.innerHTML = `<span>${esc(p.label || "")}</span><i></i>`;
+      pinMarkers.push(new mapboxgl.Marker({ element: el, anchor: "bottom" }).setLngLat(p.at).addTo(map));
+    });
   }
 
   function show(i) {
     const list = state.list; if (!list.length) return;
     state.i = (i + list.length) % list.length;
     const c = list[state.i];
-    $("eyebrow").textContent = c.eyebrow;
+    $("eyebrow").textContent = c.eyebrow || "";
     $("count").textContent = `${state.i + 1} / ${list.length}`;
     $("title").textContent = c.title;
     $("line").textContent = c.line;
     $("leg").style.display = "none";
     $("chart").innerHTML = c.chart || "";
-    const why = state.aud !== "all" && c.why && c.why[state.aud];
-    $("why").innerHTML = why ? `<div class="why"><b>${WHY_LABEL[state.aud]}</b>${esc(why)}</div>` : "";
     $("legend").innerHTML = legendHtml(c.legend);
-    $("src").textContent = c.src || "";
-    $("cta").innerHTML = c.final ? `<div class="cta"><a href="parcelvora-landing.html">See Parcelvora →</a><a href="parcelvora-records.html">Try the records →</a></div>` : "";
+    $("src").innerHTML = c.srcUrl ? `<a href="${esc(c.srcUrl)}" target="_blank" rel="noopener">${esc(c.src)}</a>` : esc(c.src || "");
+    $("tip").style.display = state.nb === "live" ? "none" : "";
+    const rec = state.live && state.live.addr ? `<a href="${RECORDS}?q=${encodeURIComponent(state.live.addr)}">Open the full record →</a>` : `<a href="${RECORDS}">Try the records →</a>`;
+    $("cta").innerHTML = c.final ? `<div class="cta"><a href="#" data-make="1">✎ Create content</a>${rec}<a href="parcelvora-landing.html">See Parcelvora →</a></div>` : "";
     $("dots").innerHTML = list.map((_, k) => `<button aria-label="Chapter ${k + 1}" ${k === state.i ? 'aria-current="true"' : ""} data-k="${k}"></button>`).join("");
-    render(); moveCamera(c);
-    const said = `${c.title} ${c.line}${why ? " " + why : ""}`;
+    render(); setPins(c); moveCamera(c);
+    const said = `${c.title} ${c.line}`;
     if (state.voice && !c.walk) speak(said);
     restartTimer(c.walk ? c.walk.length * LEG + 800 : Math.max(PACE, state.voice ? speechMs(said) : 0));
-    const p = new URLSearchParams({ n: state.nb, a: state.aud, c: state.i + 1 }); history.replaceState(null, "", "?" + p.toString());
+    const p = state.nb === "live" ? new URLSearchParams(location.search) : new URLSearchParams({ n: state.nb });
+    p.set("c", state.i + 1); history.replaceState(null, "", "?" + p.toString());
   }
 
   const hex = (rgb) => "#" + rgb.map((v) => v.toString(16).padStart(2, "0")).join("");
   function render() {
     if (!mapReady || !state.list.length || !state.data[state.nb]) return;
-    const c = state.list[state.i], walking = !!c.walk;
-    const feats = walking ? state.data[state.nb].points.filter((p) => p[3] >= 4 && p[3] <= 7)
+    const c = state.list[state.i], walking = !!c.walk, pts = state.data[state.nb].points || [];
+    const feats = walking ? pts.filter((p) => p[3] >= 4 && p[3] <= 7)
       .map((p) => ({ type: "Feature", geometry: { type: "Point", coordinates: [p[0], p[1]] }, properties: { c: hex(GROUP[p[3]][1]) } })) : [];
     map.getSource("pv-walk").setData({ type: "FeatureCollection", features: feats });
     overlay.setProps({ layers: walking ? [] : layersFor(c) });
@@ -668,29 +951,115 @@ h1 { font-weight: 400; font-size: 46px; line-height: 1.02; letter-spacing: -0.01
     setPlaying(true);
   }
 
+  // A prepared neighborhood: the lake's summary, plus its Wikipedia history and the stories of the places nearby.
   async function load(nb) {
     if (!state.dv) state.dv = await (await fetch("parcelvora-story/dataverse.json")).json();
-    if (!state.data[nb]) state.data[nb] = await (await fetch(`parcelvora-story/${nb}.json`)).json();
-    const all = chaptersFor(nb, state.data[nb], state.dv);
-    state.list = all.filter((c) => c.aud === "all" || state.aud === "all" || c.aud.split(" ").includes(state.aud));
+    if (!state.data[nb]) {
+      const d = await (await fetch(`parcelvora-story/${nb}.json`)).json();
+      const [page, stops] = await Promise.all([withTimeout(wikiPage(WIKI_TITLE[nb]).catch(() => null), 8000), withTimeout(storiesNear(d.center, NB[nb].radius > 200 ? 6000 : 2000).catch(() => []), 8000)]);
+      d.stops = (stops || []).filter((s) => !page || s.title !== page.title);
+      d.tales = talesFrom(page, d.stops);
+      state.data[nb] = d;
+    }
+    state.list = chaptersFor(nb, state.data[nb], state.dv);
   }
 
-  async function choose(nb, aud, at) {
+  async function choose(nb, at) {
     if (nb !== state.nb && state.playing && state.music) { try { song.currentTime = 0; } catch (e) {} }
-    state.nb = nb; state.aud = aud;
+    state.nb = nb;
     $("startPlace").textContent = NB[nb].label;
     document.querySelectorAll("#nbSeg button").forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.k === nb)));
-    document.querySelectorAll("#audSeg button").forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.k === aud)));
     $("lot").style.display = "none";
     $("title").textContent = "Loading the story…";
     try { await load(nb); } catch (e) { $("title").textContent = "The story data did not load. Refresh to try again."; return; }
     show(Math.min(at || 0, state.list.length - 1));
   }
 
-  $("nbSeg").insertAdjacentHTML("beforeend", Object.entries(NB).map(([k, v]) => `<button data-k="${k}" aria-pressed="false">${v.label}</button>`).join(""));
-  $("audSeg").insertAdjacentHTML("beforeend", Object.entries(AUD).map(([k, v]) => `<button data-k="${k}" aria-pressed="false">${v}</button>`).join(""));
-  $("nbSeg").addEventListener("click", (e) => { const b = e.target.closest("button[data-k]"); if (b) choose(b.dataset.k, state.aud, 0); });
-  $("audSeg").addEventListener("click", (e) => { const b = e.target.closest("button[data-k]"); if (b) choose(state.nb, b.dataset.k, 0); });
+  // Any address or place: told live. The records app links here with what it knows about the property.
+  async function startLive(L) {
+    state.nb = "live"; state.live = L; L.homeLabel = L.kind === "place" ? L.place : titleCase(L.addr) || "Here";
+    $("startPlace").textContent = L.kind === "place" ? L.place : titleCase(L.addr) || "this place";
+    $("title").textContent = "Gathering its story…";
+    $("line").textContent = "History, the places nearby with a story, how people get around, and who lives here.";
+    if (map) map.jumpTo({ center: [L.lon, L.lat], zoom: 15, pitch: 55, bearing: -20 });
+    try { state.list = await buildLive(L); state.data.live = { center: [L.lon, L.lat], points: [] }; }
+    catch (e) { $("title").textContent = "The story did not load. Refresh to try again."; return; }
+    show(Math.min(Math.max(0, (Number(qs.get("c")) || 1) - 1), state.list.length - 1));
+  }
+
+  // ── Create content: the same story as an article, a video script or a social post ──
+  const tag = (s) => String(s || "").replace(/[^A-Za-z0-9]/g, "");
+  function storyName() { return state.nb === "live" ? state.live.homeLabel : NB[state.nb].label; }
+  function contentText(kind) {
+    const name = storyName(), body = state.list.filter((c) => !c.final && !c.walk);
+    const srcs = [...new Set(body.map((c) => (c.src || "").replace(/^Sources?( in this story)?:\s*/, "")).filter(Boolean))];
+    if (kind === "article") return [`${name}: a story told by public record`, "",
+      ...body.map((c) => `${c.eyebrow ? c.eyebrow.toUpperCase() + "\n" : ""}${c.title}\n${c.line}\n`), "Sources", ...srcs.map((s) => "· " + s), "", "Made with Parcelvora Story Mode."].join("\n");
+    if (kind === "script") return [`${name}: video script (about 60 seconds)`, "",
+      ...body.slice(0, 8).map((c, k) => `SCENE ${k + 1} · ${c.eyebrow || "Opening"}\nON SCREEN: ${c.pins && c.pins.length ? "aerial, flying to " + c.pins[c.pins.length - 1].label : "aerial of " + name}\nVOICE: ${c.title} ${firstSentence(c.line)}\n`),
+      "END CARD: Every place has a story. Parcelvora Story Mode."].join("\n");
+    const fact = body.find((c) => /History|Did you know/.test(c.eyebrow || "")) || body[1] || body[0] || { line: "", title: name };
+    const region = state.nb === "live" ? state.live.region : state.nb === "coral-gables" ? "FL" : "NY";
+    return [`${name}, told by public record.`, "", firstSentence(fact.line) || fact.title, "",
+      ...body.filter((c) => c !== fact).slice(0, 3).map((c) => `• ${c.title}`), "", `#${tag(name)} #history #neighborhoods #${region === "FL" ? "Florida" : "NewYork"}`].join("\n");
+  }
+  let makeKind = "article";
+  function openMake(kind) {
+    makeKind = kind || makeKind;
+    $("makeTitle").textContent = storyName();
+    document.querySelectorAll("#makeTabs button").forEach((b) => b.setAttribute("aria-selected", String(b.dataset.k === makeKind)));
+    $("makeText").value = contentText(makeKind);
+    $("makeAi").hidden = !AI_URL;
+    $("makeNote").textContent = AI_URL ? "" : "Written straight from this story's sources. AI writing turns on where Parcelvora's server holds an AI key.";
+    $("makeBox").hidden = false;
+  }
+  $("make").onclick = () => openMake();
+  $("cta").addEventListener("click", (e) => { if (e.target.closest("[data-make]")) { e.preventDefault(); openMake(); } });
+  $("makeTabs").addEventListener("click", (e) => { const b = e.target.closest("button[data-k]"); if (b) openMake(b.dataset.k); });
+  $("makeX").onclick = () => { $("makeBox").hidden = true; };
+  $("makeBox").addEventListener("click", (e) => { if (e.target === $("makeBox")) $("makeBox").hidden = true; });
+  $("makeCopy").onclick = async () => { try { await navigator.clipboard.writeText($("makeText").value); $("makeCopy").textContent = "Copied"; } catch (e) { $("makeText").select(); document.execCommand("copy"); $("makeCopy").textContent = "Copied"; } setTimeout(() => { $("makeCopy").textContent = "Copy"; }, 1600); };
+  $("makeSave").onclick = () => {
+    const a = document.createElement("a"), url = URL.createObjectURL(new Blob([$("makeText").value], { type: "text/plain" }));
+    a.href = url; a.download = `${storyName().toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "")}-${makeKind}.txt`; document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(url), 2000);
+  };
+  // With the server's AI key: the same facts and sources, rewritten as a narrated piece that cites them.
+  $("makeAi").onclick = async () => {
+    if (!AI_URL) return;
+    $("makeAi").disabled = true; $("makeNote").textContent = "Writing…";
+    try {
+      const body = state.list.filter((c) => !c.final && !c.walk).map((c) => ({ title: c.title, line: c.line, src: c.src, url: c.srcUrl || null }));
+      const r = await fetch(AI_URL, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ kind: makeKind, place: storyName(), where: state.live ? state.live.where : NB[state.nb].label, facts: body }) });
+      const j = await r.json();
+      if (!r.ok) throw new Error(j.error || r.status);
+      $("makeText").value = j.text + (j.citations && j.citations.length ? "\n\nSources\n" + j.citations.map((u) => "· " + u).join("\n") : "");
+      $("makeNote").textContent = "Written by AI from this story's facts and the sources it cites. Read it before you publish.";
+    } catch (e) { $("makeNote").textContent = "AI writing did not answer: " + String(e.message || e).slice(0, 120); }
+    $("makeAi").disabled = false;
+  };
+
+  // ── Find any address or neighborhood ───────────────────
+  $("find").addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const q = $("findQ").value.trim(); if (!q) return;
+    $("findBtn").disabled = true; $("findBtn").textContent = "Finding…";
+    const r = await fetch("https://api.mapbox.com/search/geocode/v6/forward?" + new URLSearchParams({ q, country: "us", bbox: "-87.7,24.4,-71.8,45.1", limit: "1",
+      types: "address,street,neighborhood,locality,place,postcode", access_token: MAPBOX_TOKEN })).then((x) => x.json()).catch(() => null);
+    $("findBtn").disabled = false; $("findBtn").textContent = "Tell its story";
+    const f = r && r.features && r.features[0];
+    if (!f) { $("findQ").value = ""; $("findQ").placeholder = "Not found. Try an address or a neighborhood in NY or FL."; return; }
+    const [lon, lat] = f.geometry.coordinates, p = f.properties;
+    const next = new URLSearchParams({ lat: lat.toFixed(6), lon: lon.toFixed(6) });
+    if (p.feature_type === "address") next.set("addr", p.name); else next.set("place", p.name);
+    location.search = next.toString();
+  });
+
+  $("nbSeg").insertAdjacentHTML("beforeend", Object.entries(NB).filter(([k]) => k !== "live").map(([k, v]) => `<button data-k="${k}" aria-pressed="false">${v.label}</button>`).join(""));
+  $("nbSeg").addEventListener("click", (e) => {
+    const b = e.target.closest("button[data-k]"); if (!b) return;
+    if (state.nb === "live") { location.search = "?n=" + b.dataset.k; return; }
+    choose(b.dataset.k, 0);
+  });
   $("prev").onclick = () => show(state.i - 1);
   $("next").onclick = () => show(state.i + 1);
   $("play").onclick = () => setPlaying(!state.playing);
@@ -705,11 +1074,19 @@ h1 { font-weight: 400; font-size: 46px; line-height: 1.02; letter-spacing: -0.01
   $("goVoice").onclick = () => startStory(true);
   if (qs.get("play") === "0") $("start").style.display = "none";
   $("dots").addEventListener("click", (e) => { const b = e.target.closest("button[data-k]"); if (b) show(Number(b.dataset.k)); });
-  document.addEventListener("keydown", (e) => { if (e.key === "ArrowRight") show(state.i + 1); else if (e.key === "ArrowLeft") show(state.i - 1); else if (e.key === " " && e.target === document.body) { e.preventDefault(); setPlaying(!state.playing); } });
+  document.addEventListener("keydown", (e) => {
+    if (/^(INPUT|TEXTAREA)$/.test(e.target.tagName)) return;
+    if (e.key === "ArrowRight") show(state.i + 1); else if (e.key === "ArrowLeft") show(state.i - 1); else if (e.key === " " && e.target === document.body) { e.preventDefault(); setPlaying(!state.playing); }
+    else if (e.key === "Escape") $("makeBox").hidden = true;
+  });
   const sizeBar = () => document.documentElement.style.setProperty("--bar-h", $("bar").offsetHeight + "px");
   addEventListener("resize", sizeBar); sizeBar();
   $("play").textContent = state.playing ? "❚❚" : "▶";
-  choose(state.nb, state.aud, Math.max(0, (Number(qs.get("c")) || 1) - 1));
+  const lat0 = Number(qs.get("lat")), lon0 = Number(qs.get("lon"));
+  if (qs.get("lat") && qs.get("lon") && Number.isFinite(lat0) && Number.isFinite(lon0)) {
+    const get = (k) => qs.get(k) || "";
+    startLive({ lat: lat0, lon: lon0, addr: get("addr"), town: get("town"), region: get("region"), id: get("id"), yb: get("yb"), use: get("use"), ls: get("ls"), place: get("place"), kind: get("place") ? "place" : "property" });
+  } else choose(state.nb, Math.max(0, (Number(qs.get("c")) || 1) - 1));
 })();
 </script>
 </body>

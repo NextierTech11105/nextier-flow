@@ -50,6 +50,7 @@
     if (flags.includes("held")) tests.push((r) => r.held_since_2021 === true);
     if (flags.includes("officer")) tests.push((r) => r.officer_name != null && r.officer_name !== "");
     if (flags.includes("lien")) tests.push((r) => r.lien === true);
+    if (flags.includes("viol")) tests.push((r) => r.viol === true);
     const range = (param, field, op) => { const v = num(q.get(param)); if (v !== null) tests.push((r) => has(r[field]) && op(Number(r[field]), v)); };
     range("min", "value", (a, v) => a >= v); range("max", "value", (a, v) => a <= v);
     range("built_from", "year_built", (a, v) => a >= v); range("built_to", "year_built", (a, v) => a <= v);
@@ -129,14 +130,19 @@
       parcelvora: { region: r.region, county: r.county, town: r.town, useClass: r.use, valueBasis: r.value_basis, heldSince2021: r.held_since_2021 === true,
         unbuiltFarSqft: has(r.unbuilt) ? Number(r.unbuilt) : null,
         registeredContact: has(r.officer_name) ? { name: r.officer_name, role: String(r.officer_type || "").replace(/([a-z])([A-Z])/g, "$1 $2"), company: r.officer_company || null } : null,
-        lienSaleList: r.lien ? { listMonth: "2025-06-01" } : null },
+        lienSaleList: r.lien ? { listMonth: "2025-06-01" } : null,
+        codeViolations: has(r.viol_open) ? { open: Number(r.viol_open), hpdOpen: Number(r.viol_hpd) || 0, hpdHazardous: Number(r.viol_b) || 0,
+          hpdImmediatelyHazardous: Number(r.viol_c) || 0, dobOpen: Number(r.viol_dob) || 0, ecbOpen: Number(r.viol_ecb) || 0,
+          ecbBalance: Number(r.viol_ecb_balance) || 0, lastDate: r.viol_last || null, recent: r.viol === true } : null },
     };
   }
 
   window.fetch = async (input, init) => {
     const url = new URL(typeof input === "string" ? input : input.url, location.href);
-    const route = /\/api\/(records|map|lookup|counties|ids|detail)$/.exec(url.pathname);
+    const route = /\/api\/(records|map|lookup|counties|ids|detail|skiptrace)$/.exec(url.pathname);
     if (!route) return realFetch(input, init);
+    // Skip tracing spends Tracerfy credits, so it runs only on Parcelvora's server, where the key lives.
+    if (route[1] === "skiptrace") return reply({ error: "demo", message: "Skip tracing runs on Parcelvora's server, where the Tracerfy key lives. This preview has no server, so nothing runs or is charged here." }, 503);
     const d = await ready, q = url.searchParams;
     if (route[1] === "detail") {
       const r = d.rows.find((x) => x.id === q.get("id") && (!q.get("county") || x.county === q.get("county")));
@@ -357,6 +363,19 @@
   .lc-contact { border: 1px dashed var(--line); border-radius: 10px; padding: 10px 12px; }
   .lc-contact p { margin: 2px 0 8px; font-size: 15px; color: var(--soft); }
   .lc-actions { display: flex; flex-wrap: wrap; gap: 8px; }
+  /* Start clean: a profile opens with every section closed. The heading is the toggle; nothing is remembered open. */
+  #drawer .box:not(.open) > :not(h3) { display: none; }
+  #drawer .box > h3 { cursor: pointer; display: flex; justify-content: space-between; align-items: center; gap: 10px; margin: 0; }
+  #drawer .box > h3::after { content: "+"; font-size: 22px; line-height: 1; opacity: .8; }
+  #drawer .box.open > h3 { margin-bottom: 10px; }
+  #drawer .box.open > h3::after { content: "\2212"; }
+  #drawer .lc:not(.open) .lc-grid, #drawer .lc:not(.open) .lc-contact { display: none; }
+  .lc-more { background: none; border: 0; padding: 4px 0; font: inherit; font-weight: 700; color: inherit; cursor: pointer; text-decoration: underline; text-underline-offset: 3px; }
+  @media print { #drawer .box > *, #drawer .lc .lc-grid, #drawer .lc .lc-contact { display: revert !important; } }
+  .rt.rk { border-radius: 4px; padding: 0 7px; width: auto; background: var(--ink, #13202f); color: #fff; font-weight: 600; }
+  .trace { list-style: none; margin: 10px 0 0; padding: 0; display: grid; gap: 10px; }
+  .trace li { padding: 10px 12px; border: 1px solid var(--line, #ddd5c6); border-radius: 6px; }
+  .trace .l2 { margin-top: 4px; }
   @media (max-width: 520px) { .lc-top, .lc-grid { grid-template-columns: 1fr; } }
   /* Research: gauges, line badges and small bar charts that read in seconds. */
   .rs-h { font: 800 15px var(--display); letter-spacing: .1em; text-transform: uppercase; color: var(--blue); margin: 4px 0 -4px; }
@@ -457,6 +476,7 @@
     <button type="button" class="lead" data-lead="estates">Estates &amp; trusts</button>
     <button type="button" class="lead" data-lead="llc">LLC-owned, person on file</button>
     <button type="button" class="lead" data-lead="lien">Tax-delinquent (NYC)</button>
+    <button type="button" class="lead" data-lead="viol">Code violations (NYC)</button>
     <button type="button" class="lead soon" data-lead="pf">Pre-foreclosure · coming</button>
     <span class="leads-note" id="leadNote" hidden></span>
   </nav>
@@ -541,6 +561,7 @@
         <div class="chips" data-flags>
           <button type="button" class="chip" aria-pressed="false" data-flag="out_of_state">Mailing address out of state</button>
           <button type="button" class="chip" aria-pressed="false" data-flag="lien">On the city's lien sale list (NYC)</button>
+          <button type="button" class="chip" aria-pressed="false" data-flag="viol">Open code violations, last 3 years (NYC)</button>
         </div>
         <button type="button" class="clear" id="clear">Clear every filter</button>
       </div>
@@ -730,6 +751,7 @@
     estates: () => { $("owner").value = "trust,estate"; },
     llc: () => { $("owner").value = "entity"; pressFlag("officer"); },
     lien: () => { $("region").value = "NYC"; fillCounties(); pressFlag("lien"); const c = CENTER.NYC; if (c && map && showsMap()) map.jumpTo({ center: c, zoom: 13 }); },
+    viol: () => { $("region").value = "NYC"; fillCounties(); pressFlag("viol"); const c = CENTER.NYC; if (c && map && showsMap()) map.jumpTo({ center: c, zoom: 13 }); },
   };
   $("leads").addEventListener("click", (e) => {
     const b = e.target.closest("button[data-lead]"); if (!b) return;
@@ -1256,13 +1278,8 @@
         ${li("Police precinct", P.policeprct)}${li("Fire company", P.firecomp)}${li("Census tract (2020)", P.bct2020)}
         ${li("Assessed land", n("assessland") ? money(n("assessland")) : "")}${li("Assessed total", n("assesstot") ? money(n("assesstot")) : "")}${li("Exempt", n("exempttot") ? money(n("exempttot")) : "")}</ul>
         <div class="src">Source: NYC PLUTO (FEMA flood flags, districts, DOF assessed values).</div></div>`;
-      // Getting around: the nearest subway stations, with their lines and the walk.
-      const near = Number.isFinite(lat) && lat ? stations.map((s) => ({ ...s, d: meters(lat, lon, Number(s.gtfs_latitude), Number(s.gtfs_longitude)) }))
-        .filter((s) => s.d < 1600).sort((a, b) => a.d - b.d).slice(0, 4) : [];
-      const transit = `<div class="box rs"><h3>Getting around</h3>
-        ${near.length ? `<ul class="rec">${near.map((s) => `<li><div class="l1"><span>${String(s.daytime_routes || "").split(/\s+/).filter(Boolean).map(routeBadge).join("")} ${esc(s.stop_name)}</span><span>${walkMin(s.d)} min walk</span></div>
-          <div class="l2">${int(Math.round(s.d))} m away${s.ada === "1" ? " · step-free access" : ""}</div></li>`).join("")}</ul>` : '<div class="sm">No subway station within a mile.</div>'}
-        <div class="src">Source: MTA subway stations (NY State Open Data). Walk times are straight-line estimates.</div></div>`;
+      // Getting around: subway, trains, buses, ferries and bike share, closest first.
+      const transit = transportHtml(await closestTransport(lat, lon, "NYC").catch(() => []));
       // Business nearby: licensed businesses within a 5-minute walk.
       const close = Number.isFinite(lat) && lat ? biz.map((b) => ({ ...b, d: meters(lat, lon, Number(b.latitude), Number(b.longitude)) })).filter((b) => b.d <= 400).sort((a, b) => a.d - b.d) : [];
       const cats = {}; close.forEach((b) => { cats[b.business_category] = (cats[b.business_category] || 0) + 1; });
@@ -1299,18 +1316,185 @@
     }
   }
 
+  // ── Closest transportation, on every property: subway (MTA), trains (LIRR, Metro-North, Tri-Rail, Metrorail…), and
+  //    the nearest bus stops, ferries and bike-share docks (Mapbox / OpenStreetMap). Walk times are straight-line.
+  const RAIL_URL = "https://nextiertech11105.github.io/nextier-flow/parcelvora-rail.json";
+  let railP = null;
+  const railName = (net) => /long island rail|^LIRR$/i.test(net) ? "LIRR" : /metro-north/i.test(net) ? "Metro-North" : /tri-?rail/i.test(net) ? "Tri-Rail"
+    : /metrorail|miami-dade|^MDT$/i.test(net) ? "Metrorail" : /brightline/i.test(net) ? "Brightline" : /sunrail/i.test(net) ? "SunRail" : /amtrak/i.test(net) ? "Amtrak"
+    : /nj ?transit/i.test(net) ? "NJ Transit" : /^NFTA$/i.test(net) ? "Metro Rail" : net && net.length < 30 ? net : "Train";
+  const tilequery = (lat, lon, layer, radius) => (TOKEN ? fetch(`https://api.mapbox.com/v4/mapbox.mapbox-streets-v8/tilequery/${lon},${lat}.json?` + new URLSearchParams({ radius: String(radius), limit: "50", layers: layer, access_token: TOKEN }))
+    .then((r) => r.json()).then((d) => d.features || []).catch(() => []) : Promise.resolve([]));
+  async function closestTransport(lat, lon, region) {
+    if (!railP) railP = fetch(RAIL_URL).then((r) => r.json()).catch(() => { railP = null; return []; });
+    if (region === "NYC" && !stationsP) stationsP = fetch("https://data.ny.gov/resource/39hk-dx4f.json?" + new URLSearchParams({ $select: "stop_name,daytime_routes,gtfs_latitude,gtfs_longitude,ada", $limit: "1000" }))
+      .then((r) => r.json()).catch(() => { stationsP = null; return []; });
+    const [rail, subway, stops] = await Promise.all([railP, region === "NYC" ? stationsP : [], tilequery(lat, lon, "transit_stop_label", 600)]);
+    const out = [], seen = new Set();
+    for (const s of subway || []) { const d = meters(lat, lon, Number(s.gtfs_latitude), Number(s.gtfs_longitude)); if (d < 1600) out.push({ kind: "Subway", name: s.stop_name, lines: String(s.daytime_routes || "").split(/\s+/).filter(Boolean), d, ada: s.ada === "1" }); }
+    for (const s of rail || []) { const d = meters(lat, lon, s.a, s.o); if (d < 8000) out.push({ kind: railName(s.net), name: s.n, lines: [], d }); }
+    for (const f of stops) {
+      const p = f.properties, kind = p.mode === "bus" ? "Bus" : p.mode === "ferry" ? "Ferry" : p.mode === "bicycle" ? "Bike share" : null;
+      if (!kind || !p.name || seen.has(kind + p.name)) continue;
+      seen.add(kind + p.name); out.push({ kind, name: String(p.name).replace(/^Citi Bike [–-] /, ""), lines: [], d: p.tilequery.distance });
+    }
+    out.sort((a, b) => a.d - b.d);
+    const pick = [];
+    for (const t of out) {
+      if (pick.length >= 7) break;
+      const same = pick.filter((x) => x.kind === t.kind);
+      if ((t.kind === "Bus" && same.length >= 2) || (t.kind === "Bike share" && same.length) || (t.kind === "Subway" && same.length >= 3) || same.some((x) => x.name === t.name)) continue;
+      if (!["Subway", "Bus", "Bike share", "Ferry"].includes(t.kind) && pick.filter((x) => !["Subway", "Bus", "Bike share", "Ferry"].includes(x.kind)).length >= 2) continue;
+      pick.push(t);
+    }
+    return pick;
+  }
+  function transportHtml(pick) {
+    return `<div class="box rs"><h3>Closest transportation</h3>
+      ${pick.length ? `<ul class="rec">${pick.map((t) => `<li><div class="l1"><span>${t.lines.length ? t.lines.map(routeBadge).join("") : `<span class="rt rk">${esc(t.kind)}</span>`} ${esc(t.name)}</span>
+        <span>${t.d <= 2400 ? walkMin(t.d) + " min walk" : (t.d / 1609).toFixed(1) + " mi"}</span></div>
+        <div class="l2">${t.d >= 1609 ? (t.d / 1609).toFixed(1) + " mi" : int(Math.round(t.d)) + " m"} away${t.ada ? " · step-free access" : ""}</div></li>`).join("")}</ul>` : '<div class="sm">No station or stop on the map within walking distance.</div>'}
+      <div class="src">Sources: MTA subway stations (NY State Open Data) · trains, buses, ferries and bike share: Mapbox / OpenStreetMap. Walk times are straight-line estimates.</div></div>`;
+  }
+  const BIZ = { food_and_drink: "Restaurants and cafes", food_and_drink_stores: "Food shops", store_like: "Shops", commercial_services: "Services", lodging: "Hotels",
+    arts_and_entertainment: "Arts and entertainment", medical: "Health care" };
+  // FEMA's National Flood Hazard Layer at the point: the zone, whether it is the 1% annual-chance floodplain, the base flood elevation.
+  const femaFlood = (lat, lon) => fetch("https://hazards.fema.gov/arcgis/rest/services/public/NFHL/MapServer/28/query?" + new URLSearchParams({ geometry: `${lon},${lat}`,
+    geometryType: "esriGeometryPoint", inSR: "4326", spatialRel: "esriSpatialRelIntersects", outFields: "FLD_ZONE,ZONE_SUBTY,SFHA_TF,STATIC_BFE", returnGeometry: "false", f: "json" }), { signal: AbortSignal.timeout(15000) })
+    .then((r) => r.json()).then((d) => (d.features ? (d.features[0] ? d.features[0].attributes : { none: true }) : null)).catch(() => null);
+  // The 2020 Census tract (people, homes, land) and the school districts at the point, in one call to the Census Bureau's TIGERweb.
+  async function censusAt(lat, lon) {
+    const d = 0.01, r = await fetch("https://tigerweb.geo.census.gov/arcgis/rest/services/TIGERweb/tigerWMS_Census2020/MapServer/identify?" + new URLSearchParams({ geometry: `${lon},${lat}`,
+      geometryType: "esriGeometryPoint", sr: "4326", layers: "all:6,12,14,16", tolerance: "1", mapExtent: `${lon - d},${lat - d},${lon + d},${lat + d}`, imageDisplay: "400,400,96", returnGeometry: "false", f: "json" }))
+      .then((x) => x.json()).catch(() => null);
+    const res = (r && r.results) || [], tr = res.find((x) => x.layerId === 6);
+    return { tract: tr ? tr.attributes : null, schools: [...new Set(res.filter((x) => x.layerId !== 6).map((x) => x.attributes.NAME || x.attributes.BASENAME).filter(Boolean))] };
+  }
+  // Places with a Wikipedia article nearby, nearest first, with their first sentence.
+  async function placesNear(lat, lon) {
+    const W = "https://en.wikipedia.org/w/api.php?";
+    const g = await fetch(W + new URLSearchParams({ action: "query", list: "geosearch", gscoord: `${lat}|${lon}`, gsradius: "1500", gslimit: "8", format: "json", origin: "*" })).then((r) => r.json()).catch(() => null);
+    // a whole island, county or borough has its pin somewhere in the middle; it is not a place nearby
+    const near = ((g && g.query && g.query.geosearch) || []).filter((x) => !/^(List of|Template:)/.test(x.title) && !/^(Long Island|New York( City| \(state\))?|Florida|Brooklyn|Queens|Manhattan|The Bronx|Staten Island|.+ County, (New York|Florida)|.+ \(town\), New York)$/.test(x.title)).slice(0, 4);
+    if (!near.length) return [];
+    const ex = await fetch(W + new URLSearchParams({ action: "query", prop: "extracts", exintro: "1", explaintext: "1", exsentences: "1", exlimit: "10", titles: near.map((x) => x.title).join("|"), format: "json", origin: "*" }))
+      .then((r) => r.json()).catch(() => null);
+    const by = new Map(Object.values((ex && ex.query && ex.query.pages) || {}).map((p) => [p.title, p.extract || ""]));
+    return near.map((x) => ({ title: x.title, d: x.dist, text: by.get(x.title) || "" }));
+  }
+  // Research outside NYC: the closest transportation, business nearby, the flood zone, neighbors and schools, and history.
+  async function areaResearch(id, lat, lon) {
+    const box = $("nycResearch"); if (!box) return;
+    if (!Number.isFinite(lat) || !lat) { box.innerHTML = ""; return; }
+    const region = (leadCtx && leadCtx.p && leadCtx.p.parcel && leadCtx.p.parcel.region) || "";
+    const safe = (p) => Promise.resolve(p).catch(() => null);
+    const [trans, pois0, flood, census, places] = await Promise.all([safe(closestTransport(lat, lon, region)), safe(tilequery(lat, lon, "poi_label", 400)), safe(femaFlood(lat, lon)), safe(censusAt(lat, lon)), safe(placesNear(lat, lon))]);
+    // in the suburbs the nearest shops are often a drive away: look within a mile when nothing is within a 5-minute walk
+    const isBiz = (f) => f.properties.name && BIZ[f.properties.class], far = (pois0 || []).filter(isBiz).length < 3;
+    const pois = far ? await safe(tilequery(lat, lon, "poi_label", 1600)) : pois0;
+    if (!$("nycResearch")) return;
+    const pp = (pois || []).filter(isBiz);
+    const cats = {}; pp.forEach((f) => { const k = BIZ[f.properties.class]; cats[k] = (cats[k] || 0) + 1; });
+    const business = `<div class="box rs"><h3>Business nearby</h3>
+      ${pp.length ? `<div class="sm"><b>${pp.length >= 50 ? "50+" : pp.length}</b> places within ${far ? "a mile" : "a 5-minute walk"}: ${Object.entries(cats).sort((a, b) => b[1] - a[1]).slice(0, 4).map(([k, v]) => `${esc(k.toLowerCase())} (${v})`).join(", ")}.</div>
+        <ul class="rec">${pp.slice(0, 5).map((f) => `<li><div class="l1"><span>${esc(f.properties.name)}</span><span>${int(Math.round(f.properties.tilequery.distance))} m</span></div><div class="l2">${esc(f.properties.category_en || BIZ[f.properties.class])}</div></li>`).join("")}</ul>`
+        : '<div class="sm">No shops or services on the map within a mile.</div>'}
+      <div class="src">Source: places from Mapbox / OpenStreetMap.</div></div>`;
+    const z = flood && !flood.none ? String(flood.FLD_ZONE || "") : "", high = flood && flood.SFHA_TF === "T";
+    const sub = flood && flood.ZONE_SUBTY ? String(flood.ZONE_SUBTY).toLowerCase() : "";
+    const floodBox = `<div class="box rs"><h3>Flood zone</h3><ul>
+      ${!flood ? "<li>FEMA's flood map did not answer just now.</li>" : flood.none ? "<li>No FEMA flood zone is mapped at this point.</li>"
+        : `<li>${high ? `<span class="lien-on">FEMA zone ${esc(z)}: in the 1% annual-chance floodplain</span>` : `FEMA zone <b>${esc(z)}</b>${/0\.2/.test(sub) ? ": the 0.2% annual-chance (500-year) floodplain" : /minimal/.test(sub) ? ": minimal flood hazard" : ""}`}</li>
+          ${Number(flood.STATIC_BFE) > 0 && Number(flood.STATIC_BFE) < 9000 ? li("Base flood elevation", Number(flood.STATIC_BFE) + " ft") : ""}`}</ul>
+      <div class="src">Source: FEMA National Flood Hazard Layer.</div></div>`;
+    const t = census && census.tract, sqmi = t && t.AREALAND ? t.AREALAND / 2589988.11 : 0;
+    const people = `<div class="box rs"><h3>Neighbors &amp; schools</h3><ul>
+      ${t && t.POP100 ? `<li>About <b>${int(t.POP100)}</b> people live in this census tract, in <b>${int(t.HU100)}</b> homes${sqmi ? ` (${int(Math.round(t.POP100 / sqmi))} per square mile)` : ""}</li>` : ""}
+      ${census && census.schools.length ? li("School district", census.schools.join(" · ")) : ""}${!t && !(census && census.schools.length) ? "<li>The Census Bureau did not answer just now.</li>" : ""}</ul>
+      <div class="src">Source: US Census Bureau, 2020 Census and school district boundaries (TIGERweb)${t && t.NAME ? " · " + esc(t.NAME) : ""}.</div></div>`;
+    const [storyHref, storyLabel] = leadCtx && leadCtx.det ? storyFor(leadCtx.det) : [STORY_BASE, "Story Mode"];
+    const history = `<div class="box rs"><h3>History</h3>
+      ${places && places.length ? `<ul class="rec">${places.map((x) => `<li><a class="sub" href="https://en.wikipedia.org/wiki/${encodeURIComponent(x.title.replace(/ /g, "_"))}" target="_blank" rel="noopener"><div class="l1"><span>${esc(x.title)}</span><span>${int(Math.round(x.d))} m</span></div>
+        ${x.text ? `<div class="l2">${esc(x.text.slice(0, 200))}</div>` : ""}</a></li>`).join("")}</ul>` : '<div class="sm">No places with a written history within a mile.</div>'}
+      <div class="lc-actions" style="margin-top:8px"><a class="btn" href="${storyHref}" target="_blank" rel="noopener">${esc(storyLabel)}</a></div>
+      <div class="src">Source: Wikipedia (places within 1.5 km). The story tells the neighborhood's history, narrated, on a 3D map.</div></div>`;
+    box.innerHTML = `<h3 class="rs-h">Research</h3>${transportHtml(trans || [])}${business}${floodBox}${people}${history}`;
+  }
+
+  // ── Create report: the profile as one clean page, ready to print or save as PDF ──
+  function openReport() {
+    const d = leadCtx.det || detFromProfile(leadCtx.p), p = d.propertyInfo || {};
+    const lat = Number(p.latitude), lon = Number(p.longitude), addr = (p.address && p.address.label) || "Property report";
+    const photo = TOKEN && lat && lon ? `https://api.mapbox.com/styles/v1/mapbox/satellite-v9/static/pin-l+d9771f(${lon},${lat})/${lon},${lat},18,0/900x420@2x?access_token=${encodeURIComponent(TOKEN)}` : "";
+    const part = (id) => { const el = $(id); if (!el) return ""; const c = el.cloneNode(true); c.querySelectorAll("button, .lc-actions, #lcMsg, .lc-photo, .img").forEach((x) => x.remove()); return c.innerHTML; };
+    const css = [...document.querySelectorAll("style")].map((s) => s.textContent).join("\n");
+    const w = window.open("", "_blank");
+    if (!w) { const m = $("lcMsg"); if (m) m.textContent = "Allow pop-ups for this page to open the report."; return; }
+    const today = new Date().toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" });
+    w.document.write(`<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+      <title>${esc(addr)} · Parcelvora report</title><style>${css}
+      html, body { background: #fff; overflow: auto; height: auto; }
+      body { max-width: 900px; margin: 0 auto; padding: 28px 22px 60px; color: #13202f; font-size: 15px; }
+      .rep-h { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; border-bottom: 2px solid #13202f; padding-bottom: 10px; }
+      .rep-h b { font-size: 26px; letter-spacing: -.01em; } .rep-h b i { color: #c0611a; font-style: normal; } .rep-h span { font-size: 15px; color: #5b6573; }
+      h1.rep-t { font-size: 30px; margin: 18px 0 12px; } .hero { width: 100%; height: auto; border-radius: 8px; display: block; } .credit { font-size: 12px; color: #5b6573; margin: 4px 0 14px; }
+      .rep-sec { margin-top: 14px; display: grid; gap: 10px; } .rep-f { margin-top: 24px; padding-top: 10px; border-top: 1px solid #ddd5c6; font-size: 13px; color: #5b6573; }
+      .rep-p { position: fixed; right: 16px; bottom: 16px; padding: 12px 18px; font: 600 15px/1 Inter, system-ui, sans-serif; background: #d9771f; color: #13202f; border: 0; border-radius: 4px; cursor: pointer; }
+      @media print { .rep-p { display: none; } body { padding: 0; } a { color: inherit; text-decoration: none; } }
+      </style></head><body>
+      <div class="rep-h"><b>Parcel<i>vora</i></b><span>Property report · ${esc(today)}</span></div>
+      <h1 class="rep-t">${esc(addr)}</h1>
+      ${photo ? `<img class="hero" src="${photo}" alt="Satellite photo of the lot"><div class="credit">© Mapbox © OpenStreetMap</div>` : ""}
+      <div class="rep-sec">${part("leadCard")}</div>
+      ${$("nycResearch") ? `<div class="rep-sec">${part("nycResearch")}</div>` : ""}
+      ${$("nycRec") ? `<div class="rep-sec">${part("nycRec")}</div>` : ""}
+      <div class="rep-f">Every fact in this report comes from the public record named in its section, as of ${esc(today)}. Parcelvora · property data for New York and Florida.</div>
+      <button class="rep-p" onclick="print()">Print or save as PDF</button>
+      </body></html>`);
+    w.document.close();
+  }
+
+  // ── Skip trace: the owner's phones and emails from Tracerfy, run on the server where the key lives ──
+  function traceHtml(t) {
+    if (!t) return "";
+    if (t.error) return `<div class="sm">${esc(t.message || t.error)}</div>`;
+    const persons = t.persons || [];
+    const when = t.when ? day(t.when) : "";
+    if (!persons.length) return `<div class="sm">No match for this owner${when ? ` (${esc(when)})` : ""}. A miss costs nothing.</div>`;
+    return `<ul class="trace">${persons.map((p) => `<li><div class="l1"><b>${esc(title(p.name || "Unknown"))}</b>${p.age ? ` · ${esc(p.age)}` : ""}${p.deceased ? ' <span class="tag t-est">Deceased</span>' : ""}${p.litigator ? ' <span class="tag t-lien">Known TCPA litigator: do not contact</span>' : ""}</div>
+      ${(p.phones || []).map((ph) => `<div class="l2"><a href="tel:${esc(ph.number)}">${esc(ph.number)}</a> · ${esc(ph.type || "Phone")}${ph.carrier ? " · " + esc(ph.carrier) : ""}${ph.dnc ? ' <span class="tag t-lien">DNC: do not call or text</span>' : ""}${ph.tcpa ? ' <span class="tag t-lien">TCPA flag</span>' : ""}</div>`).join("")}
+      ${(p.emails || []).map((em) => `<div class="l2"><a href="mailto:${esc(em)}">${esc(em)}</a></div>`).join("")}</li>`).join("")}</ul>
+      <div class="src">Source: Tracerfy lookup${when ? ", " + esc(when) : ""}${t.cached ? " (traced before; no new charge)" : t.credits ? ` · ${t.credits} credits` : ""}. Calls and texts must follow the TCPA and Do Not Call rules.</div>`;
+  }
+  async function runTrace(btn) {
+    const pa = (leadCtx.p && leadCtx.p.parcel) || {}, o = leadCtx.p && leadCtx.p.owner || {};
+    if (!confirm(`Skip trace ${o.name ? title(o.name) : "the owner"}? Tracerfy charges about 5 credits if it finds a match; a miss costs nothing.`)) return;
+    btn.disabled = true; btn.textContent = "Tracing…";
+    let t;
+    try {
+      const r = await fetch("/api/skiptrace", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ id: pa.id, county: pa.county }) });
+      t = await r.json();
+      if (!r.ok && !t.error) t = { error: "The skip trace did not answer. Try again." };
+    } catch (e) { t = { error: "The skip trace did not answer. Try again." }; }
+    leadCtx.trace = t;
+    const out = $("traceOut"); if (out) out.innerHTML = traceHtml(t);
+    btn.disabled = false; btn.textContent = t && t.persons ? "Traced" : "Skip trace the owner · about 5 credits per match";
+  }
+
   // ── lead card: the top of every profile — who, the situation as loud tags, talking points, facts as bullets, the
   //    contact card and the actions. Built from the Property Detail object (/api/detail), plus the live NYC record. ─
   let leadCtx = null;
   const STORY_BASE = "https://nextiertech11105.github.io/nextier-flow/parcelvora-story.html";
   const monthsSince = (s) => { const t = new Date(String(s).slice(0, 10) + "T12:00:00"), n = new Date(); return isNaN(t) ? null : (n.getFullYear() - t.getFullYear()) * 12 + (n.getMonth() - t.getMonth()); };
   const ownedFor = (m) => (m == null ? "" : m >= 24 ? `${Math.floor(m / 12)} years` : `${m} months`);
+  // Story Mode opens on this property: its building, its block, then its neighborhood's history.
   function storyFor(d) {
-    const a = (d.propertyInfo && d.propertyInfo.address) || {}, town = String((d.parcelvora || {}).town || "").toUpperCase();
-    if ((d.parcelvora || {}).region === "NYC" && a.zip === "11215") return [STORY_BASE + "?n=park-slope", "Park Slope story"];
-    if (town === "EAST HAMPTON") return [STORY_BASE + "?n=east-hampton", "East Hampton story"];
-    if (town === "CORAL GABLES") return [STORY_BASE + "?n=coral-gables", "Coral Gables story"];
-    return [STORY_BASE, "Story Mode"];
+    const p = d.propertyInfo || {}, a = p.address || {}, pv = d.parcelvora || {};
+    if (p.latitude == null || p.longitude == null) return [STORY_BASE, "Story Mode"];
+    const q = new URLSearchParams({ lat: String(p.latitude), lon: String(p.longitude), addr: a.address || "", town: pv.town || a.city || "", region: pv.region || "",
+      id: String(d.id || ""), yb: String(p.yearBuilt || ""), use: USE[pv.useClass] || "" });
+    if (d.lastSaleDate) q.set("ls", String(d.lastSaleDate).slice(0, 4));
+    return [STORY_BASE + "?" + q.toString(), "Story of this property"];
   }
   // When /api/detail is not there (an older server), the lookup profile stands in.
   function detFromProfile(p) {
@@ -1345,6 +1529,8 @@
     else if (ld && ld.when) bits.push(`deed recorded ${String(ld.when).slice(0, 4)}${ld.amount ? " for " + money(ld.amount) : ""}`);
     else if (pv.heldSince2021) bits.push("same owner since at least 2021");
     if (d.lien || (nyc && nyc.onLien)) bits.push("on NYC's June 2025 lien sale list: behind on city charges");
+    const cv = pv.codeViolations;
+    if (cv && cv.open) bits.push(`${int(cv.open)} open code violation${cv.open === 1 ? "" : "s"}${cv.hpdImmediatelyHazardous ? ` (${int(cv.hpdImmediatelyHazardous)} immediately hazardous)` : ""}${cv.ecbBalance > 0 ? `, ${money(cv.ecbBalance)} in ECB fines owed` : ""}`);
     if (nyc && nyc.openLoans.length) {
       const L = nyc.openLoans.find((x) => x.amount > 0) || nyc.openLoans[0];
       bits.push(`open mortgage${L.amount ? " " + money(L.amount) : ""}${L.lender ? " from " + title(L.lender) : ""} (${String(L.when).slice(0, 4)})` + (L.mark ? `; its ${L.mark.y}-year mark is ${L.mark.m} months out (estimate)` : ""));
@@ -1371,6 +1557,7 @@
     if (o.owner1Type === "Trust") tag("t-trust", "Trust");
     if (pv.heldSince2021) tag("t-held", "Same owner since 2021");
     if (d.lien || (nyc && nyc.onLien)) tag("t-lien", "On the lien sale list");
+    if (pv.codeViolations && pv.codeViolations.open) tag("t-lien", `${int(pv.codeViolations.open)} open code violation${pv.codeViolations.open === 1 ? "" : "s"}`);
     if (nyc && nyc.openLoans.length) tag("t-open", nyc.openLoans.length > 1 ? `${nyc.openLoans.length} mortgages, no satisfaction` : "No satisfaction recorded");
     if (nyc && nyc.freeClear) tag("t-fc", "All mortgages satisfied");
     if (nyc && nyc.openLoans.some((l) => l.matSoon || l.mark)) tag("t-mat", "Loan date within 12 months (est.)");
@@ -1378,6 +1565,13 @@
     if ((pv.unbuiltFarSqft || 0) > 1000) tag("t-room", "Room to build");
     if (d.vacant) tag("t-other", "Vacant lot");
     return t.join("");
+  }
+  // Open code violations (NYC): housing (HPD) by class, building (DOB), and ECB fines still owed.
+  function violFacts(cv) {
+    if (!cv || !cv.open) return "";
+    const parts = [cv.hpdOpen ? `${int(cv.hpdOpen)} housing${cv.hpdImmediatelyHazardous ? ` (${int(cv.hpdImmediatelyHazardous)} immediately hazardous, class C)` : ""}` : "",
+      cv.dobOpen ? `${int(cv.dobOpen)} building (DOB)` : "", cv.ecbOpen ? `${int(cv.ecbOpen)} ECB${cv.ecbBalance > 0 ? ", " + money(cv.ecbBalance) + " owed" : ""}` : ""].filter(Boolean);
+    return `<li><b>Open code violations: ${int(cv.open)}</b>: ${esc(parts.join(" · "))}${cv.lastDate ? ` · latest ${esc(day(cv.lastDate))}` : ""}</li>`;
   }
   function leadFacts(d, nyc) {
     const p = d.propertyInfo || {}, l = d.lotInfo || {}, pv = d.parcelvora || {}, lk = d.linkedProperties || {}, o = d.ownerInfo || {}, ld = nyc && nyc.lastDeed;
@@ -1393,7 +1587,7 @@
       li("Last sale", d.lastSaleDate ? `${day(d.lastSaleDate)}${d.lastSalePrice ? " · " + money(d.lastSalePrice) : ""}` : ld && ld.when ? `${day(ld.when)}${ld.amount ? " · " + money(ld.amount) : ""} (deed)` : ""),
       li("Owned", o.ownershipLength != null ? ownedFor(o.ownershipLength) : ld && ld.when ? ownedFor(monthsSince(ld.when)) : pv.heldSince2021 ? "since at least 2021" : ""),
       li("Portfolio", (lk.totalOwned || 0) >= 2 ? `${lk.totalOwned} properties · ${money(lk.totalValue)}` : ""),
-      loans, d.lien || (nyc && nyc.onLien) ? "<li><b>On the city's June 2025 lien sale list</b></li>" : ""].join("");
+      loans, d.lien || (nyc && nyc.onLien) ? "<li><b>On the city's June 2025 lien sale list</b></li>" : "", violFacts(pv.codeViolations)].join("");
     return [prop, money_];
   }
   function leadCardHtml(ctx) {
@@ -1416,13 +1610,15 @@
       </div>
       <div class="tags lc-tags">${leadTags(d, nyc)}</div>
       <div class="lc-talk"><b>Talking points</b><p id="lcTalk">${esc(talkingPoints(d, nyc))}</p></div>
+      <button type="button" class="lc-more" data-lc="more" aria-expanded="false">Show the facts and contacts</button>
       <div class="lc-grid"><div><h3>Property</h3><ul>${prop}</ul></div><div><h3>Money &amp; timing</h3><ul>${mon || "<li>Not on record</li>"}</ul></div></div>
-      <div class="lc-contact"><h3>Call + email</h3><p>Phones and emails come from the Owner Contacts add-on: you pay only on a match, and every number is screened against the Do Not Call registry.</p>
-        <button type="button" class="btn" disabled>Run Owner Contacts · coming</button></div>
+      <div class="lc-contact"><h3>Call + email</h3><p>Skip trace finds the owner's phones and emails (Tracerfy). Every number comes back with its line type and Do Not Call flag. About 5 credits per match; a miss costs nothing.</p>
+        <button type="button" class="btn" data-lc="trace">${ctx.trace && ctx.trace.persons ? "Traced" : "Skip trace the owner · about 5 credits per match"}</button>
+        <div id="traceOut">${traceHtml(ctx.trace)}</div></div>
       <div class="lc-actions">
         <button type="button" class="btn primary" data-lc="talk">Copy talking points</button>
         <button type="button" class="btn" data-lc="card">Copy lead card</button>
-        <button type="button" class="btn" data-lc="print">Print / PDF</button>
+        <button type="button" class="btn" data-lc="report">Create report</button>
         <a class="btn" href="${storyHref}" target="_blank" rel="noopener">${esc(storyLabel)}</a>
       </div>
       <div class="sm" id="lcMsg" aria-live="polite"></div>
@@ -1439,13 +1635,21 @@
   }
   document.addEventListener("click", async (e) => {
     const b = e.target.closest("[data-lc]"); if (!b || !leadCtx) return;
-    if (b.dataset.lc === "print") { window.print(); return; }
+    if (b.dataset.lc === "more") { const c = b.closest(".lc"), on = !c.classList.contains("open"); c.classList.toggle("open", on); b.setAttribute("aria-expanded", String(on)); b.textContent = on ? "Hide the facts and contacts" : "Show the facts and contacts"; return; }
+    if (b.dataset.lc === "report") { openReport(); return; }
+    if (b.dataset.lc === "trace") { runTrace(b); return; }
     const msg = $("lcMsg"), text = b.dataset.lc === "talk" ? ($("lcTalk") ? $("lcTalk").textContent : "") : leadCardText();
     try { await navigator.clipboard.writeText(text); if (msg) msg.textContent = b.dataset.lc === "talk" ? "Talking points copied." : "Lead card copied."; }
     catch (err) { if (msg) msg.textContent = "Copying is blocked here; select the text and copy it."; }
   });
 
   // ── detail drawer ──────────────────────────────────────────────────────────────────────────────────────────────
+  // Every section heading in a profile is its own open/close button, closed to start, keyboard included.
+  const foldHeads = () => document.querySelectorAll("#drawer .box > h3:not([role])").forEach((h) => { h.setAttribute("role", "button"); h.tabIndex = 0; h.setAttribute("aria-expanded", "false"); });
+  new MutationObserver(foldHeads).observe($("drawer"), { childList: true, subtree: true });
+  const toggleBox = (h) => { const box = h.parentElement, on = !box.classList.contains("open"); box.classList.toggle("open", on); h.setAttribute("aria-expanded", String(on)); };
+  $("drawer").addEventListener("click", (e) => { const h = e.target.closest(".box > h3"); if (h && $("drawer").contains(h)) toggleBox(h); });
+  $("drawer").addEventListener("keydown", (e) => { const h = e.target.closest && e.target.closest(".box > h3"); if (h && (e.key === "Enter" || e.key === " ")) { e.preventDefault(); toggleBox(h); } });
   let lastFocus = null;
   function closeDetail() {
     $("drawer").hidden = true; $("scrim").hidden = true;
@@ -1479,7 +1683,7 @@
         <button type="button" class="btn" id="close">Close</button>
       </div>
       <div id="leadCard">${leadCardHtml(leadCtx)}</div>
-      ${pa.region === "NYC" && /^\d{10}$/.test(String(pa.id)) ? '<div id="nycResearch"><div class="box"><h3>Research</h3><div class="sm">Pulling zoning, transit, businesses and history…</div></div></div>' : ""}
+      ${pa.lat != null ? '<div id="nycResearch"><div class="box"><h3>Research</h3><div class="sm">Pulling transportation, businesses, flood zone and history…</div></div></div>' : ""}
       <div class="box"><h3>Owner</h3><ul>
         ${li("First name", o.first_name)}${li("Last name", o.last_name)}${li("Name on record", o.name)}${li("Second owner", o.second_owner)}${li("Owner type", o.type)}
         ${li("Mailing address", o.mailing_address)}${o.held_since_2021 ? "<li><b>Same owner since at least 2021</b></li>" : ""}
@@ -1498,7 +1702,7 @@
       <div class="box"><h3>Parcel</h3><ul>${li("Parcel id", pa.id)}${li("County", pa.county)}${li("Region", REGION[pa.region] || pa.region)}</ul></div>`;
     $("close").onclick = closeDetail; $("close").focus();
     if ($("nycRec")) nycRecord(String(pa.id));
-    if ($("nycResearch")) nycResearch(String(pa.id), Number(pa.lat), Number(pa.lon));
+    if ($("nycResearch")) (pa.region === "NYC" && /^\d{10}$/.test(String(pa.id)) ? nycResearch : areaResearch)(String(pa.id), Number(pa.lat), Number(pa.lon));
     if ($("onMap")) $("onMap").onclick = () => {
       $("drawer").hidden = true; $("scrim").hidden = true;
       if (view === "table") setView("map", [pa.lon, pa.lat]);
