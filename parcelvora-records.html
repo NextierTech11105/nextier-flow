@@ -520,11 +520,14 @@
   /* Start clean: a profile opens with every section closed. The heading is the toggle; nothing is remembered open. */
   #drawer .box:not(.open) > :not(h3) { display: none; }
   #drawer .box > h3 { cursor: pointer; display: flex; justify-content: space-between; align-items: center; gap: 10px; margin: 0; }
-  #drawer .box > h3::after { content: "+"; font-size: 22px; line-height: 1; opacity: .8; }
+  #drawer .box > h3::after { content: "Show \25BE"; flex: none; font: 700 14px/1 var(--body); letter-spacing: 0; text-transform: none; padding: 8px 12px;
+    border: 1px solid var(--line); border-radius: 999px; background: var(--card); color: var(--blue); }
   #drawer .box.open > h3 { margin-bottom: 10px; }
-  #drawer .box.open > h3::after { content: "\2212"; }
+  #drawer .box.open > h3::after { content: "Hide \25B4"; }
+  .fold-btn { display: inline-flex; align-items: center; gap: 6px; font-weight: 700; color: var(--blue); }
+  .fold-row { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; justify-content: space-between; margin: 4px 0; }
   #drawer .lc:not(.open) .lc-grid, #drawer .lc:not(.open) .lc-contact { display: none; }
-  .lc-more { background: none; border: 0; padding: 4px 0; font: inherit; font-weight: 700; color: inherit; cursor: pointer; text-decoration: underline; text-underline-offset: 3px; }
+  .lc-more { justify-self: start; background: var(--card); border: 1px solid var(--line); border-radius: 999px; padding: 8px 14px; font: inherit; font-weight: 700; color: var(--blue); cursor: pointer; }
   @media print { #drawer .box > *, #drawer .lc .lc-grid, #drawer .lc .lc-contact { display: revert !important; } }
   .rt.rk { border-radius: 4px; padding: 0 7px; width: auto; background: var(--ink, #13202f); color: #fff; font-weight: 600; }
   .trace { list-style: none; margin: 10px 0 0; padding: 0; display: grid; gap: 10px; }
@@ -653,10 +656,13 @@
   <section class="savedpanel activity" id="activityPanel" hidden aria-label="List export activity calendar">
     <div class="sp-head"><h2>List Activity Calendar</h2><p class="sm">A list pull is a completed export with records delivered. The log also shows empty attempts. Days follow America/New_York time.</p></div>
     <div class="activity-stats" id="activityStats"></div>
+    <button type="button" class="btn fold-btn" id="activityCalToggle" aria-expanded="false" aria-controls="activityCal">Show calendar ▾</button>
+    <div id="activityCal" class="activity" hidden>
     <div class="activity-nav"><button class="btn" type="button" id="activityPrev" aria-label="Previous month">‹</button><h3 id="activityMonth"></h3><button class="btn" type="button" id="activityNext" aria-label="Next month">›</button><button class="btn" type="button" id="activityToday">Today</button><button class="btn" type="button" id="activityRefresh">Refresh</button></div>
     <div class="activity-weekdays" aria-hidden="true"><b>Mon</b><b>Tue</b><b>Wed</b><b>Thu</b><b>Fri</b><b>Sat</b><b>Sun</b></div>
     <div class="activity-calendar" id="activityCalendar" role="group" aria-label="Export activity by day"></div>
     <h3 id="activityDayTitle"></h3><div id="activityLog" class="activity-log"></div>
+    </div>
     <div class="sm" id="activityNotice" role="status"></div>
   </section>
 
@@ -1332,8 +1338,14 @@
       renderActivity();
     } catch (_) { $("activityLog").textContent = "Could not load export history."; }
   }
-  function openActivity() {
+  const showCalendar = (on) => {
+    $("activityCal").hidden = !on; $("activityCalToggle").setAttribute("aria-expanded", String(on));
+    $("activityCalToggle").textContent = on ? "Hide calendar ▴" : "Show calendar ▾";
+  };
+  $("activityCalToggle").onclick = () => showCalendar($("activityCal").hidden);
+  function openActivity(withCalendar) {
     $("activityPanel").hidden = false; $("activityBtn").setAttribute("aria-expanded", "true");
+    showCalendar(!!withCalendar);   // the summary first; the calendar opens on request
     fetchActivity();
   }
   $("activityBtn").addEventListener("click", () => {
@@ -1400,7 +1412,7 @@
   $("download").addEventListener("click", (e) => { e.preventDefault(); openExportDialog(tableParams().toString()); });
   function closeExport() { $("exportDialog").hidden = true; document.body.classList.remove("comps-on"); }
   $("exportClose").onclick = closeExport;
-  $("exportHistory").onclick = () => { closeExport(); openActivity(); $("activityPanel").scrollIntoView({block:"start"}); };
+  $("exportHistory").onclick = () => { closeExport(); openActivity(true); $("activityPanel").scrollIntoView({block:"start"}); };
   $("exportConfirm").onclick = async () => {
     const b = $("exportConfirm"); b.disabled = true; $("exportNote").textContent = "Preparing export…";
     const chosen = document.querySelector('input[name="exportMode"]:checked'), fmt = $("exportFormat").value, target = $("exportTarget").value;
@@ -1647,7 +1659,8 @@
         <div class="box open"><h3>Send to</h3>${c.mail ? opt("ltTo", "mail", letter.to, `The owner's mailing address<br><span class="sm">${esc(c.mail.line1)}, ${esc(c.mail.line2)}</span>`)
           + opt("ltTo", "property", letter.to, `The property<br><span class="sm">${esc(c.prop.line1)}, ${esc(c.prop.line2)}</span>`) + opt("ltTo", "both", letter.to, "Both: one letter to each address")
           : `<p class="sm">${c.ownerLivesThere ? "The owner lives at the property, so the letter goes there" : "The mailing address on record is the property itself"}: ${esc(c.prop.line1)}, ${esc(c.prop.line2)}.</p>`}</div>
-        <div class="box open"><h3>From you</h3><div class="lt-form">
+        <div class="box open"><h3>From you</h3>${s.name ? `<div class="fold-row"><span class="sm">${esc([s.name, s.company, s.phone, s.email].filter(Boolean).join(" · "))}</span>
+          <button type="button" class="btn fold-btn" id="ltSenderToggle" aria-expanded="false" aria-controls="ltSender">Edit ▾</button></div>` : ""}<div class="lt-form" id="ltSender" ${s.name ? "hidden" : ""}>
           ${field("ltName", "Your name", s.name, 'autocomplete="name"')}${field("ltCompany", "Company (optional)", s.company, 'autocomplete="organization"')}
           <div class="lt-row">${field("ltPhone", "Phone", s.phone, 'autocomplete="tel" inputmode="tel"')}${field("ltEmail", "Email", s.email, 'autocomplete="email" inputmode="email"')}</div>
           ${field("ltRet1", "Your street address (return address)", s.ret1, 'autocomplete="address-line1"')}${field("ltRet2", "City, state and ZIP", s.ret2, 'autocomplete="address-level2"')}
@@ -1700,6 +1713,7 @@
   $("letters").addEventListener("click", async (e) => {
     const t = e.target;
     if (t.closest("#ltClose")) return closeLetters();
+    if (t.closest("#ltSenderToggle")) { const b = $("ltSenderToggle"), on = $("ltSender").hidden; $("ltSender").hidden = !on; b.setAttribute("aria-expanded", String(on)); b.textContent = on ? "Done ▴" : "Edit ▾"; return; }
     if (t.closest("#ltReset")) { letter.edited = false; return refreshLetter(true); }
     if (t.closest("#ltCopy")) {
       const text = $("ltBody").value; let ok = false;
@@ -2431,7 +2445,7 @@
       </div>
       <div class="tags lc-tags">${leadTags(d, nyc)}</div>
       <div class="lc-talk"><b>Talking points</b><p id="lcTalk">${esc(talkingPoints(d, nyc))}</p></div>
-      <button type="button" class="lc-more" data-lc="more" aria-expanded="false">Show the facts and contacts</button>
+      <button type="button" class="lc-more" data-lc="more" aria-expanded="false">Show facts and contacts ▾</button>
       <div class="lc-grid"><div><h3>Property</h3><ul>${prop}</ul></div><div><h3>Money &amp; timing</h3><ul>${mon || "<li>Not on record</li>"}</ul></div></div>
       <div class="lc-contact"><h3>Call + email</h3><p>Skip trace finds the owner's phones and emails (Tracerfy). Every number comes back with its line type and Do Not Call flag. About 5 credits per match; a miss costs nothing.</p>
         <button type="button" class="btn" data-lc="trace">${ctx.trace && ctx.trace.persons ? "Traced" : "Skip trace the owner · about 5 credits per match"}</button>
@@ -2460,7 +2474,7 @@
   }
   document.addEventListener("click", async (e) => {
     const b = e.target.closest("[data-lc]"); if (!b || !leadCtx) return;
-    if (b.dataset.lc === "more") { const c = b.closest(".lc"), on = !c.classList.contains("open"); c.classList.toggle("open", on); b.setAttribute("aria-expanded", String(on)); b.textContent = on ? "Hide the facts and contacts" : "Show the facts and contacts"; return; }
+    if (b.dataset.lc === "more") { const c = b.closest(".lc"), on = !c.classList.contains("open"); c.classList.toggle("open", on); b.setAttribute("aria-expanded", String(on)); b.textContent = on ? "Hide facts and contacts ▴" : "Show facts and contacts ▾"; return; }
     if (b.dataset.lc === "report") { openReport(); return; }
     if (b.dataset.lc === "letter") { openLetters(); return; }
     if (b.dataset.lc === "list") { const pa = (leadCtx.p && leadCtx.p.parcel) || {}; openListPick(`This property: ${(((leadCtx.det || {}).propertyInfo || {}).address || {}).address || pa.id}.`, { ids: [pa.id + "|" + pa.county] }); return; }
@@ -2571,13 +2585,15 @@
           <button type="button" class="btn" id="compsClear">Clear</button><button type="button" class="btn primary" id="compsClose">Close</button></div></div>
       <div class="sm comps-msg" aria-live="polite">${esc(msg || "")}</div>
       ${s ? subjectCard(s, st) : `<div class="box open"><h3>Subject</h3><p class="sm">No subject yet. Press <b>Make subject</b> on a selected property below, or in a property's profile.</p></div>`}
-      ${img ? `<img class="comps-map" src="${img}" alt="Map of the subject (S) and the comps by number">` : ""}
+      ${img ? `<button type="button" class="btn fold-btn" id="compsMapToggle" aria-expanded="${compsMapOpen}" aria-controls="compsMap">${compsMapOpen ? "Hide map ▴" : "Show map ▾"}</button>
+        <img class="comps-map" id="compsMap" src="${img}" alt="Map of the subject (S) and the comps by number" ${compsMapOpen ? "" : "hidden"}>` : ""}
       <div class="box open"><h3>Comparable sales (${list.length})</h3>
         ${list.length ? `<div class="ctable-wrap"><table class="ctable">${compHead(true)}<tbody>${list.map((r, k) => compRow(r, k, s, true, st.med)).join("")}</tbody></table></div>`
           : '<p class="sm">Nothing selected yet. Press <b>+</b> on rows in the records table to add them, or set a subject and press <b>Suggest comps</b>.</p>'}</div>
       <div class="src">${COMPS_NOTE}</div></div>`;
   }
-  function openComps(msg) { renderComps(msg); $("comps").hidden = false; document.body.classList.add("comps-on"); const c = $("compsClose"); if (c) c.focus(); }
+  let compsMapOpen = false;
+  function openComps(msg) { compsMapOpen = false; renderComps(msg); $("comps").hidden = false; document.body.classList.add("comps-on"); const c = $("compsClose"); if (c) c.focus(); }
   function closeComps() { $("comps").hidden = true; document.body.classList.remove("comps-on"); }
   async function suggestComps() {
     const s = comps.subject; if (!s) return;
@@ -2616,6 +2632,7 @@
   $("comps").addEventListener("click", (e) => {
     const t = e.target;
     if (t.closest("#compsClose")) return closeComps();
+    if (t.closest("#compsMapToggle")) { compsMapOpen = !compsMapOpen; $("compsMap").hidden = !compsMapOpen; const mb = $("compsMapToggle"); mb.setAttribute("aria-expanded", String(compsMapOpen)); mb.textContent = compsMapOpen ? "Hide map ▴" : "Show map ▾"; return; }
     if (t.closest("#compsClear")) { comps.subject = null; comps.picks.clear(); keepComps(); return renderComps(); }
     if (t.closest("#compsSuggest")) return suggestComps();
     if (t.closest("#compsReport")) return compsReport();
