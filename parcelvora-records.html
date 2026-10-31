@@ -261,6 +261,17 @@
   .drawer h3 { font: 800 13px var(--display); letter-spacing: 0.08em; text-transform: uppercase; color: var(--blue); margin: 0 0 6px; }
   .drawer ul { margin: 0; padding-left: 20px; display: grid; gap: 4px; }
   .drawer .box { background: var(--card); border: 1px solid var(--line); border-radius: 10px; padding: 12px 14px; box-shadow: var(--shadow); }
+  /* The NYC public record, live: each document on its own line, its ACRIS link and filing date beside it. */
+  .rec { list-style: none; margin: 0; padding: 0 !important; display: grid; gap: 0 !important; }
+  .rec li { padding: 9px 0; border-top: 1px solid var(--line); }
+  .rec li:first-child { border-top: 0; padding-top: 2px; }
+  .rec .l1 { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 4px 12px; font-weight: 700; }
+  .rec .l2 { color: var(--soft); font-size: 15px; }
+  .rec a, .src a { color: var(--blue); font-weight: 700; text-decoration: none; white-space: nowrap; }
+  .rec .open { color: #b45309; font-weight: 800; }
+  .rec .done { color: var(--green); font-weight: 800; }
+  .src { font-size: 15px; color: var(--soft); margin-top: 8px; }
+  .lien-on { color: var(--red); font-weight: 800; }
   .dtop { display: flex; justify-content: space-between; gap: 8px; }
   [hidden] { display: none !important; }
 </style>
@@ -659,6 +670,118 @@
   }
   document.querySelectorAll(".seg button").forEach((b) => b.addEventListener("click", () => setView(b.dataset.view)));
 
+  // ── NYC public record, live from the city (no key) ─────────────────────────────────────────────────────────────
+  // ACRIS legals → master → parties gives every recorded document on the lot; ACRIS references tie each satisfaction
+  // and assignment to the mortgage it closes; DOF gives tax class, values and exemptions; the DOF lien sale list
+  // says whether the lot is behind on city charges. Every line carries its source and filing date.
+  const SODA = "https://data.cityofnewyork.us/resource";
+  const sq = (v) => `'${String(v).replace(/'/g, "''")}'`;
+  const soda = async (ds, params) => {
+    const r = await fetch(`${SODA}/${ds}.json?` + new URLSearchParams(params));
+    if (!r.ok) throw new Error(ds + " " + r.status);
+    return r.json();
+  };
+  const acrisDoc = (id) => `https://a836-acris.nyc.gov/DS/DocumentSearch/DocumentImageView?doc_id=${encodeURIComponent(id)}`;
+  const day = (s) => { if (!s) return "date not on record"; const d = new Date(String(s).slice(0, 10) + "T12:00:00"); return isNaN(d) ? String(s).slice(0, 10) : d.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" }); };
+  const monthYear = (s) => { const d = new Date(String(s).slice(0, 10) + "T12:00:00"); return isNaN(d) ? "" : d.toLocaleDateString("en-US", { month: "long", year: "numeric" }); };
+  let docCodes = null, lienListMonth = null;
+  async function nycRecord(bbl) {
+    const box = $("nycRec"); if (!box) return;
+    const boro = bbl[0], block = String(parseInt(bbl.slice(1, 6), 10)), lot = String(parseInt(bbl.slice(6), 10));
+    const lotWhere = `borough=${sq(boro)} AND block=${sq(block)} AND lot=${sq(lot)}`;
+    if (!docCodes) docCodes = soda("7isb-wh4c", { $limit: "500" }).then((rows) => new Map(rows.map((r) => [String(r.doc__type).trim(), r]))).catch(() => { docCodes = null; return new Map(); });
+    if (!lienListMonth) lienListMonth = soda("9rz4-mjek", { $select: "max(month) as m" }).then((r) => (r[0] && r[0].m) || "").catch(() => { lienListMonth = null; return ""; });
+    try {
+      const [legals, val, lien, codes, latestList] = await Promise.all([
+        soda("8h5j-fqxa", { $where: lotWhere, $select: "document_id", $limit: "1500" }),
+        soda("8y4t-faws", { $where: `parid=${sq(bbl)}`, $order: "year DESC, period DESC", $limit: "1",
+          $select: "year,curtaxclass,curmkttot,curacttot,curactextot,curtxbtot,bld_story,zoning,lot_frt,lot_dep,units,gross_sqft,yrbuilt,extracrdt" }).catch(() => []),
+        soda("9rz4-mjek", { $where: lotWhere, $order: "month DESC", $limit: "1", $select: "month,cycle,water_debt_only" }).catch(() => []),
+        docCodes, lienListMonth,
+      ]);
+      const ids = [...new Set(legals.map((l) => String(l.document_id)))].slice(0, 400);
+      const parts = []; for (let i = 0; i < ids.length; i += 100) parts.push(ids.slice(i, i + 100));
+      const inl = (a) => a.map(sq).join(",");
+      const [master, parties] = await Promise.all([
+        Promise.all(parts.map((c) => soda("bnx9-e6tj", { $where: `document_id in(${inl(c)})`, $limit: "1000",
+          $select: "document_id,doc_type,document_date,recorded_datetime,document_amt,crfn,recorded_borough,reel_yr,reel_nbr,reel_pg" }))).then((a) => a.flat()),
+        Promise.all(parts.map((c) => soda("636b-3b5g", { $where: `document_id in(${inl(c)})`, $select: "document_id,party_type,name", $limit: "3000" }))).then((a) => a.flat()),
+      ]);
+      const byDoc = new Map();
+      for (const p of parties) { const k = String(p.document_id); if (!byDoc.has(k)) byDoc.set(k, []); byDoc.get(k).push(p); }
+      const names = (ps, t) => [...new Set(ps.filter((p) => String(p.party_type) === t).map((p) => title(p.name || "")))].filter(Boolean);
+      const docs = master.map((m) => {
+        const c = codes.get(String(m.doc_type || "").trim()) || {}, ps = byDoc.get(String(m.document_id)) || [];
+        return { id: String(m.document_id), desc: title(c.doc__type_description || m.doc_type || "Document"), cls: c.class_code_description || "OTHER DOCUMENTS",
+          r1: title(c.party1_type || ""), r2: title(c.party2_type || ""), when: m.recorded_datetime || m.document_date || "",
+          amount: Number(m.document_amt) || 0, crfn: String(m.crfn || ""), reel: [m.recorded_borough, m.reel_yr, m.reel_nbr, m.reel_pg].map((x) => String(x || "0")).join("/"),
+          p1: names(ps, "1"), p2: names(ps, "2") };
+      }).sort((a, b) => (String(a.when) < String(b.when) ? 1 : -1));
+      // A transfer of ownership is a deed; leases and easements are conveyances too, but they don't change the owner.
+      const conveyances = docs.filter((d) => d.cls === "DEEDS AND OTHER CONVEYANCES");
+      const deeds = conveyances.filter((d) => /deed/i.test(d.desc));
+      const leases = conveyances.filter((d) => !/deed/i.test(d.desc));
+      const money_ = docs.filter((d) => d.cls === "MORTGAGES & INSTRUMENTS");
+      const liens = docs.filter((d) => d.cls === "UCC AND FEDERAL LIENS");
+      const isSat = (d) => /satisfaction/i.test(d.desc), isAsst = (d) => /assignment/i.test(d.desc);
+      // Only a mortgage gets an open / satisfied status; agreements, spreaders and the like are listed as they are.
+      const loans = money_.filter((d) => !isSat(d) && !isAsst(d));
+      const isLoan = (d) => /mortgage/i.test(d.desc);
+      const closers = money_.filter((d) => isSat(d) || isAsst(d));
+      // Which satisfaction or assignment points at which mortgage: ACRIS references, by CRFN or by reel and page.
+      const closerIds = closers.map((d) => d.id), cparts = [];
+      for (let i = 0; i < closerIds.length; i += 100) cparts.push(closerIds.slice(i, i + 100));
+      const refs = (await Promise.all(cparts.map((c) => soda("pwkr-dpni", { $where: `document_id in(${inl(c)})`, $limit: "2000",
+        $select: "document_id,reference_by_crfn_,reference_by_reel_borough,reference_by_reel_year,reference_by_reel_nbr,reference_by_reel_page" }).catch(() => [])))).flat();
+      const pointsAt = new Map();
+      for (const r of refs) {
+        const keys = [String(r.reference_by_crfn_ || ""), [r.reference_by_reel_borough, r.reference_by_reel_year, r.reference_by_reel_nbr, r.reference_by_reel_page].map((x) => String(x || "0")).join("/")];
+        if (!pointsAt.has(r.document_id)) pointsAt.set(r.document_id, []);
+        pointsAt.get(r.document_id).push(...keys.filter((k) => k && k !== "0/0/0/0"));
+      }
+      const closedBy = (loan, test) => closers.filter((c) => test(c) && (pointsAt.get(c.id) || []).some((k) => k === loan.crfn || k === loan.reel));
+      const link = (d) => `<a href="${acrisDoc(d.id)}" target="_blank" rel="noopener">ACRIS ↗</a>`;
+      const who = (d) => [d.p1.length ? `${d.r1 || "From"}: ${esc(d.p1.join(", "))}` : "", d.p2.length ? `${d.r2 || "To"}: ${esc(d.p2.join(", "))}` : ""].filter(Boolean).join(" → ");
+      const row = (d, extra = "") => `<li><div class="l1"><span>${esc(day(d.when))} · ${esc(d.desc)}${d.amount ? " · " + money(d.amount) : ""}</span>${link(d)}</div><div class="l2">${who(d)}${extra}</div></li>`;
+      const more = (list, n) => (list.length > n ? `<li class="l2">…and ${list.length - n} more on ACRIS.</li>` : "");
+      const v = val[0], lr = lien[0];
+      const onLatest = lr && latestList && String(lr.month).slice(0, 7) === String(latestList).slice(0, 7);
+      const today = new Date().toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
+      box.innerHTML = `
+        <div class="box"><h3>Deed chain · ${deeds.length} recorded</h3>
+          ${deeds.length ? `<ul class="rec">${deeds.slice(0, 12).map((d) => row(d)).join("")}${more(deeds, 12)}</ul>` : '<div class="sm">No deeds on ACRIS for this lot. Staten Island deeds are not in ACRIS.</div>'}
+          <div class="src">Source: ACRIS recorded documents, read live ${esc(today)}. Each line links to the scanned document.</div></div>
+        ${leases.length ? `<div class="box"><h3>Leases &amp; easements · ${leases.length} recorded</h3>
+          <ul class="rec">${leases.slice(0, 8).map((d) => row(d)).join("")}${more(leases, 8)}</ul>
+          <div class="src">Source: ACRIS recorded documents.</div></div>` : ""}
+        <div class="box"><h3>Mortgages &amp; satisfactions · ${loans.filter(isLoan).length} mortgages</h3>
+          ${loans.length ? `<ul class="rec">${loans.slice(0, 12).map((d) => {
+            if (!isLoan(d)) return row(d);
+            const sat = closedBy(d, isSat)[0], asst = closedBy(d, isAsst);
+            const status = sat ? ` · <span class="done">Satisfied ${esc(day(sat.when))}</span> <a href="${acrisDoc(sat.id)}" target="_blank" rel="noopener">↗</a>` : ` · <span class="open">No satisfaction recorded</span>`;
+            const moved = asst.length ? ` · Assigned to ${esc(asst[0].p2.join(", ") || "a new lender")}` : "";
+            return row(d, status + moved);
+          }).join("")}${more(loans, 12)}</ul>` : '<div class="sm">No mortgages on ACRIS for this lot.</div>'}
+          <div class="src">Source: ACRIS, with each satisfaction and assignment matched to its mortgage through ACRIS references.</div></div>
+        <div class="box"><h3>Liens &amp; UCC filings · ${liens.length} recorded</h3>
+          ${liens.length ? `<ul class="rec">${liens.slice(0, 10).map((d) => row(d)).join("")}${more(liens, 10)}</ul>` : '<div class="sm">No UCC filings or federal liens recorded on ACRIS for this lot.</div>'}
+          <div class="src">Source: ACRIS, UCC and federal liens. Judgments and mechanic's liens are filed with the County Clerk, not ACRIS.</div></div>
+        <div class="box"><h3>Taxes &amp; assessment</h3><ul>
+          ${lr ? (onLatest ? `<li><span class="lien-on">On the city's lien sale list</span>: ${esc(lr.cycle || "notice")}, ${esc(monthYear(lr.month))}${lr.water_debt_only === "YES" ? " (water and sewer charges only)" : ""}</li>`
+            : `<li>Was on the ${esc(monthYear(lr.month))} lien sale list; not on the latest one (${esc(monthYear(latestList))})</li>`)
+            : `<li>Not on the city's lien sale list${latestList ? ` (latest list: ${esc(monthYear(latestList))})` : ""}</li>`}
+          ${v ? `${li("Tax class", v.curtaxclass)}${li("Market value", Number(v.curmkttot) ? money(Number(v.curmkttot)) : "")}${li("Assessed value", Number(v.curacttot) ? money(Number(v.curacttot)) : "")}${li("Exempt amount", Number(v.curactextot) ? money(Number(v.curactextot)) : "")}${li("Taxable value", Number(v.curtxbtot) ? money(Number(v.curtxbtot)) : "")}` : "<li>Assessment not found for this lot.</li>"}
+        </ul><div class="src">Sources: NYC Department of Finance assessment roll${v ? ` ${esc(v.year)}, extracted ${esc(day(v.extracrdt))}` : ""} · DOF tax lien sale list.</div></div>
+        ${v ? `<div class="box"><h3>Building facts</h3><ul>
+          ${li("Stories", Number(v.bld_story) ? Number(v.bld_story) : "")}${li("Zoning district", v.zoning)}${li("Lot", Number(v.lot_frt) ? `${Number(v.lot_frt)} × ${Number(v.lot_dep)} ft` : "")}${li("Units", Number(v.units) ? v.units : "")}${li("Gross area", Number(v.gross_sqft) ? int(Number(v.gross_sqft)) + " sq ft" : "")}${li("Year built", Number(v.yrbuilt) ? v.yrbuilt : "")}
+        </ul><div class="src">Source: NYC Department of Finance assessment roll ${esc(v.year)}.</div></div>` : ""}`;
+    } catch (e) {
+      box.innerHTML = '<div class="box"><h3>Recorded documents</h3><div class="sm">The city\'s records did not answer just now. <button type="button" class="btn" id="recRetry">Try again</button></div></div>';
+      const b = $("recRetry"); if (b) b.onclick = () => nycRecord(bbl);
+    }
+  }
+  const li = (label, v) => (v == null || v === "" ? "" : `<li>${label}: <b>${esc(v)}</b></li>`);
+
   // ── detail drawer ──────────────────────────────────────────────────────────────────────────────────────────────
   let lastFocus = null;
   function closeDetail() {
@@ -706,8 +829,10 @@
         ${li("Zoning", pr.zoning)}${li("Exemptions", pr.exemptions)}
       </ul></div>
       ${ls ? `<div class="box"><h3>Last sale</h3><ul>${li("Price", money(ls.price_usd))}${li("Date", ls.date ? saleDate(ls.date, pa.region) : ls.month ? saleDate(String(ls.month).slice(0, 7) + "-01", "FL") : "")}${li("What sold", ls.what_sold)}${li("Deed book / page", ls.deed_book_page)}</ul></div>` : ""}
+      ${pa.region === "NYC" && /^\d{10}$/.test(String(pa.id)) ? '<div id="nycRec"><div class="box"><h3>Recorded documents</h3><div class="sm">Pulling deeds, mortgages, liens and taxes from the city…</div></div></div>' : ""}
       <div class="box"><h3>Parcel</h3><ul>${li("Parcel id", pa.id)}${li("County", pa.county)}${li("Region", REGION[pa.region] || pa.region)}</ul></div>`;
     $("close").onclick = closeDetail; $("close").focus();
+    if ($("nycRec")) nycRecord(String(pa.id));
     if ($("onMap")) $("onMap").onclick = () => {
       $("drawer").hidden = true; $("scrim").hidden = true;
       if (view === "table") setView("map", [pa.lon, pa.lat]);
