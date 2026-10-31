@@ -9,7 +9,7 @@
 <link rel="icon" href="parcelvora-fox.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@700;800&family=IBM+Plex+Sans:wght@400;500;600;700&family=Bodoni+Moda:wght@700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <link href="https://api.mapbox.com/mapbox-gl-js/v3.7.0/mapbox-gl.css" rel="stylesheet">
 <script src="https://api.mapbox.com/mapbox-gl-js/v3.7.0/mapbox-gl.js"></script>
 <script src="https://unpkg.com/deck.gl@8.9.36/dist.min.js"></script>
@@ -122,49 +122,54 @@ h1 { font-family: var(--serif); font-weight: 500; font-size: 40px; line-height: 
 }
 </style>
 <style>
-/* Parcelvora brand: navy + gold + product blue, the same as the landing page and the records app. */
-:root { --mint: #dbe8f8; --mint-soft: #e3eefc; --mint-pale: #f3f8ff; --ink: #0a1a2f; --ink-2: #33465e; --line: #b9cbe3;
-  --coral: #d9a548; --pink: #9cc3f5; --lime: #1b6fe0; --gold: #f0c66e; --navy: #0b1f3a; --blue: #1b6fe0;
-  --serif: "Archivo", system-ui, sans-serif; --sans: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif; }
-body { background: #f3f8ff; }
-.bar { background: var(--navy); border-bottom: 1px solid rgba(255,255,255,.14); color: #fff; }
-.word { font-family: "Bodoni Moda", Georgia, serif; font-weight: 700; letter-spacing: .05em; color: #fff; }
-.word b { color: #d9a548; font-weight: 700; }
-.word small { color: #f0c66e; }
-.mark { border-color: rgba(255,255,255,.6); }
-.seg .lbl { color: #dbe7f7; }
-.seg button { border-color: rgba(255,255,255,.5); background: transparent; color: #fff; }
-.seg button[aria-pressed="true"] { background: #d9a548; color: var(--navy); border-color: #d9a548; }
-.panel { border: 1px solid #d5e2f2; border-radius: 16px; box-shadow: 0 24px 60px rgba(10,26,47,.25); }
-h1, .start-card h2, .lot h2, .stats b { font-weight: 800; letter-spacing: -0.01em; }
-.eyebrow { color: var(--blue); }
-.eyebrow::before { background: #d9a548; border-color: #d9a548; }
-.brow i { background: var(--blue); border-color: var(--blue); }
-.brow:nth-child(2n) i { background: #d9a548; border-color: #d9a548; }
-.brow:nth-child(3n) i { background: #9cc3f5; border-color: #9cc3f5; }
-.cols { border-bottom-color: var(--navy); }
-.cols i { background: var(--blue); border-color: var(--blue); }
-.cols i.hi { background: #d9a548; border-color: #d9a548; }
-.stats div { background: #f3f8ff; border: 1px solid #d5e2f2; }
-.stats b { color: var(--navy); }
-.why { border-color: #d9a548; background: #fdf6e7; }
-.why b { color: #8a5f12; }
-.legend .ramp { background: linear-gradient(90deg, #dbe8f8, #9cc3f5, #5b9be8, #1b6fe0, #f0c66e, #d9a548); }
-.leg { background: #f3f8ff; border-color: #d5e2f2; }
-.cta a { border-bottom-color: #d9a548; }
-.p-ctl { background: #f3f8ff; border-top-color: #d5e2f2; }
-.prog { background: #dbe8f8; border-color: #d5e2f2; }
-.prog i { background: #d9a548; }
-.btns button { border: 1px solid var(--line); color: var(--navy); }
-.btns button:hover, .btns button[aria-pressed="true"] { background: var(--navy); color: #f0c66e; border-color: var(--navy); }
-.dots button[aria-current="true"] { background: #d9a548; border-color: #d9a548; }
-.lot { border: 1px solid #d5e2f2; box-shadow: 0 18px 44px rgba(10,26,47,.3); }
-.lot .tags span { background: #e3eefc; border-color: var(--line); color: var(--navy); }
-.start { background: rgba(11,31,58,.62); }
-.start-card { border: 0; box-shadow: 0 30px 80px rgba(0,0,0,.4); }
-.start-btns button { border: 2px solid #d9a548; background: #d9a548; color: var(--navy); }
-.start-btns button.ghost { background: #fff; color: var(--navy); border-color: var(--navy); }
-.start-btns button:hover { background: #f0c66e; border-color: #f0c66e; color: var(--navy); }
+/* Parcelvora brand, from Silvia's design: navy ink, cream paper, burnt orange, Instrument Serif + Inter + DM Mono. */
+:root { --mint: #ece5d8; --mint-soft: #ece5d8; --mint-pale: #f4efe6; --ink: #13202f; --ink-2: #5b6573; --line: #ddd5c6;
+  --coral: #d9771f; --pink: #e9c9a4; --lime: #26405f; --gold: #e9a35a; --navy: #0f1c2d; --orange: #c0611a; --blue: #26405f;
+  --serif: "Instrument Serif", Georgia, serif; --sans: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif; --mono: "DM Mono", ui-monospace, Consolas, monospace; }
+body { background: #f4efe6; }
+.bar { background: var(--navy); border-bottom: 1px solid rgba(255,255,255,.12); color: #efe9de; }
+.word { font-family: var(--serif); font-weight: 400; font-size: 32px; letter-spacing: 0; color: #f4efe6; }
+.word b { color: #e08a3c; font-weight: 400; }
+.word small { font-family: var(--mono); font-weight: 500; color: #e9a35a; letter-spacing: .16em; }
+.mark { border-color: rgba(255,255,255,.5); }
+.seg .lbl { font-family: var(--mono); font-weight: 500; color: #c9c2b5; letter-spacing: .16em; }
+.seg button { border-color: rgba(239,233,222,.45); background: transparent; color: #efe9de; border-radius: 4px; }
+.seg button[aria-pressed="true"] { background: #d9771f; color: var(--navy); border-color: #d9771f; }
+.panel { background: #fbf8f2; border: 1px solid var(--line); border-radius: 10px; box-shadow: 0 24px 60px rgba(15,28,45,.28); }
+h1 { font-weight: 400; font-size: 46px; line-height: 1.02; letter-spacing: -0.01em; }
+.start-card h2, .lot h2, .stats b { font-weight: 400; }
+.eyebrow { font-family: var(--mono); font-weight: 500; letter-spacing: .16em; color: var(--ink-2); }
+.eyebrow::before { background: #d9771f; border-color: #d9771f; }
+.count { font-family: var(--mono); font-weight: 500; }
+.brow i { background: var(--blue); border-color: var(--blue); border-radius: 2px; }
+.brow:nth-child(2n) i { background: #d9771f; border-color: #d9771f; }
+.brow:nth-child(3n) i { background: #b9a888; border-color: #b9a888; }
+.cols { border-bottom-color: var(--ink); }
+.cols i { background: var(--blue); border-color: var(--blue); border-radius: 2px 2px 0 0; }
+.cols i.hi { background: #d9771f; border-color: #d9771f; }
+.stats div { background: #f4efe6; border: 1px solid var(--line); border-radius: 6px; }
+.stats b { color: var(--ink); font-size: 30px; }
+.why { border-color: #d9771f; background: #fbeee0; border-radius: 6px; }
+.why b { font-family: var(--mono); font-weight: 500; color: var(--orange); letter-spacing: .14em; }
+.leg b { font-family: var(--mono); font-weight: 500; letter-spacing: .12em; }
+.legend .ramp { background: linear-gradient(90deg, #e9e2d4, #c8bea9, #8fa0b4, #26405f, #e9a35a, #c0611a); }
+.leg { background: #f4efe6; border-color: var(--line); border-radius: 6px; }
+.cta a { border-bottom-color: #d9771f; }
+.p-ctl { background: #f4efe6; border-top-color: var(--line); }
+.prog { background: #e6dfd1; border-color: var(--line); }
+.prog i { background: #d9771f; }
+.btns button { border: 1px solid #cfc6b5; color: var(--ink); background: #fbf8f2; border-radius: 4px; }
+.btns button:hover, .btns button[aria-pressed="true"] { background: var(--navy); color: #e9a35a; border-color: var(--navy); }
+.dots button { border-color: var(--ink-2); }
+.dots button[aria-current="true"] { background: #d9771f; border-color: #d9771f; }
+.lot { background: #fbf8f2; border: 1px solid var(--line); border-radius: 10px; box-shadow: 0 18px 44px rgba(15,28,45,.3); }
+.lot .tags span { background: #ece5d8; border-color: #cfc6b5; color: var(--ink); border-radius: 4px; }
+.start { background: rgba(15,28,45,.62); }
+.start-card { background: #fbf8f2; border: 0; border-radius: 10px; box-shadow: 0 30px 80px rgba(0,0,0,.4); }
+.start-card h2 { font-size: 50px; }
+.start-btns button { border: 2px solid #d9771f; background: #d9771f; color: var(--navy); border-radius: 4px; }
+.start-btns button.ghost { background: transparent; color: var(--ink); border-color: var(--ink); }
+.start-btns button:hover { background: #e9a35a; border-color: #e9a35a; color: var(--navy); }
 @media (max-width: 860px) { .panel { box-shadow: 0 12px 30px rgba(10,26,47,.2); } }
 </style>
 </head>
@@ -173,7 +178,7 @@ h1, .start-card h2, .lot h2, .stats b { font-weight: 800; letter-spacing: -0.01e
 <div class="bar" id="bar">
   <a class="brand" href="parcelvora-landing.html">
     <span class="mark"><img src="parcelvora-fox.png" alt=""></span>
-    <span class="word">PARCEL<b>VORA</b><small>Story Mode</small></span>
+    <span class="word">Parcel<b>vora</b><small>Story Mode</small></span>
   </a>
   <div class="seg" id="nbSeg" role="group" aria-label="Neighborhood"><span class="lbl">Place</span></div>
   <div class="seg" id="audSeg" role="group" aria-label="Audience"><span class="lbl">For</span></div>
@@ -247,9 +252,9 @@ h1, .start-card h2, .lot h2, .stats b { font-weight: 800; letter-spacing: -0.01e
     recreation: "Recreation", nursery: "Nurseries", seasonal: "Seasonal", rural_estate: "Rural estates", camp_rv: "Camps + RV",
     bar_nightclub: "Bars", car_lot: "Car lots", multi_structure_res: "Multi-house lots", residential_other: "Other residential", mobile_home: "Mobile homes" };
   const OWN = { individual: "Individuals", entity: "Companies (LLC, corp)", trust: "Trusts", estate: "Estates", public: "Public", unknown: "Unknown" };
-  const GROUP = { 1: ["Houses", [27, 111, 224]], 2: ["Condos + co-ops", [120, 172, 240]], 3: ["Apartments", [18, 50, 90]], 4: ["Mixed use", [217, 165, 72]],
-    5: ["Commercial", [10, 26, 47]], 6: ["Industrial", [128, 140, 158]], 7: ["Vacant", [227, 144, 28]], 8: ["Public + parks", [15, 154, 88]], 9: ["Other", [200, 208, 220]] };
-  const RAMP = [[219, 232, 248], [156, 195, 245], [91, 155, 232], [27, 111, 224], [240, 198, 110], [217, 165, 72]];
+  const GROUP = { 1: ["Houses", [38, 64, 95]], 2: ["Condos + co-ops", [120, 145, 175]], 3: ["Apartments", [150, 112, 74]], 4: ["Mixed use", [217, 119, 31]],
+    5: ["Commercial", [15, 28, 45]], 6: ["Industrial", [128, 124, 116]], 7: ["Vacant", [214, 172, 92]], 8: ["Public + parks", [104, 150, 110]], 9: ["Other", [205, 198, 185]] };
+  const RAMP = [[233, 226, 212], [200, 190, 169], [143, 160, 180], [38, 64, 95], [233, 163, 90], [192, 97, 26]];
   const VALUE_BASIS = { assessed_total: "assessed value", full_market_value: "market value", just_value: "market value" };
 
   const fmt = (n) => (n == null ? "—" : Number(n).toLocaleString("en-US"));
@@ -452,7 +457,7 @@ h1, .start-card h2, .lot h2, .stats b { font-weight: 800; letter-spacing: -0.01e
       map.addSource("pv-walk", { type: "geojson", data: { type: "FeatureCollection", features: [] } });
       map.addLayer({ id: "pv-walk-dots", type: "circle", source: "pv-walk", paint: {
         "circle-radius": ["interpolate", ["linear"], ["zoom"], 13, 2, 16, 5, 18, 10], "circle-color": ["get", "c"],
-        "circle-stroke-color": "#0b1f3a", "circle-stroke-width": 1, "circle-pitch-alignment": "map" } });
+        "circle-stroke-color": "#13202f", "circle-stroke-width": 1, "circle-pitch-alignment": "map" } });
       overlay = new deck.MapboxOverlay({ interleaved: false, layers: [] });
       map.addControl(overlay);
       mapReady = true;
@@ -483,15 +488,15 @@ h1, .start-card h2, .lot h2, .stats b { font-weight: 800; letter-spacing: -0.01e
   function layersFor(chapter) {
     const m = chapter.map || {}, cfg = NB[state.nb], d = state.data[state.nb], pts = d.points || [], H = d.history || {}, B = d.business || {};
     const dots = (id, data, color, radius, minPx, line) => new deck.ScatterplotLayer({ id, data, getPosition: (p) => [p[0], p[1]], getFillColor: color,
-      getRadius: radius, radiusMinPixels: minPx, stroked: !!line, getLineColor: [11, 31, 58], lineWidthMinPixels: line || 0, opacity: 0.95, updateTriggers: { getFillColor: m.mode } });
+      getRadius: radius, radiusMinPixels: minPx, stroked: !!line, getLineColor: [19, 32, 47], lineWidthMinPixels: line || 0, opacity: 0.95, updateTriggers: { getFillColor: m.mode } });
     if (m.mode === "use") return [dots("pv-dots", pts, (p) => GROUP[p[3]][1], cfg.radius * 0.2, 1.5, 0)];
     if (m.mode === "biz") return [dots("pv-dots", pts.filter((p) => p[3] >= 4 && p[3] <= 6), (p) => GROUP[p[3]][1], cfg.radius * 0.32, 3, 0.75)];
-    if (m.mode === "licenses") return [dots("pv-faint", pts, [205, 220, 240], cfg.radius * 0.25, 1, 0),
-      dots("pv-lic", B.lic_points || [], [217, 165, 72], cfg.radius * 0.6, 5, 1.5)];
+    if (m.mode === "licenses") return [dots("pv-faint", pts, [222, 214, 198], cfg.radius * 0.25, 1, 0),
+      dots("pv-lic", B.lic_points || [], [217, 119, 31], cfg.radius * 0.6, 5, 1.5)];
     if (m.mode === "valueadd") {
       const tag = (p) => isValueAdd(state.nb, p);
-      return [dots("pv-faint", pts.filter((p) => !tag(p)), [205, 220, 240], cfg.radius * 0.16, 1, 0),
-        dots("pv-va", pts.filter(tag), (p) => (tag(p) === "gold" ? [227, 144, 28] : [27, 111, 224]), cfg.radius * 0.24, 2, 0.5)];
+      return [dots("pv-faint", pts.filter((p) => !tag(p)), [222, 214, 198], cfg.radius * 0.16, 1, 0),
+        dots("pv-va", pts.filter(tag), (p) => (tag(p) === "gold" ? [38, 64, 95] : [217, 119, 31]), cfg.radius * 0.24, 2, 0.5)];
     }
     const data = m.mode === "year" ? pts.filter((p) => p[2] > 0) : m.mode === "value" ? pts.filter((p) => p[4] > 0) : pts;
     const w = weight[m.mode];
@@ -502,7 +507,7 @@ h1, .start-card h2, .lot h2, .stats b { font-weight: 800; letter-spacing: -0.01e
       material: { ambient: 0.65, diffuse: 0.5, shininess: 20 }, opacity: 0.9,
       updateTriggers: { getColorWeight: m.mode, getElevationWeight: m.mode }, transitions: { elevationScale: 1200 } })];
     if (m.mode === "transit" && H.subway) L.push(new deck.ScatterplotLayer({ id: "pv-subway", data: H.subway, getPosition: (s) => [Number(s.entrance_longitude), Number(s.entrance_latitude)],
-      getFillColor: [217, 165, 72], getLineColor: [11, 31, 58], stroked: true, lineWidthMinPixels: 2, getRadius: 28, radiusMinPixels: 6 }));
+      getFillColor: [217, 119, 31], getLineColor: [19, 32, 47], stroked: true, lineWidthMinPixels: 2, getRadius: 28, radiusMinPixels: 6 }));
     return L;
   }
 
@@ -599,9 +604,9 @@ h1, .start-card h2, .lot h2, .stats b { font-weight: 800; letter-spacing: -0.01e
     if (kind === "use") return Object.values(GROUP).slice(0, 8).map(([l, c]) => `<span><i style="background:rgb(${c})"></i>${esc(l)}</span>`).join("");
     if (kind === "year") return `<span>Column height = buildings · color: newer</span><span class="ramp"></span><span>older</span>`;
     if (kind === "value") return `<span>Height + color = average value: lower</span><span class="ramp"></span><span>higher</span>`;
-    if (kind === "transit") return `<span><i style="background:#d9a548"></i>Subway entrance</span><span>Columns = parcels</span>`;
-    if (kind === "licenses") return `<span><i style="background:#d9a548"></i>Licensed business</span><span><i style="background:#cddcf0"></i>Every lot</span>`;
-    if (kind === "valueadd") return `<span><i style="background:#1b6fe0"></i>${state.nb === "park-slope" ? "Room to build bigger" : state.nb === "coral-gables" ? "House built before 1960" : "Estate-held"}</span><span><i style="background:#e3901c"></i>Vacant</span>`;
+    if (kind === "transit") return `<span><i style="background:#d9771f"></i>Subway entrance</span><span>Columns = parcels</span>`;
+    if (kind === "licenses") return `<span><i style="background:#d9771f"></i>Licensed business</span><span><i style="background:#ded6c6"></i>Every lot</span>`;
+    if (kind === "valueadd") return `<span><i style="background:#d9771f"></i>${state.nb === "park-slope" ? "Room to build bigger" : state.nb === "coral-gables" ? "House built before 1960" : "Estate-held"}</span><span><i style="background:#26405f"></i>Vacant</span>`;
     if (kind === "count") return `<span>Column height = parcels · color: fewer</span><span class="ramp"></span><span>more</span>`;
     if (kind.startsWith("share:")) return `<span>${esc(kind.slice(6))}: low</span><span class="ramp"></span><span>high</span>`;
     return "";
