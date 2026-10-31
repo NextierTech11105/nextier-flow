@@ -139,11 +139,57 @@
 
   window.fetch = async (input, init) => {
     const url = new URL(typeof input === "string" ? input : input.url, location.href);
-    const route = /\/api\/(records|map|lookup|counties|ids|detail|skiptrace|comps)$/.exec(url.pathname);
+    const route = /\/api\/(records|map|lookup|counties|ids|detail|skiptrace|comps|export(?:\/preview)?|exports)$/.exec(url.pathname);
     if (!route) return realFetch(input, init);
     // Skip tracing spends Tracerfy credits, so it runs only on Parcelvora's server, where the key lives.
     if (route[1] === "skiptrace") return reply({ error: "demo", message: "Skip tracing runs on Parcelvora's server, where the Tracerfy key lives. This preview has no server, so nothing runs or is charged here." }, 503);
     const d = await ready, q = url.searchParams;
+
+    // Sample-only export ledger: persists in this browser, not an account-wide server quota.
+    if (route[1] === "exports" || route[1].startsWith("export")) {
+      const read = (key, fallback) => { try { return JSON.parse(localStorage.getItem(key) || "null") || fallback; } catch (_) { return fallback; } };
+      const ledger = read("pv-exports", []), exported = read("pv-exported", {});
+      const dayKey = (date) => {
+        const parts = new Intl.DateTimeFormat("en-US", { timeZone: "America/New_York", year: "numeric", month: "2-digit", day: "2-digit" }).formatToParts(date);
+        const val = (type) => parts.find((part) => part.type === type).value;
+        return val("year") + "-" + val("month") + "-" + val("day");
+      };
+      if (route[1] === "exports") return reply({ exports: ledger });
+      const today = dayKey(new Date()), limit = 5000;
+      const used = ledger.filter((e) => dayKey(new Date(e.created_at)) === today).reduce((n, e) => n + (Number(e.new_count) || 0), 0);
+      const leftToday = Math.max(0, limit - used);
+      const all = select(d.rows, q).slice(0, 5000);
+      const keyOf = (row) => row.region + "|" + row.county + "|" + row.id;
+      const fresh = all.filter((row) => !exported[keyOf(row)]).length;
+      if (route[1] === "export/preview") return reply({ matched: all.length, already: all.length - fresh, fresh, leftToday, limit });
+      const newOnly = q.get("new_only") !== "0", fmt = q.get("format") === "json" ? "json" : "csv";
+      const deliveredRows = [];
+      let newCount = 0, redownloaded = 0;
+      for (const row of all) {
+        const had = !!exported[keyOf(row)];
+        if (had && newOnly) continue;
+        if (!had && newCount >= leftToday) continue;
+        if (deliveredRows.length >= 5000) break;
+        deliveredRows.push(row);
+        if (had) redownloaded++; else newCount++;
+      }
+      const entry = { id: String(Date.now()) + "-" + Math.random().toString(36).slice(2, 8), created_at: new Date().toISOString(),
+        channel: "download", format: fmt, list_name: String(q.get("name") || "Records").slice(0, 120),
+        matched: all.length, delivered: deliveredRows.length, new_count: newCount,
+        already: all.length - fresh, skipped: all.length - deliveredRows.length,
+        redownloaded, status: deliveredRows.length ? "done" : "empty" };
+      // Ledger first, then file response. The production server must do this atomically.
+      try {
+        localStorage.setItem("pv-exports", JSON.stringify([entry, ...ledger].slice(0, 2000)));
+        for (const row of deliveredRows) if (!exported[keyOf(row)]) exported[keyOf(row)] = entry.id;
+        localStorage.setItem("pv-exported", JSON.stringify(exported));
+      } catch (_) { return reply({ error: "Export history could not be saved in this browser. No file delivered." }, 507); }
+      const body = fmt === "json"
+        ? JSON.stringify(deliveredRows.map((row) => Object.fromEntries(CSV_COLS.map((c) => [c, row[c] ?? null]))), null, 2)
+        : [CSV_COLS.join(","), ...deliveredRows.map((row) => CSV_COLS.map((c) => cell(row[c])).join(","))].join("\n");
+      return new Response(body, { status: 200, headers: { "content-type": fmt === "json" ? "application/json" : "text/csv",
+        "X-Parcelvora-Export-Id": entry.id, "X-Parcelvora-New-Count": String(newCount), "X-Parcelvora-Delivered": String(deliveredRows.length) } });
+    }
     if (route[1] === "detail") {
       const r = d.rows.find((x) => x.id === q.get("id") && (!q.get("county") || x.county === q.get("county")));
       return r ? reply({ input: { id: q.get("id"), county: q.get("county") }, data: detail(r) }) : reply({ error: "no such parcel" }, 404);
@@ -188,20 +234,6 @@
     }
     return reply({ results: found.filter((r) => RESIDENTIAL.includes(r.use)).slice(0, 10).map(profile) });
   };
-
-  // Download: the page links to /api/records.csv; here the file is made in the browser from the same filtered rows.
-  document.addEventListener("click", async (e) => {
-    const a = e.target.closest && e.target.closest("#download");
-    if (!a) return;
-    e.preventDefault();
-    const d = await ready, rows = select(d.rows, new URL(a.href, location.href).searchParams).slice(0, 5000);
-    const body = [CSV_COLS.join(","), ...rows.map((r) => CSV_COLS.map((c) => cell(r[c])).join(","))].join("\n");
-    const link = document.createElement("a");
-    link.href = URL.createObjectURL(new Blob([body], { type: "text/csv" }));
-    link.download = "parcelvora-records.csv";
-    document.body.appendChild(link); link.click(); link.remove();
-    setTimeout(() => URL.revokeObjectURL(link.href), 10000);
-  }, true);
 
   // Say plainly that this is a sample.
   document.addEventListener("DOMContentLoaded", () => ready.then((d) => {
@@ -467,6 +499,33 @@
   .newc { font-weight: 800; color: var(--soft); white-space: nowrap; }
   .newc.has { color: var(--green); }
   @media (max-width: 640px) { .sp-list li { grid-template-columns: 1fr auto; } .sp-save { flex-direction: column; } }
+
+  /* List export activity calendar. No fake activity: empty history stays empty. */
+  .activity { display: grid; gap: 13px; }
+  .activity-stats { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 9px; }
+  .activity-stat { border: 1px solid var(--line); border-radius: 10px; padding: 14px; background: var(--card-2); display: grid; gap: 4px; }
+  .activity-stat strong { font: 800 26px var(--display); }
+  .activity-stat span,.activity-stat small { color: var(--soft); }
+  .activity-nav { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+  .activity-nav h3 { margin: 0 8px; min-width: 190px; text-align: center; font: 800 18px var(--display); }
+  .activity-weekdays,.activity-calendar { display: grid; grid-template-columns: repeat(7,minmax(0,1fr)); gap: 5px; }
+  .activity-weekdays { text-align: center; color: var(--soft); font-size: 12px; }
+  .activity-day { text-align: left; min-width: 0; min-height: 78px; border: 1px solid var(--line); border-radius: 9px; background: var(--card-2); color: var(--text); cursor: pointer; padding: 7px; display: flex; flex-direction: column; gap: 4px; }
+  .activity-day .ad-num { font-weight: 700; font-size: 13px; }
+  .activity-day .ad-pulls { font-size: 14px; font-weight: 800; color: var(--blue); }
+  .activity-day .ad-rows { font-size: 11px; color: var(--soft); }
+  .activity-day.other { opacity: .42; }
+  .activity-day.today { border-style: dashed; border-color: var(--blue); }
+  .activity-day.selected { outline: 2px solid var(--blue); outline-offset: -2px; }
+  .activity-log { display: grid; gap: 8px; }
+  .activity-entry { border: 1px solid var(--line); border-radius: 9px; padding: 11px 12px; display: flex; flex-wrap: wrap; justify-content: space-between; gap: 12px; background: var(--card-2); }
+  .activity-entry .sm { margin-top: 4px; }
+  .export-dialog { z-index: 35; }
+  .export-in { max-width: 680px; background: var(--card); border-radius: 12px; border: 1px solid var(--line); padding: 20px; }
+  .export-opts { display: grid; gap: 12px; padding: 12px 0; }
+  .export-opts label { display: flex; gap: 10px; align-items: center; }
+  .export-opts select { background: var(--card-2); color: var(--text); padding: 8px; border: 1px solid var(--line); border-radius: 7px; }
+  @media(max-width: 600px){ .activity-stat {padding:9px;} .activity-stats { gap: 5px; } .activity-stat strong {font-size:20px;} .activity-day { min-height:61px; padding:4px;} .activity-day .ad-rows {display:none;} .activity-nav h3{min-width:120px;} }
   .dtop { display: flex; justify-content: space-between; gap: 8px; }
   [hidden] { display: none !important; }
 </style>
@@ -488,6 +547,7 @@
         <button type="button" data-view="map" aria-pressed="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M9 4 3 6v14l6-2 6 2 6-2V4l-6 2-6-2zM9 4v14M15 6v14"/></svg>Map</button>
       </div>
       <a class="btn" id="storyBtn" href="https://nextiertech11105.github.io/nextier-flow/parcelvora-story.html" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg><span>Story Mode</span></a>
+      <button type="button" class="btn" id="activityBtn" aria-controls="activityPanel" aria-expanded="false">List Activity</button>
       <button type="button" class="btn" id="savedBtn" aria-expanded="false" aria-controls="savedPanel"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M6 3h12v18l-6-4-6 4z"/></svg><span>Saved searches</span></button>
       <button type="button" class="btn" id="compsBtn" aria-controls="comps"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg><span>Comps</span><b class="cnt" id="compsCount"></b></button>
       <a class="btn" id="download" href="/api/records.csv"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 4v11m0 0-4-4m4 4 4-4M4 19h16"/></svg>Download</a>
@@ -501,11 +561,33 @@
     <button class="btn" type="submit">Find</button>
   </form>
 
+  <section class="savedpanel activity" id="activityPanel" hidden aria-label="List export activity calendar">
+    <div class="sp-head"><h2>List Activity Calendar</h2><p class="sm">A list pull is a completed export with records delivered. The log also shows empty attempts. Days follow America/New_York time.</p></div>
+    <div class="activity-stats" id="activityStats"></div>
+    <div class="activity-nav"><button class="btn" type="button" id="activityPrev" aria-label="Previous month">‹</button><h3 id="activityMonth"></h3><button class="btn" type="button" id="activityNext" aria-label="Next month">›</button><button class="btn" type="button" id="activityToday">Today</button><button class="btn" type="button" id="activityRefresh">Refresh</button></div>
+    <div class="activity-weekdays" aria-hidden="true"><b>Mon</b><b>Tue</b><b>Wed</b><b>Thu</b><b>Fri</b><b>Sat</b><b>Sun</b></div>
+    <div class="activity-calendar" id="activityCalendar" role="group" aria-label="Export activity by day"></div>
+    <h3 id="activityDayTitle"></h3><div id="activityLog" class="activity-log"></div>
+    <div class="sm" id="activityNotice" role="status"></div>
+  </section>
+
   <section class="savedpanel" id="savedPanel" hidden aria-label="Saved searches">
     <div class="sp-head"><h2>Saved searches</h2><span class="sm">Kept in this browser. Open one to see how many new matches came in since you saved it.</span></div>
     <form class="sp-save" id="saveForm"><input id="saveName" maxlength="60" placeholder="Name this search, e.g. Absentee owners in Park Slope" aria-label="Search name"><button class="btn primary" type="submit">Save this search</button></form>
     <div class="sm" id="saveMsg" aria-live="polite"></div>
     <ul class="sp-list" id="savedList"></ul>
+  </section>
+
+  <section class="comps export-dialog" id="exportDialog" hidden role="dialog" aria-modal="true" aria-label="Download records">
+    <div class="comps-in export-in">
+      <div class="comps-top"><div><h2>Download a list</h2><div class="sm" id="exportPreview">Checking matched and previously exported records…</div></div><button class="btn" type="button" id="exportClose">Close</button></div>
+      <div class="export-opts"><label><input type="radio" name="exportMode" value="new" checked> New records only (recommended)</label><label><input type="radio" name="exportMode" value="all"> All matching records, including repeats</label>
+        <label>Format <select id="exportFormat"><option value="csv">CSV</option><option value="json">JSON</option></select></label>
+      </div>
+      <div class="sm" id="exportNote" role="status"></div>
+      <div class="comps-act"><button class="btn primary" type="button" id="exportConfirm">Download</button><button class="btn" type="button" id="exportHistory">View activity calendar</button></div>
+      <p class="sm">The static preview tracks downloads within this browser only. Cross-device duplicate protection and quotas require the Parcelvora server.</p>
+    </div>
   </section>
 
   <nav class="leads" id="leads" aria-label="Lead lists">
@@ -1060,6 +1142,140 @@
     map.easeTo({ pitch: tilt ? 60 : 0, bearing: tilt ? -20 : 0, zoom: tilt ? Math.max(map.getZoom(), 16) : map.getZoom(), duration: 1000 });
   });
   paintMapButtons();
+
+
+  // ── List pull calendar: one successful export with delivered rows = one list pull. ────────────────
+  const exportDayKey = (date) => {
+    const p = new Intl.DateTimeFormat("en-US", { timeZone: "America/New_York", year: "numeric", month: "2-digit", day: "2-digit" }).formatToParts(date);
+    const get = (type) => p.find((item) => item.type === type).value;
+    return get("year") + "-" + get("month") + "-" + get("day");
+  };
+  const keyShift = (day, shift) => {
+    const x = new Date(day + "T12:00:00Z"); x.setUTCDate(x.getUTCDate() + shift);
+    return x.toISOString().slice(0, 10);
+  };
+  const todayKey = () => exportDayKey(new Date());
+  const currentMonth = () => todayKey().slice(0, 7);
+  let activityMonth = currentMonth(), activityDate = todayKey(), activityEntries = [], exportQuery = "";
+  function pullsIn(from, to) {
+    return activityEntries.filter((e) => {
+      const date = exportDayKey(new Date(e.created_at));
+      return date >= from && date <= to && e.status === "done" && Number(e.delivered) > 0;
+    });
+  }
+  const sumKey = (a, key) => a.reduce((n, x) => n + (Number(x[key]) || 0), 0);
+  const activityStat = (title, entries) =>
+    '<div class="activity-stat"><span>' + title + '</span><strong>' + int(entries.length) +
+    ' pulls</strong><small>' + int(sumKey(entries, "new_count")) + ' new records · ' +
+    int(sumKey(entries, "delivered")) + ' delivered</small></div>';
+  function renderActivity() {
+    const today = todayKey(), weekday = new Date(today + "T12:00:00Z").getUTCDay();
+    const weekStart = keyShift(today, -((weekday + 6) % 7));
+    const monthFrom = today.slice(0, 7) + "-01";
+    const monthNext = new Date(monthFrom + "T12:00:00Z"); monthNext.setUTCMonth(monthNext.getUTCMonth() + 1);
+    const monthTo = keyShift(monthNext.toISOString().slice(0, 10), -1);
+    $("activityStats").innerHTML = activityStat("Today", pullsIn(today, today)) +
+      activityStat("This week (Mon–Sun)", pullsIn(weekStart, keyShift(weekStart, 6))) +
+      activityStat("This month", pullsIn(monthFrom, monthTo));
+    const first = activityMonth + "-01", d0 = new Date(first + "T12:00:00Z");
+    $("activityMonth").textContent = d0.toLocaleDateString("en-US", { month: "long", year: "numeric", timeZone: "UTC" });
+    const pad = (d0.getUTCDay() + 6) % 7, start = keyShift(first, -pad);
+    const cells = Math.ceil((pad + new Date(d0.getUTCFullYear(), d0.getUTCMonth() + 1, 0).getDate()) / 7) * 7;
+    $("activityCalendar").innerHTML = Array.from({length: cells}, (_, i) => {
+      const day = keyShift(start, i), entries = pullsIn(day, day);
+      const n = day === today ? " today" : "", m = day.slice(0, 7) === activityMonth ? "" : " other";
+      const sel = day === activityDate ? " selected" : "";
+      return '<button type="button" class="activity-day' + m + n + sel + '" data-day="' + day + '" aria-pressed="' + (day === activityDate) + '">' +
+        '<span class="ad-num">' + Number(day.slice(8)) + '</span>' +
+        (entries.length ? '<span class="ad-pulls">' + int(entries.length) + ' pulls</span><span class="ad-rows">' + int(sumKey(entries, "new_count")) + ' new</span>' : '') +
+        '</button>';
+    }).join("");
+    const onDay = activityEntries.filter((e) => exportDayKey(new Date(e.created_at)) === activityDate);
+    $("activityDayTitle").textContent = new Date(activityDate + "T12:00:00Z").toLocaleDateString("en-US", { timeZone: "UTC", weekday: "long", month: "long", day: "numeric", year: "numeric" }) + " · " + onDay.filter((e) => e.status === "done" && Number(e.delivered) > 0).length + " list pulls";
+    $("activityLog").innerHTML = onDay.length ? onDay.map((e) =>
+      '<div class="activity-entry"><div><strong>' + esc(e.list_name || "Records") + '</strong><div class="sm">' +
+      esc(new Date(e.created_at).toLocaleTimeString("en-US", { timeZone: "America/New_York", hour: "numeric", minute: "2-digit" })) +
+      ' ET · ' + esc((e.format || "csv").toUpperCase()) + ' · ' + esc(e.channel || "download") + ' · ' + esc(e.status || "done") +
+      '</div></div><div><b>' + int(e.delivered) + ' delivered</b><div class="sm">' + int(e.new_count) + ' new · ' +
+      int(e.already) + ' previously exported · ' + int(e.skipped) + ' not delivered</div></div></div>').join("")
+      : '<p class="sm">No exports recorded on this date.</p>';
+    $("activityNotice").textContent = location.hostname.endsWith("github.io")
+      ? "Demo activity is saved in this browser only. Other browsers, accounts, or devices will not share this history."
+      : "Activity comes from the export history available to this account.";
+  }
+  async function fetchActivity() {
+    try {
+      const r = await fetch("/api/exports"), j = await r.json();
+      if (!r.ok) throw Error(j.error || r.status);
+      activityEntries = (j.exports || []).filter((e) => e.created_at && !isNaN(new Date(e.created_at))).sort((a,b) => new Date(b.created_at) - new Date(a.created_at));
+      renderActivity();
+    } catch (_) { $("activityLog").textContent = "Could not load export history."; }
+  }
+  function openActivity() {
+    $("activityPanel").hidden = false; $("activityBtn").setAttribute("aria-expanded", "true");
+    fetchActivity();
+  }
+  $("activityBtn").addEventListener("click", () => {
+    if (!$("activityPanel").hidden) { $("activityPanel").hidden = true; $("activityBtn").setAttribute("aria-expanded", "false"); }
+    else openActivity();
+  });
+  $("activityCalendar").addEventListener("click", (e) => {
+    const b = e.target.closest("[data-day]"); if (!b) return;
+    activityDate = b.dataset.day; activityMonth = activityDate.slice(0, 7); renderActivity();
+  });
+  const moveActivityMonth = (delta) => {
+    const d = new Date(activityMonth + "-01T12:00:00Z"); d.setUTCMonth(d.getUTCMonth() + delta);
+    activityMonth = d.toISOString().slice(0, 7);
+    activityDate = activityMonth === currentMonth() ? todayKey() : activityMonth + "-01";
+    renderActivity();
+  };
+  $("activityPrev").onclick = () => moveActivityMonth(-1);
+  $("activityNext").onclick = () => moveActivityMonth(1);
+  $("activityToday").onclick = () => { activityMonth = currentMonth(); activityDate = todayKey(); renderActivity(); };
+  $("activityRefresh").onclick = fetchActivity;
+
+  // Export with a preview, saved history, repeat protection and a daily quota (the demo emulates server routes).
+  async function previewExport() {
+    $("exportPreview").textContent = "Checking records…";
+    const p = new URLSearchParams(exportQuery);
+    try {
+      const r = await fetch("/api/export/preview?" + p), j = await r.json();
+      if (!r.ok) throw Error(j.error || r.status);
+      $("exportPreview").textContent = int(j.matched) + " match · " + int(j.already) + " already exported · " +
+        int(j.fresh) + " new · " + int(j.leftToday) + " of " + int(j.limit || 5000) + " new records left today";
+      $("exportConfirm").disabled = !j.matched;
+    } catch (_) { $("exportPreview").textContent = "Preview not available on this server."; $("exportConfirm").disabled = true; }
+  }
+  $("download").addEventListener("click", (e) => {
+    e.preventDefault();
+    exportQuery = tableParams().toString();
+    $("exportDialog").hidden = false; document.body.classList.add("comps-on");
+    $("exportNote").textContent = "";
+    document.querySelector('input[name="exportMode"][value="new"]').checked = true;
+    previewExport();
+  });
+  function closeExport() { $("exportDialog").hidden = true; document.body.classList.remove("comps-on"); }
+  $("exportClose").onclick = closeExport;
+  $("exportHistory").onclick = () => { closeExport(); openActivity(); $("activityPanel").scrollIntoView({block:"start"}); };
+  $("exportConfirm").onclick = async () => {
+    const b = $("exportConfirm"); b.disabled = true; $("exportNote").textContent = "Preparing export…";
+    const p = new URLSearchParams(exportQuery), chosen = document.querySelector('input[name="exportMode"]:checked');
+    p.set("new_only", chosen && chosen.value === "all" ? "0" : "1");
+    p.set("format", $("exportFormat").value);
+    p.set("name", describeSearch());
+    try {
+      const r = await fetch("/api/export?" + p);
+      if (!r.ok) { const j = await r.json(); throw Error(j.error || r.status); }
+      const body = await r.blob(), fmt = p.get("format"), filename = "parcelvora-list-" + todayKey() + "." + fmt;
+      const link = document.createElement("a"), url = URL.createObjectURL(body);
+      link.href = url; link.download = filename; document.body.append(link); link.click(); link.remove();
+      setTimeout(() => URL.revokeObjectURL(url), 10000);
+      $("exportNote").textContent = "Export logged and " + filename + " prepared. New-only exports skip previously delivered records.";
+      previewExport(); if (!$("activityPanel").hidden) fetchActivity();
+    } catch (err) { $("exportNote").textContent = "Could not export: " + err.message; }
+    b.disabled = false;
+  };
+  document.addEventListener("keydown", (e) => { if (e.key === "Escape" && !$("exportDialog").hidden) closeExport(); });
 
   // ── saved searches: kept in this browser; reopening one shows how many new matches came in since it was saved ──
   const SAVED_KEY = "pv-saved";
