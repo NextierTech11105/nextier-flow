@@ -307,6 +307,17 @@
   /* Draw an area on the map; saved searches under the toolbar. */
   .btn[hidden] { display: none !important; }
   .drawbar { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+  .btn[aria-pressed="true"] { background: var(--blue); border-color: var(--blue); color: var(--blue-ink); }
+  /* The parcel snapshot on the map. */
+  .snap-pop .mapboxgl-popup-content { padding: 0; border-radius: 12px; overflow: hidden; background: var(--card); color: var(--text); box-shadow: 0 18px 40px rgba(0,0,0,.28); }
+  .snap-pop .mapboxgl-popup-tip { border-top-color: var(--card); border-bottom-color: var(--card); }
+  .snap-pop .mapboxgl-popup-close-button { font-size: 22px; width: 32px; height: 32px; color: #fff; text-shadow: 0 1px 3px rgba(0,0,0,.7); }
+  .snap img { display: block; width: 100%; height: auto; }
+  .snap-b { padding: 12px 14px 14px; font-size: 15px; }
+  .snap-a { display: block; font: 800 17px var(--display); }
+  .snap-o { font-weight: 700; margin-top: 8px; }
+  .snap ul { margin: 8px 0 12px; padding-left: 18px; display: grid; gap: 2px; }
+  .snap .btn { width: 100%; justify-content: center; }
   .btn.primary { background: var(--blue); border-color: var(--blue); color: var(--blue-ink); }
   .btn:disabled { opacity: .5; cursor: not-allowed; }
   .savedpanel { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 16px; margin: 0 0 14px; box-shadow: var(--shadow); }
@@ -486,6 +497,11 @@
       <div class="bar">
         <div><h2>Map</h2><div id="mapCount" aria-live="polite">Loading the map…</div></div>
         <div class="drawbar" id="drawbar">
+          <div class="seg mapseg" role="group" aria-label="Base map">
+            <button type="button" data-base="streets" aria-pressed="true">Map</button>
+            <button type="button" data-base="satellite" aria-pressed="false">Satellite</button>
+          </div>
+          <button type="button" class="btn" id="tilt3d" aria-pressed="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 3 3 8l9 5 9-5-9-5zM3 8v8l9 5 9-5V8M12 13v8"/></svg>3D</button>
           <button type="button" class="btn" id="drawArea"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M4 18 9 5l6 9 5-6v11z"/></svg>Draw an area</button>
           <button type="button" class="btn primary" id="finishArea" hidden>Finish area</button>
           <button type="button" class="btn" id="clearArea" hidden>Clear area</button>
@@ -545,7 +561,10 @@
 
   // ── theme: light blue by default, dark on request or by the system setting ─────────────────────────────────────
   const isDark = () => (document.documentElement.dataset.theme || (matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light")) === "dark";
-  const mapStyle = () => (isDark() ? "mapbox://styles/mapbox/dark-v11" : "mapbox://styles/mapbox/light-v11");
+  // Base map: Mapbox streets (light or dark with the theme) or Mapbox satellite. 3D tilts the map and raises buildings.
+  let basemap = store.get("pv-basemap") === "satellite" ? "satellite" : "streets", tilt = false;
+  const mapStyle = () => (basemap === "satellite" ? "mapbox://styles/mapbox/satellite-streets-v12"
+    : isDark() ? "mapbox://styles/mapbox/dark-v11" : "mapbox://styles/mapbox/light-v11");
   function paintThemeButton() {
     $("theme").setAttribute("aria-label", isDark() ? "Switch to light mode" : "Switch to dark mode");
     $("theme").querySelector("span").textContent = isDark() ? "Light" : "Dark";
@@ -721,7 +740,15 @@
     map.addLayer({ id: "draft-line", type: "line", source: "draft", filter: ["==", ["geometry-type"], "LineString"], paint: { "line-color": c("--red"), "line-width": 2.5 } });
     map.addLayer({ id: "draft-pts", type: "circle", source: "draft", filter: ["==", ["geometry-type"], "Point"],
       paint: { "circle-radius": 5.5, "circle-color": c("--red"), "circle-stroke-color": "#ffffff", "circle-stroke-width": 1.5 } });
-    drawMap(); mark(selected); paintArea();
+    // 3D buildings from the Mapbox streets data (every Mapbox style here carries it), under the parcels.
+    if (map.getSource("composite") && !map.getLayer("pv-3d")) {
+      map.addLayer({ id: "pv-3d", type: "fill-extrusion", source: "composite", "source-layer": "building", minzoom: 14,
+        filter: ["==", ["get", "extrude"], "true"], layout: { visibility: tilt ? "visible" : "none" },
+        paint: { "fill-extrusion-color": basemap === "satellite" ? "#e7e1d3" : isDark() ? "#2e3846" : "#dde4ee",
+          "fill-extrusion-height": ["coalesce", ["get", "height"], 8], "fill-extrusion-base": ["coalesce", ["get", "min_height"], 0],
+          "fill-extrusion-opacity": basemap === "satellite" ? 0.85 : 0.9 } }, "area-fill");
+    }
+    drawMap(); mark(selected); paintArea(); paintMapButtons();
   }
   function drawMap() {
     const src = map && map.getSource("parcels");
@@ -769,7 +796,8 @@
       document.querySelectorAll("#rows tr.hl").forEach((tr) => tr.classList.remove("hl"));
       const tr = [...document.querySelectorAll("#rows tr[data-id]")].find((t) => t.dataset.id === id);
       if (tr) { tr.classList.add("hl"); tr.scrollIntoView({ block: "nearest" }); }
-      openDetail(id, f.properties.county);
+      const r = mapRows.find((x) => x.id === id && x.county === f.properties.county);
+      if (r) snapshot(r, f.geometry.coordinates); else openDetail(id, f.properties.county);
     });
     map.on("mouseenter", "parcels", () => { map.getCanvas().style.cursor = "pointer"; });
     map.on("mouseleave", "parcels", () => { map.getCanvas().style.cursor = ""; });
@@ -813,6 +841,56 @@
     paintArea(); changed();
   }
   $("drawArea").onclick = startDraw; $("finishArea").onclick = finishDraw; $("clearArea").onclick = clearArea;
+
+  // ── snapshot: click a parcel on the map and a card opens on it — a Mapbox satellite photo of the lot, the owner,
+  //    the tags and the key facts — with the full record one press away ─────────────────────────────────────────────
+  let popup = null;
+  function snapshot(r, at) {
+    if (popup) popup.remove();
+    const [lon, lat] = at.map(Number);
+    const name = r.owner_first || r.owner_last ? [r.owner_first, r.owner_last].filter(Boolean).join(" ") : title(r.owner_name || "Owner not on record");
+    const photo = TOKEN ? `https://api.mapbox.com/styles/v1/mapbox/satellite-v9/static/pin-s+e5484d(${lon},${lat})/${lon},${lat},18.3,0/320x170@2x?access_token=${encodeURIComponent(TOKEN)}` : "";
+    const facts = [
+      r.value ? li("Value", money(Number(r.value)) + " (" + (BASIS[r.value_basis] || String(r.value_basis || "value").replace(/_/g, " ")).toLowerCase() + ")") : "",
+      li("Type", USE[r.use] || r.use), li("Built", r.year_built), li("Units", r.units),
+      li("Building", r.sqft ? int(Number(r.sqft)) + " sq ft" : ""),
+    ].join("");
+    // The card opens above the parcel; the map slides so the parcel sits low and the whole card fits.
+    const pt = map.project([lon, lat]), H = map.getContainer().clientHeight;
+    map.panBy([0, pt.y - H * 0.84], { duration: 350 });
+    popup = new mapboxgl.Popup({ maxWidth: "340px", offset: 14, anchor: "bottom", className: "snap-pop" }).setLngLat([lon, lat]).setHTML(`
+      <div class="snap">
+        ${photo ? `<img src="${photo}" width="320" height="170" alt="Satellite photo of the lot">` : ""}
+        <div class="snap-b">
+          <b class="snap-a">${esc(r.address || "Address not on record")}</b>
+          <div class="sm">${esc(title(r.town || ""))}${r.zip ? " " + esc(r.zip) : ""}</div>
+          <div class="snap-o">${esc(name)}</div>
+          <div class="tags">${tags({ owner_occupied: r.owner_occupied, absentee: r.absentee, out_of_state: r.out_of_state, owner_type: r.owner_type })}</div>
+          <ul>${facts}</ul>
+          <button type="button" class="btn primary" id="snapOpen">Open the full record</button>
+        </div>
+      </div>`).addTo(map);
+    const b = document.getElementById("snapOpen");
+    if (b) b.onclick = () => { popup.remove(); openDetail(r.id, r.county); };
+  }
+
+  // ── base map (Mapbox streets or satellite) and 3D ──────────────────────────────────────────────────────────────
+  function paintMapButtons() {
+    document.querySelectorAll(".mapseg button").forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.base === basemap)));
+    $("tilt3d").setAttribute("aria-pressed", String(tilt));
+  }
+  document.querySelectorAll(".mapseg button").forEach((b) => b.addEventListener("click", () => {
+    if (b.dataset.base === basemap) return;
+    basemap = b.dataset.base; store.set("pv-basemap", basemap); paintMapButtons();
+    if (map) map.setStyle(mapStyle());   // style.load re-adds the parcels, the drawn area and the 3D buildings
+  }));
+  $("tilt3d").addEventListener("click", () => {
+    tilt = !tilt; paintMapButtons();
+    if (!map || !mapReady) return;
+    if (map.getLayer("pv-3d")) map.setLayoutProperty("pv-3d", "visibility", tilt ? "visible" : "none");
+    map.easeTo({ pitch: tilt ? 60 : 0, bearing: tilt ? -20 : 0, zoom: tilt ? Math.max(map.getZoom(), 16) : map.getZoom(), duration: 1000 });
+  });
+  paintMapButtons();
 
   // ── saved searches: kept in this browser; reopening one shows how many new matches came in since it was saved ──
   const SAVED_KEY = "pv-saved";
