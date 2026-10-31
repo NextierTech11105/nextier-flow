@@ -1527,6 +1527,13 @@
   //    contact card and the actions. Built from the Property Detail object (/api/detail), plus the live NYC record. ─
   let leadCtx = null;
   const STORY_BASE = "https://nextiertech11105.github.io/nextier-flow/parcelvora-story.html";
+  // The top-bar Story button tells the story of what you are looking at: the open property, else the area on the map.
+  $("storyBtn").addEventListener("click", (e) => {
+    const a = e.currentTarget, c = map && mapReady ? map.getCenter() : null;
+    if (leadCtx && leadCtx.det && !$("drawer").hidden) a.href = storyFor(leadCtx.det)[0];
+    else if (c) a.href = STORY_BASE + "?" + new URLSearchParams({ lat: c.lat.toFixed(6), lon: c.lng.toFixed(6), kind: "place" });
+    else a.href = STORY_BASE;
+  });
   const monthsSince = (s) => { const t = new Date(String(s).slice(0, 10) + "T12:00:00"), n = new Date(); return isNaN(t) ? null : (n.getFullYear() - t.getFullYear()) * 12 + (n.getMonth() - t.getMonth()); };
   const ownedFor = (m) => (m == null ? "" : m >= 24 ? `${Math.floor(m / 12)} years` : `${m} months`);
   // Story Mode opens on this property: its building, its block, then its neighborhood's history.

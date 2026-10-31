@@ -732,7 +732,7 @@ h1 { font-weight: 400; font-size: 46px; line-height: 1.02; letter-spacing: -0.01
     // 10 · the end card
     ch.push({ eyebrow: "Parcelvora Story Mode", title: isProp ? "Every property has a story." : "Every neighborhood has a story.", final: true, at, zoom: 15.2, pitch: 50, bearing: 0, pins: [home],
       line: "Search any address or neighborhood in New York or Florida at the top. Or turn this story into an article, a video script or a social post.", src: "" });
-    state.live.where = where; state.live.hood = hood;
+    state.live.where = where; state.live.hood = hood; if (!state.live.homeLabel) state.live.homeLabel = hood;
     return ch;
   }
 
@@ -867,7 +867,7 @@ h1 { font-weight: 400; font-size: 46px; line-height: 1.02; letter-spacing: -0.01
   }
 
   // ── Story state ────────────────────────────────────────
-  const state = { nb: NB[qs.get("n")] ? qs.get("n") : "park-slope", i: 0, playing: false, voice: false, music: true, data: {}, dv: null, list: [], live: null };
+  const state = { nb: NB[qs.get("n")] ? qs.get("n") : "park-slope", i: 0, playing: false, voice: false, music: false, data: {}, dv: null, list: [], live: null };
   const $ = (id) => document.getElementById(id);
 
   function legendHtml(kind) {
@@ -972,7 +972,8 @@ h1 { font-weight: 400; font-size: 46px; line-height: 1.02; letter-spacing: -0.01
     $("lot").style.display = "none";
     $("title").textContent = "Loading the story…";
     try { await load(nb); } catch (e) { $("title").textContent = "The story data did not load. Refresh to try again."; return; }
-    show(Math.min(at || 0, state.list.length - 1));
+    state.i = Math.min(at || 0, state.list.length - 1);
+    if (autoplay) setPlaying(true); else show(state.i);
   }
 
   // Any address or place: told live. The records app links here with what it knows about the property.
@@ -984,7 +985,8 @@ h1 { font-weight: 400; font-size: 46px; line-height: 1.02; letter-spacing: -0.01
     if (map) map.jumpTo({ center: [L.lon, L.lat], zoom: 15, pitch: 55, bearing: -20 });
     try { state.list = await buildLive(L); state.data.live = { center: [L.lon, L.lat], points: [] }; }
     catch (e) { $("title").textContent = "The story did not load. Refresh to try again."; return; }
-    show(Math.min(Math.max(0, (Number(qs.get("c")) || 1) - 1), state.list.length - 1));
+    state.i = Math.min(Math.max(0, (Number(qs.get("c")) || 1) - 1), state.list.length - 1);
+    if (autoplay) setPlaying(true); else show(state.i);
   }
 
   // ── Create content: the same story as an article, a video script or a social post ──
@@ -1072,7 +1074,9 @@ h1 { font-weight: 400; font-size: 46px; line-height: 1.02; letter-spacing: -0.01
   $("music").onclick = () => { state.music = !state.music; $("music").setAttribute("aria-pressed", String(state.music)); syncSong(); };
   $("go").onclick = () => startStory(false);
   $("goVoice").onclick = () => startStory(true);
-  if (qs.get("play") === "0") $("start").style.display = "none";
+  // No start screen: a story opens straight on its first chapter and plays (sound waits for a tap, as browsers require).
+  $("start").style.display = "none"; $("music").setAttribute("aria-pressed", "false");
+  const autoplay = qs.get("play") !== "0";
   $("dots").addEventListener("click", (e) => { const b = e.target.closest("button[data-k]"); if (b) show(Number(b.dataset.k)); });
   document.addEventListener("keydown", (e) => {
     if (/^(INPUT|TEXTAREA)$/.test(e.target.tagName)) return;
@@ -1085,8 +1089,17 @@ h1 { font-weight: 400; font-size: 46px; line-height: 1.02; letter-spacing: -0.01
   const lat0 = Number(qs.get("lat")), lon0 = Number(qs.get("lon"));
   if (qs.get("lat") && qs.get("lon") && Number.isFinite(lat0) && Number.isFinite(lon0)) {
     const get = (k) => qs.get(k) || "";
-    startLive({ lat: lat0, lon: lon0, addr: get("addr"), town: get("town"), region: get("region"), id: get("id"), yb: get("yb"), use: get("use"), ls: get("ls"), place: get("place"), kind: get("place") ? "place" : "property" });
-  } else choose(state.nb, Math.max(0, (Number(qs.get("c")) || 1) - 1));
+    startLive({ lat: lat0, lon: lon0, addr: get("addr"), town: get("town"), region: get("region"), id: get("id"), yb: get("yb"), use: get("use"), ls: get("ls"), place: get("place"), kind: get("place") || get("kind") === "place" ? "place" : "property" });
+  } else if (NB[qs.get("n")]) choose(state.nb, Math.max(0, (Number(qs.get("c")) || 1) - 1));
+  else {
+    // Opened with no property and no place: ask for one. Park Slope and the others stay one tap away under Place.
+    $("eyebrow").textContent = "Parcelvora Story Mode"; $("count").textContent = "";
+    $("title").textContent = "Tell the story of any address or neighborhood.";
+    $("line").textContent = "Type an address or a neighborhood in New York or Florida at the top. From the records, open a property and press its Story button.";
+    $("tip").style.display = "none";
+    if (map) map.jumpTo({ center: [-74.2, 41.2], zoom: 6.2, pitch: 30, bearing: 0 });
+    setTimeout(() => $("findQ").focus(), 300);
+  }
 })();
 </script>
 </body>
