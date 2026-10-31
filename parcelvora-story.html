@@ -9,7 +9,7 @@
 <link rel="icon" href="parcelvora-fox.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,500;0,6..72,600;1,6..72,500&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@700;800&family=IBM+Plex+Sans:wght@400;500;600;700&family=Bodoni+Moda:wght@700&display=swap" rel="stylesheet">
 <link href="https://api.mapbox.com/mapbox-gl-js/v3.7.0/mapbox-gl.css" rel="stylesheet">
 <script src="https://api.mapbox.com/mapbox-gl-js/v3.7.0/mapbox-gl.js"></script>
 <script src="https://unpkg.com/deck.gl@8.9.36/dist.min.js"></script>
@@ -120,13 +120,59 @@ h1 { font-family: var(--serif); font-weight: 500; font-size: 40px; line-height: 
   .lot { left: 16px; right: 16px; width: auto; top: calc(var(--bar-h, 110px) + 12px); bottom: auto; position: absolute; }
 }
 </style>
+<style>
+/* Parcelvora brand: navy + gold + product blue, the same as the landing page and the records app. */
+:root { --mint: #dbe8f8; --mint-soft: #e3eefc; --mint-pale: #f3f8ff; --ink: #0a1a2f; --ink-2: #33465e; --line: #b9cbe3;
+  --coral: #d9a548; --pink: #9cc3f5; --lime: #1b6fe0; --gold: #f0c66e; --navy: #0b1f3a; --blue: #1b6fe0;
+  --serif: "Archivo", system-ui, sans-serif; --sans: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif; }
+body { background: #f3f8ff; }
+.bar { background: var(--navy); border-bottom: 1px solid rgba(255,255,255,.14); color: #fff; }
+.word { font-family: "Bodoni Moda", Georgia, serif; font-weight: 700; letter-spacing: .05em; color: #fff; }
+.word b { color: #d9a548; font-weight: 700; }
+.word small { color: #f0c66e; }
+.mark { border-color: rgba(255,255,255,.6); }
+.seg .lbl { color: #dbe7f7; }
+.seg button { border-color: rgba(255,255,255,.5); background: transparent; color: #fff; }
+.seg button[aria-pressed="true"] { background: #d9a548; color: var(--navy); border-color: #d9a548; }
+.panel { border: 1px solid #d5e2f2; border-radius: 16px; box-shadow: 0 24px 60px rgba(10,26,47,.25); }
+h1, .start-card h2, .lot h2, .stats b { font-weight: 800; letter-spacing: -0.01em; }
+.eyebrow { color: var(--blue); }
+.eyebrow::before { background: #d9a548; border-color: #d9a548; }
+.brow i { background: var(--blue); border-color: var(--blue); }
+.brow:nth-child(2n) i { background: #d9a548; border-color: #d9a548; }
+.brow:nth-child(3n) i { background: #9cc3f5; border-color: #9cc3f5; }
+.cols { border-bottom-color: var(--navy); }
+.cols i { background: var(--blue); border-color: var(--blue); }
+.cols i.hi { background: #d9a548; border-color: #d9a548; }
+.stats div { background: #f3f8ff; border: 1px solid #d5e2f2; }
+.stats b { color: var(--navy); }
+.why { border-color: #d9a548; background: #fdf6e7; }
+.why b { color: #8a5f12; }
+.legend .ramp { background: linear-gradient(90deg, #dbe8f8, #9cc3f5, #5b9be8, #1b6fe0, #f0c66e, #d9a548); }
+.leg { background: #f3f8ff; border-color: #d5e2f2; }
+.cta a { border-bottom-color: #d9a548; }
+.p-ctl { background: #f3f8ff; border-top-color: #d5e2f2; }
+.prog { background: #dbe8f8; border-color: #d5e2f2; }
+.prog i { background: #d9a548; }
+.btns button { border: 1px solid var(--line); color: var(--navy); }
+.btns button:hover, .btns button[aria-pressed="true"] { background: var(--navy); color: #f0c66e; border-color: var(--navy); }
+.dots button[aria-current="true"] { background: #d9a548; border-color: #d9a548; }
+.lot { border: 1px solid #d5e2f2; box-shadow: 0 18px 44px rgba(10,26,47,.3); }
+.lot .tags span { background: #e3eefc; border-color: var(--line); color: var(--navy); }
+.start { background: rgba(11,31,58,.62); }
+.start-card { border: 0; box-shadow: 0 30px 80px rgba(0,0,0,.4); }
+.start-btns button { border: 2px solid #d9a548; background: #d9a548; color: var(--navy); }
+.start-btns button.ghost { background: #fff; color: var(--navy); border-color: var(--navy); }
+.start-btns button:hover { background: #f0c66e; border-color: #f0c66e; color: var(--navy); }
+@media (max-width: 860px) { .panel { box-shadow: 0 12px 30px rgba(10,26,47,.2); } }
+</style>
 </head>
 <body>
 
 <div class="bar" id="bar">
   <a class="brand" href="parcelvora-landing.html">
     <span class="mark"><img src="parcelvora-fox.png" alt=""></span>
-    <span class="word">Parcelvora<small>Story Mode</small></span>
+    <span class="word">PARCEL<b>VORA</b><small>Story Mode</small></span>
   </a>
   <div class="seg" id="nbSeg" role="group" aria-label="Neighborhood"><span class="lbl">Place</span></div>
   <div class="seg" id="audSeg" role="group" aria-label="Audience"><span class="lbl">For</span></div>
@@ -200,9 +246,9 @@ h1 { font-family: var(--serif); font-weight: 500; font-size: 40px; line-height: 
     recreation: "Recreation", nursery: "Nurseries", seasonal: "Seasonal", rural_estate: "Rural estates", camp_rv: "Camps + RV",
     bar_nightclub: "Bars", car_lot: "Car lots", multi_structure_res: "Multi-house lots", residential_other: "Other residential", mobile_home: "Mobile homes" };
   const OWN = { individual: "Individuals", entity: "Companies (LLC, corp)", trust: "Trusts", estate: "Estates", public: "Public", unknown: "Unknown" };
-  const GROUP = { 1: ["Houses", [94, 190, 182]], 2: ["Condos + co-ops", [168, 210, 109]], 3: ["Apartments", [246, 168, 164]], 4: ["Mixed use", [239, 127, 122]],
-    5: ["Commercial", [51, 51, 51]], 6: ["Industrial", [130, 130, 130]], 7: ["Vacant", [232, 196, 110]], 8: ["Public + parks", [176, 222, 160]], 9: ["Other", [205, 205, 205]] };
-  const RAMP = [[214, 240, 237], [139, 218, 212], [94, 190, 182], [168, 210, 109], [246, 168, 164], [239, 127, 122]];
+  const GROUP = { 1: ["Houses", [27, 111, 224]], 2: ["Condos + co-ops", [120, 172, 240]], 3: ["Apartments", [18, 50, 90]], 4: ["Mixed use", [217, 165, 72]],
+    5: ["Commercial", [10, 26, 47]], 6: ["Industrial", [128, 140, 158]], 7: ["Vacant", [227, 144, 28]], 8: ["Public + parks", [15, 154, 88]], 9: ["Other", [200, 208, 220]] };
+  const RAMP = [[219, 232, 248], [156, 195, 245], [91, 155, 232], [27, 111, 224], [240, 198, 110], [217, 165, 72]];
   const VALUE_BASIS = { assessed_total: "assessed value", full_market_value: "market value", just_value: "market value" };
 
   const fmt = (n) => (n == null ? "—" : Number(n).toLocaleString("en-US"));
@@ -405,7 +451,7 @@ h1 { font-family: var(--serif); font-weight: 500; font-size: 40px; line-height: 
       map.addSource("pv-walk", { type: "geojson", data: { type: "FeatureCollection", features: [] } });
       map.addLayer({ id: "pv-walk-dots", type: "circle", source: "pv-walk", paint: {
         "circle-radius": ["interpolate", ["linear"], ["zoom"], 13, 2, 16, 5, 18, 10], "circle-color": ["get", "c"],
-        "circle-stroke-color": "#333333", "circle-stroke-width": 1, "circle-pitch-alignment": "map" } });
+        "circle-stroke-color": "#0b1f3a", "circle-stroke-width": 1, "circle-pitch-alignment": "map" } });
       overlay = new deck.MapboxOverlay({ interleaved: false, layers: [] });
       map.addControl(overlay);
       mapReady = true;
@@ -436,15 +482,15 @@ h1 { font-family: var(--serif); font-weight: 500; font-size: 40px; line-height: 
   function layersFor(chapter) {
     const m = chapter.map || {}, cfg = NB[state.nb], d = state.data[state.nb], pts = d.points || [], H = d.history || {}, B = d.business || {};
     const dots = (id, data, color, radius, minPx, line) => new deck.ScatterplotLayer({ id, data, getPosition: (p) => [p[0], p[1]], getFillColor: color,
-      getRadius: radius, radiusMinPixels: minPx, stroked: !!line, getLineColor: [51, 51, 51], lineWidthMinPixels: line || 0, opacity: 0.95, updateTriggers: { getFillColor: m.mode } });
+      getRadius: radius, radiusMinPixels: minPx, stroked: !!line, getLineColor: [11, 31, 58], lineWidthMinPixels: line || 0, opacity: 0.95, updateTriggers: { getFillColor: m.mode } });
     if (m.mode === "use") return [dots("pv-dots", pts, (p) => GROUP[p[3]][1], cfg.radius * 0.2, 1.5, 0)];
     if (m.mode === "biz") return [dots("pv-dots", pts.filter((p) => p[3] >= 4 && p[3] <= 6), (p) => GROUP[p[3]][1], cfg.radius * 0.32, 3, 0.75)];
-    if (m.mode === "licenses") return [dots("pv-faint", pts, [200, 236, 232], cfg.radius * 0.25, 1, 0),
-      dots("pv-lic", B.lic_points || [], [239, 127, 122], cfg.radius * 0.6, 5, 1.5)];
+    if (m.mode === "licenses") return [dots("pv-faint", pts, [205, 220, 240], cfg.radius * 0.25, 1, 0),
+      dots("pv-lic", B.lic_points || [], [217, 165, 72], cfg.radius * 0.6, 5, 1.5)];
     if (m.mode === "valueadd") {
       const tag = (p) => isValueAdd(state.nb, p);
-      return [dots("pv-faint", pts.filter((p) => !tag(p)), [200, 236, 232], cfg.radius * 0.16, 1, 0),
-        dots("pv-va", pts.filter(tag), (p) => (tag(p) === "gold" ? [232, 196, 110] : [239, 127, 122]), cfg.radius * 0.24, 2, 0.5)];
+      return [dots("pv-faint", pts.filter((p) => !tag(p)), [205, 220, 240], cfg.radius * 0.16, 1, 0),
+        dots("pv-va", pts.filter(tag), (p) => (tag(p) === "gold" ? [227, 144, 28] : [27, 111, 224]), cfg.radius * 0.24, 2, 0.5)];
     }
     const data = m.mode === "year" ? pts.filter((p) => p[2] > 0) : m.mode === "value" ? pts.filter((p) => p[4] > 0) : pts;
     const w = weight[m.mode];
@@ -455,7 +501,7 @@ h1 { font-family: var(--serif); font-weight: 500; font-size: 40px; line-height: 
       material: { ambient: 0.65, diffuse: 0.5, shininess: 20 }, opacity: 0.9,
       updateTriggers: { getColorWeight: m.mode, getElevationWeight: m.mode }, transitions: { elevationScale: 1200 } })];
     if (m.mode === "transit" && H.subway) L.push(new deck.ScatterplotLayer({ id: "pv-subway", data: H.subway, getPosition: (s) => [Number(s.entrance_longitude), Number(s.entrance_latitude)],
-      getFillColor: [239, 127, 122], getLineColor: [51, 51, 51], stroked: true, lineWidthMinPixels: 2, getRadius: 28, radiusMinPixels: 6 }));
+      getFillColor: [217, 165, 72], getLineColor: [11, 31, 58], stroked: true, lineWidthMinPixels: 2, getRadius: 28, radiusMinPixels: 6 }));
     return L;
   }
 
@@ -552,9 +598,9 @@ h1 { font-family: var(--serif); font-weight: 500; font-size: 40px; line-height: 
     if (kind === "use") return Object.values(GROUP).slice(0, 8).map(([l, c]) => `<span><i style="background:rgb(${c})"></i>${esc(l)}</span>`).join("");
     if (kind === "year") return `<span>Column height = buildings · color: newer</span><span class="ramp"></span><span>older</span>`;
     if (kind === "value") return `<span>Height + color = average value: lower</span><span class="ramp"></span><span>higher</span>`;
-    if (kind === "transit") return `<span><i style="background:#ef7f7a"></i>Subway entrance</span><span>Columns = parcels</span>`;
-    if (kind === "licenses") return `<span><i style="background:#ef7f7a"></i>Licensed business</span><span><i style="background:#c8ece8"></i>Every lot</span>`;
-    if (kind === "valueadd") return `<span><i style="background:#ef7f7a"></i>${state.nb === "park-slope" ? "Room to build bigger" : state.nb === "coral-gables" ? "House built before 1960" : "Estate-held"}</span><span><i style="background:#e8c46e"></i>Vacant</span>`;
+    if (kind === "transit") return `<span><i style="background:#d9a548"></i>Subway entrance</span><span>Columns = parcels</span>`;
+    if (kind === "licenses") return `<span><i style="background:#d9a548"></i>Licensed business</span><span><i style="background:#cddcf0"></i>Every lot</span>`;
+    if (kind === "valueadd") return `<span><i style="background:#1b6fe0"></i>${state.nb === "park-slope" ? "Room to build bigger" : state.nb === "coral-gables" ? "House built before 1960" : "Estate-held"}</span><span><i style="background:#e3901c"></i>Vacant</span>`;
     if (kind === "count") return `<span>Column height = parcels · color: fewer</span><span class="ramp"></span><span>more</span>`;
     if (kind.startsWith("share:")) return `<span>${esc(kind.slice(6))}: low</span><span class="ramp"></span><span>high</span>`;
     return "";
