@@ -1,0 +1,57 @@
+# Parcelvora — list activity calendar server contract
+
+Status: **demo implemented** on `parcelvora-records.html`. This document specifies production integration, which is **not implemented here** because the application server resides in a separate repository.
+
+## Meaning of a list pull
+
+A successful completed export with at least one record delivered counts as **one list pull**. A filtered search exported as a file and an explicit saved list exported as a file both count. Retries, preview requests, list creation, and unsuccessful/zero-record exports are logged but are not counted as successful pulls.
+
+Show three counters computed in the `America/New_York` timezone:
+
+- **Today**: completed pulls and total new / delivered records from 00:00 through 23:59 Eastern
+- **This week**: Monday through Sunday (Eastern)
+- **This month**: first through last local date of the month
+
+Calendar day cells show completed pulls and new records, with a click revealing per-export activity.
+
+## Ledger
+
+Use the current spec's `gold.exports` table and `gold.export_items` / `gold.exported` for stable identities and duplicate prevention. Add or expose:
+
+- `account` (tenant-scoped)
+- `id`, `created_at` in UTC
+- `list_id` (nullable) and `list_name` (human-readable immutable snapshot)
+- `channel` (`download` or `dest:<id>`)
+- `format`, `status`, `matched`, `delivered`
+- `new_count` (first-time records delivered for this account; quota metric)
+- `redownloaded` (previously exported in this channel, returned by request)
+- `already` (matched records already exported in this channel)
+- `skipped` (matched records excluded by duplicate protection, per-export cap or daily limit)
+- `error` if failed and `params` (search filter snapshot)
+
+The initial ledger write must precede the file response or webhook side effect; use DB transactions/locking and idempotency tokens so concurrent downloads, retries and multiple sessions cannot circumvent quota or double-debit. Do not treat browser localStorage as authoritative.
+
+## API
+
+`GET /api/exports?from=YYYY-MM-DD&to=YYYY-MM-DD` returns `{ "exports": [...] }` with account-scoped, newest-first ledger rows. Pagination is required for larger histories; date ranges use America/New_York boundaries but timestamps are ISO8601 UTC.
+
+`GET /api/export/preview` returns `{ matched, already, fresh, leftToday, limit }`.
+
+`GET /api/export?format=csv|json&new_only=1&name=...` returns downloadable records, creates a ledger row, and enforces 5,000 **new unique records per day** across downloads and pushes. Existing exports may be re-downloaded without consuming the new-record allowance; logged redownload counts remain distinct. List-based exports use `list=<id>`, and the server derives the list name from account-scoped data rather than trusting an arbitrary client-provided name.
+
+Guard access by account/role. Never reveal other accounts' list names, filters, parcel identifiers, or download history.
+
+## Demo limitations
+
+The GitHub Pages sample currently implements a localStorage ledger (`pv-exports`, `pv-exported`) and duplicate-aware CSV/JSON export UI. This only persists in that browser. It does **not** provide server-side quotas, multi-device consistency, push/webhooks, or reliable recovery after local storage is cleared. The demo explicitly says so.
+
+## Acceptance checks
+
+1. Two downloads of the same filter: the second new-only export has zero delivered and does not count as another successful pull; the attempt remains in the day log.
+2. Same records through two named lists: dedupe by account + channel + parcel identity, not list name.
+3. New 5,000-record daily cap enforced transactionally with two concurrent requests.
+4. The same record re-downloaded as `all` does not increment `new_count`.
+5. Midnight Eastern, DST start/end, month boundaries, and Monday/week boundaries show correct totals.
+6. A successful 100-record list download produces exactly one pull and 100 delivered records on the calendar; zero-record export remains logged but not counted.
+7. Shared-account pagination and tenant authorization verified for `/api/exports`.
+8. History remains stable after list deletion or rename; retain original list name in ledger.
