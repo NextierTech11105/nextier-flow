@@ -142,8 +142,14 @@
 
   window.fetch = async (input, init) => {
     const url = new URL(typeof input === "string" ? input : input.url, location.href);
-    const route = /\/api\/(records|map|lookup|counties|ids|detail|skiptrace|comps|exports(?:\/preview|\/\d+\/file)?|lists(?:\/\d+(?:\/items)?)?)$/.exec(url.pathname);
+    const route = /\/api\/(records|map|lookup|counties|ids|detail|skiptrace|comps|exports(?:\/preview|\/\d+\/file)?|lists(?:\/\d+(?:\/items)?)?|destinations(?:\/\d+)?|push(?:\/\d+\/retry)?)$/.exec(url.pathname);
     if (!route) return realFetch(input, init);
+    // Sending to other tools runs only on Parcelvora's server: it keeps each destination's secret encrypted, and records
+    // never leave this preview.
+    if (route[1].startsWith("destinations")) return (init && init.method && init.method !== "GET")
+      ? reply({ error: "demo", message: "Sending to other tools runs on Parcelvora's server. This preview doesn't send records anywhere: download a CSV or JSON instead." }, 503)
+      : reply({ destinations: [], sending: false });
+    if (route[1].startsWith("push")) return reply({ error: "demo", message: "Sending to other tools runs on Parcelvora's server. This preview doesn't send records anywhere." }, 503);
     // Skip tracing spends Tracerfy credits, so it runs only on Parcelvora's server, where the key lives.
     if (route[1] === "skiptrace") return reply({ error: "demo", message: "Skip tracing runs on Parcelvora's server, where the Tracerfy key lives. This preview has no server, so nothing runs or is charged here." }, 503);
     const d = await ready, q = url.searchParams;
@@ -603,6 +609,10 @@
   .export-opts { display: grid; gap: 12px; padding: 12px 0; }
   .export-opts label { display: flex; gap: 10px; align-items: center; }
   .export-opts select { background: var(--card-2); color: var(--text); padding: 8px; border: 1px solid var(--line); border-radius: 7px; }
+  .dest-form { display: flex; flex-wrap: wrap; gap: 8px; margin: 6px 0; }
+  .dest-form input { flex: 1 1 200px; min-width: 0; background: var(--card-2); color: var(--text); padding: 9px 11px; border: 1px solid var(--line); border-radius: 7px; font: inherit; }
+  .dest-list { list-style: none; padding: 0; margin: 6px 0; display: grid; gap: 6px; }
+  .dest-list li { display: flex; gap: 10px; align-items: center; justify-content: space-between; }
   @media(max-width: 600px){ .activity-stat {padding:9px;} .activity-stats { gap: 5px; } .activity-stat strong {font-size:20px;} .activity-day { min-height:61px; padding:4px;} .activity-day .ad-rows {display:none;} .activity-nav h3{min-width:120px;} }
   .dtop { display: flex; justify-content: space-between; gap: 8px; }
   [hidden] { display: none !important; }
@@ -676,8 +686,16 @@
   <section class="comps export-dialog" id="exportDialog" hidden role="dialog" aria-modal="true" aria-label="Download records">
     <div class="comps-in export-in">
       <div class="comps-top"><div><h2>Download a list</h2><div class="sm" id="exportPreview">Checking matched and previously exported records…</div></div><button class="btn" type="button" id="exportClose">Close</button></div>
-      <div class="export-opts"><label><input type="radio" name="exportMode" value="new" checked> New records only (recommended)</label><label><input type="radio" name="exportMode" value="all"> All matching records, including repeats</label>
-        <label>Format <select id="exportFormat"><option value="csv">CSV</option><option value="json">JSON</option></select></label>
+      <div class="export-opts"><label>Send to <select id="exportTarget"><option value="download">Download a file</option></select></label>
+        <div id="destBox" hidden>
+          <p class="sm" id="destOff">Sending to another tool (Zapier, Make, n8n, a CRM, a Google Sheet) runs on Parcelvora's server, where each destination's signing secret is kept encrypted. This preview doesn't send records anywhere: download a CSV or JSON instead.</p>
+          <ul class="dest-list" id="destList"></ul>
+          <form id="destForm" class="dest-form"><input id="destName" maxlength="80" placeholder="Name, e.g. My CRM" aria-label="Destination name"><input id="destUrl" type="url" placeholder="https://hooks.example.com/…" aria-label="Webhook address"><button class="btn primary" type="submit">Save destination</button></form>
+          <div id="destSecretBox" hidden class="dest-form"><input id="destSecret" readonly aria-label="Signing secret"><button class="btn" type="button" id="destSecretCopy">Copy</button></div>
+          <div class="sm" id="destMsg" role="status"></div>
+        </div>
+        <label><input type="radio" name="exportMode" value="new" checked> <span id="exportModeNew">New records only (recommended)</span></label><label><input type="radio" name="exportMode" value="all"> <span id="exportModeAll">All matching records, including repeats</span></label>
+        <label id="exportFormatL">Format <select id="exportFormat"><option value="csv">CSV</option><option value="json">JSON</option></select></label>
       </div>
       <div class="sm" id="exportNote" role="status"></div>
       <div class="comps-act"><button class="btn primary" type="button" id="exportConfirm">Download</button><button class="btn" type="button" id="exportHistory">View activity calendar</button></div>
@@ -1295,10 +1313,12 @@
     $("activityLog").innerHTML = onDay.length ? onDay.map((e) =>
       '<div class="activity-entry"><div><strong>' + esc(e.list_name || "Records") + '</strong><div class="sm">' +
       esc(new Date(e.created_at).toLocaleTimeString("en-US", { timeZone: "America/New_York", hour: "numeric", minute: "2-digit" })) +
-      ' ET · ' + esc((e.format || "csv").toUpperCase()) + ' · ' + esc(e.channel || "download") + ' · ' + esc(e.status || "completed") +
+      ' ET · ' + esc(e.destination ? "sent to " + e.destination : (e.format || "csv").toUpperCase() + " · download") + ' · ' + esc(e.status || "completed") +
+      (e.error ? ' · ' + esc(e.error) : '') +
       '</div></div><div><b>' + int(e.delivered) + ' delivered</b><div class="sm">' + int(e.new_count) + ' new · ' +
       int(e.already) + ' previously exported · ' + int(e.skipped) + ' not delivered</div>' +
-      (Number(e.delivered) > 0 && e.file ? '<button type="button" class="btn" data-redl="' + esc(e.file) + '">Download again</button>' : '') + '</div></div>').join("")
+      (Number(e.delivered) > 0 && e.file && !e.destination ? '<button type="button" class="btn" data-redl="' + esc(e.file) + '">Download again</button>' : '') +
+      (e.destination && (e.status === "partial" || e.status === "failed") ? '<button type="button" class="btn" data-retry="' + esc(String(e.id)) + '">Send again</button>' : '') + '</div></div>').join("")
       : '<p class="sm">No exports recorded on this date.</p>';
     $("activityNotice").textContent = location.hostname.endsWith("github.io")
       ? "Demo activity is saved in this browser only. Other browsers, accounts, or devices will not share this history."
@@ -1360,16 +1380,18 @@
   async function previewExport() {
     $("exportPreview").textContent = "Checking records…";
     try {
-      const r = await postJson("/api/exports/preview", { params: exportQuery }), j = await r.json();
+      const target = $("exportTarget").value, ch = target.startsWith("dest:") ? target : "download";
+      const r = await postJson("/api/exports/preview", { params: exportQuery, channel: ch }), j = await r.json();
       if (!r.ok) throw Error(j.error || r.status);
-      $("exportPreview").textContent = int(j.matched) + (j.capped ? "+" : "") + " match · " + int(j.owned) + " already yours · " +
+      $("exportPreview").textContent = int(j.matched) + (j.capped ? "+" : "") + " match · " + int(j.owned) + " already yours · " + (ch !== "download" ? int(j.sentHere) + " already sent there · " : "") +
         (j.fresh == null ? "many" : int(j.fresh)) + " new · " + int(j.leftToday) + " of " + int(j.limit) + " new records left today. " +
         "One download takes up to " + int(j.cap) + " records in the current sort order; the rest stay for the next one.";
       $("exportConfirm").disabled = !j.matched;
     } catch (_) { $("exportPreview").textContent = "Preview not available on this server."; $("exportConfirm").disabled = true; }
   }
   function openExportDialog(qs) {
-    exportQuery = qs; exportKey = newKey();
+    exportQuery = qs; exportKey = newKey(); $("destSecretBox").hidden = true; $("destMsg").textContent = "";
+    loadDestinations();
     $("exportDialog").hidden = false; document.body.classList.add("comps-on");
     $("exportNote").textContent = "";
     document.querySelector('input[name="exportMode"][value="new"]').checked = true;
@@ -1381,7 +1403,18 @@
   $("exportHistory").onclick = () => { closeExport(); openActivity(); $("activityPanel").scrollIntoView({block:"start"}); };
   $("exportConfirm").onclick = async () => {
     const b = $("exportConfirm"); b.disabled = true; $("exportNote").textContent = "Preparing export…";
-    const chosen = document.querySelector('input[name="exportMode"]:checked'), fmt = $("exportFormat").value;
+    const chosen = document.querySelector('input[name="exportMode"]:checked'), fmt = $("exportFormat").value, target = $("exportTarget").value;
+    if (target.startsWith("dest:")) {
+      try {
+        const j = await api("/api/push", "POST", { destination_id: target.slice(5), params: exportQuery, mode: chosen && chosen.value === "all" ? "all" : "new",
+          name: describeSearch(), idempotency_key: exportKey });
+        const x = j.export;
+        $("exportNote").textContent = (j.repeated ? "Already started: " : "") + `Sending ${int(x.selected - x.skipped)} records to ${x.destination || "the destination"}. ` +
+          "Only batches it acknowledges count as delivered; follow it in List Activity.";
+        exportKey = newKey(); if (!$("activityPanel").hidden) setTimeout(fetchActivity, 2500);
+      } catch (err) { $("exportNote").textContent = (err.info && (err.info.message || err.info.error)) || "Could not send: " + err.message; }
+      b.disabled = false; return;
+    }
     try {
       const r = await postJson("/api/exports", { params: exportQuery, mode: chosen && chosen.value === "all" ? "all" : "new", format: fmt,
         name: describeSearch(), idempotency_key: exportKey }), j = await r.json();
@@ -1708,6 +1741,57 @@
     w.document.close();
     $("ltMsg").textContent = targets.length > 1 ? "Two letters opened: one to each address." : "The letter opened in a new window.";
   }
+
+  // Send to another tool: a destination is a webhook (Zapier, Make, n8n, a CRM's inbound hook, a Google Sheet's script).
+  // The server signs every batch, retries once, and counts only what the receiver acknowledges.
+  let destCache = [], sendingOn = false;
+  async function loadDestinations() {
+    try { const j = await api("/api/destinations"); destCache = j.destinations || []; sendingOn = !!j.sending; } catch (e) { destCache = []; sendingOn = false; }
+    const sel = $("exportTarget"), keep = sel.value;
+    sel.innerHTML = '<option value="download">Download a file</option>' + destCache.map((d) => `<option value="dest:${d.id}">Send to ${esc(d.name)} (${esc(d.host)})</option>`).join("")
+      + (sendingOn ? '<option value="add">Add a destination…</option>' : '<option value="add">Send to another tool…</option>');
+    sel.value = [...sel.options].some((o) => o.value === keep) ? keep : "download";
+    paintTarget();
+  }
+  function paintTarget() {
+    const t = $("exportTarget").value, dest = t.startsWith("dest:");
+    $("exportFormatL").hidden = dest || t === "add";
+    $("destBox").hidden = t !== "add";
+    $("exportModeNew").textContent = dest ? "Only records this destination doesn't have yet (recommended)" : "New records only (recommended)";
+    $("exportModeAll").textContent = dest ? "Every matching record, including ones it already has" : "All matching records, including repeats";
+    $("exportConfirm").textContent = dest ? "Send" : "Download";
+    $("exportConfirm").hidden = t === "add";
+    if (t === "add") {
+      $("destList").innerHTML = destCache.map((d) => `<li>${esc(d.name)} · ${esc(d.host)} <button type="button" class="btn" data-drop-dest="${d.id}">Remove</button></li>`).join("");
+      $("destForm").hidden = !sendingOn;
+      $("destOff").hidden = sendingOn;
+    }
+  }
+  $("exportTarget").addEventListener("change", () => { paintTarget(); if ($("exportTarget").value !== "add") previewExport(); });
+  $("destForm").addEventListener("submit", async (e) => {
+    e.preventDefault();
+    $("destMsg").textContent = "Checking the address…";
+    try {
+      const j = await api("/api/destinations", "POST", { name: $("destName").value, url: $("destUrl").value });
+      $("destName").value = ""; $("destUrl").value = "";
+      $("destSecret").value = j.secret; $("destSecretBox").hidden = false;
+      $("destMsg").textContent = "Saved. Copy the signing secret now: it is shown once. " + j.verify;
+      await loadDestinations(); $("exportTarget").value = "add"; paintTarget();
+    } catch (err) { $("destMsg").textContent = (err.info && (err.info.message || err.info.error)) || err.message; }
+  });
+  $("destSecretCopy").onclick = async () => { try { await navigator.clipboard.writeText($("destSecret").value); $("destSecretCopy").textContent = "Copied"; } catch (e) { $("destSecret").select(); } };
+  $("destList").addEventListener("click", async (e) => {
+    const b = e.target.closest("[data-drop-dest]"); if (!b) return;
+    if (!confirm("Remove this destination? Its send history stays.")) return;
+    try { await api(`/api/destinations/${b.dataset.dropDest}`, "DELETE"); await loadDestinations(); $("exportTarget").value = "add"; paintTarget(); } catch (err) { $("destMsg").textContent = err.message; }
+  });
+  $("activityLog").addEventListener("click", async (e) => {
+    const b = e.target.closest("[data-retry]"); if (!b) return;
+    b.disabled = true;
+    try { const j = await api(`/api/push/${b.dataset.retry}/retry`, "POST", {}); $("activityNotice").textContent = j.message; setTimeout(fetchActivity, 3000); }
+    catch (err) { $("activityNotice").textContent = (err.info && err.info.message) || "Could not send it again: " + err.message; }
+    b.disabled = false;
+  });
 
   // ── Lists: records you chose to keep together. A list changes only when you add or remove records; a saved search
   //    runs again each time. Up to 10,000 records per list, and nothing is ever cut off quietly. ──────────────────────

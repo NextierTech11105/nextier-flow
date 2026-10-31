@@ -44,6 +44,16 @@ The initial ledger write must precede the file response or webhook side effect; 
 - `/api/records.csv` runs through the same ledger. Accounts sign in with their own keys (`app/accounts.mjs`); account B
   never sees account A's exports or files.
 
+## Lists and push (as implemented)
+
+- Lists: `GET/POST /api/lists`, `POST|DELETE /api/lists/:id/items {ids | params}`, `PATCH|DELETE /api/lists/:id`. Fixed
+  membership, up to 10,000 records; a bigger search is refused with its count. `list=<id>` filters any search and export
+  for the owning account only; exports keep the list name they had.
+- Push: `GET/POST /api/destinations` (secret shown once, sealed at rest), `DELETE /api/destinations/:id`,
+  `POST /api/push {destination_id, params | list_id, mode, idempotency_key}`, `POST /api/push/:id/retry`. Batches of 100
+  with `X-Parcelvora-Signature: t=<unix>,v1=<hex HMAC-SHA256 of "t.body">` and a stable `X-Parcelvora-Delivery`; only
+  acknowledged batches count as delivered; https public addresses only.
+
 ## Demo limitations
 
 The GitHub Pages sample currently implements a localStorage ledger (`pv-exports`, `pv-exported`) and duplicate-aware CSV/JSON export UI. This only persists in that browser. It does **not** provide server-side quotas, multi-device consistency, push/webhooks, or reliable recovery after local storage is cleared. The demo explicitly says so.
