@@ -139,7 +139,7 @@
 
   window.fetch = async (input, init) => {
     const url = new URL(typeof input === "string" ? input : input.url, location.href);
-    const route = /\/api\/(records|map|lookup|counties|ids|detail|skiptrace)$/.exec(url.pathname);
+    const route = /\/api\/(records|map|lookup|counties|ids|detail|skiptrace|comps)$/.exec(url.pathname);
     if (!route) return realFetch(input, init);
     // Skip tracing spends Tracerfy credits, so it runs only on Parcelvora's server, where the key lives.
     if (route[1] === "skiptrace") return reply({ error: "demo", message: "Skip tracing runs on Parcelvora's server, where the Tracerfy key lives. This preview has no server, so nothing runs or is charged here." }, 503);
@@ -147,6 +147,17 @@
     if (route[1] === "detail") {
       const r = d.rows.find((x) => x.id === q.get("id") && (!q.get("county") || x.county === q.get("county")));
       return r ? reply({ input: { id: q.get("id"), county: q.get("county") }, data: detail(r) }) : reply({ error: "no such parcel" }, 404);
+    }
+    // Comps: recorded sales of the same type and a similar size (half to double) within a mile in the last 24 months, nearest first.
+    if (route[1] === "comps") {
+      const s = d.rows.find((x) => x.id === q.get("id") && x.county === q.get("county"));
+      if (!s || !has(s.lat)) return reply({ miles: 1, months: 24, rows: [], note: "The subject has no map point on record." });
+      const k = Math.PI / 180, mi = (r) => { const x = Math.sin(((r.lat - s.lat) * k) / 2) ** 2 + Math.cos(s.lat * k) * Math.cos(r.lat * k) * Math.sin(((r.lon - s.lon) * k) / 2) ** 2; return 7917.5 * Math.asin(Math.sqrt(x)); };
+      const cut = Date.now() - 24 * 2629800000;
+      const sq = Number(s.sqft) || 0;
+      const out = d.rows.filter((r) => r !== s && r.region === s.region && r.use === s.use && has(r.lat) && (!sq || (Number(r.sqft) >= sq * 0.5 && Number(r.sqft) <= sq * 2)) && Number(r.sale_price) > 10000 && r.sale_date && new Date(r.sale_date).getTime() >= cut)
+        .map((r) => [mi(r), r]).filter(([m]) => m <= 1).sort((a, b) => a[0] - b[0]).slice(0, 15).map(([, r]) => r);
+      return reply({ miles: 1, months: 24, rows: out, note: out.length ? undefined : "No recorded sales of the same type within a mile in the last 24 months in this preview's sample. Long Island and upstate rolls carry no sale prices." });
     }
     if (route[1] === "ids") {
       const all = d.rows.filter(matcher(q));
@@ -363,6 +374,33 @@
   .lc-contact { border: 1px dashed var(--line); border-radius: 10px; padding: 10px 12px; }
   .lc-contact p { margin: 2px 0 8px; font-size: 15px; color: var(--soft); }
   .lc-actions { display: flex; flex-wrap: wrap; gap: 8px; }
+  .comps { position: fixed; inset: 0; z-index: 30; background: var(--bg); overflow: auto; padding: 18px 16px 40px; }
+  .comps[hidden] { display: none; }
+  body.comps-on { overflow: hidden; }
+  .comps-in { max-width: 1200px; margin: 0 auto; display: grid; gap: 14px; }
+  .comps-top { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: flex-start; gap: 12px; }
+  .comps-top h2 { margin: 0 0 4px; font-size: 28px; }
+  .comps-act { display: flex; flex-wrap: wrap; gap: 8px; }
+  .comps-map { width: 100%; height: auto; border-radius: 12px; border: 1px solid var(--line); display: block; }
+  .subj-g { display: grid; grid-template-columns: 1fr minmax(240px, 360px); gap: 16px; align-items: start; }
+  .cma { display: grid; gap: 4px; padding: 14px 16px; border-radius: 10px; background: var(--card-2); border: 1px solid var(--line); }
+  .cma .k { font-size: 13px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--soft); }
+  .cma b { font-size: 30px; line-height: 1.15; }
+  .ctable-wrap { overflow-x: auto; }
+  .ctable { width: 100%; border-collapse: collapse; font-size: 15px; }
+  .ctable th, .ctable td { text-align: left; padding: 10px 8px; border-bottom: 1px solid var(--line); vertical-align: top; }
+  .ctable th { font-size: 13px; letter-spacing: .06em; text-transform: uppercase; color: var(--soft); }
+  .ctable tr.off td { opacity: .5; }
+  .ctable .cn { display: inline-grid; place-items: center; width: 26px; height: 26px; border-radius: 13px; background: #26405f; color: #fff; font-size: 13px; }
+  .ctable .nowrap { white-space: nowrap; }
+  .ctable .btn { padding: 5px 9px; }
+  .inc { display: inline-flex; align-items: center; gap: 4px; margin-right: 6px; cursor: pointer; }
+  .pick { background: var(--card); border: 1px solid var(--line); border-radius: 8px; width: 36px; height: 36px; display: inline-grid; place-items: center; cursor: pointer; color: var(--blue); font-size: 20px; font-weight: 700; margin-right: 6px; vertical-align: top; }
+  .pick[aria-pressed="true"] { background: var(--blue); color: var(--blue-ink); border-color: var(--blue); }
+  .cnt { display: inline-grid; place-items: center; min-width: 22px; height: 22px; padding: 0 6px; border-radius: 11px; background: var(--blue); color: var(--blue-ink); font-size: 13px; }
+  .cnt:empty { display: none; }
+  td.nowrap { white-space: nowrap; }
+  @media (max-width: 760px) { .subj-g { grid-template-columns: 1fr; } }
   /* Start clean: a profile opens with every section closed. The heading is the toggle; nothing is remembered open. */
   #drawer .box:not(.open) > :not(h3) { display: none; }
   #drawer .box > h3 { cursor: pointer; display: flex; justify-content: space-between; align-items: center; gap: 10px; margin: 0; }
@@ -451,6 +489,7 @@
       </div>
       <a class="btn" id="storyBtn" href="https://nextiertech11105.github.io/nextier-flow/parcelvora-story.html" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg><span>Story Mode</span></a>
       <button type="button" class="btn" id="savedBtn" aria-expanded="false" aria-controls="savedPanel"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M6 3h12v18l-6-4-6 4z"/></svg><span>Saved searches</span></button>
+      <button type="button" class="btn" id="compsBtn" aria-controls="comps"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg><span>Comps</span><b class="cnt" id="compsCount"></b></button>
       <a class="btn" id="download" href="/api/records.csv"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 4v11m0 0-4-4m4 4 4-4M4 19h16"/></svg>Download</a>
       <button type="button" class="btn" id="toggleFilters" aria-expanded="true" aria-controls="filters"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M3 5h18l-7 8v6l-4 2v-8L3 5z"/></svg><span>Hide Filters</span></button>
       <button type="button" class="btn" id="theme" aria-label="Switch to dark mode"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg><span>Dark</span></button>
@@ -622,6 +661,7 @@
 
 <div class="scrim" id="scrim" hidden></div>
 <aside class="drawer" id="drawer" role="dialog" aria-modal="true" aria-label="Property details" hidden></aside>
+<section class="comps" id="comps" role="dialog" aria-modal="true" aria-label="Comps and CMA" hidden></section>
 
 <script src="https://api.mapbox.com/mapbox-gl-js/v3.17.0/mapbox-gl.js"></script>
 <script>
@@ -798,13 +838,15 @@
           <td><div>${esc(USE[r.use] || r.use || "—")}</div>
               <div class="sm">${[r.units ? int(r.units) + " units" : "", r.sqft ? int(r.sqft) + " sq ft" : "", r.year_built ? "Built " + r.year_built : "",
                                  r.acres ? r.acres + " acres" : ""].filter(Boolean).join(" · ")}</div></td>
-          <td><button type="button" class="eye" data-i="${i}" aria-label="Open details for ${esc(r.address || r.id)}">${EYE}</button></td>
+          <td class="nowrap"><button type="button" class="pick" data-pick="${i}" aria-pressed="false" aria-label="Select ${esc(r.address || r.id)} for comps">+</button><button type="button" class="eye" data-i="${i}" aria-label="Open details for ${esc(r.address || r.id)}">${EYE}</button></td>
         </tr>`).join("") : `<tr><td colspan="6" class="empty">${synced() ? "Nothing in the map view. Move the map or clear a filter." : "No records match these filters. Clear one and try again."}</td></tr>`;
+      try { paintPicks(); } catch (err) {}   // the + on rows already picked for comps shows as a check
     } catch (e) {
       if (mine === seq) { $("count").textContent = "Could not load records. Change a filter to try again."; $("rows").innerHTML = ""; }
     }
   }
   $("rows").addEventListener("click", (e) => {
+    const pk = e.target.closest(".pick"); if (pk) { togglePick(rows[+pk.dataset.pick]); return; }
     const tr = e.target.closest("tr[data-i]"); if (!tr) return;
     const r = rows[+tr.dataset.i]; selected = r; mark(r); openDetail(r.id, r.county);
   });
@@ -1619,6 +1661,8 @@
         <button type="button" class="btn primary" data-lc="talk">Copy talking points</button>
         <button type="button" class="btn" data-lc="card">Copy lead card</button>
         <button type="button" class="btn" data-lc="report">Create report</button>
+        <button type="button" class="btn" data-lc="subject">Make subject for comps</button>
+        <button type="button" class="btn" data-lc="comp">Add to comps</button>
         <a class="btn" href="${storyHref}" target="_blank" rel="noopener">${esc(storyLabel)}</a>
       </div>
       <div class="sm" id="lcMsg" aria-live="polite"></div>
@@ -1637,11 +1681,166 @@
     const b = e.target.closest("[data-lc]"); if (!b || !leadCtx) return;
     if (b.dataset.lc === "more") { const c = b.closest(".lc"), on = !c.classList.contains("open"); c.classList.toggle("open", on); b.setAttribute("aria-expanded", String(on)); b.textContent = on ? "Hide the facts and contacts" : "Show the facts and contacts"; return; }
     if (b.dataset.lc === "report") { openReport(); return; }
+    if (b.dataset.lc === "subject" || b.dataset.lc === "comp") {
+      const r = rowFromCtx(leadCtx);
+      if (b.dataset.lc === "subject") makeSubject(r); else if (!isPicked(r)) togglePick(r);
+      const m = $("lcMsg"); if (m) m.innerHTML = (b.dataset.lc === "subject" ? "Set as the comps subject. " : "Added to comps. ") + '<a href="#" data-open-comps="1">Open Comps</a>';
+      return;
+    }
     if (b.dataset.lc === "trace") { runTrace(b); return; }
     const msg = $("lcMsg"), text = b.dataset.lc === "talk" ? ($("lcTalk") ? $("lcTalk").textContent : "") : leadCardText();
     try { await navigator.clipboard.writeText(text); if (msg) msg.textContent = b.dataset.lc === "talk" ? "Talking points copied." : "Lead card copied."; }
     catch (err) { if (msg) msg.textContent = "Copying is blocked here; select the text and copy it."; }
   });
+
+
+  // ── Comps & CMA: pick a subject and the sales to compare it with; the CMA reads their recorded sale prices per square
+  //    foot. Sales on record: NYC Department of Finance rolling sales (12 months) and the Florida tax roll. Long Island and
+  //    upstate rolls carry no sale prices, so a property there can be the subject but not a comp. The selection lasts
+  //    for this browser tab only. ─────────────────────────────────────────────────────────────────────────────────────
+  const comps = { subject: null, picks: new Map() };   // "id|county" → the property, as the table shows it
+  const ck = (r) => `${r.id}|${r.county}`;
+  try { const s0 = JSON.parse(sessionStorage.getItem("pv-comps") || "null"); if (s0) { comps.subject = s0.subject || null; (s0.picks || []).forEach((r) => comps.picks.set(ck(r), r)); } } catch (e) {}
+  function keepComps() {
+    try { sessionStorage.setItem("pv-comps", JSON.stringify({ subject: comps.subject, picks: [...comps.picks.values()] })); } catch (e) {}
+    paintPicks();
+  }
+  const isPicked = (r) => comps.picks.has(ck(r)) || (comps.subject && ck(comps.subject) === ck(r));
+  function paintPicks() {
+    const n = comps.picks.size + (comps.subject ? 1 : 0);
+    $("compsCount").textContent = n ? String(n) : "";
+    document.querySelectorAll("#rows .pick").forEach((b) => { const r = rows[+b.dataset.pick]; const on = !!(r && isPicked(r)); b.setAttribute("aria-pressed", String(on)); b.textContent = on ? "✓" : "+"; });
+  }
+  function togglePick(r) {
+    if (comps.subject && ck(comps.subject) === ck(r)) comps.subject = null;
+    else if (comps.picks.has(ck(r))) comps.picks.delete(ck(r));
+    else comps.picks.set(ck(r), r);
+    keepComps();
+  }
+  function makeSubject(r) {
+    comps.picks.delete(ck(r));
+    if (comps.subject && ck(comps.subject) !== ck(r)) comps.picks.set(ck(comps.subject), comps.subject);
+    comps.subject = r; keepComps();
+  }
+  // The open profile as a table row: the table's own row when it is on this page, else built from the profile.
+  function rowFromCtx(ctx) {
+    const pa = (ctx.p && ctx.p.parcel) || {}, hit = rows.find((x) => String(x.id) === String(pa.id) && x.county === pa.county);
+    if (hit) return hit;
+    const d = ctx.det || detFromProfile(ctx.p), p = d.propertyInfo || {}, a = p.address || {}, pv = d.parcelvora || {}, l = d.lotInfo || {};
+    return { id: pa.id, county: pa.county, region: pa.region || pv.region, address: a.address, town: a.city, zip: a.zip, use: pv.useClass,
+      sqft: p.buildingSquareFeet, year_built: p.yearBuilt, units: p.unitsCount, acres: l.lotAcres, lat: p.latitude, lon: p.longitude,
+      sale_price: d.lastSalePrice, sale_date: d.lastSaleDate, value: d.estimatedValue || (d.taxInfo && d.taxInfo.assessedValue) || null };
+  }
+  const miles = (a, b) => meters(Number(a.lat), Number(a.lon), Number(b.lat), Number(b.lon)) / 1609.34;
+  const monthsAgo = (d) => { const t = new Date(String(d).slice(0, 10) + "T12:00:00"); return isNaN(t) ? null : (Date.now() - t.getTime()) / 2629800000; };
+  const round1k = (v) => Math.round(v / 1000) * 1000;
+  // The CMA: each included comp's sale price per square foot; the median times the subject's square feet is the
+  // indicated value, the middle half of the comps is the range (all of them under four).
+  function cma(s, list) {
+    const used = list.filter((r) => r.on !== false && Number(r.sale_price) > 10000);
+    const ppsf = used.filter((r) => Number(r.sqft) > 0).map((r) => Number(r.sale_price) / Number(r.sqft)).sort((a, b) => a - b);
+    const at = (a, f) => (a.length ? a[Math.round(f * (a.length - 1))] : null);
+    const med = at(ppsf, 0.5), lo = ppsf.length >= 4 ? at(ppsf, 0.25) : ppsf[0], hi = ppsf.length >= 4 ? at(ppsf, 0.75) : ppsf[ppsf.length - 1];
+    const sq = Number(s && s.sqft) || 0, prices = used.map((r) => Number(r.sale_price)).sort((a, b) => a - b);
+    return { n: used.length, nP: ppsf.length, med, lo, hi, value: sq && med ? sq * med : null, low: sq && lo ? sq * lo : null, high: sq && hi ? sq * hi : null, medPrice: at(prices, 0.5) };
+  }
+  function compsMap(s, list) {
+    if (!TOKEN) return "";
+    const pins = [];
+    if (s && s.lat) pins.push(`pin-l-s+d9771f(${s.lon},${s.lat})`);
+    list.slice(0, 20).forEach((r, k) => { if (r.lat) pins.push(`pin-s-${k < 9 ? k + 1 : "c"}+26405f(${r.lon},${r.lat})`); });
+    // comps in one building would zoom the map onto a single roof: frame the block instead
+    const far = s && s.lat ? Math.max(0, ...list.filter((r) => r.lat).map((r) => miles(s, r))) : 1;
+    const view = far < 0.15 && s && s.lat ? `${s.lon},${s.lat},15.4,0` : "auto";
+    return pins.length > 1 ? `https://api.mapbox.com/styles/v1/mapbox/streets-v12/static/${pins.join(",")}/${view}/900x360@2x?${view === "auto" ? "padding=48&" : ""}access_token=${encodeURIComponent(TOKEN)}` : "";
+  }
+  function compRow(r, k, s, actions, med) {
+    const ppsf = Number(r.sale_price) > 0 && Number(r.sqft) > 0 ? Number(r.sale_price) / Number(r.sqft) : null, age = r.sale_date ? monthsAgo(r.sale_date) : null;
+    return `<tr class="${r.on === false ? "off" : ""}"><td><b class="cn">${k + 1}</b></td>
+      <td><div class="strong">${esc(r.address || "No street address")}</div><div class="sm">${esc([title(r.town), r.zip].filter(Boolean).join(" "))}</div></td>
+      <td>${s && s.lat && r.lat ? (miles(s, r) < 0.02 ? "Same building" : miles(s, r).toFixed(2) + " mi") : "—"}</td><td>${esc(USE[r.use] || r.use || "—")}</td>
+      <td>${Number(r.sale_price) > 0 ? `<b>${money(Number(r.sale_price))}</b><div class="sm">${esc(saleDate(r.sale_date, r.region))}${age > 24 ? " · older sale" : ""}</div>` : '<span class="sm">No sale on record</span>'}</td>
+      <td>${r.sqft ? int(Number(r.sqft)) : "—"}</td><td>${ppsf ? "$" + int(Math.round(ppsf)) : "—"}${ppsf && med && (ppsf > med * 1.6 || ppsf < med * 0.6) ? '<div class="sm">Far from the median; check it (a multi-unit or non-market sale?)</div>' : ""}</td><td>${esc(r.year_built || "—")}</td>
+      ${actions ? `<td class="nowrap"><label class="inc"><input type="checkbox" data-inc="${esc(ck(r))}" ${r.on === false ? "" : "checked"}> Use</label>
+        <button type="button" class="btn" data-subj="${esc(ck(r))}">Make subject</button> <button type="button" class="btn" data-drop="${esc(ck(r))}" aria-label="Remove ${esc(r.address || "")}">×</button></td>` : ""}</tr>`;
+  }
+  const compHead = (actions) => `<thead><tr><th></th><th>Property</th><th>Distance</th><th>Type</th><th>Sale</th><th>Sq ft</th><th>$/sq ft</th><th>Built</th>${actions ? "<th></th>" : ""}</tr></thead>`;
+  function subjectCard(s, st) {
+    const v = st.value ? `<span class="k">Indicated value</span><b>${money(round1k(st.value))}</b><span class="sm">Range ${money(round1k(st.low))} to ${money(round1k(st.high))}</span>
+        <span class="sm">${st.nP} comp${st.nP === 1 ? "" : "s"} · median $${int(Math.round(st.med))} per sq ft × ${int(Number(s.sqft))} sq ft</span>`
+      : st.nP ? `<span class="k">Median price per sq ft</span><b>$${int(Math.round(st.med))}</b><span class="sm">The subject's square footage is not on record, so its value can't be read from price per square foot. Median comp sale: ${money(st.medPrice)}.</span>`
+      : `<span class="k">CMA</span><span class="sm">Add comps with a recorded sale and square footage to see the indicated value.</span>`;
+    return `<div class="box subj open"><h3>Subject</h3><div class="subj-g">
+      <div><div class="strong">${esc(s.address || "No street address")}</div><div class="sm">${esc([title(s.town), stateOf(s), s.zip].filter(Boolean).join(" "))}</div>
+        <div class="sm">${esc([USE[s.use] || s.use, s.sqft ? int(Number(s.sqft)) + " sq ft" : "", s.year_built ? "built " + s.year_built : "", Number(s.units) > 1 ? s.units + " units" : ""].filter(Boolean).join(" · "))}</div>
+        ${Number(s.sale_price) > 0 ? `<div class="sm">Last sale ${money(Number(s.sale_price))} · ${esc(saleDate(s.sale_date, s.region))}</div>` : ""}</div>
+      <div class="cma">${v}</div></div></div>`;
+  }
+  const sortedPicks = (s) => { const list = [...comps.picks.values()]; if (s && s.lat) list.sort((a, b) => (a.lat ? miles(s, a) : 1e9) - (b.lat ? miles(s, b) : 1e9)); return list; };
+  const COMPS_NOTE = "Sales on record: NYC Department of Finance rolling sales (the last 12 months) and the Florida Department of Revenue tax roll. Long Island and upstate assessment rolls do not publish sale prices, so a property there can be the subject but not a comp. A CMA is an estimate from recorded sales, not an appraisal.";
+  function renderComps(msg) {
+    const s = comps.subject, list = sortedPicks(s), st = cma(s, list), img = compsMap(s, list);
+    $("comps").innerHTML = `<div class="comps-in">
+      <div class="comps-top"><div><h2>Comps &amp; CMA</h2><div class="sm">Pick a subject and the sales to compare it with. The CMA uses each comp's recorded sale price per square foot.</div></div>
+        <div class="comps-act"><button type="button" class="btn" id="compsSuggest" ${s ? "" : "disabled"}>Suggest comps</button>
+          <button type="button" class="btn" id="compsReport" ${s && list.length ? "" : "disabled"}>Create CMA report</button>
+          <button type="button" class="btn" id="compsClear">Clear</button><button type="button" class="btn primary" id="compsClose">Close</button></div></div>
+      <div class="sm comps-msg" aria-live="polite">${esc(msg || "")}</div>
+      ${s ? subjectCard(s, st) : `<div class="box open"><h3>Subject</h3><p class="sm">No subject yet. Press <b>Make subject</b> on a selected property below, or in a property's profile.</p></div>`}
+      ${img ? `<img class="comps-map" src="${img}" alt="Map of the subject (S) and the comps by number">` : ""}
+      <div class="box open"><h3>Comparable sales (${list.length})</h3>
+        ${list.length ? `<div class="ctable-wrap"><table class="ctable">${compHead(true)}<tbody>${list.map((r, k) => compRow(r, k, s, true, st.med)).join("")}</tbody></table></div>`
+          : '<p class="sm">Nothing selected yet. Press <b>+</b> on rows in the records table to add them, or set a subject and press <b>Suggest comps</b>.</p>'}</div>
+      <div class="src">${COMPS_NOTE}</div></div>`;
+  }
+  function openComps(msg) { renderComps(msg); $("comps").hidden = false; document.body.classList.add("comps-on"); const c = $("compsClose"); if (c) c.focus(); }
+  function closeComps() { $("comps").hidden = true; document.body.classList.remove("comps-on"); }
+  async function suggestComps() {
+    const s = comps.subject; if (!s) return;
+    renderComps("Finding nearby sales of the same type…");
+    let msg;
+    try {
+      const r = await fetch(`/api/comps?id=${encodeURIComponent(s.id)}&county=${encodeURIComponent(s.county)}`), j = await r.json();
+      if (!r.ok) throw new Error(j.error || r.status);
+      let added = 0;
+      for (const x of j.rows || []) if (!comps.picks.has(ck(x)) && ck(x) !== ck(s)) { comps.picks.set(ck(x), x); added++; }
+      keepComps();
+      msg = added ? `Added ${added} nearby sale${added === 1 ? "" : "s"} of the same type and a similar size (within ${j.miles} mile, the last ${j.months} months).` : j.note || "No new nearby sales of the same type on record.";
+    } catch (e) { msg = "Suggest comps did not answer. Try again."; }
+    renderComps(msg);
+  }
+  function compsReport() {
+    const s = comps.subject; if (!s) return;
+    const list = sortedPicks(s), st = cma(s, list), img = compsMap(s, list), css = [...document.querySelectorAll("style")].map((x) => x.textContent).join("\n");
+    const w = window.open("", "_blank");
+    if (!w) { renderComps("Allow pop-ups for this page to open the report."); return; }
+    const today = new Date().toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" });
+    w.document.write(`<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+      <title>CMA · ${esc(s.address || "Subject")} · Parcelvora</title><style>${css}
+      html, body { background: #fff; color: #13202f; overflow: auto; height: auto; } body { max-width: 980px; margin: 0 auto; padding: 28px 22px 60px; font-size: 15px; }
+      .rep-h { display: flex; justify-content: space-between; align-items: baseline; border-bottom: 2px solid #13202f; padding-bottom: 10px; margin-bottom: 16px; }
+      .rep-h b { font-size: 26px; } .rep-h b i { color: #c0611a; font-style: normal; } .rep-h span { color: #5b6573; }
+      .rep-p { position: fixed; right: 16px; bottom: 16px; padding: 12px 18px; font: 600 15px/1 Inter, system-ui, sans-serif; background: #d9771f; color: #13202f; border: 0; border-radius: 4px; cursor: pointer; }
+      @media print { .rep-p { display: none; } body { padding: 0; } }</style></head><body>
+      <div class="rep-h"><b>Parcel<i>vora</i></b><span>Comparative market analysis · ${esc(today)}</span></div>
+      ${subjectCard(s, st)}${img ? `<img class="comps-map" src="${img}" alt="Map of the subject (S) and the comps by number">` : ""}
+      <div class="box open"><h3>Comparable sales (${list.filter((r) => r.on !== false).length})</h3><table class="ctable">${compHead(false)}<tbody>${list.filter((r) => r.on !== false).map((r, k) => compRow(r, k, s, false, st.med)).join("")}</tbody></table></div>
+      <div class="src">${COMPS_NOTE}</div><button class="rep-p" onclick="print()">Print or save as PDF</button></body></html>`);
+    w.document.close();
+  }
+  $("compsBtn").onclick = () => openComps();
+  $("comps").addEventListener("click", (e) => {
+    const t = e.target;
+    if (t.closest("#compsClose")) return closeComps();
+    if (t.closest("#compsClear")) { comps.subject = null; comps.picks.clear(); keepComps(); return renderComps(); }
+    if (t.closest("#compsSuggest")) return suggestComps();
+    if (t.closest("#compsReport")) return compsReport();
+    const subj = t.closest("[data-subj]"); if (subj) { const r = comps.picks.get(subj.dataset.subj); if (r) makeSubject(r); return renderComps(); }
+    const drop = t.closest("[data-drop]"); if (drop) { comps.picks.delete(drop.dataset.drop); keepComps(); return renderComps(); }
+  });
+  $("comps").addEventListener("change", (e) => { const c = e.target.closest("[data-inc]"); if (!c) return; const r = comps.picks.get(c.dataset.inc); if (r) { r.on = c.checked; keepComps(); renderComps(); } });
+  document.addEventListener("keydown", (e) => { if (e.key === "Escape" && !$("comps").hidden) closeComps(); });
+  document.addEventListener("click", (e) => { const a = e.target.closest("[data-open-comps]"); if (!a) return; e.preventDefault(); closeDetail(); openComps(); });
 
   // ── detail drawer ──────────────────────────────────────────────────────────────────────────────────────────────
   // Every section heading in a profile is its own open/close button, closed to start, keyboard included.
