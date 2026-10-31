@@ -79,8 +79,8 @@ h1 { font-family: var(--serif); font-weight: 500; font-size: 40px; line-height: 
 .p-ctl { border-top: 1.5px solid var(--line); padding: 12px 16px 14px; background: var(--mint-pale); }
 .prog { height: 6px; border-radius: 3px; background: var(--mint-soft); overflow: hidden; border: 1px solid rgba(51,51,51,.35); }
 .prog i { display: block; height: 100%; width: 0; background: var(--coral); }
-.ctl-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-top: 10px; }
-.btns { display: flex; gap: 8px; }
+.ctl-row { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px; margin-top: 10px; }
+.btns { display: flex; flex-wrap: wrap; gap: 8px; }
 .btns button { min-width: 44px; height: 44px; border-radius: 12px; border: 2px solid var(--line); background: var(--white); cursor: pointer; font-size: 16px; font-weight: 700; padding: 0 10px; white-space: nowrap; }
 .btns button:hover { background: var(--ink); color: var(--mint); }
 .btns button[aria-pressed="true"] { background: var(--ink); color: var(--mint); }
@@ -96,8 +96,21 @@ h1 { font-family: var(--serif); font-weight: 500; font-size: 40px; line-height: 
 .lot .x { position: absolute; right: 10px; top: 8px; border: 0; background: none; font-size: 20px; font-weight: 700; cursor: pointer; }
 .lot p { font-size: 15px; margin: 8px 0 0; }
 
+.start { position: fixed; z-index: 30; left: 0; right: 0; bottom: 0; top: var(--bar-h, 64px); display: grid; place-items: center; padding: 16px; background: rgba(139, 218, 212, .62); backdrop-filter: blur(3px); }
+.start-card { width: min(560px, 100%); background: var(--white); border: 2px solid var(--line); border-radius: 22px; box-shadow: 12px 12px 0 var(--coral); padding: 28px; text-align: center; }
+.start-card .mark { width: 72px; height: 72px; border-radius: 18px; margin: 0 auto 14px; }
+.start-card .eyebrow { justify-content: center; }
+.start-card h2 { font-family: var(--serif); font-weight: 500; font-size: 44px; line-height: 1.05; letter-spacing: -0.02em; margin: 12px 0 0; }
+.start-card p { font-size: 18px; color: var(--ink-2); margin: 10px 0 0; }
+.start-btns { display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; margin-top: 22px; }
+.start-btns button { border: 2px solid var(--line); border-radius: 12px; padding: 15px 22px; font-size: 17px; font-weight: 700; letter-spacing: .03em; cursor: pointer; background: var(--ink); color: var(--white); }
+.start-btns button.ghost { background: var(--white); color: var(--ink); }
+.start-btns button:hover { background: var(--coral); color: var(--ink); }
+.start-card .start-note { font-size: 15px; margin-top: 16px; }
+
 @media (max-width: 860px) {
   body { overflow-y: auto; }
+  .start-card h2 { font-size: 34px; }
   #map { position: relative; top: auto; height: 52vh; margin-top: var(--bar-h, 110px); }
   .mapmsg { position: absolute; }
   .panel { position: relative; left: auto; top: auto; bottom: auto; width: auto; margin: 14px 16px 24px; box-shadow: 6px 6px 0 var(--mint); }
@@ -143,6 +156,7 @@ h1 { font-family: var(--serif); font-weight: 500; font-size: 40px; line-height: 
         <button id="play" aria-label="Pause">❚❚</button>
         <button id="next" aria-label="Next chapter">▶</button>
         <button id="voice" aria-pressed="false" aria-label="Narration">🔊 Voice</button>
+        <button id="music" aria-pressed="true" aria-label="Music">🎵 Music</button>
       </div>
       <div class="dots" id="dots"></div>
     </div>
@@ -150,6 +164,22 @@ h1 { font-family: var(--serif); font-weight: 500; font-size: 40px; line-height: 
 </section>
 
 <aside class="lot" id="lot" aria-live="polite"></aside>
+
+<audio id="song" src="media/nextier-story-song-2.m4a" preload="auto" loop></audio>
+
+<div class="start" id="start" role="dialog" aria-labelledby="startTitle">
+  <div class="start-card">
+    <span class="mark"><img src="parcelvora-fox.png" alt=""></span>
+    <p class="eyebrow">Parcelvora Story Mode</p>
+    <h2 id="startTitle">The story of <span id="startPlace">Park Slope</span>.</h2>
+    <p>Told by public record, on a 3D map, set to music.</p>
+    <div class="start-btns">
+      <button id="go" type="button">▶ Play with music</button>
+      <button id="goVoice" class="ghost" type="button">▶ Music + narrator</button>
+    </div>
+    <p class="start-note">Pick another place or who it's for at the top, any time.</p>
+  </div>
+</div>
 
 <script>
 (() => {
@@ -471,7 +501,24 @@ h1 { font-family: var(--serif); font-weight: 500; font-size: 40px; line-height: 
     if (!("speechSynthesis" in window)) return;
     speechSynthesis.cancel();
     const u = new SpeechSynthesisUtterance(text); if (voicePick) u.voice = voicePick; u.rate = 1; u.pitch = 1;
+    u.onstart = () => fadeTo(MUSIC_UNDER);
+    u.onend = u.onerror = () => fadeTo(MUSIC_FULL);
     speechSynthesis.speak(u);
+  }
+
+  // ── Thomas's song ──────────────────────────────────────
+  // Plays only after a press (browsers block sound until then); dips under the narrator, then comes back.
+  const song = document.getElementById("song"), MUSIC_FULL = 0.6, MUSIC_UNDER = 0.18;
+  song.volume = MUSIC_FULL;
+  let fadeTimer = null;
+  function fadeTo(v, ms = 450) {
+    clearInterval(fadeTimer);
+    const from = song.volume, t0 = performance.now();
+    fadeTimer = setInterval(() => { const k = Math.min(1, (performance.now() - t0) / ms); song.volume = from + (v - from) * k; if (k >= 1) clearInterval(fadeTimer); }, 40);
+  }
+  function syncSong() {
+    if (state.playing && state.music) { const pr = song.play(); if (pr && pr.catch) pr.catch(() => {}); }
+    else song.pause();
   }
   const speechMs = (text) => Math.max(0, text.split(/\s+/).length * 390 + 900);
 
@@ -497,7 +544,7 @@ h1 { font-family: var(--serif); font-weight: 500; font-size: 40px; line-height: 
   }
 
   // ── Story state ────────────────────────────────────────
-  const state = { nb: NB[qs.get("n")] ? qs.get("n") : "park-slope", aud: AUD[qs.get("a")] ? qs.get("a") : "all", i: 0, playing: qs.get("play") !== "0", voice: false, data: {}, dv: null, list: [] };
+  const state = { nb: NB[qs.get("n")] ? qs.get("n") : "park-slope", aud: AUD[qs.get("a")] ? qs.get("a") : "all", i: 0, playing: false, voice: false, music: true, data: {}, dv: null, list: [] };
   const $ = (id) => document.getElementById(id);
 
   function legendHtml(kind) {
@@ -557,8 +604,16 @@ h1 { font-family: var(--serif); font-weight: 500; font-size: 40px; line-height: 
   }
   function setPlaying(on) {
     state.playing = on; $("play").textContent = on ? "❚❚" : "▶"; $("play").setAttribute("aria-label", on ? "Pause" : "Play");
+    if (on) $("start").style.display = "none";
+    syncSong();
     if (!on) { clearCam(); if ("speechSynthesis" in window) speechSynthesis.cancel(); clearTimeout(timer); $("prog").style.transition = "none"; }
     else show(state.i);
+  }
+  function startStory(withVoice) {
+    if (withVoice && "speechSynthesis" in window) { state.voice = true; $("voice").setAttribute("aria-pressed", "true"); }
+    state.music = true; $("music").setAttribute("aria-pressed", "true");
+    try { song.currentTime = 0; } catch (e) {}
+    setPlaying(true);
   }
 
   async function load(nb) {
@@ -569,7 +624,9 @@ h1 { font-family: var(--serif); font-weight: 500; font-size: 40px; line-height: 
   }
 
   async function choose(nb, aud, at) {
+    if (nb !== state.nb && state.playing && state.music) { try { song.currentTime = 0; } catch (e) {} }
     state.nb = nb; state.aud = aud;
+    $("startPlace").textContent = NB[nb].label;
     document.querySelectorAll("#nbSeg button").forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.k === nb)));
     document.querySelectorAll("#audSeg button").forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.k === aud)));
     $("lot").style.display = "none";
@@ -590,7 +647,11 @@ h1 { font-family: var(--serif); font-weight: 500; font-size: 40px; line-height: 
     if (!state.voice && "speechSynthesis" in window) speechSynthesis.cancel();
     show(state.i);
   };
-  if (!("speechSynthesis" in window)) $("voice").style.display = "none";
+  if (!("speechSynthesis" in window)) { $("voice").style.display = "none"; $("goVoice").style.display = "none"; }
+  $("music").onclick = () => { state.music = !state.music; $("music").setAttribute("aria-pressed", String(state.music)); syncSong(); };
+  $("go").onclick = () => startStory(false);
+  $("goVoice").onclick = () => startStory(true);
+  if (qs.get("play") === "0") $("start").style.display = "none";
   $("dots").addEventListener("click", (e) => { const b = e.target.closest("button[data-k]"); if (b) show(Number(b.dataset.k)); });
   document.addEventListener("keydown", (e) => { if (e.key === "ArrowRight") show(state.i + 1); else if (e.key === "ArrowLeft") show(state.i - 1); else if (e.key === " " && e.target === document.body) { e.preventDefault(); setPlaying(!state.playing); } });
   const sizeBar = () => document.documentElement.style.setProperty("--bar-h", $("bar").offsetHeight + "px");

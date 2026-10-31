@@ -728,6 +728,9 @@
     } catch (err) { $("q").setCustomValidity("The search did not answer. Try again."); $("q").reportValidity(); }
   });
   $("q").addEventListener("input", () => $("q").setCustomValidity(""));
+  // A search handed over in the link (?q=…), from the landing page's search bar, runs on open.
+  const q0 = new URLSearchParams(location.search).get("q");
+  if (q0) { $("q").value = q0.slice(0, 120); setTimeout(() => $("search").requestSubmit(), 700); }
 
   // ── start ──────────────────────────────────────────────────────────────────────────────────────────────────────
   fetch("/api/counties").then((r) => r.json()).then((j) => {
