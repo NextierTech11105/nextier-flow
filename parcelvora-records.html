@@ -35,6 +35,9 @@
     if (flags.includes("absentee")) tests.push((r) => r.absentee === true);
     if (flags.includes("homestead")) tests.push((r) => r.owner_occupied === true);
     if (flags.includes("out_of_state")) tests.push((r) => r.out_of_state === true);
+    if (flags.includes("held")) tests.push((r) => r.held_since_2021 === true);
+    if (flags.includes("officer")) tests.push((r) => r.officer_name != null && r.officer_name !== "");
+    if (flags.includes("lien")) tests.push((r) => r.lien === true);
     const range = (param, field, op) => { const v = num(q.get(param)); if (v !== null) tests.push((r) => has(r[field]) && op(Number(r[field]), v)); };
     range("min", "value", (a, v) => a >= v); range("max", "value", (a, v) => a <= v);
     range("built_from", "year_built", (a, v) => a >= v); range("built_to", "year_built", (a, v) => a <= v);
@@ -268,10 +271,23 @@
   .rec .l1 { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 4px 12px; font-weight: 700; }
   .rec .l2 { color: var(--soft); font-size: 15px; }
   .rec a, .src a { color: var(--blue); font-weight: 700; text-decoration: none; white-space: nowrap; }
+  .rec a.recrow { display: block; color: inherit; font-weight: inherit; white-space: normal; border-radius: 8px; margin: 0 -8px; padding: 4px 8px; }
+  .rec a.recrow:hover { background: var(--card-2); }
+  .rec a.recrow:hover .img { text-decoration: underline; }
+  .rec .img { color: var(--blue); font-weight: 700; white-space: nowrap; }
+  .rec .l3 { margin-top: 4px; font-size: 15px; }
   .rec .open { color: #b45309; font-weight: 800; }
   .rec .done { color: var(--green); font-weight: 800; }
   .src { font-size: 15px; color: var(--soft); margin-top: 8px; }
   .lien-on { color: var(--red); font-weight: 800; }
+  /* One-click lead lists above the filters. */
+  .leads { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin: 0 0 14px; }
+  .leads-l { font: 800 15px var(--display); letter-spacing: 0.06em; text-transform: uppercase; color: var(--soft); margin-right: 4px; }
+  .lead { border: 1px solid var(--line); background: var(--card); color: var(--text); border-radius: 999px; padding: 8px 14px; font: 600 15px var(--body); cursor: pointer; }
+  .lead:hover { border-color: var(--blue); }
+  .lead.on { background: var(--blue); border-color: var(--blue); color: var(--blue-ink); }
+  .lead.soon { border-style: dashed; color: var(--soft); }
+  .leads-note { flex-basis: 100%; font-size: 15px; color: var(--soft); }
   .dtop { display: flex; justify-content: space-between; gap: 8px; }
   [hidden] { display: none !important; }
 </style>
@@ -302,6 +318,17 @@
     <input id="q" type="search" placeholder="Find one property: address, Florida folio, NYC BBL or NY parcel id" aria-label="Find a property">
     <button class="btn" type="submit">Find</button>
   </form>
+
+  <nav class="leads" id="leads" aria-label="Lead lists">
+    <span class="leads-l">Lead lists</span>
+    <button type="button" class="lead" data-lead="absentee">Absentee owners</button>
+    <button type="button" class="lead" data-lead="held">Long-held owners</button>
+    <button type="button" class="lead" data-lead="estates">Estates &amp; trusts</button>
+    <button type="button" class="lead" data-lead="llc">LLC-owned, person on file</button>
+    <button type="button" class="lead" data-lead="lien">Tax-delinquent (NYC)</button>
+    <button type="button" class="lead soon" data-lead="pf">Pre-foreclosure · coming</button>
+    <span class="leads-note" id="leadNote" hidden></span>
+  </nav>
 
   <section class="filters" id="filters" aria-label="Filters">
     <div class="fcard">
@@ -344,10 +371,13 @@
           <option value="entity">LLC / company</option>
           <option value="trust">Trust</option>
           <option value="estate">Estate</option>
+          <option value="trust,estate">Trust or estate</option>
         </select></label>
         <div class="chips" data-flags>
           <button type="button" class="chip" aria-pressed="false" data-flag="homestead">Owner lives there</button>
           <button type="button" class="chip" aria-pressed="false" data-flag="absentee">Absentee</button>
+          <button type="button" class="chip" aria-pressed="false" data-flag="held">Same owner since 2021</button>
+          <button type="button" class="chip" aria-pressed="false" data-flag="officer">Person behind the LLC on file</button>
         </div>
       </div>
     </div>
@@ -379,6 +409,7 @@
         </div>
         <div class="chips" data-flags>
           <button type="button" class="chip" aria-pressed="false" data-flag="out_of_state">Mailing address out of state</button>
+          <button type="button" class="chip" aria-pressed="false" data-flag="lien">On the city's lien sale list (NYC)</button>
         </div>
         <button type="button" class="clear" id="clear">Clear every filter</button>
       </div>
@@ -540,7 +571,30 @@
   $("clear").addEventListener("click", () => {
     FIELDS.forEach((id) => { $(id).value = ""; });
     document.querySelectorAll(".chip").forEach((b) => b.setAttribute("aria-pressed", "false"));
+    document.querySelectorAll("#leads .lead").forEach((b) => b.classList.remove("on"));
     fillCounties(); changed();
+  });
+
+  // One-click lead lists: each one clears the filters, then sets the few that define the list.
+  const pressFlag = (flag) => { const b = document.querySelector(`[data-flags] .chip[data-flag="${flag}"]`); if (b) b.setAttribute("aria-pressed", "true"); };
+  const LEADS = {
+    absentee: () => pressFlag("absentee"),
+    held: () => pressFlag("held"),
+    estates: () => { $("owner").value = "trust,estate"; },
+    llc: () => { $("owner").value = "entity"; pressFlag("officer"); },
+    lien: () => { $("region").value = "NYC"; fillCounties(); pressFlag("lien"); const c = CENTER.NYC; if (c && map && showsMap()) map.jumpTo({ center: c, zoom: 13 }); },
+  };
+  $("leads").addEventListener("click", (e) => {
+    const b = e.target.closest("button[data-lead]"); if (!b) return;
+    const note = $("leadNote");
+    if (b.dataset.lead === "pf") { note.hidden = false; note.textContent = "Pre-foreclosure needs a court-filings source (lis pendens and foreclosure cases). It's being connected; until then this list is empty."; return; }
+    note.hidden = true;
+    FIELDS.forEach((id) => { $(id).value = ""; });
+    document.querySelectorAll(".chip").forEach((c) => c.setAttribute("aria-pressed", "false"));
+    fillCounties();
+    LEADS[b.dataset.lead]();
+    document.querySelectorAll("#leads .lead").forEach((x) => x.classList.toggle("on", x === b));
+    changed();
   });
 
   // ── table ──────────────────────────────────────────────────────────────────────────────────────────────────────
@@ -740,9 +794,11 @@
         pointsAt.get(r.document_id).push(...keys.filter((k) => k && k !== "0/0/0/0"));
       }
       const closedBy = (loan, test) => closers.filter((c) => test(c) && (pointsAt.get(c.id) || []).some((k) => k === loan.crfn || k === loan.reel));
-      const link = (d) => `<a href="${acrisDoc(d.id)}" target="_blank" rel="noopener">ACRIS ↗</a>`;
       const who = (d) => [d.p1.length ? `${d.r1 || "From"}: ${esc(d.p1.join(", "))}` : "", d.p2.length ? `${d.r2 || "To"}: ${esc(d.p2.join(", "))}` : ""].filter(Boolean).join(" → ");
-      const row = (d, extra = "") => `<li><div class="l1"><span>${esc(day(d.when))} · ${esc(d.desc)}${d.amount ? " · " + money(d.amount) : ""}</span>${link(d)}</div><div class="l2">${who(d)}${extra}</div></li>`;
+      // The whole line opens the scanned document on ACRIS. `after` sits outside that link (a link can't hold another).
+      const row = (d, extra = "", after = "") => `<li><a class="recrow" href="${acrisDoc(d.id)}" target="_blank" rel="noopener" title="Open the scanned ${esc(d.desc.toLowerCase())} on ACRIS">
+        <div class="l1"><span>${esc(day(d.when))} · ${esc(d.desc)}${d.amount ? " · " + money(d.amount) : ""}</span><span class="img">View image ↗</span></div>
+        <div class="l2">${who(d)}${extra}</div></a>${after}</li>`;
       const more = (list, n) => (list.length > n ? `<li class="l2">…and ${list.length - n} more on ACRIS.</li>` : "");
       const v = val[0], lr = lien[0];
       const onLatest = lr && latestList && String(lr.month).slice(0, 7) === String(latestList).slice(0, 7);
@@ -750,7 +806,7 @@
       box.innerHTML = `
         <div class="box"><h3>Deed chain · ${deeds.length} recorded</h3>
           ${deeds.length ? `<ul class="rec">${deeds.slice(0, 12).map((d) => row(d)).join("")}${more(deeds, 12)}</ul>` : '<div class="sm">No deeds on ACRIS for this lot. Staten Island deeds are not in ACRIS.</div>'}
-          <div class="src">Source: ACRIS recorded documents, read live ${esc(today)}. Each line links to the scanned document.</div></div>
+          <div class="src">Source: ACRIS recorded documents, read live ${esc(today)}. Click any document to see the scanned original in a pop-up.</div></div>
         ${leases.length ? `<div class="box"><h3>Leases &amp; easements · ${leases.length} recorded</h3>
           <ul class="rec">${leases.slice(0, 8).map((d) => row(d)).join("")}${more(leases, 8)}</ul>
           <div class="src">Source: ACRIS recorded documents.</div></div>` : ""}
@@ -758,9 +814,11 @@
           ${loans.length ? `<ul class="rec">${loans.slice(0, 12).map((d) => {
             if (!isLoan(d)) return row(d);
             const sat = closedBy(d, isSat)[0], asst = closedBy(d, isAsst);
-            const status = sat ? ` · <span class="done">Satisfied ${esc(day(sat.when))}</span> <a href="${acrisDoc(sat.id)}" target="_blank" rel="noopener">↗</a>` : ` · <span class="open">No satisfaction recorded</span>`;
+            const status = sat ? ` · <span class="done">Satisfied ${esc(day(sat.when))}</span>` : ` · <span class="open">No satisfaction recorded</span>`;
             const moved = asst.length ? ` · Assigned to ${esc(asst[0].p2.join(", ") || "a new lender")}` : "";
-            return row(d, status + moved);
+            const after = [sat ? `<a class="sub" href="${acrisDoc(sat.id)}" target="_blank" rel="noopener">View the satisfaction ↗</a>` : "",
+              asst.length ? `<a class="sub" href="${acrisDoc(asst[0].id)}" target="_blank" rel="noopener">View the assignment ↗</a>` : ""].filter(Boolean).join(" · ");
+            return row(d, status + moved, after ? `<div class="l3">${after}</div>` : "");
           }).join("")}${more(loans, 12)}</ul>` : '<div class="sm">No mortgages on ACRIS for this lot.</div>'}
           <div class="src">Source: ACRIS, with each satisfaction and assignment matched to its mortgage through ACRIS references.</div></div>
         <div class="box"><h3>Liens &amp; UCC filings · ${liens.length} recorded</h3>
@@ -781,6 +839,15 @@
     }
   }
   const li = (label, v) => (v == null || v === "" ? "" : `<li>${label}: <b>${esc(v)}</b></li>`);
+  // ACRIS won't show inside another site's frame (X-Frame-Options: SAMEORIGIN), so a scanned document opens in its own
+  // pop-up window beside the page. If the browser blocks pop-ups, the link opens a new tab as usual.
+  document.addEventListener("click", (e) => {
+    const a = e.target.closest("a.recrow, .rec a.sub"); if (!a) return;
+    const w = Math.min(1040, screen.availWidth - 40), h = Math.min(1200, screen.availHeight - 40);
+    const left = (screen.availLeft || 0) + screen.availWidth - w - 20, top = (screen.availTop || 0) + 20;
+    const win = window.open(a.href, "acrisDocument", `popup=yes,width=${w},height=${h},left=${left},top=${top}`);
+    if (win) { e.preventDefault(); win.focus(); }
+  });
 
   // ── detail drawer ──────────────────────────────────────────────────────────────────────────────────────────────
   let lastFocus = null;
