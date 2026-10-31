@@ -1,0 +1,324 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<title>Parcelvora News</title>
+<meta name="description" content="New York and Florida property news that changes who owns, who sells and what the records say, from Parcelvora.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+/* One template for every news desk. Everything client-specific lives in the DESK block in the script.
+   The same stories render five ways: the feed, Story, Memo, Briefing, and a public Blog post (each with Copy). */
+:root {
+  --ink: #000; --panel: #07090e; --panel-2: #0b101a; --rule: #1b2433;
+  --text: #f6f9ff; --soft: #cfd8e8; --blue: #3b8cff; --blue-soft: #8cbcff; --blue-deep: #0c1a33; --green: #12b76a;
+  --display: 'Archivo', 'Arial Narrow', Arial, sans-serif;
+  --body: 'IBM Plex Sans', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --mono: 'IBM Plex Mono', ui-monospace, 'Cascadia Mono', Consolas, monospace;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+body { margin: 0; background: var(--ink); color: var(--text); font: 16px/1.55 var(--body); -webkit-font-smoothing: antialiased; }
+a { color: var(--blue-soft); text-underline-offset: 3px; }
+button { font: inherit; color: inherit; }
+:focus-visible { outline: 2px solid var(--blue); outline-offset: 2px; border-radius: 4px; }
+h1, h2, h3 { font-family: var(--display); font-stretch: 112%; margin: 0; text-wrap: balance; }
+.wrap { max-width: 1120px; margin: 0 auto; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+.eyebrow { font-family: var(--mono); font-size: 15px; letter-spacing: .14em; text-transform: uppercase; color: var(--blue); }
+.bar { position: sticky; top: 0; z-index: 20; background: rgba(0,0,0,.9); backdrop-filter: blur(8px); border-bottom: 1px solid var(--rule); }
+.bar .wrap { display: flex; align-items: center; gap: 14px; padding-block: 10px; flex-wrap: wrap; }
+.brand { font-family: var(--display); font-weight: 780; font-stretch: 100%; font-size: 21px; white-space: nowrap; }
+.brand .sep { color: var(--soft); font-weight: 400; margin: 0 6px; }
+.bar nav { display: flex; gap: 6px; margin-left: auto; flex-wrap: wrap; }
+.bar nav a { color: var(--text); text-decoration: none; font-size: 15px; padding: 6px 11px; border: 1px solid var(--rule); border-radius: 999px; white-space: nowrap; }
+.bar nav a:hover, .bar nav a[aria-current] { border-color: var(--blue); }
+header.hero { padding: 40px 0 18px; border-bottom: 1px solid var(--rule); }
+.hero h1 { font-size: clamp(42px, 7vw, 72px); font-weight: 800; line-height: .98; margin: 8px 0 14px; }
+.hero p { margin: 0; color: var(--soft); font-size: 20px; max-width: 64ch; }
+.updated { margin-top: 12px; font-family: var(--mono); font-size: 14px; color: var(--soft); }
+.modes { display: flex; flex-wrap: wrap; gap: 7px; align-items: center; margin: 20px 0 4px; }
+.modes .mlabel { font-family: var(--mono); font-size: 15px; letter-spacing: .12em; text-transform: uppercase; color: var(--green); margin-right: 4px; }
+.mode { border: 1px solid var(--rule); background: #0d1320; border-radius: 999px; padding: 9px 16px; font-size: 17px; cursor: pointer; font-weight: 600; }
+.mode:hover { border-color: var(--blue); }
+.mode[aria-pressed="true"] { border-color: var(--blue); background: var(--blue-deep); }
+.chips { display: flex; flex-wrap: wrap; gap: 7px; margin: 14px 0 4px; }
+.chip { border: 1px solid var(--rule); background: #0d1320; border-radius: 999px; padding: 7px 12px; font-size: 15px; cursor: pointer; }
+.chip:hover { border-color: var(--blue); }
+.chip[aria-pressed="true"] { border-color: var(--blue); background: var(--blue-deep); }
+.chip .ct { font-family: var(--mono); font-size: 13px; color: var(--soft); margin-left: 6px; }
+section { padding-top: 22px; scroll-margin-top: 70px; }
+section > h2 { font-size: clamp(32px, 4.6vw, 46px); font-weight: 800; margin-bottom: 12px; display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; }
+section > h2 small { font-family: var(--body); font-stretch: 100%; font-size: 18px; font-weight: 400; color: var(--soft); }
+.top { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; }
+.list { display: grid; gap: 12px; }
+.item { background: var(--panel); border: 1px solid var(--rule); border-radius: 12px; padding: 16px 18px; display: grid; gap: 8px; min-width: 0; }
+.item.lead { border-color: #1f4f99; background: linear-gradient(180deg, #0a1426, var(--panel)); position: relative; padding-top: 18px; }
+.item .num { font-family: var(--display); font-weight: 800; font-size: 64px; line-height: .8; color: var(--blue); }
+.item.edge-b { border-left: 4px solid var(--blue); } .item.edge-g { border-left: 4px solid var(--green); } .item.edge-w { border-left: 4px solid #f6f9ff; } .item.edge-n { border-left: 4px solid #5a6b85; }
+.ic { width: 20px; height: 20px; flex: none; fill: none; stroke: var(--blue-soft); stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+.meta { display: flex; flex-wrap: wrap; gap: 6px 10px; align-items: center; font-family: var(--mono); font-size: 13px; color: var(--soft); }
+.pill { font-family: var(--mono); font-size: 12px; letter-spacing: .06em; text-transform: uppercase; padding: 2px 8px; border-radius: 999px; border: 1px solid var(--rule); color: var(--soft); }
+.pill.b { border-color: var(--blue); color: var(--blue-soft); }
+.pill.g { border-color: var(--green); color: #6fe3a8; }
+.pill.w { border-color: #f6f9ff; color: #f6f9ff; }
+.item h3 { font-size: 26px; font-stretch: 100%; font-weight: 780; line-height: 1.18; }
+.item.lead h3 { font-size: 28px; }
+.item h3 a { color: var(--text); text-decoration: none; }
+.item h3 a:hover { color: var(--blue-soft); text-decoration: underline; }
+.item p { margin: 0; font-size: 16px; }
+.why { border-left: 3px solid var(--green); background: rgba(18,183,106,.07); padding: 9px 13px; border-radius: 0 8px 8px 0; font-size: 16px; }
+.why b { color: #6fe3a8; font-weight: 600; }
+.src { font-family: var(--mono); font-size: 13px; color: var(--soft); overflow-wrap: anywhere; }
+.boards { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+.dlead { margin: 0 0 14px; font-size: 18px; color: var(--soft); max-width: 70ch; }
+.stats { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; margin-bottom: 14px; }
+.stat { background: var(--panel); border: 1px solid var(--rule); border-radius: 12px; padding: 14px 16px; display: grid; gap: 4px; }
+.stat b { font-family: var(--display); font-size: 46px; font-weight: 800; line-height: 1; }
+.stat span { font-size: 17px; color: var(--soft); }
+.stat.hot { border-color: var(--green); } .stat.hot b { color: #6fe3a8; }
+.stories { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; }
+.chain { list-style: none; margin: 4px 0; padding: 0 0 0 18px; border-left: 2px solid var(--blue); display: grid; gap: 10px; }
+.chain li { position: relative; display: grid; gap: 2px; font-size: 16px; }
+.chain li::before { content: ""; position: absolute; left: -25px; top: 6px; width: 10px; height: 10px; border-radius: 50%; background: var(--blue); }
+.chain li b { font-family: var(--mono); font-size: 15px; letter-spacing: .08em; text-transform: uppercase; color: var(--blue-soft); font-weight: 600; }
+.next { border-left: 3px solid var(--blue); background: rgba(59,140,255,.08); padding: 9px 13px; border-radius: 0 8px 8px 0; font-size: 16px; }
+.next b { color: var(--blue-soft); font-weight: 600; }
+.region > summary.rh { cursor: pointer; list-style: none; font-family: var(--display); font-stretch: 112%; font-size: clamp(28px, 4vw, 38px); font-weight: 800; padding: 14px 16px; border: 1px solid var(--rule); border-radius: 12px; background: var(--panel); display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; }
+.region > summary.rh::-webkit-details-marker { display: none; }
+.region > summary.rh::after { content: "▸"; margin-left: auto; font-size: 24px; color: var(--blue-soft); }
+.region[open] > summary.rh::after { content: "▾"; }
+.region > summary.rh small { font-family: var(--body); font-stretch: 100%; font-size: 17px; font-weight: 400; color: var(--soft); }
+.region[open] > summary.rh { margin-bottom: 12px; border-color: var(--blue); }
+.more > summary { cursor: pointer; font-size: 15px; color: var(--blue-soft); width: fit-content; }
+.more p { margin: 8px 0 6px; }
+/* the remixed formats: one readable column */
+.doctools { display: flex; gap: 8px; justify-content: flex-end; flex-wrap: wrap; max-width: 780px; margin: 22px auto 0; }
+.tool { border: 1px solid var(--rule); background: #0d1320; border-radius: 999px; padding: 8px 14px; font-size: 15px; cursor: pointer; }
+.tool:hover { border-color: var(--blue); }
+.tool.ok { border-color: var(--green); color: #6fe3a8; }
+.doc { max-width: 780px; margin: 12px auto 0; background: var(--panel); border: 1px solid var(--rule); border-radius: 14px; padding: 28px clamp(18px, 4vw, 44px) 32px; }
+.doc h2 { font-size: clamp(32px, 4.8vw, 48px); font-weight: 800; margin: 8px 0 14px; line-height: 1.08; }
+.doc h3 { font-size: 27px; font-stretch: 100%; font-weight: 780; margin: 28px 0 10px; }
+.doc h4 { font-family: var(--body); font-size: 19px; font-weight: 600; margin: 16px 0 6px; color: var(--blue-soft); }
+.doc p, .doc li { font-size: 17px; line-height: 1.62; }
+.doc p { margin: 0 0 12px; }
+.doc ul, .doc ol { margin: 0 0 12px; padding-left: 22px; }
+.doc li { margin-bottom: 8px; }
+.doc .lede { font-size: 19px; }
+.doc .small { font-family: var(--mono); font-size: 14px; color: var(--soft); }
+.memohead { display: grid; grid-template-columns: 64px 1fr; gap: 6px 12px; font-family: var(--mono); font-size: 15px; border-bottom: 1px solid var(--rule); padding-bottom: 14px; margin: 6px 0 4px; }
+.memohead b { color: var(--soft); font-weight: 600; }
+.brief li { margin-bottom: 14px; }
+.brief .pill { margin-right: 6px; vertical-align: 2px; }
+footer { border-top: 1px solid var(--rule); padding-block: 24px 44px; color: var(--soft); font-size: 15px; margin-top: 40px; }
+[hidden] { display: none !important; }
+@media (max-width: 900px) { .top { grid-template-columns: 1fr; } .boards { grid-template-columns: 1fr; } .stories { grid-template-columns: 1fr; } .stats { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 560px) { .bar nav { margin-left: 0; } .item h3, .item.lead h3 { font-size: 23px; } .memohead { grid-template-columns: 52px 1fr; font-size: 14px; } }
+@media print { .bar, .modes, .chips, .doctools, footer { display: none !important; } body { background: #fff; color: #000; } .doc { border: 0; background: #fff; } .doc a { color: #000; } }
+</style>
+<style>
+/* Parcelvora brand, from Silvia's design: cream paper, navy ink, burnt orange; Instrument Serif + Inter + DM Mono. */
+:root { --ink: #f4efe6; --panel: #fbf8f2; --panel-2: #efe8db; --rule: #ddd5c6; --text: #13202f; --soft: #4a5666;
+  --blue: #c0611a; --blue-soft: #9c4a10; --blue-deep: #f6e3cf; --green: #26405f;
+  --display: "Instrument Serif", Georgia, serif; --body: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif; --mono: "DM Mono", ui-monospace, Consolas, monospace;
+  color-scheme: light; }
+.bar { background: rgba(244, 239, 230, .94); }
+h1, h2, h3, .brand, .item .num, .stat b, .region > summary.rh { font-weight: 400 !important; font-stretch: normal !important; }
+.brand .home { color: var(--text); text-decoration: none; display: inline-flex; align-items: center; gap: 8px; }
+.brand .home img { border-radius: 50%; }
+.brand .home b { color: var(--blue); font-weight: inherit; }
+.item.edge-w { border-left-color: #13202f; }
+.next { background: rgba(192, 97, 26, .08); }
+.mode[aria-pressed="true"], .chip[aria-pressed="true"] { color: var(--text); }
+</style>
+</head>
+<body>
+<div class="bar"><div class="wrap">
+  <div class="brand" id="brand"></div>
+  <nav aria-label="Pages" id="nav"></nav>
+</div></div>
+
+<main class="wrap" id="top">
+  <header class="hero">
+    <div class="eyebrow" id="eyebrow"></div>
+    <h1 id="h1"></h1>
+    <p id="intro"></p>
+    <div class="updated" id="updated"></div>
+    <div class="modes" role="group" aria-label="Format"><span class="mlabel">Read it as</span><span id="modes"></span></div>
+  </header>
+
+  <div id="feedview">
+    <section id="first"><h2>Read these first <small>three things that change the next 90 days</small></h2><div class="top" id="toplist"></div></section>
+    <section id="deals" hidden><h2 id="deals-h"></h2><p class="dlead" id="deals-lead"></p><div class="stats" id="deals-stats"></div><div class="stories" id="deals-list"></div><p class="src" id="deals-src"></p></section>
+    <div id="areas"></div>
+    <section id="boards"><details class="region"><summary class="rh" id="boards-h"></summary><div class="boards" id="boardlist"></div></details></section>
+  </div>
+
+  <div id="remixview" hidden>
+    <div class="doctools"><button class="tool" type="button" id="copy">Copy text</button><button class="tool" type="button" id="print">Print / PDF</button><button class="tool" type="button" id="back">Back to the feed</button></div>
+    <article class="doc" id="doc" aria-live="polite"></article>
+  </div>
+</main>
+
+<footer><div class="wrap" id="footer"></div></footer>
+
+<script>
+(() => {
+"use strict";
+// ═══════════════ DESK: the only part that changes per client ═══════════════
+// items: [id, area, date (YYYY-MM-DD | YYYY-MM | label), source, headline, url, summary, why it matters to the client, kind, background?]
+// "why" is written TO the client (their book, their lots). The public Blog post uses the summaries only, never the "why".
+const DESK = {"slug": "parcelvora", "client": "Parcelvora", "desk": "News", "from": "Parcelvora", "brandHtml": "<a class=\"home\" href=\"parcelvora-landing.html\"><img src=\"parcelvora-fox.png\" alt=\"\" width=\"30\" height=\"30\">Parcel<b>vora</b></a><span class=\"sep\">·</span>News", "nav": [["Records", "parcelvora-records.html"], ["Story Mode", "parcelvora-story.html"], ["Home", "parcelvora-landing.html"]], "navSelf": "News", "eyebrow": "New York + Florida · property, distress, policy", "title": "What moved in property this month, and what it means for your list", "intro": "Three things to know first. Everything else is one tap away, with why it matters to anyone working New York and Florida property.", "description": "New York and Florida property news that changes who owns, who sells and what the records say, from Parcelvora.", "updated": "2026-10-31", "areas": [{"key": "market", "label": "Rates + the market", "short": "Market", "sub": "what every buyer and seller is reacting to", "pill": ""}, {"key": "nyc", "label": "New York City", "short": "NYC", "sub": "the five boroughs", "pill": "b"}, {"key": "ny", "label": "Long Island + Westchester", "short": "LI + Westchester", "sub": "Nassau · Suffolk · Westchester", "pill": "g"}, {"key": "fl", "label": "Florida", "sub": "Miami-Dade · Broward · Palm Beach · statewide", "pill": "w"}], "top": ["amend3", "rates", "lien"], "sortDates": {"Votes Nov 3": "2026-10-31", "Due Dec 31": "2026-10-20"}, "items": [["amend3", "fl", "Votes Nov 3", "Florida TaxWatch", "Florida votes November 3 on Amendment 3: a bigger homestead exemption and a 5% cap for everyone else", "https://floridataxwatch.org/research/florida-property-tax-resource-center/", "Amendment 3 would raise the homestead exemption from $50,000 to $150,000 in 2027 and $250,000 in 2028 for non-school taxes, and cut the yearly assessment cap on non-homestead property from 10% to 5%. It needs 60% of the vote and would take effect January 1, 2027; 2026 tax bills do not change.", "If it passes, every Florida homestead's bill changes in 2027 and investor-owned homes get a tighter cap. Parcelvora's Florida records already mark which parcels carry a homestead exemption and which owners mail from out of state.", "Policy"], ["rates", "market", "2026-10-29", "Freddie Mac", "The 30-year mortgage eases to 7.24%", "https://www.globenewswire.com/news-release/2026/10/29/3391637/0/en/mortgage-rates-decline-further-to-7-24.html", "Freddie Mac's weekly average fell to 7.24% on October 29, from 7.32% a week earlier, after holding at 7.40% on October 8 and 15.", "Above 7%, fewer buyers qualify and more listings sit. Owners who can't sell at their price are the ones open to a direct conversation; long-held and absentee owners come first.", "Rates"], ["lien", "nyc", "2026-04", "NYC Independent Budget Office", "NYC's tax lien sale is paused, and the Council has voted to replace it with a land bank by 2029", "https://www.ibo.nyc.gov/assets/ibo/downloads/pdf/taxes-and-other-revenues/2026/2026-april-nycs-tax-lien-sale.pdf", "Mayor Zohran Mamdani paused the lien sale for at least six months in March 2026, and the Department of Finance has not released a list of eligible properties for a next sale. In January the City Council overrode a veto of four reform bills that move to abolish the sale by 2029 and replace it with a land bank. The sale's legal authority runs through December 31, 2028.", "Parcelvora's lien list is the city's last published one, June 2025. Those owners were behind on city charges, and with no sale scheduled there is no auction ahead of them: it stays a distress signal, not a deadline.", "Policy", true], ["nar", "market", "2026-10-13", "National Association of Realtors", "Existing-home sales rise 1.5% in September, and the median sets a September record", "https://www.nar.realtor/newsroom/existing-home-sales-increased-1-5-in-september-according-to-nar-report", "Sales rose to a 3.99 million annual pace in September, 2.2% below a year earlier. The median price was $417,500, up 1.3%, the highest on record for a September. Inventory reached 1.60 million homes, up 4.6% from a year earlier, and sales fell in the Northeast.", "More homes for sale and fewer buyers who qualify: listings sit longer and expireds pile up. Comps in Parcelvora read recorded sales, never asking prices.", "Market"], ["fcl", "fl", "2026-09-17", "ATTOM", "Florida leads the country in foreclosure starts", "https://www.prnewswire.com/news-releases/foreclosure-activity-remains-above-year-ago-levels-in-august-2026-302881135.html", "In August, Florida had 4,278 properties with a foreclosure filing, one in every 2,397 homes, third among the states, and the most foreclosure starts of any state, 3,189. New York had 1,604, one in every 5,352 homes. Nationally, filings were up 13% from a year earlier and completed foreclosures up 42%.", "A foreclosure start is the earliest public distress signal. Parcelvora's pre-foreclosure list is being connected to the court filings, and Florida is where it will matter most.", "Distress"], ["miami", "fl", "2026-10", "PBP Real Estate (MIAMI Realtors data)", "Miami-Dade condos: about a year of supply, and nearly half bought with cash", "https://www.pbprealestate.com/market-report-miami-dade/", "September's Miami-Dade condo median was about $417,000, down 0.7% from a year earlier, while single-family homes rose about 4% to a $692,000 median. Existing condos sit at roughly 12 months of supply, a buyer's market, and nearly half of existing condo sales were cash.", "With a year of condo supply, sellers negotiate. Parcelvora's comps read recorded Florida sales, so a CMA reflects closings, not asking prices.", "Market"], ["condo", "fl", "Due Dec 31", "Florida DBPR", "Condo reserve studies paired with a milestone inspection are due by December 31, 2026", "https://condos.myfloridalicense.com/inspections/", "Associations that complete the structural integrity reserve study together with a milestone inspection must finish it by December 31, 2026. Reserve funding under the study had to begin January 1, 2026, and reserves for the structural components can no longer be waived. Milestone inspections are due the year a building turns 30, or 25 where a local agency requires it, then every 10 years.", "Older condo buildings face special assessments as reserves get funded. Every Florida record in Parcelvora carries its year built, so the 30-year mark is one filter away.", "Policy"], ["thirty", "fl", "2026-10", "PR Newswire", "Miami-Dade breaks its record for $30 million-plus home sales in nine months", "https://www.prnewswire.com/news-releases/miami-dade-breaks-annual-record-for-30-million-plus-home-sales-in-just-nine-months-302911503.html", "Through September, Miami-Dade recorded 24 single-family and condo sales of $30 million or more, a record for any full year. Haute Residence notes the count leaves out most new construction.", "At the top, owners are mostly companies and trusts. Parcelvora's lead lists separate company, trust and estate owners from individuals.", "Market"], ["fasttrack", "nyc", "2026-10", "HousingWire", "Starting January 1, affordable rezonings in 12 districts can skip the Council vote", "https://www.housingwire.com/articles/nyc-fast-track-rezonings/", "Under the ballot measures voters approved in 2025, qualifying affordable housing rezonings in 12 community districts can finish a 90-day review at the City Planning Commission without a City Council vote, for five years. Mayor Mamdani said the housing crisis won't be solved by asking the same neighborhoods to do all the building; some Council members object to losing the final vote.", "A rezoning changes what a lot can hold. Parcelvora's Research shows each NYC lot's zoning, allowed floor area and how much of it is still unbuilt.", "Approvals"], ["aep", "nyc", "2026-02-08", "NYC Department of Housing Preservation and Development", "250 of the city's most distressed apartment buildings enter stricter enforcement", "https://www.nyc.gov/site/hpd/news/004-26/mamdani-administration-stricter-enforcement-city-s-250-most-distressed-apartment", "HPD named 250 buildings for its Alternative Enforcement Program in February; its roster lists them by borough, address and units. Twelve are also on HPD's 2026 Certification Watchlist.", "Open violations are public, building by building. Parcelvora's Code violations list finds NYC lots with open housing, DOB and ECB violations from the last three years, with the fines still owed.", "Distress", true], ["li", "ny", "2026-10-24", "Long Island Guide", "Nassau's median reached $860,000 and Suffolk's $740,000 in September as inventory fell", "https://www.longislandguide.com/2026/10/24/long-island-home-prices-rose-to-860000-in-nassau-and-740000-in-suffolk-as-inventory-fell-in-september/", "OneKey MLS single-family medians in September: Nassau about $860,000, up about 2.1% from a year earlier, and Suffolk about $740,000, up 2.8%. Both dipped from August's highs, and inventory fell.", "Prices hold because supply stays short, so every owner who decides to sell matters. Parcelvora marks the owners who have held since at least 2021 across Nassau and Suffolk.", "Market"], ["westchester", "ny", "2026-10", "Houlihan Lawrence", "Westchester's third quarter: 1,636 closings and a $1.125 million median so far this year", "https://houlihanomalley.com/q3-2026-westchester-real-estate-sales-recap/", "Closed sales totaled 1,636 in the third quarter, about 1% above the same period in 2025, and the median through September 30 was $1,125,000 for single-family homes and condos.", "Westchester is next on the map after Long Island, and the Parcelvora lake now covers all of New York State, parcel by parcel.", "Market"]], "boardsTitle": "Sources to watch", "boardsSub": "where the next list shows up first", "boards": [["Freddie Mac weekly rates", "Every Thursday: the 30-year and 15-year averages", "https://www.freddiemac.com/pmms"], ["ATTOM foreclosure reports", "Monthly, about three weeks after the month ends", "https://www.attomdata.com/news/category/market-trends/foreclosures/"], ["NYC tax lien sale", "The Independent Budget Office's April 2026 review of the sale and its alternatives", "https://www.ibo.nyc.gov/assets/ibo/downloads/pdf/taxes-and-other-revenues/2026/2026-april-nycs-tax-lien-sale.pdf"], ["HPD Alternative Enforcement Program", "The 2026 building list, by borough and address", "https://www.nyc.gov/assets/hpd/downloads/pdfs/services/list-of-buildings-2026.pdf"], ["Florida Amendment 3", "The Pinellas County Property Appraiser's plain-language FAQ", "https://www.pcpao.gov/amendment3"], ["Florida condo inspections", "Milestone inspection and reserve study rules, from the state", "https://condos.myfloridalicense.com/inspections/"], ["NYC PLUTO", "The city's tax lot file, the base of every NYC record in Parcelvora", "https://www.nyc.gov/site/planning/data-maps/open-data/dwn-pluto-mappluto.page"]], "memoRe": "property, distress and policy in New York and Florida", "footer": "Sources are the publishers linked on each story. \"Background\" marks a story older than three months that still shapes the market. Ballot measures and bills are not law until they pass.", "blog": {"title": "New York and Florida property: what moved in {month}", "intro": "Rates, sales, distress and policy moved across New York and Florida this month. Here is what changed, with a link to every source.", "outro": "Parcelvora puts New York and Florida property records in one place: owners, sales, liens, code violations and the story of the neighborhood."}};
+// ════════════════════════════════════════════════════════════════════════════
+
+const ITEMS = DESK.items.map(([id, area, date, source, headline, url, summary, why, kind, background]) => ({ id, area, date, source, headline, url, summary, why, kind, background: !!background }));
+const AREA = Object.fromEntries(DESK.areas.map((a) => [a.key, a]));
+const $ = (s) => document.querySelector(s);
+const esc = (s) => String(s == null ? "" : s).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+// a date is shown only as precisely as the source gave it: a day, a month, or a label
+const day = (d) => /^\d{4}-\d{2}-\d{2}$/.test(d) ? new Date(d + "T12:00:00").toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })
+  : /^\d{4}-\d{2}$/.test(d) ? new Date(d + "-15T12:00:00").toLocaleDateString("en-US", { month: "short", year: "numeric" }) : d;
+const sortKey = (d) => (DESK.sortDates || {})[d] || d;
+const host = (u) => { try { return new URL(u).hostname.replace(/^www\./, ""); } catch (e) { return ""; } };
+const byId = new Map(ITEMS.map((n) => [n.id, n]));
+const TOP = DESK.top.map((id) => byId.get(id)).filter(Boolean);
+const newestFirst = (a, b) => (a.background ? 1 : 0) - (b.background ? 1 : 0) || sortKey(b.date).localeCompare(sortKey(a.date));
+const inArea = (k) => ITEMS.filter((n) => n.area === k && !DESK.top.includes(n.id)).sort(newestFirst);
+const month = new Date(DESK.updated + "T12:00:00").toLocaleDateString("en-US", { month: "long", year: "numeric" });
+const updatedLong = new Date(DESK.updated + "T12:00:00").toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric", year: "numeric" });
+
+// ── chrome ──
+document.title = `${DESK.client} ${DESK.desk}`;
+$("#brand").innerHTML = DESK.brandHtml || `${esc(DESK.client)}<span class="sep">·</span>${esc(DESK.desk)}`;
+$("#nav").innerHTML = DESK.nav.map(([l, u]) => `<a href="${esc(u)}">${esc(l)}</a>`).join("") + `<a href="#top" aria-current="page">${esc(DESK.navSelf || "Intelligence")}</a>`;
+$("#eyebrow").textContent = DESK.eyebrow;
+$("#h1").textContent = DESK.title;
+$("#intro").textContent = DESK.intro;
+$("#updated").textContent = `Updated ${updatedLong} · every story links to its source`;
+$("#footer").textContent = DESK.footer;
+$("#boards-h").innerHTML = `${esc(DESK.boardsTitle)} <small>${esc(DESK.boardsSub)}</small>`;
+
+// ── the feed ──
+const ICON = {
+  Land: '<path d="M3 19l6-9 4 6 3-4 5 7z"/>',
+  Rates: '<circle cx="7" cy="7" r="2.5"/><circle cx="17" cy="17" r="2.5"/><path d="M19 5L5 19"/>',
+  Market: '<path d="M3 17l5-5 4 3 8-8"/><path d="M15 7h5v5"/>',
+  Development: '<path d="M4 20V9l6-4v15M10 20h10V11l-6-3"/><path d="M14 13h2M14 16h2"/>',
+  Approvals: '<rect x="4" y="4" width="16" height="16" rx="3"/><path d="M8 12l3 3 5-6"/>',
+  Policy: '<path d="M7 3h7l4 4v14H7z"/><path d="M10 11h5M10 15h5"/>',
+  People: '<circle cx="12" cy="8" r="3.5"/><path d="M5 20c1.5-4 4-5 7-5s5.5 1 7 5"/>',
+  Distress: '<path d="M12 3l10 18H2z"/><path d="M12 10v5M12 18h.01"/>',
+};
+const icon = (k) => `<svg class="ic" viewBox="0 0 24 24" aria-hidden="true">${ICON[k] || '<circle cx="12" cy="12" r="4"/>'}</svg>`;
+function card(n, lead, i) {
+  const a = AREA[n.area] || { label: n.area, pill: "" };
+  return `<article class="item${lead ? " lead" : ""} edge-${esc(a.pill || "n")}" data-area="${esc(n.area)}">
+    ${lead ? `<div class="num" aria-hidden="true">${i + 1}</div>` : ""}<div class="meta">${icon(n.kind)}<span class="pill ${esc(a.pill || "")}">${esc(a.short || a.label)}</span><span class="pill">${esc(n.kind)}</span>${n.background ? `<span class="pill">Background</span>` : ""}<span>${esc(day(n.date))}</span></div>
+    <h3><a href="${esc(n.url)}" target="_blank" rel="noopener">${esc(n.headline)}</a></h3>
+    <div class="why"><b>Why it matters:</b> ${esc(n.why)}</div>
+    <details class="more"><summary>The details</summary><p>${esc(n.summary)}</p><div class="src">Source: <a href="${esc(n.url)}" target="_blank" rel="noopener">${esc(n.source)} · ${esc(host(n.url))}</a></div></details>
+  </article>`;
+}
+$("#toplist").innerHTML = TOP.map((n, i) => card(n, true, i)).join("");
+$("#areas").innerHTML = DESK.areas.filter((a) => inArea(a.key).length).map((a) => `<section id="${esc(a.key)}"><details class="region"><summary class="rh">${esc(a.label)} <small>${inArea(a.key).length} ${inArea(a.key).length === 1 ? "story" : "stories"} · ${esc(a.sub)}</small></summary><div class="list">${inArea(a.key).map((n) => card(n)).join("")}</div></details></section>`).join("");
+// -- deal stories: listings that expired, then another brokerage took them (from the client's own engine) --
+const DEALS = DESK.deals && DESK.deals.stories && DESK.deals.stories.length ? DESK.deals : null;
+const n0 = (v) => Number(v).toLocaleString("en-US");
+const areaOf = (k) => AREA[k] || { label: "", pill: "" };
+if (DEALS) {
+  $("#deals").hidden = false;
+  $("#deals-h").innerHTML = `${esc(DEALS.title)} <small>${esc(DEALS.sub)}</small>`;
+  $("#deals-lead").textContent = DEALS.lead;
+  $("#deals-stats").innerHTML = DEALS.stats.map(([v, l], i) => `<div class="stat${i === DEALS.stats.length - 1 ? " hot" : ""}"><b>${n0(v)}</b><span>${esc(l)}</span></div>`).join("");
+  $("#deals-list").innerHTML = DEALS.stories.map((s, i) => `<article class="item story edge-${esc(areaOf(s.area).pill || "n")}">
+    <div class="meta">${icon(s.kind)}<span class="pill ${esc(areaOf(s.area).pill || "")}">${esc(areaOf(s.area).short || areaOf(s.area).label)}</span><span>Deal story ${i + 1}</span></div>
+    <h3>${esc(s.headline)}</h3>
+    <ol class="chain">${s.chain.map(([k, v]) => `<li><b>${esc(k)}</b><span>${esc(v)}</span></li>`).join("")}</ol>
+    <div class="why"><b>What it tells you:</b> ${esc(s.lesson)}</div>
+    <div class="next"><b>Your next move:</b> ${esc(s.next)}</div>
+  </article>`).join("");
+  $("#deals-src").textContent = DEALS.source || "";
+}
+$("#boardlist").innerHTML = DESK.boards.map(([h, s, u]) => `<article class="item"><h3><a href="${esc(u)}" target="_blank" rel="noopener">${esc(h)}</a></h3><p>${esc(s)}</p><div class="src">Source: <a href="${esc(u)}" target="_blank" rel="noopener">${esc(host(u))}</a></div></article>`).join("");
+
+// ── the remix: the same stories, four more ways (built from the stories above, nothing invented) ──
+const link = (n) => `<a href="${esc(n.url)}" target="_blank" rel="noopener">${esc(n.source)}</a>`;
+const ORD = ["First", "Second", "Third", "Fourth", "Fifth"];
+const current = DESK.areas.map((a) => [a, inArea(a.key).filter((n) => !n.background)]).filter(([, l]) => l.length);
+const background = ITEMS.filter((n) => n.background && !DESK.top.includes(n.id)).sort(newestFirst);
+
+const FORMATS = {
+  story() {
+    return `<div class="eyebrow">Story mode · ${esc(month)}</div>
+      <h2>${esc(month)}: what moved, and what it means for ${esc(DESK.client)}</h2>
+      <p class="lede">${TOP.length === 3 ? "Three things" : `${TOP.length} things`} will shape the next 90 days. Here they are in order, then the rest of the month, region by region.</p>
+      ${TOP.map((n, i) => `<p><b>${ORD[i] || ""}: ${esc(n.headline)}.</b> ${esc(n.summary)} ${esc(n.why)}</p>`).join("")}
+      ${DEALS ? `<h3>${esc(DEALS.title)}</h3><p>${esc(DEALS.lead)} In the last two years: ${DEALS.stats.map(([v, l]) => `${n0(v)} ${esc(l)}`).join(", ")}.</p>${DEALS.stories.map((s) => `<p><b>${esc(s.headline)}.</b> ${s.chain.map(([, v]) => esc(v)).join(" ")} ${esc(s.lesson)} <b>Your next move:</b> ${esc(s.next)}</p>`).join("")}` : ""}
+      ${current.map(([a, list]) => `<h3>${esc(a.label)}</h3>${list.map((n) => `<p>${esc(n.summary)} ${esc(n.why)} <span class="small">(${link(n)}, ${esc(day(n.date))})</span></p>`).join("")}`).join("")}
+      ${background.length ? `<h3>Still shaping the market</h3>${background.map((n) => `<p>${esc(n.summary)} ${esc(n.why)} <span class="small">(${link(n)}, ${esc(day(n.date))})</span></p>`).join("")}` : ""}
+      ${DESK.boards.length ? `<h3>Where the next deal shows up first</h3><p>${DESK.boards.map(([h, s]) => `<b>${esc(h)}</b>: ${esc(s)}.`).join(" ")}</p>` : ""}`;
+  },
+  memo() {
+    return `<div class="eyebrow">Memo</div>
+      <div class="memohead"><b>To</b><span>${esc(DESK.client)}</span><b>From</b><span>${esc(DESK.from)}</span><b>Date</b><span>${esc(updatedLong)}</span><b>Re</b><span>${esc(month)}: ${esc(DESK.memoRe)}</span></div>
+      <h3>Bottom line</h3><ul>${TOP.map((n) => `<li><b>${esc(n.headline)}.</b> ${esc(n.why)}</li>`).join("")}</ul>
+      ${DEALS ? `<h3>${esc(DEALS.title)}</h3><ul>${DEALS.stats.map(([v, l]) => `<li>${n0(v)} ${esc(l)}</li>`).join("")}${DEALS.stories.map((s) => `<li><b>${esc(s.headline)}:</b> ${esc(s.lesson)} ${esc(s.next)}</li>`).join("")}</ul>` : ""}
+      <h3>What changed</h3>${current.map(([a, list]) => `<h4>${esc(a.label)}</h4><ul>${list.map((n) => `<li>${esc(n.headline)} <span class="small">(${esc(day(n.date))}, ${link(n)})</span></li>`).join("")}</ul>`).join("")}
+      <h3>What it means for your book</h3><ul>${current.flatMap(([, list]) => list).map((n) => `<li>${esc(n.why)}</li>`).join("")}</ul>
+      ${DESK.boards.length ? `<h3>Watch next</h3><ul>${DESK.boards.map(([h, s, u]) => `<li><a href="${esc(u)}" target="_blank" rel="noopener">${esc(h)}</a>: ${esc(s)}</li>`).join("")}</ul>` : ""}
+      ${background.length ? `<h3>Background</h3><ul>${background.map((n) => `<li>${esc(n.headline)} <span class="small">(${esc(day(n.date))}, ${link(n)})</span></li>`).join("")}</ul>` : ""}`;
+  },
+  briefing() {
+    const fresh = ITEMS.filter((n) => !n.background && !DESK.top.includes(n.id)).sort(newestFirst).slice(0, 2);
+    const five = [...TOP, ...fresh];
+    return `<div class="eyebrow">Briefing · read in 60 seconds</div>
+      <h2>Your ${esc(month)} briefing</h2>
+      <p class="small">${esc(updatedLong)} · ${five.length} things to know · ${ITEMS.length} stories on the desk</p>
+      <ol class="brief">${five.map((n) => `<li><span class="pill">${esc(n.kind)}</span><b>${esc(n.headline)}.</b><br>${esc(n.why)} <span class="small">(${link(n)})</span></li>`).join("")}</ol>
+      ${DEALS ? `<p><b>Deals other agents won:</b> ${n0(DEALS.stats.at(1)[0])} of your expireds were taken by another brokerage in two years. ${n0(DEALS.stats.at(-1)[0])} are still in the window.</p>` : ""}
+      ${DESK.boards.length ? `<p><b>Watch this week:</b> ${DESK.boards.slice(0, 3).map(([h]) => esc(h)).join(" · ")}.</p>` : ""}`;
+  },
+  blog() {
+    // public-facing: the facts and the sources, never the client's private "why"
+    return `<div class="eyebrow">Blog post · ready to publish</div>
+      <h2>${esc(DESK.blog.title.replace("{month}", month))}</h2>
+      <p class="lede">${esc(DESK.blog.intro)}</p>
+      ${TOP.length ? `<h3>The three stories that matter most</h3>${TOP.map((n) => `<p><b>${esc(n.headline)}.</b> ${esc(n.summary)} <span class="small">(${link(n)})</span></p>`).join("")}` : ""}
+      ${current.map(([a, list]) => `<h3>${esc(a.label)}</h3>${list.map((n) => `<p><b>${esc(n.headline)}.</b> ${esc(n.summary)} <span class="small">(${link(n)})</span></p>`).join("")}`).join("")}
+      ${background.length ? `<h3>Context that still matters</h3>${background.map((n) => `<p><b>${esc(n.headline)}.</b> ${esc(n.summary)} <span class="small">(${link(n)})</span></p>`).join("")}` : ""}
+      <p>${esc(DESK.blog.outro)}</p>`;
+  },
+};
+const MODES = [["feed", DESK.navSelf ? DESK.navSelf + " feed" : "Intelligence feed"], ["story", "Story"], ["memo", "Memo"], ["briefing", "Briefing"], ["blog", "Blog post"]];
+let mode = "feed";
+function setMode(m, push) {
+  mode = FORMATS[m] ? m : "feed";
+  $("#modes").innerHTML = MODES.map(([k, l]) => `<button class="mode" type="button" data-m="${k}" aria-pressed="${k === mode}">${l}</button>`).join(" ");
+  const remix = mode !== "feed";
+  $("#feedview").hidden = remix; $("#remixview").hidden = !remix;
+  if (remix) $("#doc").innerHTML = FORMATS[mode]();
+  $("#copy").textContent = "Copy text"; $("#copy").classList.remove("ok");
+  if (push) history.replaceState(null, "", mode === "feed" ? location.pathname + location.search : "#" + mode);
+}
+$("#modes").addEventListener("click", (e) => { const b = e.target.closest("[data-m]"); if (b) setMode(b.dataset.m, true); });
+$("#back").addEventListener("click", () => setMode("feed", true));
+$("#print").addEventListener("click", () => window.print());
+$("#copy").addEventListener("click", async () => {
+  const text = $("#doc").innerText.trim();
+  let ok = false;
+  try { await navigator.clipboard.writeText(text); ok = true; } catch (e) {
+    try { const t = document.createElement("textarea"); t.value = text; document.body.appendChild(t); t.select(); ok = document.execCommand("copy"); t.remove(); } catch (e2) {}
+  }
+  $("#copy").textContent = ok ? "Copied" : "Select the text to copy"; $("#copy").classList.toggle("ok", ok);
+});
+addEventListener("hashchange", () => setMode(location.hash.slice(1), false));
+setMode(location.hash.slice(1), false);
+})();
+</script>
+</body>
+</html>
