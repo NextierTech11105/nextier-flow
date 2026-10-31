@@ -358,6 +358,16 @@
   .lc-contact p { margin: 2px 0 8px; font-size: 15px; color: var(--soft); }
   .lc-actions { display: flex; flex-wrap: wrap; gap: 8px; }
   @media (max-width: 520px) { .lc-top, .lc-grid { grid-template-columns: 1fr; } }
+  /* Research: gauges, line badges and small bar charts that read in seconds. */
+  .rs-h { font: 800 15px var(--display); letter-spacing: .1em; text-transform: uppercase; color: var(--blue); margin: 4px 0 -4px; }
+  #nycResearch { display: grid; gap: 10px; }
+  .gauge { height: 14px; border-radius: 7px; background: var(--card-2); border: 1px solid var(--line); overflow: hidden; margin: 2px 0 6px; }
+  .gauge i { display: block; height: 100%; background: linear-gradient(90deg, var(--blue), #0f766e); }
+  .gauge-l { font-size: 15px; margin-bottom: 8px; }
+  .rt { display: inline-grid; place-items: center; min-width: 22px; height: 22px; padding: 0 4px; border-radius: 11px; font: 800 13px var(--display); margin-right: 3px; vertical-align: middle; }
+  .spark { display: flex; align-items: flex-end; gap: 2px; height: 54px; border-bottom: 1px solid var(--line); margin-top: 8px; }
+  .spark i { flex: 1; background: var(--blue); border-radius: 2px 2px 0 0; min-height: 3px; opacity: .85; }
+  .spark-x { display: flex; justify-content: space-between; font-size: 15px; color: var(--soft); margin-top: 4px; }
   /* Print / PDF: the open profile only, lead card first. */
   @media print {
     body * { visibility: hidden; }
@@ -1178,6 +1188,117 @@
     if (win) { e.preventDefault(); win.focus(); }
   });
 
+  // ── Research (NYC): every PLUTO field worth knowing, the nearest subway, the businesses around it and the lot's
+  //    history — institutional-grade facts laid out to read in seconds. All live from NYC and NY State open data. ───
+  const BORO_PL = { 1: "MN", 2: "BX", 3: "BK", 4: "QN", 5: "SI" };
+  const BORO_NAME = { 1: "Manhattan", 2: "Bronx", 3: "Brooklyn", 4: "Queens", 5: "Staten Island" };
+  const ROUTE_COLOR = { A: "#0039A6", C: "#0039A6", E: "#0039A6", B: "#FF6319", D: "#FF6319", F: "#FF6319", M: "#FF6319", G: "#6CBE45",
+    J: "#996633", Z: "#996633", L: "#A7A9AC", N: "#FCCC0A", Q: "#FCCC0A", R: "#FCCC0A", W: "#FCCC0A", 1: "#EE352E", 2: "#EE352E", 3: "#EE352E",
+    4: "#00933C", 5: "#00933C", 6: "#00933C", 7: "#B933AD", S: "#808183", SIR: "#0039A6" };
+  const routeBadge = (r) => `<span class="rt" style="background:${ROUTE_COLOR[r] || "#808183"};color:${"NQRW".includes(r) && r.length === 1 ? "#000" : "#fff"}">${esc(r)}</span>`;
+  const meters = (a, b, c, d) => { const k = Math.PI / 180, x = Math.sin(((c - a) * k) / 2) ** 2 + Math.cos(a * k) * Math.cos(c * k) * Math.sin(((d - b) * k) / 2) ** 2; return 12742000 * Math.asin(Math.sqrt(x)); };
+  const walkMin = (m) => Math.max(1, Math.round(m / 80));   // about 80 m a minute
+  const nyNum = (v) => (v == null || v === "" || isNaN(Number(v)) ? null : Number(v));
+  let stationsP = null;
+  async function nycResearch(bbl, lat, lon) {
+    const box = $("nycResearch"); if (!box) return;
+    const boro = bbl[0], block = String(parseInt(bbl.slice(1, 6), 10)), lot = String(parseInt(bbl.slice(6), 10));
+    if (!stationsP) stationsP = fetch("https://data.ny.gov/resource/39hk-dx4f.json?" + new URLSearchParams({ $select: "stop_name,daytime_routes,gtfs_latitude,gtfs_longitude,ada", $limit: "1000" }))
+      .then((r) => r.json()).catch(() => { stationsP = null; return []; });
+    try {
+      const [pl, blk, lpc, hpdYears, hpdOpen, stations] = await Promise.all([
+        soda("64uk-42ks", { $where: `borough=${sq(BORO_PL[boro])} AND block=${sq(block)} AND lot=${sq(lot)}`, $limit: "1" }).then((r) => r[0] || null),
+        soda("64uk-42ks", { $where: `borough=${sq(BORO_PL[boro])} AND block=${sq(block)}`, $select: "lot,yearbuilt,landmark,histdist,bldgclass", $limit: "600" }).catch(() => []),
+        soda("gpmc-yuvp", { $where: `bbl=${sq(bbl)}`, $select: "style_prim,arch_build,date_combo,use_orig,hist_dist,mat_prim", $limit: "1" }).then((r) => r[0] || null).catch(() => null),
+        soda("wvxf-dwi5", { $where: `boroid=${sq(boro)} AND block=${sq(block)} AND lot=${sq(lot)}`, $select: "date_extract_y(inspectiondate) as y,count(*) as n", $group: "y", $order: "y" }).catch(() => []),
+        soda("wvxf-dwi5", { $where: `boroid=${sq(boro)} AND block=${sq(block)} AND lot=${sq(lot)} AND violationstatus='Open'`, $select: "class,count(*) as n", $group: "class" }).catch(() => []),
+        stationsP,
+      ]);
+      const zip = (pl && pl.zipcode) || (leadCtx && leadCtx.det && leadCtx.det.propertyInfo && leadCtx.det.propertyInfo.address.zip) || "";
+      const biz = zip ? await soda("w7w3-xahh", { $where: `address_zip=${sq(zip)} AND license_status='Active' AND latitude IS NOT NULL`,
+        $select: "business_name,business_category,latitude,longitude", $limit: "3000" }).catch(() => []) : [];
+      if (!$("nycResearch")) return;
+      const P = pl || {}, n = (k) => nyNum(P[k]);
+      // Zoning & development: how much of the allowed floor area the building uses, and what's left.
+      // A home is measured against the residential FAR; a community facility (school, clinic) can often go bigger, said apart.
+      const top = Math.max(n("residfar") || 0, n("commfar") || 0, n("facilfar") || 0);
+      const maxFar = n("residfar") > 0 && /^0[1-4]$/.test(String(P.landuse || "")) ? n("residfar") : top;
+      const built = n("builtfar") || 0, lotArea = n("lotarea") || 0;
+      const room = maxFar && lotArea ? Math.round(maxFar * lotArea - (n("bldgarea") || 0)) : null;
+      const pct = maxFar ? Math.min(100, Math.round((built / maxFar) * 100)) : null;
+      const cfRoom = top > maxFar && lotArea ? Math.round(top * lotArea - (n("bldgarea") || 0)) : null;
+      const zones = [P.zonedist1, P.zonedist2, P.zonedist3, P.zonedist4].filter(Boolean).join(", ");
+      const overlays = [P.overlay1, P.overlay2].filter(Boolean).join(", "), special = [P.spdist1, P.spdist2, P.spdist3].filter(Boolean).join(", ");
+      const zoning = `<div class="box rs"><h3>Zoning &amp; development</h3>
+        ${pct != null ? `<div class="gauge" title="Built ${built} of ${maxFar} allowed FAR"><i style="width:${pct}%"></i></div>
+          <div class="gauge-l"><b>${pct}%</b> of the allowed floor area is built (FAR ${built} of ${maxFar})${room > 0 ? ` · <b>about ${int(room)} sq ft</b> more could go up` : " · built out"}${cfRoom > 0 ? `; up to ${int(cfRoom)} sq ft for a community facility` : ""}</div>` : ""}
+        <ul>${li("Zoning", zones)}${li("Commercial overlay", overlays)}${li("Special district", special)}${li("Limited height", P.ltdheight)}
+          ${li("Allowed FAR", [n("residfar") ? "residential " + n("residfar") : "", n("commfar") ? "commercial " + n("commfar") : "", n("facilfar") ? "community facility " + n("facilfar") : ""].filter(Boolean).join(" · "))}
+          ${P.splitzone === "Y" ? "<li><b>Split zoning</b>: the lot sits in more than one district</li>" : ""}${P.transitzone ? li("Transit zone", P.transitzone) : ""}
+          ${P.landmark ? li("Individual landmark", title(P.landmark)) : ""}${P.histdist ? li("Historic district", P.histdist) : ""}${P.edesignum ? li("E-designation", P.edesignum) : ""}</ul>
+        <div class="src">Source: NYC PLUTO ${esc(P.version || "")} (Department of City Planning).</div></div>`;
+      // Building & lot: what stands, and what it's made of by use.
+      const uses = [["Residential", n("resarea")], ["Commercial", n("comarea")], ["Office", n("officearea")], ["Retail", n("retailarea")], ["Garage", n("garagearea")],
+        ["Storage", n("strgearea")], ["Factory", n("factryarea")], ["Other", n("otherarea")]].filter((u) => u[1] > 0);
+      const building = `<div class="box rs"><h3>Building &amp; lot</h3><ul>
+        ${li("Building class", P.bldgclass)}${li("Floors", n("numfloors"))}${li("Buildings on the lot", n("numbldgs") > 1 ? n("numbldgs") : "")}
+        ${li("Units", n("unitstotal") ? `${n("unitsres") || 0} residential of ${n("unitstotal")} total` : "")}
+        ${li("Built", n("yearbuilt") || "")}${li("Altered", [n("yearalter1"), n("yearalter2")].filter((x) => x > 0).join(" and "))}
+        ${li("Building area", n("bldgarea") ? int(n("bldgarea")) + " sq ft" : "")}${uses.length > 1 ? li("By use", uses.map((u) => `${u[0]} ${int(u[1])}`).join(" · ")) : ""}
+        ${li("Building footprint", n("bldgfront") ? `${n("bldgfront")} × ${n("bldgdepth")} ft` : "")}
+        ${li("Lot", lotArea ? `${int(lotArea)} sq ft · ${n("lotfront")} × ${n("lotdepth")} ft${P.irrlotcode === "Y" ? " (irregular)" : ""}` : "")}</ul>
+        <div class="src">Source: NYC PLUTO.</div></div>`;
+      // Districts, flood and values.
+      const flood = P.pfirm15_flag === "1" || P.firm07_flag === "1";
+      const districts = `<div class="box rs"><h3>Districts, flood &amp; values</h3><ul>
+        <li>${flood ? `<span class="lien-on">In FEMA's 1% annual-chance floodplain</span> (${[P.firm07_flag === "1" ? "2007 map" : "", P.pfirm15_flag === "1" ? "2015 preliminary map" : ""].filter(Boolean).join(", ")})` : "Not in the 1% floodplain on FEMA's 2007 or 2015 maps"}</li>
+        ${li("Community district", P.cd ? `${BORO_NAME[String(P.cd)[0]] || ""} ${Number(String(P.cd).slice(1))}` : "")}${li("City council district", P.council)}${li("School district", P.schooldist)}
+        ${li("Police precinct", P.policeprct)}${li("Fire company", P.firecomp)}${li("Census tract (2020)", P.bct2020)}
+        ${li("Assessed land", n("assessland") ? money(n("assessland")) : "")}${li("Assessed total", n("assesstot") ? money(n("assesstot")) : "")}${li("Exempt", n("exempttot") ? money(n("exempttot")) : "")}</ul>
+        <div class="src">Source: NYC PLUTO (FEMA flood flags, districts, DOF assessed values).</div></div>`;
+      // Getting around: the nearest subway stations, with their lines and the walk.
+      const near = Number.isFinite(lat) && lat ? stations.map((s) => ({ ...s, d: meters(lat, lon, Number(s.gtfs_latitude), Number(s.gtfs_longitude)) }))
+        .filter((s) => s.d < 1600).sort((a, b) => a.d - b.d).slice(0, 4) : [];
+      const transit = `<div class="box rs"><h3>Getting around</h3>
+        ${near.length ? `<ul class="rec">${near.map((s) => `<li><div class="l1"><span>${String(s.daytime_routes || "").split(/\s+/).filter(Boolean).map(routeBadge).join("")} ${esc(s.stop_name)}</span><span>${walkMin(s.d)} min walk</span></div>
+          <div class="l2">${int(Math.round(s.d))} m away${s.ada === "1" ? " · step-free access" : ""}</div></li>`).join("")}</ul>` : '<div class="sm">No subway station within a mile.</div>'}
+        <div class="src">Source: MTA subway stations (NY State Open Data). Walk times are straight-line estimates.</div></div>`;
+      // Business nearby: licensed businesses within a 5-minute walk.
+      const close = Number.isFinite(lat) && lat ? biz.map((b) => ({ ...b, d: meters(lat, lon, Number(b.latitude), Number(b.longitude)) })).filter((b) => b.d <= 400).sort((a, b) => a.d - b.d) : [];
+      const cats = {}; close.forEach((b) => { cats[b.business_category] = (cats[b.business_category] || 0) + 1; });
+      const topCats = Object.entries(cats).sort((a, b) => b[1] - a[1]).slice(0, 4);
+      const business = `<div class="box rs"><h3>Business nearby</h3>
+        ${close.length ? `<div class="sm"><b>${int(close.length)}</b> city-licensed businesses within a 5-minute walk${topCats.length ? ": " + topCats.map(([c, k]) => `${esc(c)} (${k})`).join(", ") : ""}.</div>
+          <ul class="rec">${close.slice(0, 5).map((b) => `<li><div class="l1"><span>${esc(title(b.business_name || ""))}</span><span>${int(Math.round(b.d))} m</span></div><div class="l2">${esc(b.business_category || "")}</div></li>`).join("")}</ul>`
+          : '<div class="sm">No city-licensed businesses on record within a 5-minute walk.</div>'}
+        <div class="src">Source: NYC Department of Consumer and Worker Protection, licensed businesses${zip ? " in ZIP " + esc(zip) : ""}.</div></div>`;
+      // History: the block, the building, the landmark file and the housing record.
+      const years = blk.map((x) => nyNum(x.yearbuilt)).filter((y) => y > 1600).sort((a, b) => a - b);
+      const median = years.length ? years[Math.floor(years.length / 2)] : null;
+      const decades = {}; years.forEach((y) => { const d = Math.floor(y / 10) * 10; decades[d] = (decades[d] || 0) + 1; });
+      const dk = Object.keys(decades).map(Number).sort((a, b) => a - b), dmax = Math.max(1, ...Object.values(decades));
+      const lmCount = blk.filter((x) => x.landmark || x.histdist).length;
+      const hy = hpdYears.map((r) => ({ y: Number(r.y), n: Number(r.n) })).filter((r) => r.y > 1900);
+      const hTotal = hy.reduce((s, r) => s + r.n, 0), hMax = Math.max(1, ...hy.map((r) => r.n));
+      const openN = hpdOpen.reduce((s, r) => s + Number(r.n || 0), 0), openC = Number((hpdOpen.find((r) => r.class === "C") || {}).n || 0);
+      const [storyHref, storyLabel] = leadCtx && leadCtx.det ? storyFor(leadCtx.det) : [STORY_BASE, "Story Mode"];
+      const history = `<div class="box rs"><h3>History</h3>
+        ${years.length ? `<div class="sm">This block: <b>${years.length}</b> lots, built mostly around <b>${median}</b>; the oldest in <b>${years[0]}</b>${lmCount ? `; <b>${lmCount}</b> landmarked or in a historic district` : ""}.</div>
+          <div class="spark" aria-label="Lots on the block by decade built">${dk.map((d) => `<i title="${d}s: ${decades[d]}" style="height:${Math.max(6, (decades[d] / dmax) * 100)}%"></i>`).join("")}</div>
+          <div class="spark-x"><span>${dk[0]}s</span><span>${dk[dk.length - 1]}s</span></div>` : ""}
+        <ul>${lpc ? li("Landmark file", [lpc.style_prim && lpc.style_prim !== "Not determined" ? lpc.style_prim : "", lpc.date_combo, lpc.arch_build && lpc.arch_build !== "Not determined" ? "by " + lpc.arch_build : "", lpc.mat_prim, lpc.use_orig ? "built as " + lpc.use_orig.toLowerCase() : ""].filter(Boolean).join(" · ")) : ""}
+          ${hTotal ? `<li>Housing violations: <b>${int(hTotal)}</b> since ${hy[0].y}${openN ? `, <b>${int(openN)} open now</b>${openC ? ` (${openC} immediately hazardous)` : ""}` : ", none open"}</li>` : "<li>No housing violations on record</li>"}</ul>
+        ${hTotal ? `<div class="spark" aria-label="Housing violations by year">${hy.map((r) => `<i title="${r.y}: ${r.n}" style="height:${Math.max(6, (r.n / hMax) * 100)}%"></i>`).join("")}</div>
+          <div class="spark-x"><span>${hy[0].y}</span><span>${hy[hy.length - 1].y}</span></div>` : ""}
+        <div class="lc-actions" style="margin-top:8px"><a class="btn" href="${storyHref}" target="_blank" rel="noopener">${esc(storyLabel)}</a></div>
+        <div class="src">Sources: NYC PLUTO (the block) · Landmarks Preservation Commission building database · HPD housing maintenance code violations.</div></div>`;
+      box.innerHTML = `<h3 class="rs-h">Research</h3>${zoning}${building}${districts}${transit}${business}${history}`;
+    } catch (e) {
+      box.innerHTML = '<div class="box"><h3>Research</h3><div class="sm">The city\'s data did not answer just now. <button type="button" class="btn" id="rsRetry">Try again</button></div></div>';
+      const b = $("rsRetry"); if (b) b.onclick = () => nycResearch(bbl, lat, lon);
+    }
+  }
+
   // ── lead card: the top of every profile — who, the situation as loud tags, talking points, facts as bullets, the
   //    contact card and the actions. Built from the Property Detail object (/api/detail), plus the live NYC record. ─
   let leadCtx = null;
@@ -1358,6 +1479,7 @@
         <button type="button" class="btn" id="close">Close</button>
       </div>
       <div id="leadCard">${leadCardHtml(leadCtx)}</div>
+      ${pa.region === "NYC" && /^\d{10}$/.test(String(pa.id)) ? '<div id="nycResearch"><div class="box"><h3>Research</h3><div class="sm">Pulling zoning, transit, businesses and history…</div></div></div>' : ""}
       <div class="box"><h3>Owner</h3><ul>
         ${li("First name", o.first_name)}${li("Last name", o.last_name)}${li("Name on record", o.name)}${li("Second owner", o.second_owner)}${li("Owner type", o.type)}
         ${li("Mailing address", o.mailing_address)}${o.held_since_2021 ? "<li><b>Same owner since at least 2021</b></li>" : ""}
@@ -1376,6 +1498,7 @@
       <div class="box"><h3>Parcel</h3><ul>${li("Parcel id", pa.id)}${li("County", pa.county)}${li("Region", REGION[pa.region] || pa.region)}</ul></div>`;
     $("close").onclick = closeDetail; $("close").focus();
     if ($("nycRec")) nycRecord(String(pa.id));
+    if ($("nycResearch")) nycResearch(String(pa.id), Number(pa.lat), Number(pa.lon));
     if ($("onMap")) $("onMap").onclick = () => {
       $("drawer").hidden = true; $("scrim").hidden = true;
       if (view === "table") setView("map", [pa.lon, pa.lat]);
