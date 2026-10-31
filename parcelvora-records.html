@@ -584,6 +584,7 @@
   .btn:disabled { opacity: .5; cursor: not-allowed; }
   .savedpanel { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 16px; margin: 0 0 14px; box-shadow: var(--shadow); }
   .sp-head h2 { font: 800 20px var(--display); margin: 0 0 2px; }
+  .sp-hide { float: right; margin: 0 0 8px 12px; }
   .sp-save { display: flex; gap: 8px; margin-top: 12px; }
   .sp-save input { flex: 1; min-width: 0; border: 1px solid var(--line); border-radius: 8px; padding: 10px 12px; font: 500 15px var(--body); background: var(--card-2); color: var(--text); }
   #saveMsg { margin-top: 8px; min-height: 1em; }
@@ -661,7 +662,7 @@
   </form>
 
   <section class="savedpanel activity" id="activityPanel" hidden aria-label="List export activity calendar">
-    <div class="sp-head"><h2>List Activity Calendar</h2><p class="sm">A list pull is a completed export with records delivered. The log also shows empty attempts. Days follow America/New_York time.</p></div>
+    <div class="sp-head"><button type="button" class="btn fold-btn sp-hide" data-hide="activityPanel" data-btn="activityBtn">Hide ▴</button><h2>List Activity Calendar</h2><p class="sm">A list pull is a completed export with records delivered. The log also shows empty attempts. Days follow America/New_York time.</p></div>
     <div class="activity-stats" id="activityStats"></div>
     <button type="button" class="btn fold-btn" id="activityCalToggle" aria-expanded="false" aria-controls="activityCal">Show calendar ▾</button>
     <div id="activityCal" class="activity" hidden>
@@ -674,14 +675,14 @@
   </section>
 
   <section class="savedpanel" id="savedPanel" hidden aria-label="Saved searches">
-    <div class="sp-head"><h2>Saved searches</h2><span class="sm">Kept in this browser. Open one to see how many new matches came in since you saved it.</span></div>
+    <div class="sp-head"><button type="button" class="btn fold-btn sp-hide" data-hide="savedPanel" data-btn="savedBtn">Hide ▴</button><h2>Saved searches</h2><span class="sm">Kept in this browser. Open one to see how many new matches came in since you saved it.</span></div>
     <form class="sp-save" id="saveForm"><input id="saveName" maxlength="60" placeholder="Name this search, e.g. Absentee owners in Park Slope" aria-label="Search name"><button class="btn primary" type="submit">Save this search</button></form>
     <div class="sm" id="saveMsg" aria-live="polite"></div>
     <ul class="sp-list" id="savedList"></ul>
   </section>
 
   <section class="savedpanel" id="listsPanel" hidden aria-label="Lists">
-    <div class="sp-head"><h2>Lists</h2><span class="sm">Records you chose to keep together. A list changes only when you add or remove records; a saved search runs again each time. Up to 10,000 records a list.</span></div>
+    <div class="sp-head"><button type="button" class="btn fold-btn sp-hide" data-hide="listsPanel" data-btn="listsBtn">Hide ▴</button><h2>Lists</h2><span class="sm">Records you chose to keep together. A list changes only when you add or remove records; a saved search runs again each time. Up to 10,000 records a list.</span></div>
     <form class="sp-save" id="listForm"><input id="listName" maxlength="120" placeholder="Name a new list, e.g. Brooklyn code violations" aria-label="List name"><button class="btn primary" type="submit">Create list</button></form>
     <div class="sm" id="listMsg" aria-live="polite"></div>
     <ul class="sp-list lists" id="listList"></ul>
@@ -1356,9 +1357,9 @@
     $("activityCalToggle").textContent = on ? "Hide calendar ▴" : "Show calendar ▾";
   };
   $("activityCalToggle").onclick = () => showCalendar($("activityCal").hidden);
-  function openActivity(withCalendar) {
+  function openActivity() {
     $("activityPanel").hidden = false; $("activityBtn").setAttribute("aria-expanded", "true");
-    showCalendar(!!withCalendar);   // the summary first; the calendar opens on request
+    showCalendar(false);   // always the summary first; the calendar opens with its button
     fetchActivity();
   }
   $("activityBtn").addEventListener("click", () => {
@@ -1425,7 +1426,12 @@
   $("download").addEventListener("click", (e) => { e.preventDefault(); openExportDialog(tableParams().toString()); });
   function closeExport() { $("exportDialog").hidden = true; document.body.classList.remove("comps-on"); }
   $("exportClose").onclick = closeExport;
-  $("exportHistory").onclick = () => { closeExport(); openActivity(true); $("activityPanel").scrollIntoView({block:"start"}); };
+  $("exportHistory").onclick = () => { closeExport(); openActivity(); $("activityPanel").scrollIntoView({block:"start"}); };
+  // Every panel folds away with its own Hide button, the same as pressing its button in the top row again.
+  document.addEventListener("click", (e) => {
+    const h = e.target.closest(".sp-hide"); if (!h) return;
+    $(h.dataset.hide).hidden = true; $(h.dataset.btn).setAttribute("aria-expanded", "false"); $(h.dataset.btn).focus();
+  });
   $("exportConfirm").onclick = async () => {
     const b = $("exportConfirm"); b.disabled = true; $("exportNote").textContent = "Preparing export…";
     const chosen = document.querySelector('input[name="exportMode"]:checked'), fmt = $("exportFormat").value, target = $("exportTarget").value;
