@@ -14,6 +14,8 @@
   const realFetch = window.fetch.bind(window);
   const ready = realFetch(script.dataset.src).then((r) => r.json());
   const reply = (body, status = 200) => new Response(JSON.stringify(body), { status, headers: { "content-type": "application/json" } });
+  // Lists, kept in this browser: [{ id, name, created_at, updated_at, keys: ["parcel|county", …] }]
+  const readLists = () => { try { return JSON.parse(localStorage.getItem("pv-lists") || "[]") || []; } catch (_) { return []; } };
   const num = (v) => (v === null || v === undefined || v === "" || !Number.isFinite(Number(v)) ? null : Number(v));
   const has = (v) => v !== null && v !== undefined && v !== "";
   const list = (v) => String(v || "").split(",").map((s) => s.trim()).filter(Boolean);
@@ -51,6 +53,7 @@
     if (flags.includes("officer")) tests.push((r) => r.officer_name != null && r.officer_name !== "");
     if (flags.includes("lien")) tests.push((r) => r.lien === true);
     if (flags.includes("viol")) tests.push((r) => r.viol === true);
+    if (q.get("list")) { const L = readLists().find((l) => String(l.id) === q.get("list")); const keys = new Set(L ? L.keys : []); tests.push((r) => keys.has(r.id + "|" + r.county)); }
     const range = (param, field, op) => { const v = num(q.get(param)); if (v !== null) tests.push((r) => has(r[field]) && op(Number(r[field]), v)); };
     range("min", "value", (a, v) => a >= v); range("max", "value", (a, v) => a <= v);
     range("built_from", "year_built", (a, v) => a >= v); range("built_to", "year_built", (a, v) => a <= v);
@@ -139,12 +142,53 @@
 
   window.fetch = async (input, init) => {
     const url = new URL(typeof input === "string" ? input : input.url, location.href);
-    const route = /\/api\/(records|map|lookup|counties|ids|detail|skiptrace|comps|exports(?:\/preview|\/\d+\/file)?)$/.exec(url.pathname);
+    const route = /\/api\/(records|map|lookup|counties|ids|detail|skiptrace|comps|exports(?:\/preview|\/\d+\/file)?|lists(?:\/\d+(?:\/items)?)?)$/.exec(url.pathname);
     if (!route) return realFetch(input, init);
     // Skip tracing spends Tracerfy credits, so it runs only on Parcelvora's server, where the key lives.
     if (route[1] === "skiptrace") return reply({ error: "demo", message: "Skip tracing runs on Parcelvora's server, where the Tracerfy key lives. This preview has no server, so nothing runs or is charged here." }, 503);
     const d = await ready, q = url.searchParams;
 
+    // Lists, kept in this browser, with the server's answers: fixed membership, up to 10,000, never cut off quietly.
+    if (route[1].startsWith("lists")) {
+      const lists = readLists(), m = /^lists(?:\/(\d+))?(\/items)?$/.exec(route[1]), method = (init && init.method) || "GET";
+      const body = (() => { try { return JSON.parse((init && init.body) || "{}"); } catch (_) { return {}; } })();
+      const save = () => { try { localStorage.setItem("pv-lists", JSON.stringify(lists)); return true; } catch (_) { return false; } };
+      const out = (l) => ({ id: l.id, name: l.name, created_at: l.created_at, updated_at: l.updated_at, count: l.keys.length });
+      const now = new Date().toISOString();
+      if (!m[1]) {
+        if (method === "GET") return reply({ lists: lists.slice().sort((a, b) => (a.updated_at < b.updated_at ? 1 : -1)).map(out) });
+        const name = String(body.name || "").replace(/\s+/g, " ").trim().slice(0, 120);
+        if (!name) return reply({ error: "name the list" }, 400);
+        const l = { id: Date.now(), name, created_at: now, updated_at: now, keys: [] };
+        lists.push(l); if (!save()) return reply({ error: "This browser could not save the list." }, 507);
+        return reply({ list: out(l) });
+      }
+      const L = lists.find((l) => String(l.id) === m[1]);
+      if (!L) return reply({ error: "no such list" }, 404);
+      if (m[2] && method === "POST") {
+        let keys;
+        if (Array.isArray(body.ids)) keys = body.ids.map(String);
+        else { const lq = new URLSearchParams(String(body.params || "")); lq.delete("list"); keys = d.rows.filter(matcher(lq)).map((r) => r.id + "|" + r.county); }
+        if (keys.length > 10000) return reply({ error: "too_many", matched: keys.length, max: 10000 }, 400);
+        const have = new Set(L.keys), fresh = keys.filter((k) => !have.has(k));
+        if (L.keys.length + fresh.length > 10000) return reply({ error: "list_full", count: L.keys.length, adding: fresh.length, max: 10000 }, 400);
+        L.keys.push(...fresh); L.updated_at = now;
+        if (!save()) return reply({ error: "This browser could not save the list." }, 507);
+        return reply({ added: fresh.length, count: L.keys.length, list: { id: L.id, name: L.name } });
+      }
+      if (m[2] && method === "DELETE") {
+        const drop = new Set((body.ids || []).map(String)), before = L.keys.length;
+        L.keys = L.keys.filter((k) => !drop.has(k)); L.updated_at = now; save();
+        return reply({ removed: before - L.keys.length });
+      }
+      if (method === "PATCH") {
+        const name = String(body.name || "").replace(/\s+/g, " ").trim().slice(0, 120);
+        if (!name) return reply({ error: "name the list" }, 400);
+        L.name = name; L.updated_at = now; save(); return reply({ ok: true });
+      }
+      if (method === "DELETE") { lists.splice(lists.indexOf(L), 1); save(); return reply({ ok: true }); }
+      return reply({ error: "not found" }, 404);
+    }
     // Exports, kept in this browser: the same routes and answers as the server, so the page runs the same on both. What
     // a browser holds is not an account: other browsers and devices don't share it, and clearing site data resets it.
     if (route[1].startsWith("exports")) {
@@ -171,7 +215,10 @@
         return new Response(text, { status: 200, headers: { "content-type": e.format === "json" ? "application/json" : "text/csv",
           "content-disposition": `attachment; filename="parcelvora-export-${e.id}.${e.format}"` } });
       }
-      const all = select(d.rows, new URLSearchParams(String(body.params || "")));
+      const eq = new URLSearchParams(String(body.params || "")); if (body.list_id != null) eq.set("list", String(body.list_id));
+      const theList = eq.get("list") ? readLists().find((l) => String(l.id) === eq.get("list")) : null;
+      if (eq.get("list") && !theList) return reply({ error: "no such list" }, 404);
+      const all = select(d.rows, eq);
       const owned = all.filter((r) => acquired[keyOf(r)]).length;
       if (route[1] === "exports/preview") return reply({ matched: all.length, capped: false, owned, fresh: all.length - owned, sentHere: owned, leftToday: left, limit: LIMIT, cap: CAP });
       // create: a repeated key returns the first export
@@ -189,7 +236,7 @@
       }
       const id = Date.now(), now = new Date().toISOString();
       const entry = { id, key: key || null, created_at: now, completed_at: now, channel: "download", format: fmt,
-        list_name: String(body.name || "Records").slice(0, 120), status: "completed", matched: all.length, selected: rows.length,
+        list_id: theList ? theList.id : null, list_name: theList ? theList.name : String(body.name || "Records").slice(0, 120), status: "completed", matched: all.length, selected: rows.length,
         delivered: take.length, new_count: fresh, already: take.length - fresh, skipped: rows.length - take.length,
         remaining: mode === "new" ? Math.max(0, all.length - owned - fresh) : Math.max(0, all.length - take.length), error: null,
         file: `/api/exports/${id}/file`, keys: take.map(keyOf) };
@@ -418,6 +465,25 @@
   .lc-contact { border: 1px dashed var(--line); border-radius: 10px; padding: 10px 12px; }
   .lc-contact p { margin: 2px 0 8px; font-size: 15px; color: var(--soft); }
   .lc-actions { display: flex; flex-wrap: wrap; gap: 8px; }
+  .letters .lt-grid { display: grid; grid-template-columns: minmax(300px, 430px) 1fr; gap: 14px; align-items: start; }
+  .lt-form { display: grid; gap: 12px; }
+  .lt-form label { display: grid; gap: 5px; font-weight: 600; font-size: 15px; }
+  .lt-form input, .lt-form select, .lt-form textarea { font: inherit; font-size: 15px; padding: 9px 11px; border: 1px solid var(--line); border-radius: 8px; background: var(--card-2); color: var(--text); }
+  .lt-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .lt-form label.lt-opt, .letters label.lt-opt { display: flex; gap: 8px; align-items: flex-start; font-weight: 500; margin: 6px 0; }
+  .lt-opt input { margin-top: 4px; }
+  .lt-to { font-family: Georgia, "Times New Roman", serif; white-space: pre-line; padding: 10px 12px; border: 1px dashed var(--line); border-radius: 8px; margin-bottom: 10px; }
+  #ltBody { width: 100%; min-height: 540px; font: 15px/1.55 Georgia, "Times New Roman", serif; color: var(--text); background: var(--card-2); border: 1px solid var(--line); border-radius: 8px; padding: 12px; resize: vertical; }
+  .lt-foot { display: flex; flex-wrap: wrap; gap: 10px; justify-content: space-between; align-items: center; margin-top: 8px; }
+  .lt-note { font-size: 14px; color: var(--soft); margin: 0; }
+  .lt-flag { margin: 0; font-weight: 700; color: #e5484d; }
+  .lt-flag:empty { display: none; }
+  @media (max-width: 900px) { .letters .lt-grid { grid-template-columns: 1fr; } .lt-row { grid-template-columns: 1fr; } }
+  .bar-r { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; justify-content: flex-end; }
+  .listbar { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; justify-content: space-between; margin: 0 0 10px; padding: 10px 14px;
+    border: 1px solid var(--blue); border-radius: 10px; background: var(--blue-tint); font-weight: 600; }
+  .sp-list.lists li { grid-template-columns: 1fr auto auto auto auto; }
+  @media (max-width: 640px) { .sp-list.lists li { grid-template-columns: 1fr auto; } }
   .comps { position: fixed; inset: 0; z-index: 30; background: var(--bg); overflow: auto; padding: 18px 16px 40px; }
   .comps[hidden] { display: none; }
   body.comps-on { overflow: hidden; }
@@ -561,6 +627,7 @@
       <a class="btn" id="storyBtn" href="https://nextiertech11105.github.io/nextier-flow/parcelvora-story.html" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg><span>Story Mode</span></a>
       <button type="button" class="btn" id="activityBtn" aria-controls="activityPanel" aria-expanded="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg><span>List Activity</span></button>
       <button type="button" class="btn" id="savedBtn" aria-expanded="false" aria-controls="savedPanel"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M6 3h12v18l-6-4-6 4z"/></svg><span>Saved searches</span></button>
+      <button type="button" class="btn" id="listsBtn" aria-expanded="false" aria-controls="listsPanel"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M9 6h12M9 12h12M9 18h12M4 6h.01M4 12h.01M4 18h.01"/></svg><span>Lists</span></button>
       <button type="button" class="btn" id="compsBtn" aria-controls="comps"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg><span>Comps</span><b class="cnt" id="compsCount"></b></button>
       <a class="btn" id="download" href="/api/records.csv"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 4v11m0 0-4-4m4 4 4-4M4 19h16"/></svg>Download</a>
       <button type="button" class="btn" id="toggleFilters" aria-expanded="false" aria-controls="filters"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M3 5h18l-7 8v6l-4 2v-8L3 5z"/></svg><span>Filters</span></button>
@@ -588,6 +655,22 @@
     <form class="sp-save" id="saveForm"><input id="saveName" maxlength="60" placeholder="Name this search, e.g. Absentee owners in Park Slope" aria-label="Search name"><button class="btn primary" type="submit">Save this search</button></form>
     <div class="sm" id="saveMsg" aria-live="polite"></div>
     <ul class="sp-list" id="savedList"></ul>
+  </section>
+
+  <section class="savedpanel" id="listsPanel" hidden aria-label="Lists">
+    <div class="sp-head"><h2>Lists</h2><span class="sm">Records you chose to keep together. A list changes only when you add or remove records; a saved search runs again each time. Up to 10,000 records a list.</span></div>
+    <form class="sp-save" id="listForm"><input id="listName" maxlength="120" placeholder="Name a new list, e.g. Brooklyn code violations" aria-label="List name"><button class="btn primary" type="submit">Create list</button></form>
+    <div class="sm" id="listMsg" aria-live="polite"></div>
+    <ul class="sp-list lists" id="listList"></ul>
+  </section>
+
+  <section class="comps export-dialog" id="listPick" hidden role="dialog" aria-modal="true" aria-label="Add to a list">
+    <div class="comps-in export-in">
+      <div class="comps-top"><div><h2>Add to a list</h2><div class="sm" id="listPickWhat"></div></div><button class="btn" type="button" id="listPickClose">Close</button></div>
+      <div class="export-opts"><label>List <select id="listPickSel"></select></label><label id="listPickNewL" hidden>New list name <input id="listPickNew" maxlength="120"></label></div>
+      <div class="sm" id="listPickMsg" role="status"></div>
+      <div class="comps-act"><button class="btn primary" type="button" id="listPickGo">Add</button></div>
+    </div>
   </section>
 
   <section class="comps export-dialog" id="exportDialog" hidden role="dialog" aria-modal="true" aria-label="Download records">
@@ -705,6 +788,7 @@
     <section class="panel" id="tableView">
       <div class="bar">
         <div><h2>Records</h2><div id="count" aria-live="polite">Loading…</div></div>
+        <div class="bar-r"><button type="button" class="btn" id="addResults">Add these to a list</button>
         <label class="sm">Sort <select id="sort">
           <option value="value_desc">Highest value</option>
           <option value="value_asc">Lowest value</option>
@@ -712,8 +796,9 @@
           <option value="built_desc">Newest built</option>
           <option value="sqft_desc">Largest building</option>
           <option value="address">Address A–Z</option>
-        </select></label>
+        </select></label></div>
       </div>
+      <div class="listbar" id="listBar" hidden><span>Showing the list <b id="listBarName"></b></span><button type="button" class="btn" id="listBarClose">Show all records</button></div>
       <div class="scroll">
         <table>
           <thead><tr><th>Property</th><th>Owner</th><th class="col-mail">Mailing Address</th><th>Value &amp; Sale</th><th>Property Details</th><th>Actions</th></tr></thead>
@@ -756,6 +841,7 @@
 <div class="scrim" id="scrim" hidden></div>
 <aside class="drawer" id="drawer" role="dialog" aria-modal="true" aria-label="Property details" hidden></aside>
 <section class="comps" id="comps" role="dialog" aria-modal="true" aria-label="Comps and CMA" hidden></section>
+<section class="comps letters" id="letters" role="dialog" aria-modal="true" aria-label="Write a letter" hidden></section>
 
 <script src="https://api.mapbox.com/mapbox-gl-js/v3.17.0/mapbox-gl.js"></script>
 <script>
@@ -819,6 +905,7 @@
 
   // ── filters ────────────────────────────────────────────────────────────────────────────────────────────────────
   const FIELDS = ["region", "county", "town", "zip", "use", "owner", "min", "max", "built_from", "built_to", "sqft_min", "sqft_max", "units_min"];
+  let activeList = null;   // an open list: { id, name }
   function params() {
     const p = new URLSearchParams();
     for (const id of FIELDS) { const v = $(id).value.trim(); if (v) p.set(id, v); }
@@ -826,11 +913,12 @@
     if (f.length) p.set("flags", f.join(","));
     if ($("sold").getAttribute("aria-pressed") === "true") p.set("sold", "12m");
     if (area) p.set("poly", area.map(([x, y]) => x.toFixed(6) + "," + y.toFixed(6)).join(";"));
+    if (activeList) p.set("list", String(activeList.id));
     p.set("sort", $("sort").value);
     return p;
   }
   // With a drawn area the table lists everything inside it, wherever the map is; without one it lists what the map shows.
-  function tableParams() { const p = params(); if (synced() && !area) p.set("bbox", bboxOf()); return p; }
+  function tableParams() { const p = params(); if (synced() && !area && !activeList) p.set("bbox", bboxOf()); return p; }
   const refreshDownload = () => { $("download").href = "/api/records.csv?" + tableParams(); };
   let counties = [], page = 1, seq = 0, typing = null;
   function fillCounties() {
@@ -1280,14 +1368,14 @@
       $("exportConfirm").disabled = !j.matched;
     } catch (_) { $("exportPreview").textContent = "Preview not available on this server."; $("exportConfirm").disabled = true; }
   }
-  $("download").addEventListener("click", (e) => {
-    e.preventDefault();
-    exportQuery = tableParams().toString(); exportKey = newKey();
+  function openExportDialog(qs) {
+    exportQuery = qs; exportKey = newKey();
     $("exportDialog").hidden = false; document.body.classList.add("comps-on");
     $("exportNote").textContent = "";
     document.querySelector('input[name="exportMode"][value="new"]').checked = true;
     previewExport();
-  });
+  }
+  $("download").addEventListener("click", (e) => { e.preventDefault(); openExportDialog(tableParams().toString()); });
   function closeExport() { $("exportDialog").hidden = true; document.body.classList.remove("comps-on"); }
   $("exportClose").onclick = closeExport;
   $("exportHistory").onclick = () => { closeExport(); openActivity(); $("activityPanel").scrollIntoView({block:"start"}); };
@@ -1385,6 +1473,328 @@
       }).catch(() => {});
     }
   });
+
+  // ── Letters: an LOI or a buyer's personal letter to the owner, filled from the record, addressed to the owner's mailing
+  //    address, the property, or both. One page per address, laid out for a #10 window envelope; print or save as PDF.
+  //    The sender's own details are remembered in this browser only. ────────────────────────────────────────────────
+  const LETTER_KINDS = { loi: "Non-binding letter of intent (LOI)", personal: "Personal letter from a buyer who will live there" };
+  // Words that can read as a reference to a protected trait (family status, religion, national origin, age, disability,
+  // sex, military status). A buyer letter should leave them out; printing asks before it goes out with any of them.
+  const FLAG = /\b(kids?|child(ren)?|sons?|daughters?|bab(y|ies)|toddlers?|pregnan\w*|expecting|grand(kids|children|child)|newlyweds?|(?<![-\w])famil(y(?!\s+room)|ies)|wife|husband|spouse|married|marriage|fianc[eé]e?|mom|dad|mother|father|parents|church(es)?|temples?|synagogues?|mosques?|christian|jewish|muslim|catholic|hindu|buddhist|faith|god|pray\w*|bible|worship|immigra\w*|heritage|ethnic\w*|races?|nationality|retire[ds]?|retirees?|seniors?|elderly|young couple|wheelchair|disab\w*|handicap\w*|veterans?|military|gay|lesbian)\b/gi;
+  const flagWords = (t) => [...new Set((String(t || "").match(FLAG) || []).map((w) => w.toLowerCase()))];
+  // Placeholders the template prints when a term or a detail is still blank.
+  const BLANKS = [[/\$_{4,}/, "a price or deposit"], [/\[Your name\]/, "your name"], [/\[your phone or email\]/, "your phone or email"], [/\[Describe the financing\]/, "the financing"]];
+  const SENDER_KEY = "pv-sender";
+  const sender = (() => { try { return JSON.parse(localStorage.getItem(SENDER_KEY) || "{}") || {}; } catch (e) { return {}; } })();
+  const keepSender = () => { try { localStorage.setItem(SENDER_KEY, JSON.stringify(sender)); } catch (e) {} };
+  let letter = null;
+  // Two spellings of one address are one address: "State Rd 7 #1306" and "State Road 7 #1306" get one letter, not two.
+  const ADDR_ABBR = { ROAD: "RD", STREET: "ST", AVENUE: "AVE", AV: "AVE", BOULEVARD: "BLVD", DRIVE: "DR", LANE: "LN", COURT: "CT", PLACE: "PL",
+    TERRACE: "TER", PARKWAY: "PKWY", HIGHWAY: "HWY", CIRCLE: "CIR", NORTH: "N", SOUTH: "S", EAST: "E", WEST: "W",
+    APARTMENT: "", APT: "", UNIT: "", SUITE: "", STE: "" };
+  const normAddr = (s) => String(s || "").toUpperCase().split(/[^A-Z0-9]+/).map((w) => (w in ADDR_ABBR ? ADDR_ABBR[w] : w)).join("");
+  const US_STATES = { ALABAMA: "AL", ALASKA: "AK", ARIZONA: "AZ", ARKANSAS: "AR", CALIFORNIA: "CA", COLORADO: "CO", CONNECTICUT: "CT", DELAWARE: "DE",
+    "DISTRICT OF COLUMBIA": "DC", FLORIDA: "FL", GEORGIA: "GA", HAWAII: "HI", IDAHO: "ID", ILLINOIS: "IL", INDIANA: "IN", IOWA: "IA", KANSAS: "KS",
+    KENTUCKY: "KY", LOUISIANA: "LA", MAINE: "ME", MARYLAND: "MD", MASSACHUSETTS: "MA", MICHIGAN: "MI", MINNESOTA: "MN", MISSISSIPPI: "MS",
+    MISSOURI: "MO", MONTANA: "MT", NEBRASKA: "NE", NEVADA: "NV", "NEW HAMPSHIRE": "NH", "NEW JERSEY": "NJ", "NEW MEXICO": "NM", "NEW YORK": "NY",
+    "NORTH CAROLINA": "NC", "NORTH DAKOTA": "ND", OHIO: "OH", OKLAHOMA: "OK", OREGON: "OR", PENNSYLVANIA: "PA", "RHODE ISLAND": "RI",
+    "SOUTH CAROLINA": "SC", "SOUTH DAKOTA": "SD", TENNESSEE: "TN", TEXAS: "TX", UTAH: "UT", VERMONT: "VT", VIRGINIA: "VA", WASHINGTON: "WA",
+    "WEST VIRGINIA": "WV", WISCONSIN: "WI", WYOMING: "WY", "PUERTO RICO": "PR" };
+  const stateAbbr = (st) => { const u = String(st || "").toUpperCase().replace(/\s+/g, " ").trim(); return US_STATES[u] || u; };
+  const plusDays = (n) => { const t = new Date(); t.setDate(t.getDate() + (Number(n) || 0)); return t.toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" }); };
+  // Who the letter is to, written the way the owner is on record: a person, a company (to the person behind it), a trust or an estate.
+  function letterCtx() {
+    const d = leadCtx.det || detFromProfile(leadCtx.p), o = d.ownerInfo || {}, p = d.propertyInfo || {}, a = p.address || {}, m = o.mailAddress || {};
+    const pv = d.parcelvora || {}, l = d.lotInfo || {}, rc = pv.registeredContact, kind = o.owner1Type;
+    // names exactly as on record, minus the city's "/AKA …" tails
+    const clean = (n) => title(String(n || "").replace(/\s*\/\s*aka\b.*$/i, "").replace(/\s+/g, " ").trim());
+    const first = clean(o.owner1FirstName), last = clean(o.owner1LastName), full = clean(o.owner1FullName);
+    const person = [first, last].filter(Boolean).join(" ");
+    const line2 = (x) => [title(x.city || ""), [stateAbbr(x.state), x.zip].filter(Boolean).join(" ")].filter(Boolean).join(", ");
+    const prop = { line1: title(a.address || ""), line2: line2(a) };
+    const mail = m.address ? { line1: title(m.address), line2: line2(m) } : null;
+    const same = !mail || (normAddr(mail.line1) === normAddr(prop.line1) && String(m.zip || "").slice(0, 5) === String(a.zip || "").slice(0, 5));
+    let names, hello, display;
+    if (kind === "Company") {
+      names = [full || "Owner"].concat(rc && rc.name ? [`Attn: ${title(rc.name)}${rc.role ? ", " + rc.role : ""}`] : []);
+      hello = rc && rc.name ? `Dear ${title(rc.name)},` : "Hello,"; display = full || "Owner";
+    } else if (kind === "Trust") {
+      names = [`Trustee, ${full || "the trust"}`]; hello = "Dear Trustee,"; display = full || "Trustee";
+    } else if (kind === "Estate") {
+      const est = /^estate\b/i.test(full) ? full : `Estate of ${person || full}`;
+      names = [est, "c/o the Executor or Administrator"]; hello = "Dear Executor,"; display = est;
+    } else {
+      display = person || full || "Owner"; names = [display];
+      hello = first ? `Dear ${first},` : person || full ? `Dear ${person || full},` : "Dear Owner,";
+    }
+    return { d, pv, l, names, hello, display, prop, mail: same ? null : mail, ownerLivesThere: !!d.ownerOccupied, kind,
+      yb: Number(p.yearBuilt) || 0, use: pv.useClass, county: pv.county || "", town: title(pv.town || a.city || ""), apn: l.apn || d.id || "",
+      region: pv.region, formalHello: kind === "Individual" || !kind ? (person || full ? `Dear ${person || full},` : "Dear Owner,") : hello };
+  }
+  const HOME_WORD = { one_family: "home", two_family: "two-family house", three_family: "three-family house", multifamily_small: "building", multifamily: "building",
+    condo: "condo", coop: "co-op", mobile_home: "home", residential_other: "home", vacant_res: "lot" };
+  // A line about the block from Research, only when Research found it: the nearest train within a 30-minute walk.
+  function nearLine() {
+    const t = ((leadCtx && leadCtx.transit) || []).find((x) => !["Bus", "Bike share", "Ferry"].includes(x.kind) && x.d <= 2400);
+    if (!t) return "";
+    const m = walkMin(t.d), mins = m === 1 ? "a minute" : `${m} minutes`;
+    return t.kind === "Subway" && t.lines.length ? `I love that the ${t.lines.join(" and ")} ${t.lines.length > 1 ? "trains are" : "train is"} ${mins} away at ${t.name}.`
+      : `I love being ${mins} from the ${t.kind === "Train" ? "train" : t.kind} at ${t.name}.`;
+  }
+  function letterBody() {
+    const c = letterCtx(), f = letter.f, s = sender, me = s.name || "[Your name]";
+    const reach = [s.phone, s.email].filter(Boolean).join(" or ") || "[your phone or email]";
+    const sign = [me, s.company, [s.phone, s.email].filter(Boolean).join(" · ")].filter(Boolean).join("\n");
+    const where = [c.prop.line1, c.prop.line2].filter(Boolean).join(", ");
+    if (letter.kind === "loi") {
+      const price = Number(f.price) > 0 ? money(Number(f.price)) : "$__________", dep = Number(f.deposit) > 0 ? money(Number(f.deposit)) : "$__________";
+      const fin = f.financing === "cash" ? "All cash. No financing contingency."
+        : f.financing === "loan" ? `A conventional mortgage, subject to loan approval within ${Number(f.finDays) || 21} days of a signed contract.` : (f.finOther || "[Describe the financing]");
+      const terms = [`Purchase price: ${price}`, `Earnest money deposit: ${dep}, held in escrow by the closing attorney or title company and credited to the price at closing.`,
+        `Financing: ${fin}`, `Inspection: ${Number(f.insp) || 10} days from a signed contract to inspect the property, with the right to cancel and have the deposit returned within that time.`,
+        `Closing: on or before ${Number(f.close) || 30} days from a signed contract, or another date we agree on.`,
+        `Closing costs: each side pays the costs customary${c.county ? ` in ${c.county} County` : " where the property is"}.`].concat(f.other ? [`Other terms: ${f.other}`] : []);
+      return [`RE: Non-binding letter of intent to purchase ${where}`, "", c.formalHello, "",
+        `Thank you for taking a moment to read this. ${me}${s.company ? ` of ${s.company}` : ""} would like to buy the property at ${c.prop.line1}${c.county ? ` (${c.county} County${c.apn ? ", parcel " + c.apn : ""})` : ""} on the terms below.`, "",
+        ...terms.map((t, k) => `${k + 1}. ${t}`), "",
+        `This letter is an expression of interest only. It is not a contract and does not bind either of us; a binding agreement exists only when we both sign a written purchase contract. These terms are open until ${plusDays(f.expires || 7)}.`, "",
+        `If they work for you, or you would like to talk them over, you can reach me at ${reach}.`, "", "Sincerely,", "", sign, "", "",
+        "Accepted in principle (not binding):", "", "______________________________     Date: ______________", c.display].join("\n");
+    }
+    const vacant = c.use === "vacant_res", word = HOME_WORD[c.use] || "home";
+    const age = c.yb && c.yb < 1990 && !vacant ? `, and a ${word === "home" ? "house" : word} built in ${c.yb} has a character newer ones don't` : "";
+    return [c.hello, "",
+      vacant ? `My name is ${me}, and I'm looking for a place to build a home to live in. Not to flip and not to rent out: to live in.`
+        : `My name is ${me}, and I'm looking for a home to live in. Not to flip and not to rent out: to live in.`, "",
+      [`Your ${word} at ${c.prop.line1} is the kind of place I've hoped to find${age}.`, f.why, f.near !== false ? nearLine() : ""].filter(Boolean).join(" "), "",
+      `I know a home holds years of memories, and I would take good care of this one. If you have ever thought about selling, now or in the next year or so, I'd love to talk, on your timeline and with no pressure.`, "",
+      `You can reach me at ${reach}. Thank you for reading this.`, "", "Warmly,", "", sign].join("\n");
+  }
+  // Every address this letter goes to; the owner's mailing address leads when the owner gets mail somewhere else.
+  function letterTargets() {
+    const c = letterCtx(), to = letter.to;
+    const at = (x) => ({ lines: [...c.names, x.line1, x.line2].filter(Boolean) });
+    if (!c.mail) return [at(c.prop)];
+    return to === "both" ? [at(c.mail), at(c.prop)] : to === "property" ? [at(c.prop)] : [at(c.mail)];
+  }
+  function cmaHint() {
+    try {
+      const pa = (leadCtx.p && leadCtx.p.parcel) || {};
+      if (!comps.subject || String(comps.subject.id) !== String(pa.id) || comps.subject.county !== pa.county) return "";
+      const st = cma(comps.subject, sortedPicks(comps.subject));
+      return st.value ? `CMA: ${money(round1k(st.value))}` : "";
+    } catch (e) { return ""; }
+  }
+  const opt = (name, val, cur, label) => `<label class="lt-opt"><input type="radio" name="${name}" value="${val}" ${val === cur ? "checked" : ""}> <span>${label}</span></label>`;
+  const field = (id, label, val, extra = "") => `<label>${label}<input id="${id}" value="${esc(val || "")}" ${extra}></label>`;
+  function letterTerms() {
+    const f = letter.f;
+    if (letter.kind === "loi") return `<div class="box open"><h3>Terms</h3><div class="lt-form">
+      <div class="lt-row">${field("ltPrice", "Offer price ($)", f.price, `inputmode="numeric" placeholder="${esc(cmaHint() || "e.g. 650000")}"`)}${field("ltDeposit", "Earnest money ($)", f.deposit, 'inputmode="numeric" placeholder="e.g. 10000"')}</div>
+      <label>Financing<select id="ltFin"><option value="cash" ${f.financing === "cash" ? "selected" : ""}>All cash</option><option value="loan" ${f.financing === "loan" ? "selected" : ""}>Conventional mortgage</option><option value="other" ${f.financing === "other" ? "selected" : ""}>Other</option></select></label>
+      ${f.financing === "loan" ? field("ltFinDays", "Loan approval within (days)", f.finDays, 'inputmode="numeric"') : f.financing === "other" ? field("ltFinOther", "Financing, in your words", f.finOther) : ""}
+      <div class="lt-row">${field("ltInsp", "Inspection (days)", f.insp, 'inputmode="numeric"')}${field("ltClose", "Close within (days)", f.close, 'inputmode="numeric"')}</div>
+      ${field("ltExp", "Terms open for (days)", f.expires, 'inputmode="numeric"')}
+      <label>Other terms (optional)<textarea id="ltOther" rows="3">${esc(f.other || "")}</textarea></label>
+      <p class="lt-note">This is a non-binding draft: it says so in the letter. Blank terms print as blanks, and printing lists them first.</p></div></div>`;
+    return `<div class="box open"><h3>Your words</h3><div class="lt-form">
+      <label>Why this home (optional)<textarea id="ltWhy" rows="4" placeholder="What you love about the house and the block: the porch, the light, the garden, the street.">${esc(f.why || "")}</textarea></label>
+      ${nearLine() ? `<label class="lt-opt"><input type="checkbox" id="ltNear" ${f.near !== false ? "checked" : ""}> <span>Add a line about the block: “${esc(nearLine())}”</span></label>` : ""}
+      <p class="lt-flag" id="ltFlag" role="status"></p>
+      <p class="lt-note">Keep it about the home and the neighborhood. Leave out family status, religion, national origin, age and other protected traits: fair housing rules apply to buyer letters.</p></div></div>`;
+  }
+  function renderLetters() {
+    const c = letterCtx(), s = sender;
+    $("letters").innerHTML = `<div class="comps-in">
+      <div class="comps-top"><div><h2>Write a letter</h2><div class="sm">To ${esc(c.display)} about ${esc(c.prop.line1 || "this property")}. Print it or save it as a PDF: it fits a standard #10 window envelope.</div></div>
+        <div class="comps-act"><button type="button" class="btn primary" id="ltPrint">Print or save as PDF</button><button type="button" class="btn" id="ltCopy">Copy text</button><button type="button" class="btn" id="ltClose">Close</button></div></div>
+      <div class="sm comps-msg" id="ltMsg" aria-live="polite"></div>
+      <div class="lt-grid"><div class="lt-form">
+        <div class="box open"><h3>Letter</h3>${Object.entries(LETTER_KINDS).map(([k, v]) => opt("ltKind", k, letter.kind, v)).join("")}</div>
+        <div class="box open"><h3>Send to</h3>${c.mail ? opt("ltTo", "mail", letter.to, `The owner's mailing address<br><span class="sm">${esc(c.mail.line1)}, ${esc(c.mail.line2)}</span>`)
+          + opt("ltTo", "property", letter.to, `The property<br><span class="sm">${esc(c.prop.line1)}, ${esc(c.prop.line2)}</span>`) + opt("ltTo", "both", letter.to, "Both: one letter to each address")
+          : `<p class="sm">${c.ownerLivesThere ? "The owner lives at the property, so the letter goes there" : "The mailing address on record is the property itself"}: ${esc(c.prop.line1)}, ${esc(c.prop.line2)}.</p>`}</div>
+        <div class="box open"><h3>From you</h3><div class="lt-form">
+          ${field("ltName", "Your name", s.name, 'autocomplete="name"')}${field("ltCompany", "Company (optional)", s.company, 'autocomplete="organization"')}
+          <div class="lt-row">${field("ltPhone", "Phone", s.phone, 'autocomplete="tel" inputmode="tel"')}${field("ltEmail", "Email", s.email, 'autocomplete="email" inputmode="email"')}</div>
+          ${field("ltRet1", "Your street address (return address)", s.ret1, 'autocomplete="address-line1"')}${field("ltRet2", "City, state and ZIP", s.ret2, 'autocomplete="address-level2"')}
+          <p class="lt-note">Kept in this browser only, for your next letter.</p></div></div>
+        <div id="ltTermsBox">${letterTerms()}</div>
+      </div>
+      <div class="lt-prev"><div class="box open"><h3>The letter</h3>
+        <div class="lt-to" id="ltTo"></div>
+        <textarea id="ltBody" aria-label="The letter's text; edit it freely"></textarea>
+        <div class="lt-foot"><span class="lt-note" id="ltEdited"></span><button type="button" class="btn" id="ltReset">Reset to the template</button></div></div></div>
+      </div></div>`;
+    refreshLetter(true);
+  }
+  function refreshLetter(force) {
+    const t = letterTargets();
+    $("ltTo").textContent = t.map((x, k) => (t.length > 1 ? `Letter ${k + 1}:\n` : "") + x.lines.join("\n")).join("\n\n");
+    if (force || !letter.edited) $("ltBody").value = letterBody();
+    $("ltEdited").textContent = letter.edited ? "You edited the text; changes to the form above no longer rewrite it." : "The text follows the form; edit it freely.";
+    paintFlags();
+  }
+  function paintFlags() {
+    const el = $("ltFlag"); if (!el) return;
+    const words = letter.kind === "personal" ? flagWords($("ltBody").value) : [];
+    el.textContent = words.length ? `These words can read as a reference to a protected trait: ${words.join(", ")}. Edit them out before sending.` : "";
+  }
+  function openLetters() {
+    const c = letterCtx();
+    letter = { kind: c.ownerLivesThere && (c.kind === "Individual" || !c.kind) ? "personal" : "loi", to: c.mail ? "mail" : "property", edited: false,
+      f: { financing: "cash", finDays: 21, insp: 10, close: 30, expires: 7, near: true } };
+    renderLetters(); $("letters").hidden = false; document.body.classList.add("comps-on"); const b = $("ltClose"); if (b) b.focus();
+  }
+  function closeLetters() { $("letters").hidden = true; if ($("comps").hidden) document.body.classList.remove("comps-on"); }
+  const SENDER_FIELDS = { ltName: "name", ltCompany: "company", ltPhone: "phone", ltEmail: "email", ltRet1: "ret1", ltRet2: "ret2" };
+  const TERM_FIELDS = { ltPrice: "price", ltDeposit: "deposit", ltFinDays: "finDays", ltFinOther: "finOther", ltInsp: "insp", ltClose: "close", ltExp: "expires", ltOther: "other", ltWhy: "why" };
+  $("letters").addEventListener("input", (e) => {
+    const id = e.target.id;
+    if (id === "ltBody") { letter.edited = true; $("ltEdited").textContent = "You edited the text; changes to the form above no longer rewrite it."; paintFlags(); return; }
+    if (SENDER_FIELDS[id]) { sender[SENDER_FIELDS[id]] = e.target.value.trim(); keepSender(); }
+    else if (TERM_FIELDS[id]) letter.f[TERM_FIELDS[id]] = id === "ltPrice" || id === "ltDeposit" ? e.target.value.replace(/[^0-9.]/g, "") : e.target.value;
+    else return;
+    refreshLetter();
+  });
+  $("letters").addEventListener("change", (e) => {
+    const t = e.target;
+    if (t.name === "ltKind") { letter.kind = t.value; letter.edited = false; $("ltTermsBox").innerHTML = letterTerms(); refreshLetter(true); }
+    else if (t.name === "ltTo") { letter.to = t.value; refreshLetter(); }
+    else if (t.id === "ltFin") { letter.f.financing = t.value; $("ltTermsBox").innerHTML = letterTerms(); refreshLetter(); }
+    else if (t.id === "ltNear") { letter.f.near = t.checked; refreshLetter(); }
+  });
+  $("letters").addEventListener("click", async (e) => {
+    const t = e.target;
+    if (t.closest("#ltClose")) return closeLetters();
+    if (t.closest("#ltReset")) { letter.edited = false; return refreshLetter(true); }
+    if (t.closest("#ltCopy")) {
+      const text = $("ltBody").value; let ok = false;
+      try { await navigator.clipboard.writeText(text); ok = true; } catch (err) { $("ltBody").select(); ok = document.execCommand("copy"); }
+      $("ltMsg").textContent = ok ? "Letter text copied." : "Copying is blocked here; select the text and copy it.";
+      return;
+    }
+    if (t.closest("#ltPrint")) return printLetters();
+  });
+  document.addEventListener("keydown", (e) => { if (e.key === "Escape" && !$("letters").hidden) closeLetters(); });
+  // One sheet per address: return address top left, the owner's block where a #10 window shows it, then the letter.
+  function printLetters() {
+    const body = $("ltBody").value, s = sender, targets = letterTargets();
+    // Before anything prints: blanks still in the text, and (in a personal letter) words that can read as protected traits.
+    const blanks = BLANKS.filter(([re]) => re.test(body)).map(([, what]) => what);
+    if (blanks.length && !confirm(`Still blank: ${blanks.join(", ")}. They will print as blanks. Print anyway?`)) return;
+    const words = letter.kind === "personal" ? flagWords(body) : [];
+    if (words.length && !confirm(`This letter uses words that can read as a reference to a protected trait (${words.join(", ")}). Fair housing rules apply. Print anyway?`)) return;
+    const ret = [s.name, s.company, s.ret1, s.ret2].filter(Boolean);
+    const today = new Date().toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" });
+    const w = window.open("", "_blank");
+    if (!w) { $("ltMsg").textContent = "Allow pop-ups for this page to open the letters."; return; }
+    const sheet = (t) => `<section class="sheet"><div class="ret">${ret.map(esc).join("<br>")}</div><div class="to">${t.lines.map(esc).join("<br>")}</div>
+      <div class="date">${esc(today)}</div><div class="body">${esc(body)}</div></section>`;
+    w.document.write(`<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+      <title>${esc(LETTER_KINDS[letter.kind])} · ${esc(letterCtx().prop.line1)}</title><style>
+      @page { size: letter; margin: 0; }
+      * { box-sizing: border-box; } html, body { margin: 0; background: #e9e5dc; color: #111; }
+      .sheet { position: relative; width: 8.5in; min-height: 11in; margin: 24px auto; padding: 3.15in 1in .9in; background: #fff; box-shadow: 0 6px 24px rgba(0,0,0,.18);
+        font: 11.5pt/1.5 Georgia, "Times New Roman", serif; page-break-after: always; break-after: page; }
+      .ret { position: absolute; top: .55in; left: .875in; font-size: 10pt; line-height: 1.35; }
+      .to { position: absolute; top: 2in; left: .875in; width: 3.9in; font-size: 11.5pt; line-height: 1.3; }
+      .date { position: absolute; top: 2in; right: 1in; }
+      .body { white-space: pre-wrap; }
+      .bar { position: fixed; right: 16px; bottom: 16px; display: flex; gap: 8px; }
+      .bar button { padding: 12px 18px; font: 600 15px/1 system-ui, sans-serif; background: #13202f; color: #fff; border: 0; border-radius: 6px; cursor: pointer; }
+      @media print { html, body { background: #fff; } .sheet { margin: 0; box-shadow: none; } .bar { display: none; } }
+      </style></head><body>${targets.map(sheet).join("")}<div class="bar"><button onclick="print()">Print or save as PDF</button></div></body></html>`);
+    w.document.close();
+    $("ltMsg").textContent = targets.length > 1 ? "Two letters opened: one to each address." : "The letter opened in a new window.";
+  }
+
+  // ── Lists: records you chose to keep together. A list changes only when you add or remove records; a saved search
+  //    runs again each time. Up to 10,000 records per list, and nothing is ever cut off quietly. ──────────────────────
+  let listsCache = [], pickPayload = null;
+  const api = (u, method = "GET", body) => fetch(u, body === undefined ? { method } : { method, headers: { "content-type": "application/json" }, body: JSON.stringify(body) })
+    .then(async (r) => { const j = await r.json().catch(() => ({})); if (!r.ok) { const e = Error(j.error || String(r.status)); e.info = j; throw e; } return j; });
+  const listWhy = (e) => (e.info && e.info.error === "too_many" ? `That's ${int(e.info.matched)} records; a list takes up to ${int(e.info.max)} at a time. Narrow the search, then add again.`
+    : e.info && e.info.error === "list_full" ? `That list has ${int(e.info.count)} records; adding ${int(e.info.adding)} more would pass ${int(e.info.max)}.`
+    : "Could not save: " + e.message);
+  async function loadLists() { listsCache = (await api("/api/lists")).lists || []; return listsCache; }
+  async function renderLists() {
+    const box = $("listList");
+    try { await loadLists(); } catch (e) { box.innerHTML = '<li class="sm" style="display:block">Lists did not load. Try again.</li>'; return; }
+    if (!listsCache.length) { box.innerHTML = '<li class="sm" style="display:block">No lists yet. Name one above, or press “Add these to a list” on any search.</li>'; return; }
+    box.innerHTML = listsCache.map((l) => `<li data-id="${l.id}"><div><b>${esc(l.name)}</b><span class="sm">${int(l.count)} record${l.count === 1 ? "" : "s"} · updated ${esc(day(l.updated_at))}</span></div>
+      <button type="button" class="btn" data-lopen>Open</button><button type="button" class="btn" data-ldl>Download</button><button type="button" class="btn" data-lren>Rename</button><button type="button" class="btn" data-ldel aria-label="Delete ${esc(l.name)}">Delete</button></li>`).join("");
+  }
+  // Opening a list shows its records alone: the filters clear, and the table lists the whole list, wherever the map is.
+  function openList(l) {
+    FIELDS.forEach((id) => { $(id).value = ""; });
+    document.querySelectorAll(".chip").forEach((c) => c.setAttribute("aria-pressed", "false"));
+    document.querySelectorAll("#leads .lead").forEach((b) => b.classList.remove("on"));
+    area = null; draft = null; paintArea(); fillCounties();
+    activeList = { id: l.id, name: l.name };
+    $("listBarName").textContent = `${l.name} · ${int(l.count)} record${l.count === 1 ? "" : "s"}`; $("listBar").hidden = false;
+    $("listsPanel").hidden = true; $("listsBtn").setAttribute("aria-expanded", "false");
+    changed();
+  }
+  $("listBarClose").onclick = () => { activeList = null; $("listBar").hidden = true; changed(); };
+  $("listsBtn").addEventListener("click", () => {
+    const show = $("listsPanel").hidden;
+    $("listsPanel").hidden = !show; $("listsBtn").setAttribute("aria-expanded", String(show));
+    if (show) { $("listMsg").textContent = ""; renderLists(); }
+  });
+  $("listForm").addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const name = $("listName").value.trim(); if (!name) return;
+    try { await api("/api/lists", "POST", { name }); $("listName").value = ""; $("listMsg").textContent = `Created “${name}”. Add records from any search, profile or the comps page.`; renderLists(); }
+    catch (err) { $("listMsg").textContent = listWhy(err); }
+  });
+  $("listList").addEventListener("click", async (e) => {
+    const li = e.target.closest("li[data-id]"); if (!li) return;
+    const l = listsCache.find((x) => String(x.id) === li.dataset.id); if (!l) return;
+    if (e.target.closest("[data-lopen]")) return openList(l);
+    if (e.target.closest("[data-ldl]")) return openExportDialog(new URLSearchParams({ list: String(l.id), sort: $("sort").value }).toString());
+    if (e.target.closest("[data-lren]")) {
+      const name = prompt("Rename the list (its download history keeps the old name)", l.name);
+      if (name && name.trim()) { try { await api(`/api/lists/${l.id}`, "PATCH", { name: name.trim() }); renderLists(); } catch (err) { $("listMsg").textContent = listWhy(err); } }
+      return;
+    }
+    if (e.target.closest("[data-ldel]")) {
+      if (!confirm(`Delete the list “${l.name}”? Its download history stays.`)) return;
+      try { await api(`/api/lists/${l.id}`, "DELETE"); if (activeList && String(activeList.id) === String(l.id)) $("listBarClose").click(); renderLists(); }
+      catch (err) { $("listMsg").textContent = listWhy(err); }
+    }
+  });
+  // Add to a list, from a search, a profile or the comps page: pick a list or name a new one.
+  async function openListPick(what, payload) {
+    pickPayload = payload; $("listPickWhat").textContent = what; $("listPickMsg").textContent = "";
+    try { await loadLists(); } catch (e) { listsCache = []; }
+    $("listPickSel").innerHTML = listsCache.map((l) => `<option value="${l.id}">${esc(l.name)} (${int(l.count)})</option>`).join("") + '<option value="new">New list…</option>';
+    if (!listsCache.length) $("listPickSel").value = "new";
+    $("listPickNewL").hidden = $("listPickSel").value !== "new"; $("listPickNew").value = "";
+    $("listPick").hidden = false; document.body.classList.add("comps-on");
+  }
+  function closeListPick() {
+    $("listPick").hidden = true;
+    if ([...document.querySelectorAll("section.comps")].every((x) => x.hidden)) document.body.classList.remove("comps-on");
+  }
+  $("listPickSel").addEventListener("change", () => { $("listPickNewL").hidden = $("listPickSel").value !== "new"; if (!$("listPickNewL").hidden) $("listPickNew").focus(); });
+  $("listPickClose").onclick = closeListPick;
+  $("listPickGo").onclick = async () => {
+    const b = $("listPickGo"); b.disabled = true; $("listPickMsg").textContent = "Adding…";
+    try {
+      let id = $("listPickSel").value;
+      if (id === "new") {
+        const name = $("listPickNew").value.trim();
+        if (!name) { $("listPickMsg").textContent = "Name the new list first."; b.disabled = false; return; }
+        id = String((await api("/api/lists", "POST", { name })).list.id);
+      }
+      const j = await api(`/api/lists/${id}/items`, "POST", pickPayload), asked = pickPayload.ids ? pickPayload.ids.length : null;
+      $("listPickMsg").textContent = `Added ${int(j.added)} to “${j.list.name}”${asked != null && j.added < asked ? ` (${int(asked - j.added)} already on it)` : ""}. It has ${int(j.count)} record${j.count === 1 ? "" : "s"} now.`;
+    } catch (err) { $("listPickMsg").textContent = listWhy(err); }
+    b.disabled = false;
+  };
+  $("addResults").onclick = () => openListPick(`Every record in this search${synced() && !area && !activeList ? " that the map shows" : ""} (${$("count").textContent}).`, { params: tableParams().toString() });
+  document.addEventListener("keydown", (e) => { if (e.key === "Escape" && !$("listPick").hidden) closeListPick(); });
 
   // ── NYC public record, live from the city (no key) ─────────────────────────────────────────────────────────────
   // ACRIS legals → master → parties gives every recorded document on the lot; ACRIS references tie each satisfaction
@@ -1596,7 +2006,9 @@
         ${li("Assessed land", n("assessland") ? money(n("assessland")) : "")}${li("Assessed total", n("assesstot") ? money(n("assesstot")) : "")}${li("Exempt", n("exempttot") ? money(n("exempttot")) : "")}</ul>
         <div class="src">Source: NYC PLUTO (FEMA flood flags, districts, DOF assessed values).</div></div>`;
       // Getting around: subway, trains, buses, ferries and bike share, closest first.
-      const transit = transportHtml(await closestTransport(lat, lon, "NYC").catch(() => []));
+      const pickT = await closestTransport(lat, lon, "NYC").catch(() => []);
+      if (leadCtx) leadCtx.transit = pickT;   // the personal letter can mention the nearest train
+      const transit = transportHtml(pickT);
       // Business nearby: licensed businesses within a 5-minute walk.
       const close = Number.isFinite(lat) && lat ? biz.map((b) => ({ ...b, d: meters(lat, lon, Number(b.latitude), Number(b.longitude)) })).filter((b) => b.d <= 400).sort((a, b) => a.d - b.d) : [];
       const cats = {}; close.forEach((b) => { cats[b.business_category] = (cats[b.business_category] || 0) + 1; });
@@ -1710,6 +2122,7 @@
     const isBiz = (f) => f.properties.name && BIZ[f.properties.class], far = (pois0 || []).filter(isBiz).length < 3;
     const pois = far ? await safe(tilequery(lat, lon, "poi_label", 1600)) : pois0;
     if (!$("nycResearch")) return;
+    if (leadCtx) leadCtx.transit = trans || [];   // the personal letter can mention the nearest train
     const pp = (pois || []).filter(isBiz);
     const cats = {}; pp.forEach((f) => { const k = BIZ[f.properties.class]; cats[k] = (cats[k] || 0) + 1; });
     const business = `<div class="box rs"><h3>Business nearby</h3>
@@ -1943,8 +2356,10 @@
         <button type="button" class="btn primary" data-lc="talk">Copy talking points</button>
         <button type="button" class="btn" data-lc="card">Copy lead card</button>
         <button type="button" class="btn" data-lc="report">Create report</button>
+        <button type="button" class="btn" data-lc="letter">Write a letter</button>
         <button type="button" class="btn" data-lc="subject">Make subject for comps</button>
         <button type="button" class="btn" data-lc="comp">Add to comps</button>
+        <button type="button" class="btn" data-lc="list">Add to list</button>
         <a class="btn" href="${storyHref}" target="_blank" rel="noopener">${esc(storyLabel)}</a>
       </div>
       <div class="sm" id="lcMsg" aria-live="polite"></div>
@@ -1963,6 +2378,8 @@
     const b = e.target.closest("[data-lc]"); if (!b || !leadCtx) return;
     if (b.dataset.lc === "more") { const c = b.closest(".lc"), on = !c.classList.contains("open"); c.classList.toggle("open", on); b.setAttribute("aria-expanded", String(on)); b.textContent = on ? "Hide the facts and contacts" : "Show the facts and contacts"; return; }
     if (b.dataset.lc === "report") { openReport(); return; }
+    if (b.dataset.lc === "letter") { openLetters(); return; }
+    if (b.dataset.lc === "list") { const pa = (leadCtx.p && leadCtx.p.parcel) || {}; openListPick(`This property: ${(((leadCtx.det || {}).propertyInfo || {}).address || {}).address || pa.id}.`, { ids: [pa.id + "|" + pa.county] }); return; }
     if (b.dataset.lc === "subject" || b.dataset.lc === "comp") {
       const r = rowFromCtx(leadCtx);
       if (b.dataset.lc === "subject") makeSubject(r); else if (!isPicked(r)) togglePick(r);
@@ -2066,6 +2483,7 @@
       <div class="comps-top"><div><h2>Comps &amp; CMA</h2><div class="sm">Pick a subject and the sales to compare it with. The CMA uses each comp's recorded sale price per square foot.</div></div>
         <div class="comps-act"><button type="button" class="btn" id="compsSuggest" ${s ? "" : "disabled"}>Suggest comps</button>
           <button type="button" class="btn" id="compsReport" ${s && list.length ? "" : "disabled"}>Create CMA report</button>
+          <button type="button" class="btn" id="compsSave" ${s || list.length ? "" : "disabled"}>Save as a list</button>
           <button type="button" class="btn" id="compsClear">Clear</button><button type="button" class="btn primary" id="compsClose">Close</button></div></div>
       <div class="sm comps-msg" aria-live="polite">${esc(msg || "")}</div>
       ${s ? subjectCard(s, st) : `<div class="box open"><h3>Subject</h3><p class="sm">No subject yet. Press <b>Make subject</b> on a selected property below, or in a property's profile.</p></div>`}
@@ -2117,6 +2535,7 @@
     if (t.closest("#compsClear")) { comps.subject = null; comps.picks.clear(); keepComps(); return renderComps(); }
     if (t.closest("#compsSuggest")) return suggestComps();
     if (t.closest("#compsReport")) return compsReport();
+    if (t.closest("#compsSave")) { const all = [comps.subject, ...comps.picks.values()].filter(Boolean); return openListPick(`The comps selection: ${all.length} propert${all.length === 1 ? "y" : "ies"}.`, { ids: all.map(ck) }); }
     const subj = t.closest("[data-subj]"); if (subj) { const r = comps.picks.get(subj.dataset.subj); if (r) makeSubject(r); return renderComps(); }
     const drop = t.closest("[data-drop]"); if (drop) { comps.picks.delete(drop.dataset.drop); keepComps(); return renderComps(); }
   });
