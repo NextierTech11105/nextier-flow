@@ -491,7 +491,7 @@
       <button type="button" class="btn" id="savedBtn" aria-expanded="false" aria-controls="savedPanel"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M6 3h12v18l-6-4-6 4z"/></svg><span>Saved searches</span></button>
       <button type="button" class="btn" id="compsBtn" aria-controls="comps"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg><span>Comps</span><b class="cnt" id="compsCount"></b></button>
       <a class="btn" id="download" href="/api/records.csv"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 4v11m0 0-4-4m4 4 4-4M4 19h16"/></svg>Download</a>
-      <button type="button" class="btn" id="toggleFilters" aria-expanded="true" aria-controls="filters"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M3 5h18l-7 8v6l-4 2v-8L3 5z"/></svg><span>Hide Filters</span></button>
+      <button type="button" class="btn" id="toggleFilters" aria-expanded="false" aria-controls="filters"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M3 5h18l-7 8v6l-4 2v-8L3 5z"/></svg><span>Filters</span></button>
       <button type="button" class="btn" id="theme" aria-label="Switch to dark mode"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg><span>Dark</span></button>
     </div>
   </header>
@@ -520,10 +520,10 @@
     <span class="leads-note" id="leadNote" hidden></span>
   </nav>
 
-  <section class="filters" id="filters" aria-label="Filters">
+  <section class="filters" id="filters" aria-label="Filters" hidden>
     <div class="fcard">
-      <button type="button" aria-expanded="true">Location<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button>
-      <div class="fbody">
+      <button type="button" aria-expanded="false">Location<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button>
+      <div class="fbody" hidden>
         <div class="pair">
           <label class="f">Region<select id="region"><option value="">Every region</option></select></label>
           <label class="f">County<select id="county"><option value="">Every county</option></select></label>
@@ -535,8 +535,8 @@
       </div>
     </div>
     <div class="fcard">
-      <button type="button" aria-expanded="true">Property<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button>
-      <div class="fbody">
+      <button type="button" aria-expanded="false">Property<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button>
+      <div class="fbody" hidden>
         <label class="f">Type<select id="use">
           <option value="">Every residential type</option>
           <option value="one_family">Single family</option>
@@ -553,8 +553,8 @@
       </div>
     </div>
     <div class="fcard">
-      <button type="button" aria-expanded="true">Owner<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button>
-      <div class="fbody">
+      <button type="button" aria-expanded="false">Owner<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button>
+      <div class="fbody" hidden>
         <label class="f">Owner type<select id="owner">
           <option value="">Any owner</option>
           <option value="individual">Person</option>
@@ -572,8 +572,8 @@
       </div>
     </div>
     <div class="fcard">
-      <button type="button" aria-expanded="true">Value<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button>
-      <div class="fbody">
+      <button type="button" aria-expanded="false">Value<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button>
+      <div class="fbody" hidden>
         <div class="pair">
           <label class="f">Min $<input id="min" type="number" min="0" step="10000"></label>
           <label class="f">Max $<input id="max" type="number" min="0" step="10000"></label>
@@ -582,8 +582,8 @@
       </div>
     </div>
     <div class="fcard">
-      <button type="button" aria-expanded="true">Property Details<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button>
-      <div class="fbody">
+      <button type="button" aria-expanded="false">Property Details<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button>
+      <div class="fbody" hidden>
         <div class="pair">
           <label class="f">Sq ft from<input id="sqft_min" type="number" min="0" step="100"></label>
           <label class="f">Sq ft to<input id="sqft_max" type="number" min="0" step="100"></label>
@@ -592,8 +592,8 @@
       </div>
     </div>
     <div class="fcard">
-      <button type="button" aria-expanded="true">Sale &amp; Mailing<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button>
-      <div class="fbody">
+      <button type="button" aria-expanded="false">Sale &amp; Mailing<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button>
+      <div class="fbody" hidden>
         <div class="chips">
           <button type="button" class="chip" aria-pressed="false" id="sold">Sold in the last 12 months</button>
         </div>
@@ -747,7 +747,7 @@
     if (list.some((c) => c.county === keep)) $("county").value = keep;
   }
   function changed() {
-    page = 1; refreshDownload();
+    page = 1; refreshDownload(); paintFilters();
     if (showsTable()) loadTable();
     if (showsMap()) loadMap();
   }
@@ -756,13 +756,38 @@
     const open = b.getAttribute("aria-expanded") !== "true";
     b.setAttribute("aria-expanded", String(open)); b.nextElementSibling.hidden = !open;
   }));
+  // A clean start every visit; opening filters reveals only the cards with active values.
+  function activeCards() {
+    return [...document.querySelectorAll("#filters .fcard")].filter((card) =>
+      [...card.querySelectorAll("input,select")].some((el) => el.value.trim() !== "") ||
+      !!card.querySelector('.chip[aria-pressed="true"]'));
+  }
+  function paintFilters() {
+    const count = params();
+    count.delete("sort"); count.delete("poly");
+    const n = [...count].reduce((sum, [k, v]) => sum + (k === "flags" ? v.split(",").filter(Boolean).length : 1), 0);
+    $("toggleFilters").querySelector("span").textContent = n ? "Filters · " + n : "Filters";
+  }
+  function openFilters() {
+    $("filters").hidden = false;
+    $("toggleFilters").setAttribute("aria-expanded", "true");
+    const active = new Set(activeCards());
+    document.querySelectorAll("#filters .fcard").forEach((card) => {
+      const shown = active.has(card), b = card.querySelector(":scope > button");
+      b.setAttribute("aria-expanded", String(shown));
+      b.nextElementSibling.hidden = !shown;
+    });
+    paintFilters();
+    if (map) requestAnimationFrame(() => map.resize());
+  }
   $("toggleFilters").addEventListener("click", () => {
-    const show = $("filters").hidden;
-    $("filters").hidden = !show;
-    $("toggleFilters").setAttribute("aria-expanded", String(show));
-    $("toggleFilters").querySelector("span").textContent = show ? "Hide Filters" : "Show Filters";
+    if ($("filters").hidden) return openFilters();
+    $("filters").hidden = true;
+    $("toggleFilters").setAttribute("aria-expanded", "false");
+    paintFilters();
     if (map) requestAnimationFrame(() => map.resize());
   });
+  paintFilters();
   $("region").addEventListener("change", () => {
     fillCounties();
     const c = CENTER[$("region").value];
@@ -802,7 +827,7 @@
     document.querySelectorAll(".chip").forEach((c) => c.setAttribute("aria-pressed", "false"));
     area = null; draft = null; paintArea();   // a lead list starts clean; draw an area after picking one to narrow it
     fillCounties();
-    LEADS[b.dataset.lead]();
+    LEADS[b.dataset.lead](); openFilters();
     document.querySelectorAll("#leads .lead").forEach((x) => x.classList.toggle("on", x === b));
     changed();
   });
@@ -1088,7 +1113,7 @@
       const xs = area.map((a) => a[0]), ys = area.map((a) => a[1]);
       map.fitBounds([[Math.min(...xs), Math.min(...ys)], [Math.max(...xs), Math.max(...ys)]], { padding: 50, duration: 0 });
     }
-    changed();
+    openFilters(); changed();
   }
   $("savedBtn").addEventListener("click", () => {
     const show = $("savedPanel").hidden;
