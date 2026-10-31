@@ -18,6 +18,16 @@
   const has = (v) => v !== null && v !== undefined && v !== "";
   const list = (v) => String(v || "").split(",").map((s) => s.trim()).filter(Boolean);
   const YEAR_MS = 365 * 24 * 3600 * 1000;
+  // A drawn area, "lon,lat;lon,lat;…", and the same ray-casting test the server's silver.in_poly() runs.
+  const parsePoly = (v) => { const p = String(v || "").split(";").map((s) => s.split(",").map(Number)).filter((a) => a.length === 2 && a.every(Number.isFinite)); return p.length >= 3 && p.length <= 200 ? p : null; };
+  const inPoly = (x, y, p) => {
+    let inside = false;
+    for (let i = 0, j = p.length - 1; i < p.length; j = i++) {
+      const [xi, yi] = p[i], [xj, yj] = p[j];
+      if ((yi > y) !== (yj > y) && x < ((xj - xi) * (y - yi)) / (yj - yi) + xi) inside = !inside;
+    }
+    return inside;
+  };
   const RESIDENTIAL = ["one_family", "two_family", "three_family", "multifamily_small", "multifamily", "condo", "coop", "mobile_home",
     "residential_other", "vacant_res"];
 
@@ -25,6 +35,8 @@
     const tests = [(r) => RESIDENTIAL.includes(r.use)];
     const b = String(q.get("bbox") || "").split(",").map(Number);
     if (b.length === 4 && b.every(Number.isFinite)) tests.push((r) => has(r.lat) && r.lat >= b[1] && r.lat <= b[3] && r.lon >= b[0] && r.lon <= b[2]);
+    const poly = parsePoly(q.get("poly"));
+    if (poly) tests.push((r) => has(r.lat) && inPoly(Number(r.lon), Number(r.lat), poly));
     if (q.get("region")) tests.push((r) => r.region === q.get("region"));
     if (q.get("county")) tests.push((r) => r.county === q.get("county"));
     if (q.get("town")) { const t = q.get("town").trim().toUpperCase(); tests.push((r) => String(r.town || "").toUpperCase() === t); }
@@ -86,9 +98,13 @@
 
   window.fetch = async (input, init) => {
     const url = new URL(typeof input === "string" ? input : input.url, location.href);
-    const route = /\/api\/(records|map|lookup|counties)$/.exec(url.pathname);
+    const route = /\/api\/(records|map|lookup|counties|ids)$/.exec(url.pathname);
     if (!route) return realFetch(input, init);
     const d = await ready, q = url.searchParams;
+    if (route[1] === "ids") {
+      const all = d.rows.filter(matcher(q));
+      return reply({ total: Math.min(all.length, 10000), capped: all.length > 10000, ids: all.slice(0, 10000).map((r) => r.id + "|" + r.county) });
+    }
     if (route[1] === "records") {
       const all = select(d.rows, q);
       const size = Math.min(Math.max(num(q.get("size")) || 50, 1), 200), page = Math.min(Math.max(num(q.get("page")) || 1, 1), 200);
@@ -288,6 +304,22 @@
   .lead.on { background: var(--blue); border-color: var(--blue); color: var(--blue-ink); }
   .lead.soon { border-style: dashed; color: var(--soft); }
   .leads-note { flex-basis: 100%; font-size: 15px; color: var(--soft); }
+  /* Draw an area on the map; saved searches under the toolbar. */
+  .btn[hidden] { display: none !important; }
+  .drawbar { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+  .btn.primary { background: var(--blue); border-color: var(--blue); color: var(--blue-ink); }
+  .btn:disabled { opacity: .5; cursor: not-allowed; }
+  .savedpanel { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 16px; margin: 0 0 14px; box-shadow: var(--shadow); }
+  .sp-head h2 { font: 800 20px var(--display); margin: 0 0 2px; }
+  .sp-save { display: flex; gap: 8px; margin-top: 12px; }
+  .sp-save input { flex: 1; min-width: 0; border: 1px solid var(--line); border-radius: 8px; padding: 10px 12px; font: 500 15px var(--body); background: var(--card-2); color: var(--text); }
+  #saveMsg { margin-top: 8px; min-height: 1em; }
+  .sp-list { list-style: none; padding: 0; margin: 10px 0 0; display: grid; gap: 8px; }
+  .sp-list li { display: grid; grid-template-columns: 1fr auto auto auto; gap: 10px; align-items: center; border: 1px solid var(--line); border-radius: 10px; padding: 10px 12px; }
+  .sp-list li .sm { display: block; }
+  .newc { font-weight: 800; color: var(--soft); white-space: nowrap; }
+  .newc.has { color: var(--green); }
+  @media (max-width: 640px) { .sp-list li { grid-template-columns: 1fr auto; } .sp-save { flex-direction: column; } }
   .dtop { display: flex; justify-content: space-between; gap: 8px; }
   [hidden] { display: none !important; }
 </style>
@@ -308,6 +340,7 @@
         <button type="button" data-view="table" aria-pressed="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M3 5h18M3 12h18M3 19h18"/></svg>Table</button>
         <button type="button" data-view="map" aria-pressed="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M9 4 3 6v14l6-2 6 2 6-2V4l-6 2-6-2zM9 4v14M15 6v14"/></svg>Map</button>
       </div>
+      <button type="button" class="btn" id="savedBtn" aria-expanded="false" aria-controls="savedPanel"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M6 3h12v18l-6-4-6 4z"/></svg><span>Saved searches</span></button>
       <a class="btn" id="download" href="/api/records.csv"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 4v11m0 0-4-4m4 4 4-4M4 19h16"/></svg>Download</a>
       <button type="button" class="btn" id="toggleFilters" aria-expanded="true" aria-controls="filters"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M3 5h18l-7 8v6l-4 2v-8L3 5z"/></svg><span>Hide Filters</span></button>
       <button type="button" class="btn" id="theme" aria-label="Switch to dark mode"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg><span>Dark</span></button>
@@ -318,6 +351,13 @@
     <input id="q" type="search" placeholder="Find one property: address, Florida folio, NYC BBL or NY parcel id" aria-label="Find a property">
     <button class="btn" type="submit">Find</button>
   </form>
+
+  <section class="savedpanel" id="savedPanel" hidden aria-label="Saved searches">
+    <div class="sp-head"><h2>Saved searches</h2><span class="sm">Kept in this browser. Open one to see how many new matches came in since you saved it.</span></div>
+    <form class="sp-save" id="saveForm"><input id="saveName" maxlength="60" placeholder="Name this search, e.g. Absentee owners in Park Slope" aria-label="Search name"><button class="btn primary" type="submit">Save this search</button></form>
+    <div class="sm" id="saveMsg" aria-live="polite"></div>
+    <ul class="sp-list" id="savedList"></ul>
+  </section>
 
   <nav class="leads" id="leads" aria-label="Lead lists">
     <span class="leads-l">Lead lists</span>
@@ -445,6 +485,11 @@
     <section class="panel" id="mapView">
       <div class="bar">
         <div><h2>Map</h2><div id="mapCount" aria-live="polite">Loading the map…</div></div>
+        <div class="drawbar" id="drawbar">
+          <button type="button" class="btn" id="drawArea"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M4 18 9 5l6 9 5-6v11z"/></svg>Draw an area</button>
+          <button type="button" class="btn primary" id="finishArea" hidden>Finish area</button>
+          <button type="button" class="btn" id="clearArea" hidden>Clear area</button>
+        </div>
         <div class="legend" aria-label="Map colors">
           <span><i style="background:var(--green)"></i>Owner lives there</span>
           <span><i style="background:var(--amber)"></i>Absentee</span>
@@ -513,7 +558,7 @@
   paintThemeButton();
 
   // ── view: table + map side by side and synced (the table lists what the map shows), or one at a time ──────────
-  let view = "split", map = null, mapReady = false;
+  let view = "split", map = null, mapReady = false, area = null, draft = null;
   const showsTable = () => view !== "map", showsMap = () => view !== "table";
   const synced = () => view === "split" && mapReady;
   function bboxOf() { const b = map.getBounds(); return [b.getWest(), b.getSouth(), b.getEast(), b.getNorth()].map((x) => x.toFixed(6)).join(","); }
@@ -526,10 +571,12 @@
     const f = [...document.querySelectorAll("[data-flags] .chip[aria-pressed=true]")].map((b) => b.dataset.flag);
     if (f.length) p.set("flags", f.join(","));
     if ($("sold").getAttribute("aria-pressed") === "true") p.set("sold", "12m");
+    if (area) p.set("poly", area.map(([x, y]) => x.toFixed(6) + "," + y.toFixed(6)).join(";"));
     p.set("sort", $("sort").value);
     return p;
   }
-  function tableParams() { const p = params(); if (synced()) p.set("bbox", bboxOf()); return p; }
+  // With a drawn area the table lists everything inside it, wherever the map is; without one it lists what the map shows.
+  function tableParams() { const p = params(); if (synced() && !area) p.set("bbox", bboxOf()); return p; }
   const refreshDownload = () => { $("download").href = "/api/records.csv?" + tableParams(); };
   let counties = [], page = 1, seq = 0, typing = null;
   function fillCounties() {
@@ -572,6 +619,7 @@
     FIELDS.forEach((id) => { $(id).value = ""; });
     document.querySelectorAll(".chip").forEach((b) => b.setAttribute("aria-pressed", "false"));
     document.querySelectorAll("#leads .lead").forEach((b) => b.classList.remove("on"));
+    area = null; draft = null; if (map) { map.getCanvas().style.cursor = ""; map.doubleClickZoom.enable(); } paintArea();
     fillCounties(); changed();
   });
 
@@ -591,6 +639,7 @@
     note.hidden = true;
     FIELDS.forEach((id) => { $(id).value = ""; });
     document.querySelectorAll(".chip").forEach((c) => c.setAttribute("aria-pressed", "false"));
+    area = null; draft = null; paintArea();   // a lead list starts clean; draw an area after picking one to narrow it
     fillCounties();
     LEADS[b.dataset.lead]();
     document.querySelectorAll("#leads .lead").forEach((x) => x.classList.toggle("on", x === b));
@@ -664,7 +713,15 @@
     map.addLayer({ id: "sel", type: "circle", source: "sel", paint: {
       "circle-radius": ["interpolate", ["linear"], ["zoom"], 10, 9, 19, 16], "circle-color": "rgba(0,0,0,0)",
       "circle-stroke-color": c("--red"), "circle-stroke-width": 3.5 } });
-    drawMap(); mark(selected);
+    // The drawn area (blue, dashed) under the parcels, and the shape being drawn (red points and line).
+    map.addSource("area", { type: "geojson", data: { type: "FeatureCollection", features: [] } });
+    map.addSource("draft", { type: "geojson", data: { type: "FeatureCollection", features: [] } });
+    map.addLayer({ id: "area-fill", type: "fill", source: "area", paint: { "fill-color": c("--blue"), "fill-opacity": 0.08 } }, "parcels");
+    map.addLayer({ id: "area-line", type: "line", source: "area", paint: { "line-color": c("--blue"), "line-width": 2.5, "line-dasharray": [2, 1.5] } });
+    map.addLayer({ id: "draft-line", type: "line", source: "draft", filter: ["==", ["geometry-type"], "LineString"], paint: { "line-color": c("--red"), "line-width": 2.5 } });
+    map.addLayer({ id: "draft-pts", type: "circle", source: "draft", filter: ["==", ["geometry-type"], "Point"],
+      paint: { "circle-radius": 5.5, "circle-color": c("--red"), "circle-stroke-color": "#ffffff", "circle-stroke-width": 1.5 } });
+    drawMap(); mark(selected); paintArea();
   }
   function drawMap() {
     const src = map && map.getSource("parcels");
@@ -703,7 +760,10 @@
       clearTimeout(mtimer);
       mtimer = setTimeout(() => { loadMap(); if (synced()) { page = 1; loadTable(); refreshDownload(); } }, 250);
     });
+    map.on("click", (e) => { if (!draft) return; draft.push([e.lngLat.lng, e.lngLat.lat]); paintArea(); });
+    map.on("dblclick", (e) => { if (draft) { e.preventDefault(); finishDraw(); } });
     map.on("click", "parcels", (e) => {
+      if (draft) return;
       const f = e.features[0], id = f.properties.id;
       selected = { id, lat: f.geometry.coordinates[1], lon: f.geometry.coordinates[0] }; mark(selected);
       document.querySelectorAll("#rows tr.hl").forEach((tr) => tr.classList.remove("hl"));
@@ -723,6 +783,111 @@
     refreshDownload();
   }
   document.querySelectorAll(".seg button").forEach((b) => b.addEventListener("click", () => setView(b.dataset.view)));
+
+  // ── draw an area: click points on the map, finish, and the list, map and download keep only what's inside ──────
+  function paintArea() {
+    $("drawArea").hidden = !!draft || !!area; $("finishArea").hidden = !draft; $("clearArea").hidden = !draft && !area;
+    $("finishArea").disabled = !draft || draft.length < 3;
+    if (!map || !map.getSource("area")) return;
+    map.getSource("area").setData({ type: "FeatureCollection", features: area ? [{ type: "Feature", properties: {},
+      geometry: { type: "Polygon", coordinates: [[...area, area[0]]] } }] : [] });
+    const d = draft || [];
+    map.getSource("draft").setData({ type: "FeatureCollection", features: [
+      ...(d.length > 1 ? [{ type: "Feature", properties: {}, geometry: { type: "LineString", coordinates: d } }] : []),
+      ...d.map((c) => ({ type: "Feature", properties: {}, geometry: { type: "Point", coordinates: c } }))] });
+  }
+  function startDraw() {
+    if (!map || !mapReady) return;
+    draft = []; area = null; map.doubleClickZoom.disable(); map.getCanvas().style.cursor = "crosshair";
+    $("mapCount").textContent = "Click the map to place each corner. Press Finish area (or double-click) when the shape is done.";
+    paintArea();
+  }
+  function finishDraw() {
+    if (!draft || draft.length < 3) return;
+    area = draft; draft = null; map.getCanvas().style.cursor = ""; setTimeout(() => map.doubleClickZoom.enable(), 300);
+    paintArea(); changed();
+  }
+  function clearArea() {
+    area = null; draft = null;
+    if (map) { map.getCanvas().style.cursor = ""; map.doubleClickZoom.enable(); }
+    paintArea(); changed();
+  }
+  $("drawArea").onclick = startDraw; $("finishArea").onclick = finishDraw; $("clearArea").onclick = clearArea;
+
+  // ── saved searches: kept in this browser; reopening one shows how many new matches came in since it was saved ──
+  const SAVED_KEY = "pv-saved";
+  const savedList = () => { try { return JSON.parse(store.get(SAVED_KEY) || "[]"); } catch (e) { return []; } };
+  const keepSaved = (l) => store.set(SAVED_KEY, JSON.stringify(l.slice(0, 20)));
+  const idsFor = async (qs) => { const r = await fetch("/api/ids?" + qs); const j = await r.json(); if (!r.ok) throw new Error(j.error || r.status); return j; };
+  function describeSearch() {
+    const p = params(), bits = [];
+    const lead = document.querySelector("#leads .lead.on"); if (lead) bits.push(lead.textContent.trim());
+    if (p.get("county")) bits.push(p.get("county")); else if (p.get("region")) bits.push(REGION[p.get("region")] || p.get("region"));
+    if (p.get("town")) bits.push(title(p.get("town"))); if (p.get("zip")) bits.push(p.get("zip")); if (area) bits.push("drawn area");
+    return bits.join(" · ") || "Every residential property";
+  }
+  async function saveSearch() {
+    const name = $("saveName").value.trim() || describeSearch(), qs = params().toString();
+    $("saveMsg").textContent = "Saving…";
+    try {
+      const j = await idsFor(qs);
+      const l = savedList().filter((s) => s.name !== name);
+      l.unshift({ name, qs, at: new Date().toISOString(), total: j.total, ids: j.ids });
+      keepSaved(l); $("saveName").value = "";
+      $("saveMsg").textContent = `Saved “${name}”: ${int(j.total)}${j.capped ? "+" : ""} matches.`;
+      renderSaved();
+    } catch (e) { $("saveMsg").textContent = "Could not save just now. Try again."; }
+  }
+  function renderSaved() {
+    const l = savedList(), box = $("savedList");
+    if (!l.length) { box.innerHTML = '<li class="sm" style="display:block">No saved searches yet. Pick a lead list, set filters or draw an area, then save it here.</li>'; return; }
+    box.innerHTML = l.map((s, i) => `<li data-i="${i}"><div><b>${esc(s.name)}</b><span class="sm">Saved ${esc(new Date(s.at).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" }))} · ${int(s.total)} matches then</span></div>
+      <span class="newc" data-new>Checking…</span><button type="button" class="btn" data-open>Open</button><button type="button" class="btn" data-del aria-label="Delete ${esc(s.name)}">Delete</button></li>`).join("");
+    l.forEach(async (s, i) => {
+      const el = box.querySelector(`li[data-i="${i}"] [data-new]`);
+      try {
+        const j = await idsFor(s.qs), had = new Set(s.ids || []), fresh = j.ids.filter((k) => !had.has(k)).length;
+        if (el) { el.textContent = fresh ? `${int(fresh)} new since saved` : "No new matches"; el.classList.toggle("has", fresh > 0); }
+      } catch (e) { if (el) el.textContent = "—"; }
+    });
+  }
+  function applySearch(qs) {
+    const p = new URLSearchParams(qs);
+    $("region").value = p.get("region") || ""; fillCounties();
+    FIELDS.forEach((id) => { if (id !== "region") $(id).value = p.get(id) || ""; });
+    const flags = (p.get("flags") || "").split(",");
+    document.querySelectorAll("[data-flags] .chip").forEach((b) => b.setAttribute("aria-pressed", String(flags.includes(b.dataset.flag))));
+    $("sold").setAttribute("aria-pressed", String(p.get("sold") === "12m"));
+    if (p.get("sort")) $("sort").value = p.get("sort");
+    document.querySelectorAll("#leads .lead").forEach((b) => b.classList.remove("on"));
+    const poly = String(p.get("poly") || "").split(";").map((s) => s.split(",").map(Number)).filter((a) => a.length === 2 && a.every(Number.isFinite));
+    area = poly.length >= 3 ? poly : null; draft = null; paintArea();
+    if (area && map && mapReady) {
+      const xs = area.map((a) => a[0]), ys = area.map((a) => a[1]);
+      map.fitBounds([[Math.min(...xs), Math.min(...ys)], [Math.max(...xs), Math.max(...ys)]], { padding: 50, duration: 0 });
+    }
+    changed();
+  }
+  $("savedBtn").addEventListener("click", () => {
+    const show = $("savedPanel").hidden;
+    $("savedPanel").hidden = !show; $("savedBtn").setAttribute("aria-expanded", String(show));
+    if (show) { $("saveMsg").textContent = ""; renderSaved(); }
+  });
+  $("saveForm").addEventListener("submit", (e) => { e.preventDefault(); saveSearch(); });
+  $("savedList").addEventListener("click", (e) => {
+    const li = e.target.closest("li[data-i]"); if (!li) return;
+    const l = savedList(), i = Number(li.dataset.i), s = l[i]; if (!s) return;
+    if (e.target.closest("[data-del]")) { l.splice(i, 1); keepSaved(l); renderSaved(); return; }
+    if (e.target.closest("[data-open]")) {
+      applySearch(s.qs);
+      // Opening a saved search counts as seeing its new matches: the saved list catches up to today's.
+      idsFor(s.qs).then((j) => {
+        const fresh = j.ids.filter((k) => !new Set(s.ids || []).has(k)).length;
+        $("saveMsg").textContent = `Opened “${s.name}”: ${int(j.total)} matches${fresh ? `, ${int(fresh)} new since you saved it` : ""}.`;
+        s.ids = j.ids; s.total = j.total; keepSaved(l);
+      }).catch(() => {});
+    }
+  });
 
   // ── NYC public record, live from the city (no key) ─────────────────────────────────────────────────────────────
   // ACRIS legals → master → parties gives every recorded document on the lot; ACRIS references tie each satisfaction
